@@ -1,0 +1,69 @@
+#header {
+    position: fixed;
+    top:0;
+    left:0;
+    height:80px;
+    width:100%;
+    padding:0;
+    background: rgb(54,57,63);
+}
+
+#content {
+    position: absolute;
+    top:75px;
+    bottom:70px;
+    left:0;
+    width:100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+#footer {
+    position: absolute;
+    bottom:0;
+    left:0;
+    height: 70px;
+    width:100%;
+    padding:0;
+    background: aqua;
+    text-align: center;
+}
+
+body {
+    background-color: rgb(245, 189, 189);
+}
+
+a {
+    text-decoration: none;
+}
+
+form {
+    padding-top: 20px;
+    padding-left: 30px;
+}
+
+.meta {
+    width: 500px;
+}
+
+textarea {
+    width: 550px;
+    height: 300px;
+}
+
+#logoBanner {
+    height: 70px;
+    width: 70px;
+    vertical-align: middle;
+}
+
+#siteTitle {
+    color: lavender;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    margin-top: 5px;
+    padding-left: 10px;
+}
+
+.madeBy {
+    font-family: "Comic Sans MS", Verdana, sans-serif;
+}
