@@ -7,6 +7,16 @@ const app = Express();
 
 const upload = Multer({ dest: Config.uploadDestination });
 
+if (Config.port == NaN) {
+    // Port not provided
+    console.log('Please provide a valid port for app to listen to in config.json. Terminating application...');
+    process.exit(1);
+} else if (Config.uploadDestination == "") {
+    // Upload destination not provided
+    console.log('Please provide a file path where all uploaded files will be stored in config.json. Terminating application...');
+    process.exit(1);
+}
+
 app.use(Express.static('public'));
 
 app.get('/', (request,response) => {
