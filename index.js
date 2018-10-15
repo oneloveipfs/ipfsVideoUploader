@@ -1,3 +1,4 @@
+const SteemConnect = require('steemconnect');
 const Multer = require('multer');
 const Shell = require('shelljs');
 const fs = require('fs');

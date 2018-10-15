@@ -9,6 +9,7 @@
     "express": "^4.16.4",
     "fs": "0.0.1-security",
     "multer": "^1.4.1",
-    "shelljs": "^0.8.2"
+    "shelljs": "^0.8.2",
+    "steemconnect": "^2.0.1"
   }
 }
