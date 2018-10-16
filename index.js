@@ -21,6 +21,20 @@ if (Config.port == NaN) {
 app.use(Express.static('public'));
 
 app.get('/', (request,response) => {
+    fs.readFile('./welcome.html',function(error, data) {
+        if (error != null) {
+            response.writeHead(404);
+            response.write(error);
+            response.end();
+        } else {
+            response.writeHead(200, {'Content-Type': 'text/html'});
+            response.write(data);
+            response.end();
+        }
+    });
+});
+
+app.get('/upload', (request,response) => {
     fs.readFile('./uploader.html',function(error, data) {
         if (error != null) {
             response.writeHead(404);

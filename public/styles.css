@@ -1,5 +1,5 @@
 #header {
-    position: fixed;
+    position: absolute;
     top:0;
     left:0;
     height:80px;
@@ -64,6 +64,84 @@ textarea {
     padding-left: 10px;
 }
 
+#authButton {
+    position: absolute;
+    top: 0.25vw;
+    right: 0.25vw;
+}
+
 .madeBy {
     font-family: "Comic Sans MS", Verdana, sans-serif;
+}
+
+/* Welcome page only */
+#head {
+    text-align: center;
+    color: rgb(50, 50, 50);
+    height: auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#head h1 {
+    font-size: 75px;
+}
+
+#head h3 {
+    font-size: 30px;
+}
+
+/* Signup/Login buttons */
+.authButton {
+	background-color:#ffffff;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+	border:1px solid #dcdcdc;
+	display:inline-block;
+	cursor:pointer;
+	color:#666666;
+	font-family:Verdana;
+	font-size:20px;
+	padding:15px 40px;
+    text-decoration:none;
+    margin: 5px;
+}
+.authButton:hover {
+	background-color:#f6f6f6;
+}
+.authButton:active {
+	position:relative;
+	top:1px;
+}
+#buttons {
+    margin-left: auto;
+    margin-right: auto;
+    padding-bottom: 20px;
+    width: 60vw;
+}
+
+#intro1 {
+    background: blueviolet;
+    text-align: left;
+    font-family: Geneva, Verdana, sans-serif;
+    font-size: 65px;
+    padding-left: 6vw;;
+    padding-right: 30vw;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    color: rgb(230, 250, 255);
+}
+
+#table1 {
+    margin-left: auto;
+    margin-right: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    width: 85vw;
+}
+
+td {
+    text-align: center;
+    font-family: Geneva, Verdana, sans-serif;
+    font-size: 35px;
 }
