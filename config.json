@@ -1,4 +1,7 @@
 {
     "port": 8082,
-    "uploadDestination": "/Users/techcoderx/testUploaded/"
+    "uploadDestination": "/Users/techcoderx/testUploaded/",
+    "SteemConnectApp": "",
+    "callbackURL": "http://localhost:8082/upload",
+    "clientSecret": ""
 }

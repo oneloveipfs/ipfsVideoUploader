@@ -8,6 +8,10 @@ const app = Express();
 
 const upload = Multer({ dest: Config.uploadDestination });
 
+// Steemconnect api
+var sc2api;
+
+// Check for invalid config
 if (Config.port == NaN) {
     // Port not provided
     console.log('Please provide a valid port for app to listen to in config.json. Terminating application...');
@@ -35,17 +39,28 @@ app.get('/', (request,response) => {
 });
 
 app.get('/upload', (request,response) => {
-    fs.readFile('./uploader.html',function(error, data) {
-        if (error != null) {
-            response.writeHead(404);
-            response.write(error);
-            response.end();
-        } else {
-            response.writeHead(200, {'Content-Type': 'text/html'});
-            response.write(data);
-            response.end();
-        }
-    });
+    if (request.query.access_token != "") {
+        sc2api = SteemConnect.Initialize({ accessToken: request.query.access_token });
+        sc2api.me(function(err,res) {
+            if (res == null) {
+                // Invalid login
+                response.end('Invalid login!');
+                return;
+            } else {
+                fs.readFile('./uploader.html',function(error, data) {
+                    if (error != null) {
+                        response.writeHead(404);
+                        response.write(error);
+                        response.end();
+                    } else {
+                        response.writeHead(200, {'Content-Type': 'text/html'});
+                        response.write(data);
+                        response.end();
+                    }
+                });
+            }
+        })
+    }
 });
 
 var cpUpload = upload.fields([{name: 'VideoUpload', maxCount: 1},{name: 'SnapUpload', maxCount: 1}]);
