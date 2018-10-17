@@ -6,6 +6,18 @@
         <title>OneLoveDTube Uploader</title>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <script>
+            function loadToken() {
+                // Load Steem Connect access token to client
+                var url = new URL(window.location.href);
+                var token = url.searchParams.get('access_token'); // Access token for logged in user
+                var input = document.createElement('input');
+                input.setAttribute("type", "hidden");
+                input.setAttribute("name","accesstoken");
+                input.setAttribute("value",token);
+                document.getElementById('uploaderForm').appendChild(input);
+                console.log(token);
+            }
+
             function validateForm() {
                 // Validate data entered
                 var title = document.forms["uploaderForm"]["title"].value;
@@ -27,10 +39,10 @@
             }
         </script>
     </head>
-    <body>
+    <body onload="loadToken()">
         <div id='header'><h1 id="siteTitle"><img id="logoBanner" src="logo.png">  OneLoveDTube Uploader</h1></div>
         <div id='content'>
-        <form action="videoupload" method="POST" enctype="multipart/form-data" name="uploaderForm" onsubmit="return validateForm()">
+        <form action="videoupload" method="POST" enctype="multipart/form-data" name="uploaderForm" id="uploaderForm" onsubmit="return validateForm()">
             <h3>Upload a video (mp4 file accepted): <input type="file" accept="video/mp4" name="VideoUpload" required></h3>
             <h3>Upload a thumbnail: <input type="file" accept="image/jpg,image/png" name="SnapUpload" required></h3>
             <h3>Title: <input type="text" id="title" name="title" class="meta" required></h3>

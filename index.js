@@ -8,9 +8,6 @@ const app = Express();
 
 const upload = Multer({ dest: Config.uploadDestination });
 
-// Steemconnect api
-var sc2api;
-
 // Check for invalid config
 if (Config.port == NaN) {
     // Port not provided
@@ -40,13 +37,14 @@ app.get('/', (request,response) => {
 
 app.get('/upload', (request,response) => {
     if (request.query.access_token != "") {
-        sc2api = SteemConnect.Initialize({ accessToken: request.query.access_token });
+        var sc2api = SteemConnect.Initialize({ accessToken: request.query.access_token });
         sc2api.me(function(err,res) {
             if (res == null) {
                 // Invalid login
                 response.end('Invalid login!');
                 return;
             } else {
+                // let username = res.account.name;
                 fs.readFile('./uploader.html',function(error, data) {
                     if (error != null) {
                         response.writeHead(404);
@@ -79,6 +77,7 @@ app.post('/videoupload', cpUpload, function (request,response) {
         fs.renameSync(request.files.SnapUpload[0].path,request.files.SnapUpload[0].path + '.png');
     }
 
+    console.log(request.body.accesstoken);
     // Add files to IPFS
     Shell.exec('ipfs add ' + videoPathName,function(code,stdout,stderr) {
         var outs = stdout.split(' ');
