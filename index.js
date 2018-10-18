@@ -5,6 +5,7 @@ const getDuration = require('get-video-duration');
 const fs = require('fs');
 const Config = require('./config.json');
 const Express = require('express');
+const https = require('https');
 const app = Express();
 
 const upload = Multer({ dest: Config.uploadDestination });
@@ -216,4 +217,11 @@ app.use(function (req,res) {
     return res.status(404).send('Error 404 file not found');
 })
 
-app.listen(Config.port);
+if (Config.useHTTPS == true) {
+    https.createServer({
+        key: fs.readFileSync('server.key'),
+        cert: fs.readFileSync('server.cert')
+    },app).listen(Config.port);
+} else {
+    app.listen(Config.port);
+}

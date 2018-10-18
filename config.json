@@ -2,6 +2,7 @@
     "port": 8082,
     "uploadDestination": "/Users/techcoderx/testUploaded/",
     "SteemConnectApp": "",
+    "useHTTPS": false,
     "whitelistEnabled": false,
     "callbackURL": "http://localhost:8082/upload",
     "JSONApp": "dtube/0.8"
