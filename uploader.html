@@ -15,7 +15,6 @@
                 input.setAttribute("name","accesstoken");
                 input.setAttribute("value",token);
                 document.getElementById('uploaderForm').appendChild(input);
-                console.log(token);
             }
 
             function validateForm() {
@@ -47,9 +46,9 @@
             <h3>Upload a thumbnail: <input type="file" accept="image/jpg,image/png" name="SnapUpload" required></h3>
             <h3>Title: <input type="text" id="title" name="title" class="meta" required></h3>
             <h3>Description: <br>
-            <textarea id="description" required></textarea></h3>
+            <textarea name="description" required></textarea></h3>
             <h3>Tags: <input type="text" id="tags" name="tags" class="meta" required></h3>
-            <h4><input type="checkbox" id="powerUp"> Power Up 100%</h4>
+            <h4><input type="checkbox" name="powerup" id="powerup"> Power Up 100%</h4>
             <input type="submit">
         </form><br>
         </div>

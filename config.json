@@ -3,5 +3,5 @@
     "uploadDestination": "/Users/techcoderx/testUploaded/",
     "SteemConnectApp": "",
     "callbackURL": "http://localhost:8082/upload",
-    "clientSecret": ""
+    "JSONApp": "dtube/0.8"
 }
