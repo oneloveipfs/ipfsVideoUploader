@@ -98,14 +98,15 @@ app.post('/videoupload', cpUpload, function (request,response) {
                     getDuration(videoPathName).then((videoDuration) => {
                         // Post on blockchain
                         let metadata = request.body;
-                        let transaction = generatePost(username,ipfsHash,ipfsSnapHash,ipfsSpriteHash,metadata.title,metadata.description,metadata.tags,videoDuration,videoSize,request.body.powerup);
+                        let videoPermlink = generatePermlink();
+                        let transaction = generatePost(username,videoPermlink,ipfsHash,ipfsSnapHash,ipfsSpriteHash,metadata.title,metadata.description,metadata.tags,videoDuration,videoSize,request.body.powerup);
                         api.broadcast(transaction,function(err) {
                             if (err != null) {
                                 response.end('Error: '+ err);
                                 return;
                             }
                             console.log('It works!!! Video posted onto DTube!')
-                            response.end('Video upload success!');
+                            response.redirect('https://d.tube/v/' + username + '/' + videoPermlink);
                         });
                     });
                 });
@@ -156,8 +157,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,tagS
     return jsonMeta;
 }
 
-function generatePost(username,sourceHash,snapHash,spriteHash,title,description,tagString,duration,filesize,powerUp) {
-    let permlink = generatePermlink();
+function generatePost(username,permlink,sourceHash,snapHash,spriteHash,title,description,tagString,duration,filesize,powerUp) {
     let tags = tagString.split(' ');
 
     // Power up all rewards or not
