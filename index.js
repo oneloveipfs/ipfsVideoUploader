@@ -34,7 +34,7 @@ app.get('/upload', (request,response) => {
         sc2api.me(function(err,res) {
             if (res == null) {
                 // Invalid login
-                response.end('Invalid login!');
+                loadWebpage('./noaccesstoken.html',response);
                 return;
             } else {
                 let username = res.account.name;
@@ -211,5 +211,9 @@ function loadWebpage(HTMLFile,response) {
         }
     });
 }
+
+app.use(function (req,res) {
+    return res.status(404).send('Error 404 file not found');
+})
 
 app.listen(Config.port);
