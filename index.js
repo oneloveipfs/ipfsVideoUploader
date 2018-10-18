@@ -24,17 +24,7 @@ app.use(Express.static('public'));
 
 app.get('/', (request,response) => {
     // Welcome page
-    fs.readFile('./welcome.html',function(error, data) {
-        if (error != null) {
-            response.writeHead(404);
-            response.write(error);
-            response.end();
-        } else {
-            response.writeHead(200, {'Content-Type': 'text/html'});
-            response.write(data);
-            response.end();
-        }
-    });
+    loadWebpage('./welcome.html',response);
 });
 
 app.get('/upload', (request,response) => {
@@ -47,18 +37,17 @@ app.get('/upload', (request,response) => {
                 response.end('Invalid login!');
                 return;
             } else {
-                // let username = res.account.name;
-                fs.readFile('./uploader.html',function(error, data) {
-                    if (error != null) {
-                        response.writeHead(404);
-                        response.write(error);
-                        response.end();
-                    } else {
-                        response.writeHead(200, {'Content-Type': 'text/html'});
-                        response.write(data);
-                        response.end();
+                let username = res.account.name;
+                if (Config.whitelistEnabled == true) {
+                    if (fs.existsSync('whitelist.txt')) {
+                        var readList = fs.readFileSync('whitelist.txt','utf8');
+                        if (!readList.includes(username)) {
+                            loadWebpage('./restricted.html',response);
+                            return;
+                        }
                     }
-                });
+                }
+                loadWebpage('./uploader.html',response);
             }
         })
     }
@@ -177,6 +166,7 @@ function generatePost(username,sourceHash,snapHash,spriteHash,title,description,
         percentSBD = 0;
     }
 
+    // Create transaction to post on Steem blockchain
     let operations = [
         [ 'comment', {
                 parent_author: '',
@@ -206,6 +196,20 @@ function generatePost(username,sourceHash,snapHash,spriteHash,title,description,
         }]
     ];
     return operations;
+}
+
+function loadWebpage(HTMLFile,response) {
+    fs.readFile(HTMLFile,function(error, data) {
+        if (error != null) {
+            response.writeHead(404);
+            response.write(error);
+            response.end();
+        } else {
+            response.writeHead(200, {'Content-Type': 'text/html'});
+            response.write(data);
+            response.end();
+        }
+    });
 }
 
 app.listen(Config.port);

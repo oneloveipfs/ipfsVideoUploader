@@ -154,3 +154,10 @@ td {
 .icons {
     margin-top: 30px;
 }
+
+/* Restricted page */
+.restrictedmessage {
+    font-family: Geneva, Verdana, sans-serif;
+    font-size: 20px;
+    text-align: center;
+}
