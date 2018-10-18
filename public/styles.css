@@ -66,8 +66,8 @@ textarea {
 
 #authButton {
     position: absolute;
-    top: 0.25vw;
-    right: 0.25vw;
+    top: 0.5vw;
+    right: 0.5vw;
 }
 
 .madeBy {
@@ -84,10 +84,14 @@ textarea {
 
 #head h1 {
     font-size: 75px;
+    margin-left: 50px;
+    margin-right: 50px;
 }
 
 #head h3 {
     font-size: 30px;
+    margin-left: 50px;
+    margin-right: 50px;
 }
 
 /* Signup/Login buttons */
@@ -124,9 +128,10 @@ textarea {
     background: blueviolet;
     text-align: left;
     font-family: Geneva, Verdana, sans-serif;
-    font-size: 65px;
-    padding-left: 6vw;;
-    padding-right: 30vw;
+    font-size: 50px;
+    align-content: center;
+    padding-left: 6vw;
+    padding-right: 6vw;
     padding-top: 20px;
     padding-bottom: 20px;
     color: rgb(230, 250, 255);
@@ -143,5 +148,9 @@ textarea {
 td {
     text-align: center;
     font-family: Geneva, Verdana, sans-serif;
-    font-size: 35px;
+    font-size: 25px;
+}
+
+.icons {
+    margin-top: 30px;
 }
