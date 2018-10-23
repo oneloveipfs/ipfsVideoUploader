@@ -1,4 +1,3 @@
-const SteemConnect = require('steemconnect');
 const Multer = require('multer');
 const Shell = require('shelljs');
 const getDuration = require('get-video-duration');
