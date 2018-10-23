@@ -1,57 +1,28 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link rel="stylesheet" href="styles.css">
-        <link rel="shortcut icon" href="logo.png">
+        <link rel="stylesheet" href="public/styles.css">
+        <link rel="shortcut icon" href="public/logo.png">
         <title>OneLoveDTube Uploader</title>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-        <script>
-            function loadToken() {
-                // Load Steem Connect access token to client
-                var url = new URL(window.location.href);
-                var token = url.searchParams.get('access_token'); // Access token for logged in user
-                var input = document.createElement('input');
-                input.setAttribute("type", "hidden");
-                input.setAttribute("name","accesstoken");
-                input.setAttribute("value",token);
-                document.getElementById('uploaderForm').appendChild(input);
-            }
-
-            function validateForm() {
-                // Validate data entered
-                var title = document.forms["uploaderForm"]["title"].value;
-                if (title.length > 256) {
-                    alert('Title is too long!');
-                    return false;
-                }
-                var tag = document.forms["uploaderForm"]["tags"].value;
-                if (/^[a-zA-Z0-9- _]*$/.test(tag) == false){
-                    alert('Invalid tags!')
-                    return false;
-                }
-
-                var tags = tag.split(' ');
-                if (tags.length > 4) {
-                    alert('Please do not use more than 4 tags!');
-                    return false;
-                }
-            }
-        </script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/steemconnect@latest"></script>
+        <script src="uploader.js"></script>
     </head>
-    <body onload="loadToken()">
-        <div id='header'><h1 id="siteTitle"><img id="logoBanner" src="logo.png">  OneLoveDTube Uploader</h1></div>
+    <body>
+        <div id='header'><h1 id="siteTitle"><img id="logoBanner" src="public/logo.png">  OneLoveDTube Uploader</h1></div>
         <div id='content' class="uploadcontent">
-        <form action="videoupload" method="POST" enctype="multipart/form-data" name="uploaderForm" id="uploaderForm" onsubmit="return validateForm()">
-            <h3>Upload a video (mp4 file accepted): <input type="file" accept="video/mp4" name="VideoUpload" required></h3>
-            <h3>Upload a thumbnail: <input type="file" accept="image/jpg,image/png" name="SnapUpload" required></h3>
+        <div id="uploadForm">
+            <h3>Upload a video (mp4 file accepted): <input type="file" accept="video/mp4" name="VideoUpload" id="sourcevideo" required></h3>
+            <h3>Upload a thumbnail: <input type="file" accept="image/jpg,image/png" name="SnapUpload" id="snapfile" required></h3>
             <h3>Title: <br><input type="text" id="title" name="title" class="meta" required></h3>
             <h3>Description: <br>
-            <textarea name="description" required></textarea></h3>
+            <textarea id="description" name="description" required></textarea></h3>
             <h3>Tags (seperated by space): <br><input type="text" id="tags" name="tags" class="meta" required></h3>
             <h4><input type="checkbox" name="powerup" id="powerup"> Power Up 100%</h4>
-            <input class="styledButton" type="submit" value="Upload!">
+            <input class="styledButton" type="submit" value="Upload!" id="submitbutton" onclick="submitVideo()">
             <h4>(You will have to wait for a while when you click this button for your video to be uploaded)</h4>
-        </form><br>
+        </div>
         </div>
         <div id='footer'><h4 class="madeBy">Made by <a target="_blank" href=https://d.tube/c/techcoderx>@techcoderx</a> - <a target="_blank" href=https://github.com/techcoderx/ipfsVideoUploader>Source Code</a> - <a target="_blank" href="https://discord.gg/Sc4utKr">Discord</a></h4></div>
         

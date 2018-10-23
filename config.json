@@ -1,9 +1,9 @@
 {
-    "port": 8082,
     "uploadDestination": "/Users/techcoderx/testUploaded/",
     "SteemConnectApp": "",
     "useHTTPS": false,
+    "port": 80,
     "whitelistEnabled": false,
-    "callbackURL": "http://localhost:8082/upload",
+    "callbackURL": "http://localhost:80/upload",
     "JSONApp": "dtube/0.8"
 }
