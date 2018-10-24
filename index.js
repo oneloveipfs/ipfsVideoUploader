@@ -24,12 +24,12 @@ app.use(Express.static(__dirname));
 
 app.get('/', (request,response) => {
     // Welcome page
-    loadWebpage('./welcome.html',response);
+    loadWebpage('./client/welcome.html',response);
 });
 
 app.get('/upload', (request,response) => {
     // Uploader page
-    loadWebpage('uploader.html',response);
+    loadWebpage('./client/uploader.html',response);
 });
 
 app.get('/checkuser', function(request,response) {
