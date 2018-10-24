@@ -20,7 +20,34 @@ if (Config.port == NaN) {
     process.exit(1);
 }
 
-app.use(Express.static(__dirname));
+var privateKey;
+var certificate;
+var ca;
+var credentials;
+
+if (Config.useHTTPS == true) {
+    privateKey = fs.readFileSync('/etc/letsencrypt/live/' + Config.domain + '/privkey.pem','utf8');
+    certificate = fs.readFileSync('/etc/letsencrypt/live/' + Config.domain + '/cert.pem','utf8');
+    ca = fs.readFileSync('/etc/letsencrypt/live/' + Config.domain + '/chain.pem','utf8');
+
+    credentials = {
+        key: privateKey,
+        cert: certificate,
+        ca: ca
+    }
+}
+
+app.use(Express.static(__dirname, { dotfiles: 'allow' }));
+
+app.use(function(req,res,next) {
+    if (Config.useHTTPS == true) {
+        if (req.secure) {
+           next(); 
+        } else {
+           res.redirect('https://' + req.headers.host + req.url);
+        }
+    }
+});
 
 app.get('/', (request,response) => {
     // Welcome page
@@ -115,7 +142,8 @@ app.use(function (req,res) {
 })
 
 if (Config.useHTTPS == true) {
-    app.listen(Config.port);
+    app.listen(80);
+    https.createServer(credentials,app).listen(443);
 } else {
-    app.listen(Config.port);
+    app.listen(80);
 }

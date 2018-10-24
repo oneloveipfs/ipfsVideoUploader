@@ -1,9 +1,8 @@
 {
-    "uploadDestination": "/Users/techcoderx/testUploaded/",
-    "SteemConnectApp": "",
-    "useHTTPS": false,
-    "port": 80,
-    "whitelistEnabled": false,
-    "callbackURL": "http://localhost:80/upload",
-    "JSONApp": "dtube/0.8"
+    "useHTTPS": true,
+    "uploadDestination": "/home/onelove/uploaded",
+    "SteemConnectApp": "ipfsuploader.app",
+    "whitelistEnabled": true,
+    "domain": "uploader.oneloved.tube",
+    "callbackURL": "https://uploader.oneloved.tube/upload"
 }
