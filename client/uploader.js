@@ -42,6 +42,13 @@ function reenableFields() {
 
 function submitVideo() {
     // Validate data entered
+    var description = document.getElementById('description').value;
+    var powerup = document.getElementById('powerup').checked;
+    var permlink = generatePermlink();
+
+    var sourceVideo = document.getElementById('sourcevideo').files;
+    var snap = document.getElementById('snapfile').files;
+
     var title = document.getElementById('title').value;
     if (title.length > 256) {
         alert('Title is too long!');
@@ -59,16 +66,30 @@ function submitVideo() {
         return;
     }
 
+    // Check for empty fields
+    if (sourceVideo.length == 0) {
+        alert('Please upload a video!');
+        return;
+    }
+
+    if (snap.length == 0) {
+        alert('Please upload a thumbnail for your video!');
+        return;
+    }
+
+    if (title.length == 0) {
+        alert('Please enter a title!');
+        return;
+    }
+
+    if (tag.length == 0) {
+        alert('Please enter some tags (up to 4) for your video!');
+        return;
+    }
+
     restrict();
 
-    var description = document.getElementById('description').value;
-    var powerup = document.getElementById('powerup').checked;
-    var permlink = generatePermlink();
-    
     // Upload video
-    var sourceVideo = document.getElementById('sourcevideo').files;
-    var snap = document.getElementById('snapfile').files;
-
     var formdata = new FormData();
     formdata.append('VideoUpload',sourceVideo[0]);
     formdata.append('SnapUpload',snap[0]);
@@ -134,7 +155,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,DTub
             },
         },
         tags: SteemTags,
-        app: 'dtube/0.8',
+        app: 'onelovedtube/0.8',
     }
     return jsonMeta;
 }
