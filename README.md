@@ -11,7 +11,7 @@ This is an alternative IPFS uploader to upload videos onto DTube. Includes a bas
 ### Additional requirements
 
 * A SteemConnect application
-* A domain name for HTTPS
+* A domain name for HTTPS, plus SSL certificate for that domain installed (code is written to work well with certbot)
 
 # Installation
 
