@@ -55,7 +55,7 @@ function submitVideo() {
         return;
     }
     var tag = document.getElementById('tags').value;
-    if (/^[a-zA-Z0-9- _]*$/.test(tag) == false){
+    if (/^[a-z0-9- _]*$/.test(tag) == false){
         alert('Invalid tags!')
         return;
     }
