@@ -1,6 +1,5 @@
 {
     "useHTTPS": true,
-    "uploadDestination": "/home/onelove/uploaded",
     "SteemConnectApp": "ipfsuploader.app",
     "whitelistEnabled": true,
     "domain": "uploader.oneloved.tube",

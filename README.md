@@ -29,6 +29,8 @@ This is an alternative IPFS uploader to upload videos onto DTube. Includes a bas
 
 *Note: You may need to enable read permissions for `/etc/letsencrypt/live/yourdomain.com/` directory for the user account if using HTTPS; and port 80 and 443 binding permissions (or use a reverse proxy).*
 
+All uploaded files will be saved in the `uploaded` folder within the repo.
+
 # Supported file formats
 
 IPFS works the best for videos with .mp4, therefore only mp4 files will be supported at this moment. Both .jpg and .png file formats are supported for thumbnail uploads.

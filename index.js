@@ -2,21 +2,18 @@ const Multer = require('multer');
 const Shell = require('shelljs');
 const getDuration = require('get-video-duration');
 const fs = require('fs');
+const sanitize = require('sanitize-filename');
 const Config = require('./config.json');
 const Express = require('express');
 const https = require('https');
 const app = Express();
 
-const upload = Multer({ dest: Config.uploadDestination });
+const upload = Multer({ dest: './uploaded/' });
 
 // Check for invalid config
 if (Config.port == NaN) {
     // Port not provided
     console.log('Please provide a valid port for app to listen to in config.json. Terminating application...');
-    process.exit(1);
-} else if (Config.uploadDestination == "") {
-    // Upload destination not provided
-    console.log('Please provide a file path where all uploaded files will be stored in config.json. Terminating application...');
     process.exit(1);
 }
 
@@ -78,17 +75,18 @@ app.post('/videoupload', function(request,response) {
         if (err != null) throw err;
         
         // Add video to IPFS
-        var videoPathName = request.files.VideoUpload[0].path + '.mp4';
-        fs.renameSync(request.files.VideoUpload[0].path,request.files.VideoUpload[0].path + '.mp4');
+        var sourceVideoFilename = sanitize(request.files.VideoUpload[0].filename);
+        var videoPathName = 'uploaded/' + sourceVideoFilename + '.mp4';
+        fs.renameSync('uploaded/' + sourceVideoFilename,videoPathName);
 
+        var snapFilename = sanitize(request.files.SnapUpload[0].filename);
         var snapPathName;
         if (request.files.SnapUpload[0].mimetype == 'image/jpeg') {
-            snapPathName = request.files.SnapUpload[0].path + '.jpg';
-            fs.renameSync(request.files.SnapUpload[0].path,request.files.SnapUpload[0].path + '.jpg');
+            snapPathName = 'uploaded/' + snapFilename + '.jpg';
         } else if (request.files.SnapUpload[0].mimetype == 'image/png') {
-            snapPathName = request.files.SnapUpload[0].path + '.png';
-            fs.renameSync(request.files.SnapUpload[0].path,request.files.SnapUpload[0].path + '.png');
+            snapPathName = 'uploaded/' + snapFilename + '.png';
         }
+        fs.renameSync('uploaded/' + snapFilename,snapPathName);
 
         Shell.exec('ipfs add ' + videoPathName + ' -t',function(code,stdout,stderr) {
             var outs = stdout.split(' ');
@@ -100,8 +98,8 @@ app.post('/videoupload', function(request,response) {
                 Shell.exec('ipfs pin add ' + ipfsSnapHash);
 
                 // Sprite creation
-                Shell.exec('./dtube-sprite.sh ' + videoPathName + ' ' + request.files.VideoUpload[0].path + '.jpg');
-                Shell.exec('ipfs add ' + request.files.VideoUpload[0].path + '.jpg -t',function(code,stdout,stderr) {
+                Shell.exec('./dtube-sprite.sh ' + videoPathName + ' uploaded/' + sourceVideoFilename + '.jpg');
+                Shell.exec('ipfs add uploader/' + sourceVideoFilename + '.jpg -t',function(code,stdout,stderr) {
                     var spriteouts = stdout.split(' ');
                     var ipfsSpriteHash = spriteouts[1];
                     Shell.exec('ipfs pin add ' + ipfsSpriteHash);
