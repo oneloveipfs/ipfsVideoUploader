@@ -114,7 +114,8 @@ app.post('/videoupload', function(request,response) {
                             snaphash: ipfsSnapHash,
                             spritehash: ipfsSpriteHash,
                             duration: videoDuration,
-                            filesize: videoSize
+                            filesize: videoSize,
+                            dtubefees: Config.dtubefees
                         })
                     });
                 });

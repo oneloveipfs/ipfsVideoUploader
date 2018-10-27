@@ -104,7 +104,7 @@ function submitVideo() {
         console.log(uploaderResponse);
 
         // Post to Steem blockchain
-        let transaction = generatePost(username,permlink,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup);
+        let transaction = generatePost(username,permlink,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup,uploaderResponse.dtubefees);
         api.broadcast(transaction,function(err) {
             if (err != null) {
                 alert('Failed to post on DTube: ' + err);
@@ -160,7 +160,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,DTub
     return jsonMeta;
 }
 
-function generatePost(username,permlink,sourceHash,snapHash,spriteHash,title,description,tags,duration,filesize,powerUp) {
+function generatePost(username,permlink,sourceHash,snapHash,spriteHash,title,description,tags,duration,filesize,powerUp,dtubefees) {
     // Power up all rewards or not
     var percentSBD = 10000;
     if (powerUp == true) {
@@ -190,7 +190,7 @@ function generatePost(username,permlink,sourceHash,snapHash,spriteHash,title,des
                 [0, {
                     beneficiaries: [{
                         account: 'dtube',
-                        weight: 800
+                        weight: dtubefees
                     }]
                 }]
             ]

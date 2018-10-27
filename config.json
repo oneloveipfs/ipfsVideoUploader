@@ -4,5 +4,6 @@
     "SteemConnectApp": "ipfsuploader.app",
     "whitelistEnabled": true,
     "domain": "uploader.oneloved.tube",
-    "callbackURL": "https://uploader.oneloved.tube/upload"
+    "callbackURL": "https://uploader.oneloved.tube/upload",
+    "dtubefees": 800
 }
