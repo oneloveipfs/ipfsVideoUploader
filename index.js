@@ -10,13 +10,6 @@ const app = Express();
 
 const upload = Multer({ dest: './uploaded/' });
 
-// Check for invalid config
-if (Config.port == NaN) {
-    // Port not provided
-    console.log('Please provide a valid port for app to listen to in config.json. Terminating application...');
-    process.exit(1);
-}
-
 var privateKey;
 var certificate;
 var ca;
@@ -36,15 +29,15 @@ if (Config.useHTTPS == true) {
 
 app.use(Express.static(__dirname, { dotfiles: 'allow' }));
 
-app.use(function(req,res,next) {
-    if (Config.useHTTPS == true) {
+if (Config.useHTTPS == true) {
+    app.use(function(req,res,next) {
         if (req.secure) {
            next(); 
         } else {
            res.redirect(301,'https://' + req.headers.host + req.url);
         }
-    }
-});
+    });
+}
 
 app.get('/', (request,response) => {
     // Welcome page
@@ -99,7 +92,7 @@ app.post('/videoupload', function(request,response) {
 
                 // Sprite creation
                 Shell.exec('./dtube-sprite.sh ' + videoPathName + ' uploaded/' + sourceVideoFilename + '.jpg');
-                Shell.exec('ipfs add uploader/' + sourceVideoFilename + '.jpg -t',function(code,stdout,stderr) {
+                Shell.exec('ipfs add uploaded/' + sourceVideoFilename + '.jpg -t',function(code,stdout,stderr) {
                     var spriteouts = stdout.split(' ');
                     var ipfsSpriteHash = spriteouts[1];
                     Shell.exec('ipfs pin add ' + ipfsSpriteHash);
