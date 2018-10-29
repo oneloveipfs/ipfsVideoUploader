@@ -17,15 +17,17 @@ This is an alternative IPFS uploader to upload videos onto DTube. Includes a bas
 
 1. Clone this repository by typing `git clone https://github.com/techcoderx/ipfsVideoUploader.git` in a terminal window.
 
-2. Configure uploader by modifying `config.json` file. If you need help with the configuration, view the documentation [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/ConfigDocs.md)
+2. Intall all required node modules. `cd ipfsVideoUploader && npm install`
 
-3. Run `node getLoginLink.js` to generate SteemConnect login link.
+3. Configure uploader by modifying `config.json` file. If you need help with the configuration, view the documentation [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/ConfigDocs.md)
 
-4. Replace the login link with the one you obtained from step 3 [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/welcome.html#L7).
+4. Run `node getLoginLink.js` to generate SteemConnect login link.
 
-5. If `whitelistEnabled` is set to `true`, add some Steem accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Steem user)
+5. Replace the login link with the one you obtained from step 3 [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/welcome.html#L7).
 
-6. Run the app by typing `node index.js`. Your app will listen to port 80, and 443 if you have HTTPS enabled.
+6. If `whitelistEnabled` is set to `true`, add some Steem accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Steem user)
+
+7. Run the app by typing `node index.js`. Your app will listen to port 80, and 443 if you have HTTPS enabled.
 
 *Note: You may need to enable read permissions for `/etc/letsencrypt/live/yourdomain.com/` directory for the user account if using HTTPS; and port 80 and 443 binding permissions (or use a reverse proxy).*
 
