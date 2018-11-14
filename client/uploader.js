@@ -130,7 +130,7 @@ function generatePermlink() {
 }
 
 function buildPostBody(author,permlink,videoHash,snapHash,description) {
-    return '<center><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'><img src=\'https://ipfs.io/ipfs/' + snapHash + '\'></a></center><hr>\n\n' + description + '\n\n<hr><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'> ▶️ DTube</a><br /><a href=\'https://ipfs.io/ipfs/' + videoHash + '\'> ▶️ IPFS</a>'
+    return '<center><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'><img src=\'https://cloudflare-ipfs.com/ipfs/' + snapHash + '\'></a></center><hr>\n\n' + description + '\n\n<hr><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'> ▶️ DTube</a><br /><a href=\'https://cloudflare-ipfs.com/ipfs/' + videoHash + '\'> ▶️ IPFS</a>'
 }
 
 function buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,DTubeTags,duration,filesize,author,permlink) {
