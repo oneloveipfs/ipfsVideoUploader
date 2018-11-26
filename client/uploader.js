@@ -5,6 +5,7 @@ var token = url.searchParams.get('access_token'); // Access token for logged in 
 if (token == '') {
     // Not logged in or no access token
     restrict();
+    document.getElementById('loggedInUser').innerHTML = 'You are not logged in!';
     alert('Looks like you do not have access to the uploader!');
 } else {
     var api = sc2.Initialize({ accessToken: token });
@@ -16,6 +17,24 @@ if (token == '') {
             if (response.data.isInWhitelist == false) {
                 restrict();
                 alert('Looks like you do not have access to the uploader!');
+                return;
+            }
+
+            // Retrieve metadata from draft if any
+            var savedTitle = localStorage.getItem('OneLoveTitle');
+            var savedDescription = localStorage.getItem('OneLoveDescription');
+            var savedTags = localStorage.getItem('OneLoveTags');
+
+            if (savedTitle != null) {
+                document.getElementById('title').value = savedTitle;
+            }
+
+            if (savedDescription != null) {
+                document.getElementById('description').value = savedDescription;
+            }
+
+            if (savedTags != null) {
+                document.getElementById('tags').value = savedTags;
             }
         });
     });
@@ -219,4 +238,11 @@ function updateProgressBar(progress) {
     var progressbarInner = document.getElementById('progressBarFront');
     progressbarInner.style.width = progress + '%';
     progressbarInner.innerHTML = 'Uploading... (' + progress + '%)';
+}
+
+function saveAsDraft() {
+    localStorage.setItem('OneLoveTitle',document.getElementById('title').value);
+    localStorage.setItem('OneLoveDescription',document.getElementById('description').value);
+    localStorage.setItem('OneLoveTags',document.getElementById('tags').value);
+    alert('Metadata saved as draft!')
 }
