@@ -43,6 +43,23 @@ a {
     width: 700px;
 }
 
+#progressBarBack {
+    width: 100%;
+    background-color: gray;
+    border-radius: 5px;
+    display: none;
+}
+
+#progressBarFront {
+    width: 0%;
+    height: 30px;
+    background-color: rgb(61, 171, 235);
+    border-radius: 5px;
+    text-align: center;
+    line-height: 30px;
+    white-space: nowrap;
+}
+
 .uploadcontent {
     font-family: Geneva, Verdana, sans-serif;
 }

@@ -10,6 +10,7 @@ if (token == '') {
     var api = sc2.Initialize({ accessToken: token });
     api.me(function(err,res) {
         username = res.account.name; // Account name
+        document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + username;
         axios.get('/checkuser?user=' + username).then(function(response) {
             console.log(response);
             if (response.data.isInWhitelist == false) {
@@ -94,20 +95,34 @@ function submitVideo() {
     formdata.append('VideoUpload',sourceVideo[0]);
     formdata.append('SnapUpload',snap[0]);
 
+    var progressbar = document.getElementById('progressBarBack');
+    var progressbarInner = document.getElementById('progressBarFront');
+    progressbar.style.display = "block";
+    progressbarInner.innerHTML = "Uploading... (0%)";
+
     var contentType = {
         headers: {
             "content-type": "multipart/form-data"
+        },
+        onUploadProgress: function (progressEvent) {
+            console.log(progressEvent);
+
+            var progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+            updateProgressBar(progressPercent);
         }
     };
     axios.post('/videoupload',formdata,contentType).then(function(response) {
         var uploaderResponse = response.data;
         console.log(uploaderResponse);
 
+        progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
+
         // Post to Steem blockchain
         let transaction = generatePost(username,permlink,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup,uploaderResponse.dtubefees);
         api.broadcast(transaction,function(err) {
             if (err != null) {
                 alert('Failed to post on DTube: ' + err);
+                progressbar.style.display = "none";
                 reenableFields();
             } else {
                 window.location.replace('https://d.tube/v/' + username + '/' + permlink);
@@ -115,6 +130,7 @@ function submitVideo() {
         });
     }).catch(function(err) {
         alert('Upload error: ' + err);
+        progressbar.style.display = "none";
         reenableFields();
     });
 }
@@ -155,7 +171,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,DTub
             },
         },
         tags: SteemTags,
-        app: 'onelovedtube/0.8',
+        app: 'onelovedtube/0.8.1',
     }
     return jsonMeta;
 }
@@ -197,4 +213,10 @@ function generatePost(username,permlink,sourceHash,snapHash,spriteHash,title,des
         }]
     ];
     return operations;
+}
+
+function updateProgressBar(progress) {
+    var progressbarInner = document.getElementById('progressBarFront');
+    progressbarInner.style.width = progress + '%';
+    progressbarInner.innerHTML = 'Uploading... (' + progress + '%)';
 }
