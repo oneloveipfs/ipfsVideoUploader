@@ -1,0 +1,55 @@
+# FAQ
+
+#### 1. I'm getting an alert that I do not have access to the uploader after logging in.
+
+If you're the server admin, please add your Steem username to `whitelist.txt`, reload the uploader page and try again. Otherwise contact a server admin on how to get into the whitelist for uploader access.
+
+#### 2. Why is .mp4 the only accepted file format for video uploads?
+
+We have done some testing with several video file formats for IPFS, and we found that .mp4 file format performed the best for video on IPFS.
+
+#### 3. I'm getting a sc2-sdk error while submitting video onto the blockchain. What is happenning?
+
+Looks like SteemConnect, the auth solution that we're currently using right now, has some issues with the API. This is not an issue with upload servers or IPFS. Refresh the webpage and try again later.
+
+#### 4. I'm getting a network error while uploading. Is there a server issue?
+
+Check your internet connection and try again later. If webpage fails to load right after you get this error, there is an issue with the upload servers.
+
+#### 5. The text underneath the submit button reads "Detecting login" even after waiting for a few minutes. What went wrong here?
+
+Refresh the webpage and see if your Steem username shows up. If not, there might be an issue with SteemConnect's API server. If so, try again later.
+
+#### 6. I'm not getting any encoded versions of the source video. What did I do wrong?
+
+We have made a decision that videos should be user encoded to reduce overhead costs of running the upload servers. This also increases decentralization further because encoding is done with user's computing power, not on the server side. Right now users will only be able to upload source video files, but options to upload encoded versions of source videos will be added in future code updates.
+
+#### 7. What is the best specifications for thumbnails?
+
+We recommend either 1280x720px, or 1920x1080px at `.jpg` or `.png` file formats.
+
+#### 8. Can I upload in 4K?
+
+We have tested 4K video uploads (with 4K videos pinned to a single node) and it ended up playing for most users who have the average internet bandwidth required for streaming 4K videos. For optimal performance, you may want to have your videos pinned to multiple IPFS nodes, either manually or setting up an [IPFS cluster](https://github.com/ipfs/ipfs-cluster).
+
+In future code updates, all uploaded videos will have its hashes logged into a text file, and will be downloadable through HTTPS so that anyone can view all video hashes that are pinned to an upload server, and may use this to sync up with their own IPFS node to ensure that all videos uploaded through the uploader gets pinned.
+
+#### 9. The uploader webpage does not render properly on mobile, and I can't get my videos uploaded from my mobile device.
+
+The uploader is not mobile optimised. There is a possibility that a dedicated mobile app may be developed solely to post videos onto DTube, but we are unable to provide an ETA of when it will be completed.
+
+#### 10. I have saved my metadata as draft, but they disappeared the next time I log in.
+
+The drafts are stored in your web browser locally, so when you login with the same account on another web browser (or another device), it will not find your saved drafts. Also please ensure that you're not in private browsing mode while saving them as draft. Clearing your browser cache will delete your drafts as well.
+
+#### 11. How are the beneficiaries set?
+
+For OneLoveDTube's uploader services, beneficiary to @dtube account is set to 8% to support their development and curation efforts (instead of 10%). Other than the $10 USD flat rate to use OneLoveDTube's uploader services, we do not take any other additional beneficiaries from your post payouts.
+
+#### 12. Am I eligible for DTube curation when I upload my videos using this uploader?
+
+Yes! We have tested this with actual high quality DTube videos, and they get picked up by the curation team, just like any other DTube videos.
+
+#### 13. My question is not listed in this document. What can I do?
+
+Contact us in [OneLoveDTube Discord server](https://discord.gg/Sc4utKr), with a screenshot of the console output from your browser (if applicable).

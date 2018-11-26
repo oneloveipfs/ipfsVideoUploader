@@ -6,7 +6,6 @@ if (token == '') {
     // Not logged in or no access token
     restrict();
     document.getElementById('loggedInUser').innerHTML = 'You are not logged in!';
-    alert('Looks like you do not have access to the uploader!');
 } else {
     var api = sc2.Initialize({ accessToken: token });
     api.me(function(err,res) {
@@ -144,6 +143,7 @@ function submitVideo() {
                 progressbar.style.display = "none";
                 reenableFields();
             } else {
+                localStorage.clear();
                 window.location.replace('https://d.tube/v/' + username + '/' + permlink);
             }
         });
