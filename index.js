@@ -130,7 +130,7 @@ function loadWebpage(HTMLFile,response) {
 }
 
 app.use(function (req,res) {
-    return res.status(404).send('Error 404 file not found');
+    return res.status(404).redirect('https://uploader.oneloved.tube/404.html');
 })
 
 if (Config.useHTTPS == true) {
