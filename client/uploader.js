@@ -169,7 +169,7 @@ function buildPostBody(author,permlink,videoHash,snapHash,description) {
 }
 
 function buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,DTubeTags,duration,filesize,author,permlink) {
-    var SteemTags = DTubeTags;
+    var SteemTags = Object.assign([],DTubeTags);
     SteemTags.push('dtube');
 
     var jsonMeta = {
