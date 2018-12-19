@@ -130,12 +130,12 @@ function loadWebpage(HTMLFile,response) {
 }
 
 app.use(function (req,res) {
-    return res.status(404).redirect('https://uploader.oneloved.tube/404.html');
+    return res.status(404).redirect('/404.html');
 })
 
 if (Config.useHTTPS == true) {
-    app.listen(80);
-    https.createServer(credentials,app).listen(443);
+    app.listen(Config.HTTP_PORT);
+    https.createServer(credentials,app).listen(Config.HTTPS_PORT);
 } else {
-    app.listen(80);
+    app.listen(Config.HTTP_PORT);
 }

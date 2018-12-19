@@ -4,5 +4,7 @@
     "whitelistEnabled": true,
     "domain": "uploader.oneloved.tube",
     "callbackURL": "https://uploader.oneloved.tube/upload",
-    "dtubefees": 800
+    "dtubefees": 800,
+    "HTTP_PORT": 80,
+    "HTTPS_PORT": 443
 }

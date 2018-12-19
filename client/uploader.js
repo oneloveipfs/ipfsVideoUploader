@@ -2,10 +2,12 @@
 var username;
 var url = new URL(window.location.href);
 var token = url.searchParams.get('access_token'); // Access token for logged in user
-if (token == '') {
+if (token == null) {
     // Not logged in or no access token
-    restrict();
-    document.getElementById('loggedInUser').innerHTML = 'You are not logged in!';
+    window.setTimeout(function() {
+        document.getElementById('loggedInUser').innerHTML = 'You are not logged in!';
+        restrict();
+    },100);
 } else {
     var api = sc2.Initialize({ accessToken: token });
     api.me(function(err,res) {
