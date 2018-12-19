@@ -165,6 +165,13 @@ app.post('/videoupload', function(request,response) {
     });
 });
 
+app.get('/usage', function(request,response) {
+    // API to get usage info
+    if (Config.UsageLogs != true) return response.send('Logs are disabled therefore API is not available for usage.');
+    if (request.query.user == undefined || request.query.user == '') return response.send('Steem username is not defined!');
+    response.send(JSON.parse(fs.readFileSync('usage.json','utf8'))[request.query.user]);
+})
+
 function loadWebpage(HTMLFile,response) {
     fs.readFile(HTMLFile,function(error, data) {
         if (error != null) {

@@ -39,6 +39,13 @@ IPFS works the best for videos with .mp4, therefore only mp4 files will be suppo
 
 Right now the uploader will only take source videos, but options for adding a user-encoded 240p, 480p, 720p and 1080p versions of the source video will be added later.
 
+# GET API
+
+To get usage info for specific Steem user:
+```
+/usage?user=STEEM_USERNAME
+```
+
 # How to contribute?
 
 If you found any ways to improve on the code, or found any bugs, feel free to create a pull request on the GitHub repository. You can also contact me on Discord `techcoderx#7481` if you have any enquiries.
