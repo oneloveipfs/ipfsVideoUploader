@@ -66,7 +66,16 @@ app.get('/checkuser', function(request,response) {
 app.post('/videoupload', function(request,response) {
     upload.fields([{name: 'VideoUpload', maxCount: 1},{name: 'SnapUpload', maxCount: 1}])(request,response,function(err) {
         if (err != null) throw err;
-        
+
+        let username = request.body.Username; //steem username
+        if (Config.UsageLogs == true) {
+            if (typeof username != 'string') {
+                throw "Username submitted to upload server is not a string!"
+            } else if ((username == undefined || null) || (username == '')) {
+                throw "We can't process your upload because our server doesn't know who you are!"
+            }
+        }
+
         // Add video to IPFS
         var sourceVideoFilename = sanitize(request.files.VideoUpload[0].filename);
         var videoPathName = 'uploaded/' + sourceVideoFilename + '.mp4';
@@ -82,23 +91,64 @@ app.post('/videoupload', function(request,response) {
         fs.renameSync('uploaded/' + snapFilename,snapPathName);
 
         Shell.exec('ipfs add ' + videoPathName + ' -t',function(code,stdout,stderr) {
-            var outs = stdout.split(' ');
-            var ipfsHash = outs[1];
+            let outs = stdout.split(' ');
+            let ipfsHash = outs[1];
             Shell.exec('ipfs pin add ' + ipfsHash);
             Shell.exec('ipfs add ' + snapPathName,function(code,stdout,stderr) {
-                var snapOuts = stdout.split(' ');
-                var ipfsSnapHash = snapOuts[1];
+                let snapOuts = stdout.split(' ');
+                let ipfsSnapHash = snapOuts[1];
                 Shell.exec('ipfs pin add ' + ipfsSnapHash);
 
                 // Sprite creation
                 Shell.exec('./dtube-sprite.sh ' + videoPathName + ' uploaded/' + sourceVideoFilename + '.jpg');
                 Shell.exec('ipfs add uploaded/' + sourceVideoFilename + '.jpg -t',function(code,stdout,stderr) {
-                    var spriteouts = stdout.split(' ');
-                    var ipfsSpriteHash = spriteouts[1];
+                    let spriteouts = stdout.split(' ');
+                    let ipfsSpriteHash = spriteouts[1];
                     Shell.exec('ipfs pin add ' + ipfsSpriteHash);
 
                     // Get video duration and file size
-                    var videoSize = request.files.VideoUpload[0].size;
+                    let videoSize = request.files.VideoUpload[0].size;
+                    let snapSize = request.files.SnapUpload[0].size;
+                    fs.stat('uploaded/' + sourceVideoFilename + '.jpg',(err,stat) => {
+                        if (Config.UsageLogs == true) {
+                            // Log usage data if no errors and if logging is enabled
+                            var allStats = JSON.parse(fs.readFileSync('usage.json','utf8'));
+
+                            if (allStats[username] == undefined) {
+                                // New user?
+                                allStats[username] = {};
+                            }
+
+                            var videoUsage = allStats[username]['videos'];
+                            console.log(videoUsage);
+                            console.log(videoSize);
+                            if (videoUsage == undefined) {
+                                allStats[username]['videos'] = videoSize;
+                            } else {
+                                allStats[username]['videos'] = videoUsage + videoSize;
+                            }
+
+                            var snapUsage = allStats[username]['thumbnails'];
+                            if (snapUsage == undefined) {
+                                allStats[username]['thumbnails'] = snapSize;
+                            } else {
+                                allStats[username]['thumbnails'] = snapUsage + snapSize;
+                            }
+
+                            if (err != null) {
+                                console.log('Error getting sprite filesize: ' + err);
+                            } else {
+                                var spriteUsage = allStats[username]['sprites'];
+                                if (spriteUsage == undefined) {
+                                    allStats[username]['sprites'] = stat['size'];
+                                } else {
+                                    allStats[username]['sprites'] = spriteUsage + stat['size'];
+                                }
+                            }
+
+                            fs.writeFileSync('usage.json',JSON.stringify(allStats));
+                        }
+                    });
                     getDuration(videoPathName).then((videoDuration) => {
                         response.send({
                             ipfshash: ipfsHash,

@@ -114,6 +114,7 @@ function submitVideo() {
     var formdata = new FormData();
     formdata.append('VideoUpload',sourceVideo[0]);
     formdata.append('SnapUpload',snap[0]);
+    formdata.append('Username',username);
 
     var progressbar = document.getElementById('progressBarBack');
     var progressbarInner = document.getElementById('progressBarFront');
