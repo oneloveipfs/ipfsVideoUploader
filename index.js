@@ -202,6 +202,49 @@ app.get('/usage', function(request,response) {
     response.send(usageData[request.query.user]);
 })
 
+app.get('/hashes', function(request,response) {
+    // API to get IPFS hashes of uploaded files
+    let typerequested = request.query.hashtype;
+    if (typerequested == '' || typerequested == undefined) {
+        // What are you looking for???
+        return response.send('hashtype not specified in GET. What are you looking for?');
+    }
+
+    typerequested.split(',');
+
+    var hashesToReturn = {};
+    if (request.query.user == undefined || request.query.user == '') {
+        // Steem user not specified, return all hashes (either all videos, snaps or sprites, or all three)
+        function getAllHashes(hashType) {
+            var hashArrToReturn = [];
+            for(var key in hashes) {
+                if (hashes.hasOwnProperty(key)) {
+                    hashArrToReturn = hashArrToReturn.concat(hashes[key][hashType]);
+                }
+            }
+            return hashArrToReturn;
+        }
+        if (typerequested.includes('videos'))
+            hashesToReturn.videos = getAllHashes('videos');
+        if (typerequested.includes('thumbnails'))
+            hashesToReturn.thumbnails = getAllHashes('thumbnails');
+        if (typerequested.includes('sprites'))
+            hashesToReturn.sprites = getAllHashes('sprites');
+        
+        return response.send(hashesToReturn);
+    }
+
+    // BOTH Steem username and hash type request are specified
+    if (typerequested.includes('videos'))
+        hashesToReturn.videos = hashes[request.query.user]['videos'];
+    if (typerequested.includes('thumbnails'))
+        hashesToReturn.thumbnails = hashes[request.query.user]['thumbnails'];
+    if (typerequested.includes('sprites'))
+        hashesToReturn.sprites = hashes[request.query.user]['sprites'];
+    
+    return response.send(hashesToReturn);
+});
+
 function loadWebpage(HTMLFile,response) {
     fs.readFile(HTMLFile,function(error, data) {
         if (error != null) {
