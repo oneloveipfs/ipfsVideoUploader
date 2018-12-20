@@ -10,6 +10,13 @@ const app = Express();
 
 const upload = Multer({ dest: './uploaded/' });
 
+// Cache usage data in a variable
+var usageData = {};
+if (Config.UsageLogs == true) {
+    usageData = JSON.parse(fs.readFileSync('usage.json','utf8'));
+}
+
+// Setup HTTPS
 var privateKey;
 var certificate;
 var ca;
@@ -112,41 +119,41 @@ app.post('/videoupload', function(request,response) {
                     fs.stat('uploaded/' + sourceVideoFilename + '.jpg',(err,stat) => {
                         if (Config.UsageLogs == true) {
                             // Log usage data if no errors and if logging is enabled
-                            var allStats = JSON.parse(fs.readFileSync('usage.json','utf8'));
+                            // var allStats = JSON.parse(fs.readFileSync('usage.json','utf8'));
 
-                            if (allStats[username] == undefined) {
+                            if (usageData[username] == undefined) {
                                 // New user?
-                                allStats[username] = {};
+                                usageData[username] = {};
                             }
 
-                            var videoUsage = allStats[username]['videos'];
+                            var videoUsage = usageData[username]['videos'];
                             console.log(videoUsage);
                             console.log(videoSize);
                             if (videoUsage == undefined) {
-                                allStats[username]['videos'] = videoSize;
+                                usageData[username]['videos'] = videoSize;
                             } else {
-                                allStats[username]['videos'] = videoUsage + videoSize;
+                                usageData[username]['videos'] = videoUsage + videoSize;
                             }
 
-                            var snapUsage = allStats[username]['thumbnails'];
+                            var snapUsage = usageData[username]['thumbnails'];
                             if (snapUsage == undefined) {
-                                allStats[username]['thumbnails'] = snapSize;
+                                usageData[username]['thumbnails'] = snapSize;
                             } else {
-                                allStats[username]['thumbnails'] = snapUsage + snapSize;
+                                usageData[username]['thumbnails'] = snapUsage + snapSize;
                             }
 
                             if (err != null) {
                                 console.log('Error getting sprite filesize: ' + err);
                             } else {
-                                var spriteUsage = allStats[username]['sprites'];
+                                var spriteUsage = usageData[username]['sprites'];
                                 if (spriteUsage == undefined) {
-                                    allStats[username]['sprites'] = stat['size'];
+                                    usageData[username]['sprites'] = stat['size'];
                                 } else {
-                                    allStats[username]['sprites'] = spriteUsage + stat['size'];
+                                    usageData[username]['sprites'] = spriteUsage + stat['size'];
                                 }
                             }
 
-                            fs.writeFileSync('usage.json',JSON.stringify(allStats));
+                            fs.writeFileSync('usage.json',JSON.stringify(usageData));
                         }
                     });
                     getDuration(videoPathName).then((videoDuration) => {
@@ -169,7 +176,7 @@ app.get('/usage', function(request,response) {
     // API to get usage info
     if (Config.UsageLogs != true) return response.send('Logs are disabled therefore API is not available for usage.');
     if (request.query.user == undefined || request.query.user == '') return response.send('Steem username is not defined!');
-    response.send(JSON.parse(fs.readFileSync('usage.json','utf8'))[request.query.user]);
+    response.send(usageData[request.query.user]);
 })
 
 function loadWebpage(HTMLFile,response) {
