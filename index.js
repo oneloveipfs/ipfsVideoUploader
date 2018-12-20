@@ -16,6 +16,9 @@ if (Config.UsageLogs == true) {
     usageData = JSON.parse(fs.readFileSync('usage.json','utf8'));
 }
 
+// Cache hashes data in a variable
+var hashes = JSON.parse(fs.readFileSync('hashes.json','utf8'));
+
 // Setup HTTPS
 var privateKey;
 var certificate;
@@ -119,16 +122,12 @@ app.post('/videoupload', function(request,response) {
                     fs.stat('uploaded/' + sourceVideoFilename + '.jpg',(err,stat) => {
                         if (Config.UsageLogs == true) {
                             // Log usage data if no errors and if logging is enabled
-                            // var allStats = JSON.parse(fs.readFileSync('usage.json','utf8'));
-
                             if (usageData[username] == undefined) {
                                 // New user?
                                 usageData[username] = {};
                             }
 
                             var videoUsage = usageData[username]['videos'];
-                            console.log(videoUsage);
-                            console.log(videoSize);
                             if (videoUsage == undefined) {
                                 usageData[username]['videos'] = videoSize;
                             } else {
@@ -156,7 +155,31 @@ app.post('/videoupload', function(request,response) {
                             fs.writeFileSync('usage.json',JSON.stringify(usageData));
                         }
                     });
+
+                    // Log IPFS hashes by Steem account
+                    if (hashes[username] == undefined) {
+                        hashes[username] = {
+                            videos: [],
+                            thumbnails: [],
+                            sprites: []
+                        }
+                    }
+                    
+                    // If hash is not in database, add the hash into database
+                    if (!hashes[username]['videos'].includes(ipfsHash))
+                        hashes[username]['videos'].push(ipfsHash);
+                    if (!hashes[username]['thumbnails'].includes(ipfsSnapHash))
+                        hashes[username]['thumbnails'].push(ipfsSnapHash);
+                    if (!hashes[username]['sprites'].includes(ipfsSpriteHash))
+                        hashes[username]['sprites'].push(ipfsSpriteHash);
+
+                    fs.writeFile('hashes.json',JSON.stringify(hashes),(err) => {
+                        if (err != null)
+                            console.log('Error saving hash logs: ' + err);
+                    });
+
                     getDuration(videoPathName).then((videoDuration) => {
+                        // Send IPFS hashes, duration and filesize back to client
                         response.send({
                             ipfshash: ipfsHash,
                             snaphash: ipfsSnapHash,
