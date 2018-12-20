@@ -45,6 +45,15 @@ To get usage info for specific Steem user:
 ```
 /usage?user=STEEM_USERNAME
 ```
+* `user` *(required)*: Steem account username
+
+To get list of hashes of uploaded files:
+```
+/hashes?user=STEEM_USERNAME&hashtype=videos,thumbnails,sprites
+```
+
+* `user` *(optional)*: Steem account username
+* `hashtype` *(required)*: Type of hash to obtain. Valid values: `videos`, `thumbnails`, `sprites`.
 
 # How to contribute?
 

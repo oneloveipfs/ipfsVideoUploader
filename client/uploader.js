@@ -193,7 +193,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,DTub
             },
         },
         tags: SteemTags,
-        app: 'onelovedtube/0.8.1',
+        app: 'onelovedtube/0.8.2',
     }
     return jsonMeta;
 }

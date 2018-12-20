@@ -10,7 +10,7 @@ We have done some testing with several video file formats for IPFS, and we found
 
 #### 3. I'm getting a sc2-sdk error while submitting video onto the blockchain. What is happenning?
 
-Looks like SteemConnect, the auth solution that we're currently using right now, has some issues with the API. This is not an issue with upload servers or IPFS. Refresh the webpage and try again later.
+Looks like SteemConnect, the auth solution that we're currently using right now, has some issues with the API. This is not an issue with upload servers or IPFS. Clear your browser cache, refresh the webpage and try again later.
 
 #### 4. I'm getting a network error while uploading. Is there a server issue?
 
@@ -32,11 +32,11 @@ We recommend either 1280x720px, or 1920x1080px at `.jpg` or `.png` file formats.
 
 We have tested 4K video uploads (with 4K videos pinned to a single node) and it ended up playing for most users who have the average internet bandwidth required for streaming 4K videos. For optimal performance, you may want to have your videos pinned to multiple IPFS nodes, either manually or setting up an [IPFS cluster](https://github.com/ipfs/ipfs-cluster).
 
-In future code updates, all uploaded videos will have its hashes logged into a text file, and will be downloadable through HTTPS so that anyone can view all video hashes that are pinned to an upload server, and may use this to sync up with their own IPFS node to ensure that all videos uploaded through the uploader gets pinned.
+In 0.8.2 update, you may now call an API to obtain the list of IPFS hashes of files uploaded by certain user (or all users), categorized by videos, thumbnails and sprites. You may then sync up your node with the data returned.
 
 #### 9. The uploader webpage does not render properly on mobile, and I can't get my videos uploaded from my mobile device.
 
-The uploader is not mobile optimised. There is a possibility that a dedicated mobile app may be developed solely to post videos onto DTube, but we are unable to provide an ETA of when it will be completed.
+The uploader is yet to be mobile optimised. There is a possibility that a dedicated mobile app may be developed solely to post videos onto DTube, but we are unable to provide an ETA of when it will be completed.
 
 #### 10. I have saved my metadata as draft, but they disappeared the next time I log in.
 
@@ -44,7 +44,7 @@ The drafts are stored in your web browser locally, so when you login with the sa
 
 #### 11. How are the beneficiaries set?
 
-For OneLoveDTube's uploader services, beneficiary to @dtube account is set to 8% to support their development and curation efforts (instead of 10%). Other than the $10 USD flat rate to use OneLoveDTube's uploader services, we do not take any other additional beneficiaries from your post payouts.
+For OneLoveDTube's uploader services, beneficiary to @dtube account is set to 6% to support their development and curation efforts (instead of 10%). Other than the $10 USD/month flat rate to use OneLoveDTube's uploader services, we do not take any other additional beneficiaries from your post payouts.
 
 #### 12. Am I eligible for DTube curation when I upload my videos using this uploader?
 
