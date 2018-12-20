@@ -5,6 +5,7 @@ const fs = require('fs');
 const sanitize = require('sanitize-filename');
 const Config = require('./config.json');
 const Express = require('express');
+const CORS = require('cors');
 const https = require('https');
 const app = Express();
 
@@ -59,7 +60,7 @@ app.get('/upload', (request,response) => {
     loadWebpage('./client/uploader.html',response);
 });
 
-app.get('/checkuser', function(request,response) {
+app.get('/checkuser', CORS(), function(request,response) {
     // Check if user is in whitelist
     if (Config.whitelistEnabled == true) {
         if (fs.existsSync('whitelist.txt')) {
@@ -195,14 +196,14 @@ app.post('/videoupload', function(request,response) {
     });
 });
 
-app.get('/usage', function(request,response) {
+app.get('/usage', CORS(), function(request,response) {
     // API to get usage info
     if (Config.UsageLogs != true) return response.send('Logs are disabled therefore API is not available for usage.');
     if (request.query.user == undefined || request.query.user == '') return response.send('Steem username is not defined!');
     response.send(usageData[request.query.user]);
 })
 
-app.get('/hashes', function(request,response) {
+app.get('/hashes', CORS(), function(request,response) {
     // API to get IPFS hashes of uploaded files
     let typerequested = request.query.hashtype;
     if (typerequested == '' || typerequested == undefined) {

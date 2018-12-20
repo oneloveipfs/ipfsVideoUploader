@@ -6,6 +6,7 @@
   "author": "techcoderx",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.16.4",
     "fs": "0.0.1-security",
     "get-video-duration": "^0.3.0",
