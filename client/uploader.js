@@ -172,8 +172,9 @@ function buildPostBody(author,permlink,videoHash,snapHash,description) {
 }
 
 function buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,DTubeTags,duration,filesize,author,permlink) {
-    var SteemTags = Object.assign([],DTubeTags);
-    SteemTags.push('dtube');
+    // 'dtube' tag as first tag for Steemit post
+    var SteemTags = ['dtube'];
+    SteemTags = SteemTags.concat(DTubeTags);
 
     var jsonMeta = {
         video: {
@@ -209,7 +210,7 @@ function generatePost(username,permlink,sourceHash,snapHash,spriteHash,title,des
     let operations = [
         [ 'comment', {
                 parent_author: '',
-                parent_permlink: tags[0],
+                parent_permlink: 'dtube',
                 author: username,
                 permlink: permlink,
                 title: title,
