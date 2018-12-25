@@ -20,16 +20,16 @@ if (Config.UsageLogs == true) {
 // Cache hashes data in a variable
 var hashes = JSON.parse(fs.readFileSync('hashes.json','utf8'));
 
-// Setup HTTPS
+// Setup HTTPS if needed
 var privateKey;
 var certificate;
 var ca;
 var credentials;
 
 if (Config.useHTTPS == true) {
-    privateKey = fs.readFileSync('/etc/letsencrypt/live/' + Config.domain + '/privkey.pem','utf8');
-    certificate = fs.readFileSync('/etc/letsencrypt/live/' + Config.domain + '/cert.pem','utf8');
-    ca = fs.readFileSync('/etc/letsencrypt/live/' + Config.domain + '/chain.pem','utf8');
+    privateKey = fs.readFileSync(Config.HTTPS_PrivKey_Dir,'utf8');
+    certificate = fs.readFileSync(Config.HTTPS_Cert_Dir,'utf8');
+    ca = fs.readFileSync(Config.HTTPS_CertAuth_Dir,'utf8');
 
     credentials = {
         key: privateKey,
@@ -38,8 +38,9 @@ if (Config.useHTTPS == true) {
     }
 }
 
-app.use(Express.static(__dirname, { dotfiles: 'allow' }));
+app.use(Express.static(__dirname, { dotfiles: 'deny' }));
 
+// HTTP to HTTPS redirect
 if (Config.useHTTPS == true) {
     app.use(function(req,res,next) {
         if (req.secure) {
@@ -60,7 +61,12 @@ app.get('/upload', (request,response) => {
     loadWebpage('./client/uploader.html',response);
 });
 
-app.get('/checkuser', CORS(), function(request,response) {
+app.get('/404', (request,response) => {
+    // 404 page
+    loadWebpage('./client/404.html',response);
+})
+
+app.get('/checkuser', CORS(), (request,response) => {
     // Check if user is in whitelist
     if (Config.whitelistEnabled == true) {
         if (fs.existsSync('whitelist.txt')) {
@@ -74,7 +80,7 @@ app.get('/checkuser', CORS(), function(request,response) {
     }
 });
 
-app.post('/videoupload', function(request,response) {
+app.post('/videoupload', (request,response) => {
     upload.fields([{name: 'VideoUpload', maxCount: 1},{name: 'SnapUpload', maxCount: 1}])(request,response,function(err) {
         if (err != null) throw err;
 
@@ -196,14 +202,14 @@ app.post('/videoupload', function(request,response) {
     });
 });
 
-app.get('/usage', CORS(), function(request,response) {
+app.get('/usage', CORS(), (request,response) => {
     // API to get usage info
     if (Config.UsageLogs != true) return response.send('Logs are disabled therefore API is not available for usage.');
     if (request.query.user == undefined || request.query.user == '') return response.send('Steem username is not defined!');
     response.send(usageData[request.query.user]);
 })
 
-app.get('/hashes', CORS(), function(request,response) {
+app.get('/hashes', CORS(), (request,response) => {
     // API to get IPFS hashes of uploaded files
     let typerequested = request.query.hashtype;
     if (typerequested == '' || typerequested == undefined) {
@@ -261,7 +267,7 @@ function loadWebpage(HTMLFile,response) {
 }
 
 app.use(function (req,res) {
-    return res.status(404).redirect('/404.html');
+    return res.status(404).redirect('/404');
 })
 
 if (Config.useHTTPS == true) {
