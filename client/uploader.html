@@ -19,7 +19,10 @@
             <h3>Description: <br>
             <textarea id="description" name="description"></textarea></h3>
             <h3>Tags (seperated by space): <br><input type="text" id="tags" name="tags" class="meta"></h3>
-            <h4><input type="checkbox" name="powerup" id="powerup"> Power Up 100%</h4>
+            <label class="switch">
+                <input type="checkbox" name="powerup" id="powerup">
+                <span class="slider round"></span>
+            </label><h3 class="poweruptext"> Power Up 100%</h3><br><br>
             <input class="styledButton" type="submit" value="Upload!" id="submitbutton" onclick="submitVideo()">
             <input class="styledButton" type="button" value="Save draft" id="draftBtn" onclick="saveAsDraft()">
             <h4 id="loggedInUser">Detecting login...</h4>
