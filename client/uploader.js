@@ -25,6 +25,7 @@ if (token == null) {
             var savedTitle = localStorage.getItem('OneLoveTitle');
             var savedDescription = localStorage.getItem('OneLoveDescription');
             var savedTags = localStorage.getItem('OneLoveTags');
+            var savedPostBody = localStorage.getItem('OneLovePostBody');
 
             if (savedTitle != null) {
                 document.getElementById('title').value = savedTitle;
@@ -36,6 +37,10 @@ if (token == null) {
 
             if (savedTags != null) {
                 document.getElementById('tags').value = savedTags;
+            }
+
+            if (savedPostBody != null) {
+                document.getElementById('postBody').value = savedPostBody;
             }
         });
     });
@@ -64,6 +69,8 @@ function restrict() {
     document.getElementById('description').disabled = true;
     document.getElementById('tags').disabled = true;
     document.getElementById('powerup').disabled = true;
+    document.getElementById('postBody').disabled = true;
+    document.getElementById('draftBtn').disabled = true;
     document.getElementById('submitbutton').disabled = true;
 }
 
@@ -74,11 +81,14 @@ function reenableFields() {
     document.getElementById('description').disabled = false;
     document.getElementById('tags').disabled = false;
     document.getElementById('powerup').disabled = false;
+    document.getElementById('postBody').disabled = false;
+    document.getElementById('draftBtn').disabled = false;
     document.getElementById('submitbutton').disabled = false;
 }
 
 function submitVideo() {
     // Validate data entered
+    var postBody = document.getElementById('postBody').value;
     var description = document.getElementById('description').value;
     var powerup = document.getElementById('powerup').checked;
     var permlink = generatePermlink();
@@ -155,7 +165,7 @@ function submitVideo() {
         progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
 
         // Post to Steem blockchain
-        let transaction = generatePost(username,permlink,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup,uploaderResponse.dtubefees);
+        let transaction = generatePost(username,permlink,postBody,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup,uploaderResponse.dtubefees);
         api.broadcast(transaction,function(err) {
             if (err != null) {
                 alert('Failed to post on DTube: ' + err + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
@@ -183,8 +193,12 @@ function generatePermlink() {
     return permlink;
 }
 
-function buildPostBody(author,permlink,videoHash,snapHash,description) {
-    return '<center><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'><img src=\'https://cloudflare-ipfs.com/ipfs/' + snapHash + '\'></a></center><hr>\n\n' + description + '\n\n<hr><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'> ▶️ DTube</a><br /><a href=\'https://cloudflare-ipfs.com/ipfs/' + videoHash + '\'> ▶️ IPFS</a>'
+function buildPostBody(author,permlink,postBody,videoHash,snapHash,description) {
+    if (postBody == '') {
+        return '<center><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'><img src=\'https://cloudflare-ipfs.com/ipfs/' + snapHash + '\'></a></center><hr>\n\n' + description + '\n\n<hr><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'> ▶️ DTube</a><br /><a href=\'https://cloudflare-ipfs.com/ipfs/' + videoHash + '\'> ▶️ IPFS</a>'
+    } else {
+        return '<center><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'><img src=\'https://cloudflare-ipfs.com/ipfs/' + snapHash + '\'></a></center><hr>\n\n' + postBody + '\n\n<hr><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'> ▶️ DTube</a><br /><a href=\'https://cloudflare-ipfs.com/ipfs/' + videoHash + '\'> ▶️ IPFS</a>'
+    }
 }
 
 function buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,DTubeTags,duration,filesize,author,permlink) {
@@ -215,7 +229,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,DTub
     return jsonMeta;
 }
 
-function generatePost(username,permlink,sourceHash,snapHash,spriteHash,title,description,tags,duration,filesize,powerUp,dtubefees) {
+function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,title,description,tags,duration,filesize,powerUp,dtubefees) {
     // Power up all rewards or not
     var percentSBD = 10000;
     if (powerUp == true) {
@@ -230,7 +244,7 @@ function generatePost(username,permlink,sourceHash,snapHash,spriteHash,title,des
                 author: username,
                 permlink: permlink,
                 title: title,
-                body: buildPostBody(username,permlink,sourceHash,snapHash,description),
+                body: buildPostBody(username,permlink,postBody,sourceHash,snapHash,description),
                 json_metadata: JSON.stringify(buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,tags,duration,filesize,username,permlink)),
             }
         ],
@@ -264,5 +278,6 @@ function saveAsDraft() {
     localStorage.setItem('OneLoveTitle',document.getElementById('title').value);
     localStorage.setItem('OneLoveDescription',document.getElementById('description').value);
     localStorage.setItem('OneLoveTags',document.getElementById('tags').value);
+    localStorage.setItem('OneLovePostBody',document.getElementById('postBody').value);
     alert('Metadata saved as draft!')
 }

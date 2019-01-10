@@ -67,6 +67,10 @@ a {
     display: none;
 }
 
+#postBody {
+    height: 200px;
+}
+
 #progressBarBack {
     width: 100%;
     background-color: gray;
