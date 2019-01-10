@@ -70,6 +70,14 @@ function restrict() {
     document.getElementById('tags').disabled = true;
     document.getElementById('powerup').disabled = true;
     document.getElementById('postBody').disabled = true;
+    document.getElementById('postImgBtn').disabled = true;
+    document.getElementById('draftBtn').disabled = true;
+    document.getElementById('submitbutton').disabled = true;
+}
+
+function restrictImg() {
+    document.getElementById('postBody').disabled = true;
+    document.getElementById('postImgBtn').disabled = true;
     document.getElementById('draftBtn').disabled = true;
     document.getElementById('submitbutton').disabled = true;
 }
@@ -82,6 +90,14 @@ function reenableFields() {
     document.getElementById('tags').disabled = false;
     document.getElementById('powerup').disabled = false;
     document.getElementById('postBody').disabled = false;
+    document.getElementById('postImgBtn').disabled = false;
+    document.getElementById('draftBtn').disabled = false;
+    document.getElementById('submitbutton').disabled = false;
+}
+
+function reenableFieldsImg() {
+    document.getElementById('postBody').disabled = false;
+    document.getElementById('postImgBtn').disabled = false;
     document.getElementById('draftBtn').disabled = false;
     document.getElementById('submitbutton').disabled = false;
 }
@@ -266,6 +282,47 @@ function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,
         }]
     ];
     return operations;
+}
+
+function uploadImage() {
+    let postImg = document.getElementById('postImg').files;
+    if (postImg.length == 0) {
+        // do not upload if no images are selected
+        return;
+    }
+
+    var imgFormData = new FormData();
+    imgFormData.append('postImg',postImg[0]);
+    imgFormData.append('username',username);
+
+    restrictImg();
+
+    var progressbar = document.getElementById('progressBarBack');
+    var progressbarInner = document.getElementById('progressBarFront');
+    progressbar.style.display = "block";
+    progressbarInner.innerHTML = "Uploading... (0%)";
+
+    var contentType = {
+        headers: {
+            "content-type": "multipart/form-data"
+        },
+        onUploadProgress: function (progressEvent) {
+            console.log(progressEvent);
+
+            var progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+            updateProgressBar(progressPercent);
+        }
+    };
+    axios.post('/imageupload',imgFormData,contentType).then(function(response) {
+        console.log(response);
+        progressbar.style.display = "none";
+        document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + '](https://cloudflare-ipfs.com/ipfs/' + response.data.imghash + ')');
+        reenableFieldsImg();
+    }).catch(function(err) {
+        alert('Upload error: ' + err);
+        progressbar.style.display = "none";
+        reenableFieldsImg();
+    })
 }
 
 function updateProgressBar(progress) {

@@ -10,6 +10,7 @@ const https = require('https');
 const app = Express();
 
 const upload = Multer({ dest: './uploaded/' });
+const imgUpload = Multer({ dest: './imguploads/', limits: { fileSize: 7340032 } })
 
 // Cache usage data in a variable
 var usageData = {};
@@ -110,18 +111,18 @@ app.post('/videoupload', (request,response) => {
         Shell.exec('ipfs add ' + videoPathName + ' -t',function(code,stdout,stderr) {
             let outs = stdout.split(' ');
             let ipfsHash = outs[1];
-            Shell.exec('ipfs pin add ' + ipfsHash);
+            Shell.exec('ipfs pin add ' + ipfsHash,() => {});
             Shell.exec('ipfs add ' + snapPathName,function(code,stdout,stderr) {
                 let snapOuts = stdout.split(' ');
                 let ipfsSnapHash = snapOuts[1];
-                Shell.exec('ipfs pin add ' + ipfsSnapHash);
+                Shell.exec('ipfs pin add ' + ipfsSnapHash,() => {});
 
                 // Sprite creation
                 Shell.exec('./dtube-sprite.sh ' + videoPathName + ' uploaded/' + sourceVideoFilename + '.jpg',function(code,stdout,stderr) {
                     Shell.exec('ipfs add uploaded/' + sourceVideoFilename + '.jpg -t',function(code,stdout,stderr) {
                         let spriteouts = stdout.split(' ');
                         let ipfsSpriteHash = spriteouts[1];
-                        Shell.exec('ipfs pin add ' + ipfsSpriteHash);
+                        Shell.exec('ipfs pin add ' + ipfsSpriteHash,() => {});
     
                         // Get video duration and file size
                         let videoSize = request.files.VideoUpload[0].size;
@@ -168,7 +169,8 @@ app.post('/videoupload', (request,response) => {
                             hashes[username] = {
                                 videos: [],
                                 thumbnails: [],
-                                sprites: []
+                                sprites: [],
+                                images: [],
                             }
                         }
                         
@@ -202,6 +204,69 @@ app.post('/videoupload', (request,response) => {
         });
     });
 });
+
+app.post('/imageupload',imgUpload.single('postImg'),(request,response) => {
+    let username = request.body.username; //steem username
+    if (Config.UsageLogs == true) {
+        if (typeof username != 'string') {
+            throw "Username submitted to upload server is not a string!"
+        } else if ((username == undefined || null) || (username == '')) {
+            throw "We can't process your upload because our server doesn't know who you are!"
+        }
+    }
+    let uploadedImg = sanitize(request.file.filename);
+    Shell.exec('ipfs add imguploads/' + uploadedImg,(code,stdout,stderr) => {
+        let outs = stdout.split(' ');
+        let ipfsImgHash = outs[1];
+        Shell.exec('ipfs pin add ' + ipfsImgHash,() => {});
+
+        if (Config.UsageLogs == true) {
+            // Log usage data for image uploads
+            if (usageData[username] == undefined) {
+                // New user?
+                usageData[username] = {};
+            }
+
+            var imgUsage = usageData[username]['images'];
+            if (imgUsage == undefined) {
+                usageData[username]['images'] = request.file.size;
+            } else {
+                usageData[username]['images'] = imgUsage + request.file.size;
+            }
+
+            fs.writeFileSync('usage.json',JSON.stringify(usageData));
+        }
+
+        // Log IPFS hashes by Steem account
+        if (hashes[username] == undefined) {
+            hashes[username] = {
+                videos: [],
+                thumbnails: [],
+                sprites: [],
+                images: [],
+            }
+        }
+
+        // Patch for empty images array
+        if (hashes[username].images == undefined) {
+            hashes[username].images = [];
+        }
+
+        // If hash is not in database, add the hash into database
+        if (!hashes[username]['images'].includes(ipfsImgHash))
+            hashes[username]['images'].push(ipfsImgHash);
+        
+        fs.writeFile('hashes.json',JSON.stringify(hashes),(err) => {
+            if (err != null)
+                console.log('Error saving image hash logs: ' + err);
+        });
+
+        // Send image IPFS hash back to client
+        response.send({
+            imghash: ipfsImgHash
+        })
+    })
+})
 
 app.get('/usage', CORS(), (request,response) => {
     // API to get usage info
