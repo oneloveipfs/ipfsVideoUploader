@@ -13,16 +13,25 @@
         <div id='header'><h1 id="siteTitle"><img id="logoBanner" src="public/logo.png">  <div id="headTitleText">OneLoveDTube Uploader</div></h1></div>
         <div id='content' class="uploadcontent">
         <div id="uploadForm">
-            <h3>Upload a video (mp4 file accepted): <input type="file" accept="video/mp4" name="VideoUpload" id="sourcevideo"></h3>
-            <h3>Upload a thumbnail: <input type="file" accept="image/jpg,image/png" name="SnapUpload" id="snapfile"></h3>
-            <h3>Title: <br><input type="text" id="title" name="title" class="meta"></h3>
-            <h3>Description: <br>
-            <textarea id="description" name="description"></textarea></h3>
-            <h3>Tags (seperated by space): <br><input type="text" id="tags" name="tags" class="meta"></h3>
-            <label class="switch">
-                <input type="checkbox" name="powerup" id="powerup">
-                <span class="slider round"></span>
-            </label><h3 class="poweruptext"> Power Up 100%</h3><br><br>
+            <div id="tab">
+                <a class="tabs" id="tabBasics" onclick="tabBasicsClicked()">Basics</a>
+                <a class="tabs" id="tabAdvanced" onclick="tabAdvancedClicked()">Advanced</a>
+            </div>
+            <div id="basics"> <!-- Basics tab -->
+                <h3>Upload a video (mp4 file accepted): <input type="file" accept="video/mp4" name="VideoUpload" id="sourcevideo"></h3>
+                <h3>Upload a thumbnail: <input type="file" accept="image/jpg,image/png" name="SnapUpload" id="snapfile"></h3>
+                <h3>Title: <br><input type="text" id="title" name="title" class="meta"></h3>
+                <h3>Description: <br>
+                <textarea id="description" name="description"></textarea></h3>
+                <h3>Tags (seperated by space): <br><input type="text" id="tags" name="tags" class="meta"></h3>
+                <label class="switch">
+                    <input type="checkbox" name="powerup" id="powerup">
+                    <span class="slider round"></span>
+                </label><h3 class="poweruptext"> Power Up 100%</h3><br><br>
+            </div>
+            <div id="advanced"> <!-- Advanced tab -->
+
+            </div>
             <input class="styledButton" type="submit" value="Upload!" id="submitbutton" onclick="submitVideo()">
             <input class="styledButton" type="button" value="Save draft" id="draftBtn" onclick="saveAsDraft()">
             <h4 id="loggedInUser">Detecting login...</h4>

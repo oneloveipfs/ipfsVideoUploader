@@ -41,6 +41,22 @@ if (token == null) {
     });
 }
 
+function tabBasicsClicked() {
+    document.getElementById('advanced').style.display = "none";
+    document.getElementById('basics').style.display = "block";
+    document.getElementById('tabAdvanced').style.backgroundColor = "transparent"
+    document.getElementById('tabBasics').style.backgroundColor = "#2196F3";
+    return true;
+}
+
+function tabAdvancedClicked() {
+    document.getElementById('advanced').style.display = "block";
+    document.getElementById('basics').style.display = "none";
+    document.getElementById('tabAdvanced').style.backgroundColor = "#2196F3"
+    document.getElementById('tabBasics').style.backgroundColor = "transparent";
+    return true;
+}
+
 function restrict() {
     document.getElementById('sourcevideo').disabled = true;
     document.getElementById('snapfile').disabled = true;
