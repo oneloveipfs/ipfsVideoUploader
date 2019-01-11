@@ -309,7 +309,12 @@ app.get('/hashes', CORS(), (request,response) => {
         return response.send(hashesToReturn);
     }
 
-    // BOTH Steem username and hash type request are specified
+    // Steem username specified does not exist in our record
+    if (!hashes.hasOwnProperty(request.query.user)) {
+        return response.send('Steem user specified doesn\'t exist in our record.');
+    }
+
+    // BOTH valid Steem username and hash type request are specified
     if (typerequested.includes('videos'))
         hashesToReturn.videos = hashes[request.query.user]['videos'];
     if (typerequested.includes('thumbnails'))
