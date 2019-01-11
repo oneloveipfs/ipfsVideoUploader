@@ -303,6 +303,8 @@ app.get('/hashes', CORS(), (request,response) => {
             hashesToReturn.thumbnails = getAllHashes('thumbnails');
         if (typerequested.includes('sprites'))
             hashesToReturn.sprites = getAllHashes('sprites');
+        if (typerequested.includes('images'))
+            hashesToReturn.images = getAllHashes('images');
         
         return response.send(hashesToReturn);
     }
@@ -314,6 +316,8 @@ app.get('/hashes', CORS(), (request,response) => {
         hashesToReturn.thumbnails = hashes[request.query.user]['thumbnails'];
     if (typerequested.includes('sprites'))
         hashesToReturn.sprites = hashes[request.query.user]['sprites'];
+    if (typerequested.includes('images'))
+        hashesToReturn.images = hashes[request.query.user]['images'];
     
     return response.send(hashesToReturn);
 });
