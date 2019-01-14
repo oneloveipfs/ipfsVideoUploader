@@ -26,7 +26,9 @@ Change the Brave Shields settings to allow all cookies instead of blocking 3rd p
 
 #### 7. I'm not getting any encoded versions of the source video. What did I do wrong?
 
-We have made a decision that videos should be user encoded to reduce overhead costs of running the upload servers. This also increases decentralization further because encoding is done with user's computing power, not on the server side. Right now users will only be able to upload source video files, but options to upload encoded versions of source videos will be added in future code updates.
+We have made a decision that videos should be user encoded to reduce overhead costs of running the upload servers. This also increases decentralization further because encoding is done with user's computing power, not on the server side.
+
+You may encode your video into another video file that is lower resolution than your source video, using [Handbrake](https://handbrake.fr) with the prepared config files [here](https://steemit.com/video/@techcoderx/config-files-for-encoding-dtube-videos-with-handbrake). Then upload those files in the respective upload fields in the advanced tab of the uploader page.
 
 #### 8. What is the best specifications for thumbnails?
 
@@ -38,22 +40,20 @@ We have tested 4K video uploads (with 4K videos pinned to a single node) and it 
 
 In 0.8.2 update, you may now call an API to obtain the list of IPFS hashes of files uploaded by certain user (or all users), categorized by videos, thumbnails and sprites. You may then sync up your node with the data returned.
 
-#### 10. The uploader webpage does not render properly on mobile, and I can't get my videos uploaded from my mobile device.
+You may also want to encode your video into another video file that is lower resolution than the source video file, and upload them seperately by selecting the encoded files in the respective upload fields in the advanced tab. This will allow users with poor internet connection to play the video at lower quality settings.
 
-The uploader is yet to be mobile optimised. There is a possibility that a dedicated mobile app may be developed solely to post videos onto DTube, but we are unable to provide an ETA of when it will be completed.
-
-#### 11. I have saved my metadata as draft, but they disappeared the next time I log in.
+#### 10. I have saved my metadata as draft, but they disappeared the next time I log in.
 
 The drafts are stored in your web browser locally, so when you login with the same account on another web browser (or another device), it will not find your saved drafts. Also please ensure that you're not in private browsing mode while saving them as draft. Clearing your browser cache will delete your drafts as well.
 
-#### 12. How are the beneficiaries set?
+#### 11. How are the beneficiaries set?
 
 For OneLoveDTube's uploader services, beneficiary to @dtube account is set to 6% to support their development and curation efforts (instead of 10%). Other than the $10 USD/month flat rate to use OneLoveDTube's uploader services, we do not take any other additional beneficiaries from your post payouts.
 
-#### 13. Am I eligible for DTube curation when I upload my videos using this uploader?
+#### 12. Am I eligible for DTube curation when I upload my videos using this uploader?
 
 Yes! We have tested this with actual high quality DTube videos, and they get picked up by the curation team, just like any other DTube videos.
 
-#### 14. My question is not listed in this document. What can I do?
+#### 13. My question is not listed in this document. What can I do?
 
 Contact us in [OneLoveDTube Discord server](https://discord.gg/Sc4utKr), with a screenshot of the console output from your browser (if applicable).

@@ -1,10 +1,10 @@
 {
   "name": "ipfsvideouploader",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Alternative IPFS uploader for DTube videos.",
   "main": "index.js",
   "author": "techcoderx",
-  "license": "ISC",
+  "license": "GPLv3",
   "dependencies": {
     "async": "^2.6.1",
     "buffer": "^5.2.1",
