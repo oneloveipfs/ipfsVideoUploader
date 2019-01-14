@@ -104,26 +104,31 @@ function reenableFieldsImg() {
 
 function submitVideo() {
     // Validate data entered
-    var postBody = document.getElementById('postBody').value;
-    var description = document.getElementById('description').value;
-    var powerup = document.getElementById('powerup').checked;
-    var permlink = generatePermlink();
+    let postBody = document.getElementById('postBody').value;
+    let description = document.getElementById('description').value;
+    let powerup = document.getElementById('powerup').checked;
+    let permlink = generatePermlink();
 
-    var sourceVideo = document.getElementById('sourcevideo').files;
-    var snap = document.getElementById('snapfile').files;
+    let sourceVideo = document.getElementById('sourcevideo').files;
+    let snap = document.getElementById('snapfile').files;
 
-    var title = document.getElementById('title').value;
+    let video240 = document.getElementById('video240p').files;
+    let video480 = document.getElementById('video480p').files;
+    let video720 = document.getElementById('video720p').files;
+    let video1080 = document.getElementById('video1080p').files;
+
+    let title = document.getElementById('title').value;
     if (title.length > 256) {
         alert('Title is too long!');
         return;
     }
-    var tag = document.getElementById('tags').value;
+    let tag = document.getElementById('tags').value;
     if (/^[a-z0-9- _]*$/.test(tag) == false){
         alert('Invalid tags!')
         return;
     }
 
-    var tags = tag.split(' ');
+    let tags = tag.split(' ');
     if (tags.length > 4) {
         alert('Please do not use more than 4 tags!');
         return;
@@ -158,6 +163,15 @@ function submitVideo() {
     formdata.append('SnapUpload',snap[0]);
     formdata.append('Username',username);
 
+    if (video240.length > 0)
+        formdata.append('Video240Upload',video240[0]);
+    if (video480.length > 0)
+        formdata.append('Video480Upload',video480[0]);
+    if (video720.length > 0)
+        formdata.append('Video720Upload',video720[0]);
+    if (video1080.length > 0)
+        formdata.append('Video1080Upload',video1080[0]);
+
     var progressbar = document.getElementById('progressBarBack');
     var progressbarInner = document.getElementById('progressBarFront');
     progressbar.style.display = "block";
@@ -181,7 +195,7 @@ function submitVideo() {
         progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
 
         // Post to Steem blockchain
-        let transaction = generatePost(username,permlink,postBody,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup,uploaderResponse.dtubefees);
+        let transaction = generatePost(username,permlink,postBody,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup,uploaderResponse.dtubefees);
         api.broadcast(transaction,function(err) {
             if (err != null) {
                 alert('Failed to post on DTube: ' + err + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
@@ -217,7 +231,7 @@ function buildPostBody(author,permlink,postBody,videoHash,snapHash,description) 
     }
 }
 
-function buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,DTubeTags,duration,filesize,author,permlink) {
+function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,DTubeTags,duration,filesize,author,permlink) {
     // 'dtube' tag as first tag for Steemit post
     var SteemTags = ['dtube'];
     SteemTags = SteemTags.concat(DTubeTags);
@@ -235,6 +249,10 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,DTub
             },
             content: {
                 videohash: sourceHash,
+                video240hash: video240Hash,
+                video480hash: video480Hash,
+                video720hash: video720Hash,
+                video1080hash: video1080Hash,
                 description: description,
                 tags: DTubeTags,
             },
@@ -245,7 +263,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,DTub
     return jsonMeta;
 }
 
-function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,title,description,tags,duration,filesize,powerUp,dtubefees) {
+function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,tags,duration,filesize,powerUp,dtubefees) {
     // Power up all rewards or not
     var percentSBD = 10000;
     if (powerUp == true) {
@@ -261,7 +279,7 @@ function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,
                 permlink: permlink,
                 title: title,
                 body: buildPostBody(username,permlink,postBody,sourceHash,snapHash,description),
-                json_metadata: JSON.stringify(buildJsonMetadata(sourceHash,snapHash,spriteHash,title,description,tags,duration,filesize,username,permlink)),
+                json_metadata: JSON.stringify(buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,tags,duration,filesize,username,permlink)),
             }
         ],
         [ "comment_options", {

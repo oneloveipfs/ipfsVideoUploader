@@ -84,7 +84,14 @@ app.get('/checkuser', CORS(), (request,response) => {
 });
 
 app.post('/videoupload', (request,response) => {
-    upload.fields([{name: 'VideoUpload', maxCount: 1},{name: 'SnapUpload', maxCount: 1}])(request,response,function(err) {
+    upload.fields([
+        {name: 'VideoUpload', maxCount: 1},
+        {name: 'SnapUpload', maxCount: 1},
+        {name: 'Video240Upload', maxCount: 1},
+        {name: 'Video480Upload', maxCount: 1},
+        {name: 'Video720Upload', maxCount: 1},
+        {name: 'Video1080Upload', maxCount: 1},
+    ])(request,response,function(err) {
         if (err != null) throw err;
 
         let username = request.body.Username; //steem username
@@ -97,11 +104,11 @@ app.post('/videoupload', (request,response) => {
         }
 
         // Add video to IPFS
-        var sourceVideoFilename = sanitize(request.files.VideoUpload[0].filename);
-        var videoPathName = 'uploaded/' + sourceVideoFilename + '.mp4';
+        let sourceVideoFilename = sanitize(request.files.VideoUpload[0].filename);
+        let videoPathName = 'uploaded/' + sourceVideoFilename + '.mp4';
         fs.renameSync('uploaded/' + sourceVideoFilename,videoPathName);
 
-        var snapFilename = request.files.SnapUpload[0].filename;
+        let snapFilename = request.files.SnapUpload[0].filename;
         var snapPathName;
         if (request.files.SnapUpload[0].mimetype == 'image/jpeg') {
             snapPathName = 'uploaded/' + snapFilename + '.jpg';
@@ -110,6 +117,7 @@ app.post('/videoupload', (request,response) => {
         }
         fs.renameSync('uploaded/' + snapFilename,snapPathName);
 
+        // Generate sprite from source video, and add all uploaded files to IPFS
         var ipfsops = {
             videohash: (cb) => {
                 fs.readFile(videoPathName,(err,data) => {
@@ -130,8 +138,51 @@ app.post('/videoupload', (request,response) => {
             }
         }
 
+        // Add encoded versions to IPFS as well if available
+        if (request.files.Video240Upload != undefined) {
+            ipfsops.video240hash = (cb) => {
+                let video240PathName = 'uploaded/' + sourceVideoFilename + '_240.mp4'
+                fs.renameSync('uploaded/' + request.files.Video240Upload[0].filename,video240PathName)
+                fs.readFile(video240PathName,(err,data) => {
+                    ipfsAPI.add(data,{trickle: true},(err,file) => cb(err,file[0].hash))
+                })
+            }
+        }
+
+        if (request.files.Video480Upload != undefined) {
+            ipfsops.video480hash = (cb) => {
+                let video480PathName = 'uploaded/' + sourceVideoFilename + '_480.mp4'
+                fs.renameSync('uploaded/' + request.files.Video480Upload[0].filename,video480PathName)
+                fs.readFile(video480PathName,(err,data) => {
+                    ipfsAPI.add(data,{trickle: true},(err,file) => cb(err,file[0].hash))
+                })
+            }
+        }
+
+        if (request.files.Video720Upload != undefined) {
+            ipfsops.video720hash = (cb) => {
+                let video720PathName = 'uploaded/' + sourceVideoFilename + '_720.mp4'
+                fs.renameSync('uploaded/' + request.files.Video720Upload[0].filename,video720PathName)
+                fs.readFile(video720PathName,(err,data) => {
+                    ipfsAPI.add(data,{trickle: true},(err,file) => cb(err,file[0].hash))
+                })
+            }
+        }
+
+        if (request.files.Video1080Upload != undefined) {
+            ipfsops.video1080hash = (cb) => {
+                let video1080PathName = 'uploaded/' + sourceVideoFilename + '_1080.mp4'
+                fs.renameSync('uploaded/' + request.files.Video1080Upload[0].filename,video1080PathName)
+                fs.readFile(video1080PathName,(err,data) => {
+                    ipfsAPI.add(data,{trickle: true},(err,file) => cb(err,file[0].hash))
+                })
+            }
+        }
+
+        // Add everything to IPFS asynchronously
         async.parallel(ipfsops,(err,results) => {
             if (err) console.log(err)
+            console.log(results);
             // Get video duration and file size
             let videoSize = request.files.VideoUpload[0].size;
             let snapSize = request.files.SnapUpload[0].size;
@@ -168,6 +219,39 @@ app.post('/videoupload', (request,response) => {
                         }
                     }
 
+                    // Log encoded video disk usage only if available
+                    if (results.video240hash != undefined) {
+                        var video240Usage = usageData[username]['video240']
+                        if (video240Usage == undefined)
+                            usageData[username]['video240'] = request.files.Video240Upload[0].size
+                        else
+                            usageData[username]['video240'] = video240Usage + request.files.Video240Upload[0].size
+                    }
+
+                    if (results.video480hash != undefined) {
+                        var video480Usage = usageData[username]['video480']
+                        if (video480Usage == undefined)
+                            usageData[username]['video480'] = request.files.Video480Upload[0].size
+                        else
+                            usageData[username]['video480'] = video480Usage + request.files.Video480Upload[0].size
+                    }
+
+                    if (results.video720hash != undefined) {
+                        var video720Usage = usageData[username]['video720']
+                        if (video720Usage == undefined)
+                            usageData[username]['video720'] = request.files.Video720Upload[0].size
+                        else
+                            usageData[username]['video720'] = video720Usage + request.files.Video720Upload[0].size
+                    }
+
+                    if (results.video1080hash != undefined) {
+                        var video1080Usage = usageData[username]['video1080']
+                        if (video1080Usage == undefined)
+                            usageData[username]['video1080'] = request.files.Video1080Upload[0].size
+                        else
+                            usageData[username]['video1080'] = video1080Usage + request.files.Video1080Upload[0].size
+                    }
+
                     fs.writeFile('usage.json',JSON.stringify(usageData),() => {});
                 }
             });
@@ -190,6 +274,43 @@ app.post('/videoupload', (request,response) => {
             if (!hashes[username]['sprites'].includes(results.spritehash))
                 hashes[username]['sprites'].push(results.spritehash)
 
+            // Add encoded video hashes into database if available
+            if (results.video240hash != undefined) {
+                if (hashes[username].video240 == undefined) {
+                    hashes[username].video240 = [results.video240hash]
+                } else {
+                    if (!hashes[username]['video240'].includes(results.video240hash))
+                        hashes[username]['video240'].push(results.video240hash)
+                }
+            }
+
+            if (results.video480hash != undefined) {
+                if (hashes[username].video480 == undefined) {
+                    hashes[username].video480 = [results.video480hash]
+                } else {
+                    if (!hashes[username]['video480'].includes(results.video480hash))
+                        hashes[username]['video480'].push(results.video480hash)
+                }
+            }
+
+            if (results.video720hash != undefined) {
+                if (hashes[username].video720 == undefined) {
+                    hashes[username].video720 = [results.video720hash]
+                } else {
+                    if (!hashes[username]['video720'].includes(results.video720hash))
+                        hashes[username]['video720'].push(results.video720hash)
+                }
+            }
+
+            if (results.video1080hash != undefined) {
+                if (hashes[username].video1080 == undefined) {
+                    hashes[username].video1080 = [results.video240hash]
+                } else {
+                    if (!hashes[username]['video1080'].includes(results.video1080hash))
+                        hashes[username]['video1080'].push(results.video1080hash)
+                }
+            }
+
             fs.writeFile('hashes.json',JSON.stringify(hashes),(err) => {
                 if (err != null)
                     console.log('Error saving hash logs: ' + err);
@@ -199,6 +320,10 @@ app.post('/videoupload', (request,response) => {
                 // Send IPFS hashes, duration and filesize back to client
                 response.send({
                     ipfshash: results.videohash,
+                    ipfs240hash: results.video240hash,
+                    ipfs480hash: results.video480hash,
+                    ipfs720hash: results.video720hash,
+                    ipfs1080hash: results.video1080hash,
                     snaphash: results.snaphash,
                     spritehash: results.spritehash,
                     duration: videoDuration,
