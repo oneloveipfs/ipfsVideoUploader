@@ -92,6 +92,7 @@ app.post('/videoupload', (request,response) => {
         {name: 'Video720Upload', maxCount: 1},
         {name: 'Video1080Upload', maxCount: 1},
     ])(request,response,function(err) {
+        request.socket.setTimeout(0)
         if (err != null) throw err;
 
         let username = request.body.Username; //steem username
