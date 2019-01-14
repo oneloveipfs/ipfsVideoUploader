@@ -1,7 +1,9 @@
 const Multer = require('multer');
+const IPFS = require('ipfs-http-client');
 const Shell = require('shelljs');
 const getDuration = require('get-video-duration');
 const fs = require('fs');
+const async = require('async');
 const sanitize = require('sanitize-filename');
 const Config = require('./config.json');
 const Express = require('express');
@@ -9,6 +11,7 @@ const CORS = require('cors');
 const https = require('https');
 const app = Express();
 
+const ipfsAPI = IPFS('localhost',5001,{protocol: 'http'})
 const upload = Multer({ dest: './uploaded/' });
 const imgUpload = Multer({ dest: './imguploads/', limits: { fileSize: 7340032 } })
 
@@ -69,15 +72,14 @@ app.get('/404', (request,response) => {
 
 app.get('/checkuser', CORS(), (request,response) => {
     // Check if user is in whitelist
-    if (Config.whitelistEnabled == true) {
-        if (fs.existsSync('whitelist.txt')) {
-            var readList = fs.readFileSync('whitelist.txt', 'utf8');
+    if (Config.whitelistEnabled == true && fs.existsSync('whitelist.txt')) {
+        fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
             if (!readList.includes(request.query.user)) {
                 response.send({ "isInWhitelist": false });
             } else {
                 response.send({ "isInWhitelist": true });
             }
-        }
+        })
     }
 });
 
@@ -99,7 +101,7 @@ app.post('/videoupload', (request,response) => {
         var videoPathName = 'uploaded/' + sourceVideoFilename + '.mp4';
         fs.renameSync('uploaded/' + sourceVideoFilename,videoPathName);
 
-        var snapFilename = sanitize(request.files.SnapUpload[0].filename);
+        var snapFilename = request.files.SnapUpload[0].filename;
         var snapPathName;
         if (request.files.SnapUpload[0].mimetype == 'image/jpeg') {
             snapPathName = 'uploaded/' + snapFilename + '.jpg';
@@ -108,100 +110,103 @@ app.post('/videoupload', (request,response) => {
         }
         fs.renameSync('uploaded/' + snapFilename,snapPathName);
 
-        Shell.exec('ipfs add ' + videoPathName + ' -t',function(code,stdout,stderr) {
-            let outs = stdout.split(' ');
-            let ipfsHash = outs[1];
-            Shell.exec('ipfs pin add ' + ipfsHash,() => {});
-            Shell.exec('ipfs add ' + snapPathName,function(code,stdout,stderr) {
-                let snapOuts = stdout.split(' ');
-                let ipfsSnapHash = snapOuts[1];
-                Shell.exec('ipfs pin add ' + ipfsSnapHash,() => {});
+        var ipfsops = {
+            videohash: (cb) => {
+                fs.readFile(videoPathName,(err,data) => {
+                    ipfsAPI.add(data,{trickle: true},(err,file) => cb(err,file[0].hash))
+                })
+            },
+            snaphash: (cb) => {
+                fs.readFile(snapPathName,(err,data) => {
+                    ipfsAPI.add(data,{trickle: false},(err,file) => cb(err,file[0].hash))
+                })
+            },
+            spritehash: (cb) => {
+                Shell.exec('./dtube-sprite.sh ' + videoPathName + ' uploaded/' + sourceVideoFilename + '.jpg',() => {
+                    fs.readFile('uploaded/' + sourceVideoFilename + '.jpg',(err,data) => {
+                        ipfsAPI.add(data,{trickle: true},(err,file) => cb(err,file[0].hash))
+                    })
+                })
+            }
+        }
 
-                // Sprite creation
-                Shell.exec('./dtube-sprite.sh ' + videoPathName + ' uploaded/' + sourceVideoFilename + '.jpg',function(code,stdout,stderr) {
-                    Shell.exec('ipfs add uploaded/' + sourceVideoFilename + '.jpg -t',function(code,stdout,stderr) {
-                        let spriteouts = stdout.split(' ');
-                        let ipfsSpriteHash = spriteouts[1];
-                        Shell.exec('ipfs pin add ' + ipfsSpriteHash,() => {});
-    
-                        // Get video duration and file size
-                        let videoSize = request.files.VideoUpload[0].size;
-                        let snapSize = request.files.SnapUpload[0].size;
-                        fs.stat('uploaded/' + sourceVideoFilename + '.jpg',(err,stat) => {
-                            if (Config.UsageLogs == true) {
-                                // Log usage data if no errors and if logging is enabled
-                                if (usageData[username] == undefined) {
-                                    // New user?
-                                    usageData[username] = {};
-                                }
-    
-                                var videoUsage = usageData[username]['videos'];
-                                if (videoUsage == undefined) {
-                                    usageData[username]['videos'] = videoSize;
-                                } else {
-                                    usageData[username]['videos'] = videoUsage + videoSize;
-                                }
-    
-                                var snapUsage = usageData[username]['thumbnails'];
-                                if (snapUsage == undefined) {
-                                    usageData[username]['thumbnails'] = snapSize;
-                                } else {
-                                    usageData[username]['thumbnails'] = snapUsage + snapSize;
-                                }
-    
-                                if (err != null) {
-                                    console.log('Error getting sprite filesize: ' + err);
-                                } else {
-                                    var spriteUsage = usageData[username]['sprites'];
-                                    if (spriteUsage == undefined) {
-                                        usageData[username]['sprites'] = stat['size'];
-                                    } else {
-                                        usageData[username]['sprites'] = spriteUsage + stat['size'];
-                                    }
-                                }
-    
-                                fs.writeFileSync('usage.json',JSON.stringify(usageData));
-                            }
-                        });
-    
-                        // Log IPFS hashes by Steem account
-                        if (hashes[username] == undefined) {
-                            hashes[username] = {
-                                videos: [],
-                                thumbnails: [],
-                                sprites: [],
-                                images: [],
-                            }
+        async.parallel(ipfsops,(err,results) => {
+            if (err) console.log(err)
+            // Get video duration and file size
+            let videoSize = request.files.VideoUpload[0].size;
+            let snapSize = request.files.SnapUpload[0].size;
+            fs.stat('uploaded/' + sanitize(sourceVideoFilename) + '.jpg',(err,stat) => {
+                if (Config.UsageLogs == true) {
+                    // Log usage data if no errors and if logging is enabled
+                    if (usageData[username] == undefined) {
+                        // New user?
+                        usageData[username] = {};
+                    }
+
+                    var videoUsage = usageData[username]['videos'];
+                    if (videoUsage == undefined) {
+                        usageData[username]['videos'] = videoSize;
+                    } else {
+                        usageData[username]['videos'] = videoUsage + videoSize;
+                    }
+
+                    var snapUsage = usageData[username]['thumbnails'];
+                    if (snapUsage == undefined) {
+                        usageData[username]['thumbnails'] = snapSize;
+                    } else {
+                        usageData[username]['thumbnails'] = snapUsage + snapSize;
+                    }
+
+                    if (err != null) {
+                        console.log('Error getting sprite filesize: ' + err);
+                    } else {
+                        var spriteUsage = usageData[username]['sprites'];
+                        if (spriteUsage == undefined) {
+                            usageData[username]['sprites'] = stat['size'];
+                        } else {
+                            usageData[username]['sprites'] = spriteUsage + stat['size'];
                         }
-                        
-                        // If hash is not in database, add the hash into database
-                        if (!hashes[username]['videos'].includes(ipfsHash))
-                            hashes[username]['videos'].push(ipfsHash);
-                        if (!hashes[username]['thumbnails'].includes(ipfsSnapHash))
-                            hashes[username]['thumbnails'].push(ipfsSnapHash);
-                        if (!hashes[username]['sprites'].includes(ipfsSpriteHash))
-                            hashes[username]['sprites'].push(ipfsSpriteHash);
-    
-                        fs.writeFile('hashes.json',JSON.stringify(hashes),(err) => {
-                            if (err != null)
-                                console.log('Error saving hash logs: ' + err);
-                        });
-    
-                        getDuration(videoPathName).then((videoDuration) => {
-                            // Send IPFS hashes, duration and filesize back to client
-                            response.send({
-                                ipfshash: ipfsHash,
-                                snaphash: ipfsSnapHash,
-                                spritehash: ipfsSpriteHash,
-                                duration: videoDuration,
-                                filesize: videoSize,
-                                dtubefees: Config.dtubefees
-                            })
-                        });
-                    });
-                });
+                    }
+
+                    fs.writeFile('usage.json',JSON.stringify(usageData),() => {});
+                }
             });
-        });
+
+            // Log IPFS hashes by Steem account
+            if (hashes[username] == undefined) {
+                hashes[username] = {
+                    videos: [],
+                    thumbnails: [],
+                    sprites: [],
+                    images: [],
+                }
+            }
+            
+            // If hash is not in database, add the hash into database
+            if (!hashes[username]['videos'].includes(results.videohash))
+                hashes[username]['videos'].push(results.videohash)
+            if (!hashes[username]['thumbnails'].includes(results.snaphash))
+                hashes[username]['thumbnails'].push(results.snaphash)
+            if (!hashes[username]['sprites'].includes(results.spritehash))
+                hashes[username]['sprites'].push(results.spritehash)
+
+            fs.writeFile('hashes.json',JSON.stringify(hashes),(err) => {
+                if (err != null)
+                    console.log('Error saving hash logs: ' + err);
+            });
+
+            getDuration(videoPathName).then((videoDuration) => {
+                // Send IPFS hashes, duration and filesize back to client
+                response.send({
+                    ipfshash: results.videohash,
+                    snaphash: results.snaphash,
+                    spritehash: results.spritehash,
+                    duration: videoDuration,
+                    filesize: videoSize,
+                    dtubefees: Config.dtubefees
+                })
+            })
+        })
     });
 });
 
@@ -214,12 +219,8 @@ app.post('/imageupload',imgUpload.single('postImg'),(request,response) => {
             throw "We can't process your upload because our server doesn't know who you are!"
         }
     }
-    let uploadedImg = sanitize(request.file.filename);
-    Shell.exec('ipfs add imguploads/' + uploadedImg,(code,stdout,stderr) => {
-        let outs = stdout.split(' ');
-        let ipfsImgHash = outs[1];
-        Shell.exec('ipfs pin add ' + ipfsImgHash,() => {});
-
+    let uploadedImg = request.file.filename;
+    fs.readFile('imguploads/' + uploadedImg,(err,data) => ipfsAPI.add(data,{trickle: true},(err,file) => {
         if (Config.UsageLogs == true) {
             // Log usage data for image uploads
             if (usageData[username] == undefined) {
@@ -234,7 +235,7 @@ app.post('/imageupload',imgUpload.single('postImg'),(request,response) => {
                 usageData[username]['images'] = imgUsage + request.file.size;
             }
 
-            fs.writeFileSync('usage.json',JSON.stringify(usageData));
+            fs.writeFile('usage.json',JSON.stringify(usageData),() => {});
         }
 
         // Log IPFS hashes by Steem account
@@ -253,8 +254,8 @@ app.post('/imageupload',imgUpload.single('postImg'),(request,response) => {
         }
 
         // If hash is not in database, add the hash into database
-        if (!hashes[username]['images'].includes(ipfsImgHash))
-            hashes[username]['images'].push(ipfsImgHash);
+        if (!hashes[username]['images'].includes(file[0].hash))
+            hashes[username]['images'].push(file[0].hash);
         
         fs.writeFile('hashes.json',JSON.stringify(hashes),(err) => {
             if (err != null)
@@ -263,9 +264,9 @@ app.post('/imageupload',imgUpload.single('postImg'),(request,response) => {
 
         // Send image IPFS hash back to client
         response.send({
-            imghash: ipfsImgHash
+            imghash: file[0].hash
         })
-    })
+    }))
 })
 
 app.get('/usage', CORS(), (request,response) => {
