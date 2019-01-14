@@ -431,6 +431,14 @@ app.get('/hashes', CORS(), (request,response) => {
             hashesToReturn.sprites = getAllHashes('sprites');
         if (typerequested.includes('images'))
             hashesToReturn.images = getAllHashes('images');
+        if (typerequested.includes('video240'))
+            hashesToReturn.video240 = getAllHashes('video240')
+        if (typerequested.includes('video480'))
+            hashesToReturn.video480 = getAllHashes('video480')
+        if (typerequested.includes('video240'))
+            hashesToReturn.video720 = getAllHashes('video720')
+        if (typerequested.includes('video240'))
+            hashesToReturn.video1080 = getAllHashes('video1080')
         
         return response.send(hashesToReturn);
     }
@@ -449,6 +457,14 @@ app.get('/hashes', CORS(), (request,response) => {
         hashesToReturn.sprites = hashes[request.query.user]['sprites'];
     if (typerequested.includes('images'))
         hashesToReturn.images = hashes[request.query.user]['images'];
+    if (typerequested.includes('video240'))
+        hashesToReturn.video240 = hashes[request.query.user]['video240'];
+    if (typerequested.includes('video480'))
+        hashesToReturn.video480 = hashes[request.query.user]['video480'];
+    if (typerequested.includes('video720'))
+        hashesToReturn.video720 = hashes[request.query.user]['video720'];
+    if (typerequested.includes('video1080'))
+        hashesToReturn.video1080 = hashes[request.query.user]['video1080'];
     
     return response.send(hashesToReturn);
 });
