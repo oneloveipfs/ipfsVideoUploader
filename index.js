@@ -418,7 +418,7 @@ app.get('/hashes', CORS(), (request,response) => {
         function getAllHashes(hashType) {
             var hashArrToReturn = [];
             for(var key in hashes) {
-                if (hashes.hasOwnProperty(key)) {
+                if (hashes.hasOwnProperty(key) && hashes[key][hashType] != undefined) {
                     hashArrToReturn = hashArrToReturn.concat(hashes[key][hashType]);
                 }
             }
@@ -436,9 +436,9 @@ app.get('/hashes', CORS(), (request,response) => {
             hashesToReturn.video240 = getAllHashes('video240')
         if (typerequested.includes('video480'))
             hashesToReturn.video480 = getAllHashes('video480')
-        if (typerequested.includes('video240'))
+        if (typerequested.includes('video720'))
             hashesToReturn.video720 = getAllHashes('video720')
-        if (typerequested.includes('video240'))
+        if (typerequested.includes('video1080'))
             hashesToReturn.video1080 = getAllHashes('video1080')
         
         return response.send(hashesToReturn);
