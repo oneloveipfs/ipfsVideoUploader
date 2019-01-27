@@ -74,7 +74,8 @@ app.get('/checkuser', CORS(), (request,response) => {
     // Check if user is in whitelist
     if (Config.whitelistEnabled == true && fs.existsSync('whitelist.txt')) {
         fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
-            if (!readList.includes(request.query.user)) {
+            let whitelistedUsers = readList.split('\n')
+            if (!whitelistedUsers.includes(request.query.user)) {
                 response.send({ "isInWhitelist": false });
             } else {
                 response.send({ "isInWhitelist": true });

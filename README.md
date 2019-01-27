@@ -39,6 +39,12 @@ IPFS works the best for videos with .mp4, therefore only mp4 files will be suppo
 
 # GET API
 
+To check if Steem user is in the whitelist:
+```
+/checkuser?user=STEEM_USERNAME
+```
+* `user` *(required)*: Steem account username
+
 To get usage info for specific Steem user:
 ```
 /usage?user=STEEM_USERNAME
