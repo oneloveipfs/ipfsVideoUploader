@@ -6,11 +6,13 @@
         <title>OneLoveDTube Uploader</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="An alternative way of uploading videos to DTube, a decentralized video platform built on Steem blockchain.">
+        <script src="client/welcome.js"></script>
     </head>
     <body>
         <div id='header'>
             <h1 id="siteTitle"><img id="logoBanner" src="public/logo.png">  <div id="headTitleText">OneLoveDTube Uploader</div></h1>
-            <a href="https://steemconnect.com/oauth2/authorize?client_id=ipfsuploader.app&redirect_uri=https%3A%2F%2Fuploader.oneloved.tube%2Fupload&scope=comment,comment_options" id="authButton" class="styledButton">Log In</a>
+            <!-- <a href="https://steemconnect.com/oauth2/authorize?client_id=ipfsuploader.app&redirect_uri=https%3A%2F%2Fuploader.oneloved.tube%2Fupload&scope=comment,comment_options" id="authButton" class="styledButton">Log In</a> -->
+            <a onclick="loginBtnClicked()" id="authButton" class="styledButton">Log In</a>
         </div>
         <div id='content'>
             <div id="head">
@@ -32,6 +34,20 @@
                     <tr><td><img class="icons" src="public/about/servers.png"></td></tr>
                     <tr><td>DTube servers down? Old videos unplayable on DTube? Our uploader uploads your video straight to the public IPFS gateway, without involving DTube's upload servers. Your video will remain playable even during DTube's downtime, as long as it is available in the IPFS network!</td></tr>
                 </table>
+            </div>
+        </div>
+        <!-- Login Pop Up Window -->
+        <div id="loginPopup" class="popup">
+            <div class="popup-content">
+                <div class="popup-header">
+                    <h2>Login</h2>
+                </div>
+                <div class="popup-body">
+                    <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginUsername"><br><br>
+                    <a onclick="keychainLogin()" class="roundedBtn">Login with Steem Keychain</a>
+                    <h3>OR</h3>
+                    <a class="roundedBtn" href="https://steemconnect.com/oauth2/authorize?client_id=ipfsuploader.app&redirect_uri=https%3A%2F%2Fuploader.oneloved.tube%2Fupload&scope=comment,comment_options">Login with SteemConnect</a>
+                </div>
             </div>
         </div>
         <div id='footer'><h4 class="madeBy">Made by <a target="_blank" rel="noreferrer" href=https://d.tube/c/techcoderx>@techcoderx</a> - <a target="_blank" rel="noreferrer" href=https://github.com/techcoderx/ipfsVideoUploader>Source Code</a> - <a target="_blank" rel="noreferrer" href="https://discord.gg/Sc4utKr">Discord</a> - <a target="_blank" rel="noreferrer" href="https://github.com/techcoderx/ipfsVideoUploader/blob/master/FAQ.md">FAQ</a></h4></div>

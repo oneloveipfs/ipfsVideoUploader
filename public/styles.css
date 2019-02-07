@@ -37,6 +37,70 @@ a {
     text-decoration: none;
 }
 
+/* Pop up window */
+.popup {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.popup-content {
+    position: relative;
+    background-color: rgb(207, 207, 207);
+    margin: 10% auto;
+    width: 500px;
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s;
+}
+
+.popup-header {
+    background-color: rgb(54,57,63);
+    color: #ffffff;
+}
+
+.popup-header h2 {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 40px;
+}
+
+.popup-body {
+    font-family: Geneva, Verdana, sans-serif;
+    margin-left: 15px;
+    margin-right: 25px;
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+@-webkit-keyframes animatetop {
+    from {top:-300px; opacity:0} 
+    to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+}
+
+#loginUsername {
+    width: 100%;
+    height: 29px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding-left: 5px;
+    font-size: 12px;
+}
+
 #uploadForm {
     margin-left: auto;
     margin-right: auto;
@@ -71,7 +135,7 @@ a {
     height: 200px;
 }
 
-#postImgBtn {
+.roundedBtn {
 	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
 	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
 	box-shadow:inset 0px 1px 0px 0px #ffffff;
@@ -94,14 +158,14 @@ a {
 	font-weight:bold;
     padding-top: 7px;
     padding-bottom: 7px;
-    width: 100%;
+    width: 101%;
     margin-left: auto;
     margin-right: auto;
 	text-decoration:none;
     text-shadow:0px 1px 0px #ffffff;
     text-align: center;
 }
-#postImgBtn:hover {
+.roundedBtn:hover {
 	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #f6f6f6), color-stop(1, #ffffff));
 	background:-moz-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
 	background:-webkit-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
@@ -112,7 +176,7 @@ a {
 	background-color:#f6f6f6;
 }
 
-#postImgBtn:active {
+.roundedBtn:active {
 	position:relative;
 	top:1px;
 }
@@ -376,11 +440,23 @@ td {
     .tabs {
         padding: 6px 7%;
     }
+
+    .popup-content {
+        width: 85%;
+    }
+
+    .popup-header h2 {
+        font-size: 30px;
+    }
 }
 
 @media screen and (max-width: 360px) {
     .tabs {
         padding: 6px 3%;
+    }
+
+    .popup-content {
+        width: 100%;
     }
 }
 
