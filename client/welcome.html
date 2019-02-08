@@ -7,6 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="An alternative way of uploading videos to DTube, a decentralized video platform built on Steem blockchain.">
         <script src="client/welcome.js"></script>
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     </head>
     <body>
         <div id='header'>
@@ -44,7 +45,7 @@
                 </div>
                 <div class="popup-body">
                     <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginUsername"><br><br>
-                    <a onclick="keychainLogin()" class="roundedBtn">Login with Steem Keychain</a>
+                    <a onclick="keychainLogin()" class="roundedBtn" id="keychainAuthBtn">Login with Steem Keychain</a>
                     <h3>OR</h3>
                     <a class="roundedBtn" href="https://steemconnect.com/oauth2/authorize?client_id=ipfsuploader.app&redirect_uri=https%3A%2F%2Fuploader.oneloved.tube%2Fupload&scope=comment,comment_options">Login with SteemConnect</a>
                 </div>

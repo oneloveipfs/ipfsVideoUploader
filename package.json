@@ -1,22 +1,26 @@
 {
   "name": "ipfsvideouploader",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Alternative IPFS uploader for DTube videos.",
   "main": "index.js",
   "author": "techcoderx",
   "license": "GPLv3",
   "dependencies": {
     "async": "^2.6.1",
+    "body-parser": "^1.18.3",
     "buffer": "^5.2.1",
     "cors": "^2.8.5",
+    "crypto-js": "^3.1.9-1",
     "express": "^4.16.4",
     "fs": "0.0.1-security",
     "get-video-duration": "^0.3.0",
     "https": "^1.0.0",
     "ipfs-http-client": "^28.1.1",
+    "jsonwebtoken": "^8.4.0",
     "multer": "^1.4.1",
     "sanitize-filename": "^1.6.1",
     "shelljs": "^0.8.2",
+    "steem": "^0.7.4",
     "steemconnect": "^2.0.1"
   }
 }

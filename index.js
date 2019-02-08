@@ -4,9 +4,14 @@ const Shell = require('shelljs');
 const getDuration = require('get-video-duration');
 const fs = require('fs');
 const async = require('async');
+const Crypto = require('crypto-js')
+const JWT = require('jsonwebtoken');
+const Steem = require('steem');
 const sanitize = require('sanitize-filename');
 const Config = require('./config.json');
+const Keys = require('./.auth.json');
 const Express = require('express');
+const Parser = require('body-parser');
 const CORS = require('cors');
 const https = require('https');
 const app = Express();
@@ -43,6 +48,7 @@ if (Config.useHTTPS == true) {
 }
 
 app.use(Express.static(__dirname, { dotfiles: 'deny' }));
+app.use(Parser.text())
 
 // HTTP to HTTPS redirect
 if (Config.useHTTPS == true) {
@@ -76,13 +82,53 @@ app.get('/checkuser', CORS(), (request,response) => {
         fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
             let whitelistedUsers = readList.split('\n')
             if (!whitelistedUsers.includes(request.query.user)) {
-                response.send({ "isInWhitelist": false });
+                response.send({isInWhitelist: false})
             } else {
-                response.send({ "isInWhitelist": true });
+                response.send({isInWhitelist: true})
             }
         })
+    } else {
+        response.send({isInWhitelist: true})
     }
 });
+
+app.get('/login',(request,response) => {
+    // Steem Keychain Auth
+    if ((request.query.user == null || undefined) || request.query.user == '') {
+        // Username not specified, throw an error
+        response.send({error: 'Username not specified!'})
+        return
+    }
+    if (Config.whitelistEnabled == true && fs.existsSync('whitelist.txt')) {
+        fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
+            let whitelistedUsers = readList.split('\n')
+            if (!whitelistedUsers.includes(request.query.user)) {
+                response.send({error: 'Looks like you do not have access to the uploader!'})
+            } else {
+                generateEncryptedMemo(request.query.user,response)
+            }
+        })
+    } else {
+        generateEncryptedMemo(request.query.user,response)
+    }
+});
+
+app.post('/logincb',(request,response) => {
+    // Keychain Auth Callback
+    let decoded = Crypto.AES.decrypt(request.body,Keys.AESKey).toString(Crypto.enc.Utf8).split(':')
+    if (Config.whitelistEnabled == true && fs.existsSync('whitelist.txt')) {
+        fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
+            let whitelistedUsers = readList.split('\n')
+            if (!whitelistedUsers.includes(decoded[0])) {
+                response.send({error: 'Looks like you do not have access to the uploader!'})
+            } else {
+                generateJWT(decoded,response)
+            }
+        })
+    } else {
+        generateJWT(decoded,response)
+    }
+})
 
 app.post('/videoupload', (request,response) => {
     upload.fields([
@@ -483,6 +529,32 @@ function loadWebpage(HTMLFile,response) {
             response.end();
         }
     });
+}
+
+function generateEncryptedMemo(username,response) {
+    // Generate encrypted text to be decrypted by Keychain on client
+    let encrypted_message = Crypto.AES.encrypt(username + ':oneloveipfs_login_' + Date.now(),Keys.AESKey).toString()
+    Steem.api.getAccounts([username],(err,res) => {
+        let encrypted_memo = Steem.memo.encode(Keys.wifMessage,res[0].posting.key_auths[0][0],'#' + encrypted_message)
+        response.send({encrypted_memo: encrypted_memo, error: null})
+    })
+}
+
+function generateJWT(data,response) {
+    // Generate access token to be sent as response
+    JWT.sign({
+        user: data[0],
+        app: 'oneloveipfs',
+        iat: data[1].split('_')[2] / 1000,
+        exp: (data[1].split('_')[2] / 1000) + 604800
+    },Keys.JWTKey,(err,token) => {
+        if (err != null) {
+            console.log('Error signing JWT: ' + err)
+            response.send({error: 'Error generating access token: ' + err})
+        } else {
+            response.send({access_token: token, error: null})
+        }
+    })
 }
 
 app.use(function (req,res) {
