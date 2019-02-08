@@ -130,6 +130,26 @@ app.post('/logincb',(request,response) => {
     }
 })
 
+app.get('/auth',(request,response) => {
+    let access_token = request.query.access_token
+    JWT.verify(access_token,Keys.JWTKey,(err,result) => {
+        if (err != null) {
+            response.send({error: 'Login error: ' + err})
+        } else if (Config.whitelistEnabled == true && fs.existsSync('whitelist.txt')) {
+            fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
+                let whitelistedUsers = readList.split('\n')
+                if (!whitelistedUsers.includes(result.user)) {
+                    response.send({error: 'Looks like you do not have access to the uploader!'})
+                } else {
+                    response.send(result)
+                }
+            })
+        } else {
+            response.send(result)
+        }
+    })
+})
+
 app.post('/videoupload', (request,response) => {
     upload.fields([
         {name: 'VideoUpload', maxCount: 1},

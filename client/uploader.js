@@ -1,14 +1,28 @@
 // Load Steem Connect access token to client
 var username;
-var url = new URL(window.location.href);
-var token = url.searchParams.get('access_token'); // Access token for logged in user
+let url = new URL(window.location.href)
+let token = url.searchParams.get('access_token') // Access token for logged in user
+let iskeychain = url.searchParams.get('keychain')
 if (token == null) {
     // Not logged in or no access token
     window.setTimeout(function() {
         document.getElementById('loggedInUser').innerHTML = 'You are not logged in!';
         restrict();
     },100);
+} else if (iskeychain == 'true') {
+    // Steem Keychain Login
+    axios.get('/auth?access_token=' + token).then((authResponse) => {
+        if (authResponse.data.error != null) {
+            alert(authResponse.data.error)
+            document.getElementById('loggedInUser').innerHTML = 'Not authorized'
+            restrict()
+        } else {
+            username = authResponse.data.user
+            document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + username
+        }
+    })
 } else {
+    // SteemConnect login
     var api = sc2.Initialize({ accessToken: token });
     api.me(function(err,res) {
         username = res.account.name; // Account name
@@ -196,16 +210,31 @@ function submitVideo() {
 
         // Post to Steem blockchain
         let transaction = generatePost(username,permlink,postBody,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup,uploaderResponse.dtubefees);
-        api.broadcast(transaction,function(err) {
-            if (err != null) {
-                alert('Failed to post on DTube: ' + err + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
-                progressbar.style.display = "none";
-                reenableFields();
-            } else {
-                localStorage.clear();
-                window.location.replace('https://d.tube/v/' + username + '/' + permlink);
-            }
-        });
+        if (iskeychain == 'true') {
+            // Broadcast with Keychain
+            steem_keychain.requestBroadcast(username,transaction,'Posting',(response) => {
+                if (response.error != null) {
+                    alert('Failed to post on DTube: ' + response.error + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
+                    progressbar.style.display = "none";
+                    reenableFields();
+                } else {
+                    localStorage.clear();
+                    window.location.replace('https://d.tube/v/' + username + '/' + permlink);
+                }
+            })
+        } else {
+            // Broadcast with SteemConnect
+            api.broadcast(transaction,function(err) {
+                if (err != null) {
+                    alert('Failed to post on DTube: ' + err + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
+                    progressbar.style.display = "none";
+                    reenableFields();
+                } else {
+                    localStorage.clear();
+                    window.location.replace('https://d.tube/v/' + username + '/' + permlink);
+                }
+            });
+        }
     }).catch(function(err) {
         alert('Upload error: ' + err);
         progressbar.style.display = "none";
