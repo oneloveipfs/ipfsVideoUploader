@@ -10,8 +10,8 @@ This is an alternative IPFS uploader to upload videos onto DTube. Includes a bas
 
 ### Additional requirements
 
-* A SteemConnect application
-* A domain name for HTTPS, plus SSL certificate for that domain installed (code is written to work well with certbot)
+* A SteemConnect application (if SteemConnect authentication is used)
+* A domain name for HTTPS, plus SSL certificate for that domain installed
 
 # Installation
 
@@ -21,17 +21,21 @@ This is an alternative IPFS uploader to upload videos onto DTube. Includes a bas
 
 3. Configure uploader by modifying `config.json` file. If you need help with the configuration, view the documentation [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/ConfigDocs.md)
 
-4. Run `node getLoginLink.js` to generate SteemConnect login link.
+4. Run `node generateKeys.js` to generate encryption and auth keys for Steem Keychain support. Then backup the contents of `.auth.json` file in a safe place.
 
-5. Replace the login link with the one you obtained from step 3 [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/welcome.html#L7).
+5. Run `node getLoginLink.js` to generate SteemConnect login link (if SteemConnect is used).
 
-6. If `whitelistEnabled` is set to `true`, add some Steem accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Steem user)
+6. Replace the login link with the one you obtained from step 3 [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/welcome.html#L7) (if SteemConnect is used).
 
-7. Run the app by typing `node index.js`. Your app will listen to port 80, and 443 if you have HTTPS enabled.
+7. If `whitelistEnabled` is set to `true`, add some Steem accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Steem user)
 
-*Note: You may need to enable read permissions for `/etc/letsencrypt/live/yourdomain.com/` directory for the user account if using HTTPS; and port 80 and 443 binding permissions (or use a reverse proxy).*
+8. Run the app by typing `node index.js`. Your app will listen to ports you specify in `config.json` file.
 
 All uploaded files will be saved in the `uploaded` folder within the repo. Image files (for Steem article body) will be saved in the `imguploads` folder.
+
+# Removing support for SteemConnect
+
+If you do not wish to support SteemConnect authentication and use only Steem Keychain, skip step 5 and 6 above when setting up, and delete lines 49-50 in [welcome.html file](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/welcome.html#L49-L50).
 
 # Supported file formats
 

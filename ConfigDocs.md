@@ -11,6 +11,8 @@
 * `SteemConnectApp`: Specify the app name of your SteemConnect application.
 * `callbackURL`: Specify the uploader page URL (https://yourdomain.com/upload) where the URL must be listed in SteemConnect application settings.
 
+Ignore this section if you do not wish to support SteemConnect authentication.
+
 #### General settings
 * `HTTP_PORT`: Specify port to listen to HTTP requests. If `useHTTPS` is enabled, all HTTP requests will be redirected to HTTPS.
 * `whitelistEnabled`: When set to false, whitelist checks will be ignored.

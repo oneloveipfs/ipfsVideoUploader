@@ -12,6 +12,8 @@ We have done some testing with several video file formats for IPFS, and we found
 
 Looks like SteemConnect, the auth solution that we're currently using right now, has some issues with the API. This is not an issue with upload servers or IPFS. Clear your browser cache, refresh the webpage and try again later.
 
+Alternatively you may authenticate with Steem Keychain to avoid this SteemConnect related issue.
+
 #### 4. I'm getting a network error while uploading. Is there a server issue?
 
 Check your internet connection and try again later. If webpage fails to load right after you get this error, there is an issue with the upload servers.
@@ -19,6 +21,8 @@ Check your internet connection and try again later. If webpage fails to load rig
 #### 5. The text underneath the submit button reads "Detecting login" even after waiting for a few minutes. What went wrong here?
 
 Refresh the webpage and see if your Steem username shows up. If not, there might be an issue with SteemConnect's API server. If so, try again later. (Also see below if using Brave Browser)
+
+If using Steem Keychain for authentication, this is an auth API issue. Please take a screenshot of your console output from your browser and send a DM to `techcoderx#7481` on Discord.
 
 #### 6. I'm getting CORS related errors logged into the console on Brave Browser. What do?
 
@@ -48,7 +52,7 @@ The drafts are stored in your web browser locally, so when you login with the sa
 
 #### 11. How are the beneficiaries set?
 
-For OneLoveDTube's uploader services, beneficiary to @dtube account is set to 6% to support their development and curation efforts (instead of 10%). Other than the $10 USD/month flat rate to use OneLoveDTube's uploader services, we do not take any other additional beneficiaries from your post payouts.
+For OneLoveDTube's uploader services, beneficiary to @dtube account is set to 2% to support their development and curation efforts (instead of 10%). If authenticated with SteemConnect, [additional fees](https://steemit.com/steemconnect/@fabien/major-incoming-changes-on-steemconnect) may be imposed by the SteemConnect team (up to 2.5%). Other than the $10 USD/month flat rate to use OneLoveDTube's uploader services, we do not take any other additional beneficiaries from your post payouts.
 
 #### 12. Am I eligible for DTube curation when I upload my videos using this uploader?
 
