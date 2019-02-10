@@ -6,13 +6,27 @@
         <title>OneLoveDTube Uploader</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="description" content="An alternative way of uploading videos to DTube, a decentralized video platform built on Steem blockchain.">
+        <meta name="image" content="https://cloudflare-ipfs.com/ipfs/QmaMkaquzvyrwksumFZry69GV9qr3YA2t2J26LeXi4pxWp">
+        <link rel="canonical" href="https://uploader.oneloved.tube">
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="OneLoveDTube Uploader">
+        <meta name="twitter:description" content="An alternative way of uploading videos to DTube, a decentralized video platform built on Steem blockchain.">
+        <meta name="twitter:image:src" content="https://cloudflare-ipfs.com/ipfs/QmaMkaquzvyrwksumFZry69GV9qr3YA2t2J26LeXi4pxWp">
+        <!-- OpenGraph -->
+        <meta name="og:title" content="OneLoveDTube Uploader">
+        <meta name="og:description" content="An alternative way of uploading videos to DTube, a decentralized video platform built on Steem blockchain.">
+        <meta name="og:image" content="https://cloudflare-ipfs.com/ipfs/QmaMkaquzvyrwksumFZry69GV9qr3YA2t2J26LeXi4pxWp">
+        <meta name="og:url" content="https://uploader.oneloved.tube">
+        <meta name="og:site_name" content="OneLoveIPFS">
+        <meta name="og:type" content="website">
+        <!-- JavaScripts -->
         <script src="client/welcome.js"></script>
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     </head>
     <body>
         <div id='header'>
-            <h1 id="siteTitle"><img id="logoBanner" src="public/logo.png">  <div id="headTitleText">OneLoveDTube Uploader</div></h1>
-            <!-- <a href="https://steemconnect.com/oauth2/authorize?client_id=ipfsuploader.app&redirect_uri=https%3A%2F%2Fuploader.oneloved.tube%2Fupload&scope=comment,comment_options" id="authButton" class="styledButton">Log In</a> -->
+            <h1 id="siteTitle"><img id="logoBanner" src="public/logo.png" alt="onelovedtube logo">  <div id="headTitleText">OneLoveDTube Uploader</div></h1>
             <a onclick="loginBtnClicked()" id="authButton" class="styledButton">Log In</a>
         </div>
         <div id='content'>
@@ -28,11 +42,11 @@
             </div>
             <div id="table1">
                 <table>
-                    <tr><td><img class="icons" src="public/about/queue.png"></td></tr>
+                    <tr><td><img class="icons" src="public/about/queue.png" alt="encoding queues"></td></tr>
                     <tr><td>Stuck in upload queue? You can skip it by using our upload servers instead! IPFS operations are handled asynchronously, means there's no need to wait for others' to complete adding files to IPFS to add your outstanding video to the network!</td></tr>
-                    <tr><td><img class="icons" src="public/about/keys.png"></td></tr>
+                    <tr><td><img class="icons" src="public/about/keys.png" alt="private keys"></td></tr>
                     <tr><td>Hesitating logging into DTube with your posting key to upload? Have problems with SteemConnect on DTube? Our uploader works very well with SteemConnect, so never worry about giving your private keys to 3rd party applications!</td></tr>
-                    <tr><td><img class="icons" src="public/about/servers.png"></td></tr>
+                    <tr><td><img class="icons" src="public/about/servers.png" alt="servers"></td></tr>
                     <tr><td>DTube servers down? Old videos unplayable on DTube? Our uploader uploads your video straight to the public IPFS gateway, without involving DTube's upload servers. Your video will remain playable even during DTube's downtime, as long as it is available in the IPFS network!</td></tr>
                 </table>
             </div>
