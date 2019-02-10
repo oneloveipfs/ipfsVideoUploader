@@ -37,6 +37,10 @@ a {
     text-decoration: none;
 }
 
+h2 {
+    font-size: 45px;
+}
+
 /* Pop up window */
 .popup {
     display: none;
@@ -71,7 +75,6 @@ a {
     padding-bottom: 20px;
     text-align: center;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 40px;
 }
 
 .popup-body {
@@ -300,6 +303,8 @@ textarea {
     width: 60vw;
 }
 
+/* Homepage content */
+
 #intro1 {
     background: blueviolet;
     text-align: left;
@@ -319,6 +324,29 @@ textarea {
     padding-top: 20px;
     padding-bottom: 20px;
     width: 85vw;
+}
+
+#whatOurCustomersSay {
+    text-align: center;
+    padding-top: 1px;
+    padding-bottom: 20px;
+    background: lightcoral;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#whatOurCustomersSay h3 {
+    font-size: 30px;
+}
+
+#updates {
+    text-align: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#updates h3 {
+    margin-left: 25px;
+    margin-right: 25px;
+    font-size: 30px;
 }
 
 td {
@@ -427,6 +455,14 @@ td {
         font-size: 30px;
     }
 
+    #whatOurCustomersSay h3 {
+        font-size: 20px;
+    }
+
+    #updates h3 {
+        font-size: 20px;
+    }
+
     td {
         font-size: 15px;
     }
@@ -445,8 +481,13 @@ td {
         width: 85%;
     }
 
-    .popup-header h2 {
+    h2 {
         font-size: 30px;
+    }
+
+    /* Display td on top of each other on mobile */
+    .testtd {
+        display: table-row;
     }
 }
 
