@@ -66,6 +66,10 @@ app.get('/', (request,response) => {
     loadWebpage('./client/welcome.html',response);
 });
 
+app.get('/reviews', (request,response) => {
+    loadWebpage('./client/reviews.html',response)
+})
+
 app.get('/upload', (request,response) => {
     // Uploader page
     loadWebpage('./client/uploader.html',response);
