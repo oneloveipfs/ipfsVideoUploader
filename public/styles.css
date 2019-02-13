@@ -531,17 +531,26 @@ td {
         font-size: 15px;
     }
 
+    #reviewTable {
+        width: 90%;
+    }
+
     #reviewTable td {
         display: table-row;
-        font-size: 25px;
+        font-size: 3.5vw;
     }
 
     #reviewTable img {
         height: 15px;
     }
 
+    #reviewTable iframe {
+        width: 100%;
+        height: 48.25vw;
+    }
+
     .reviewQuote {
-        padding-top: 30px;
+        padding-top: 0px;
         padding-left: 0px;
         padding-right: 0px;
     }
