@@ -25,7 +25,7 @@ This is an alternative IPFS uploader to upload videos onto DTube. Includes a bas
 
 5. Run `node getLoginLink.js` to generate SteemConnect login link (if SteemConnect is used).
 
-6. Replace the login link with the one you obtained from step 3 [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/welcome.html#L7) (if SteemConnect is used).
+6. Replace the login link with the one you obtained from step 3 [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/welcome.html#L74) (if SteemConnect is used).
 
 7. If `whitelistEnabled` is set to `true`, add some Steem accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Steem user)
 
@@ -35,7 +35,7 @@ All uploaded files will be saved in the `uploaded` folder within the repo. Image
 
 # Removing support for SteemConnect
 
-If you do not wish to support SteemConnect authentication and use only Steem Keychain, skip step 5 and 6 above when setting up, and delete lines 49-50 in [welcome.html file](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/welcome.html#L49-L50).
+If you do not wish to support SteemConnect authentication and use only Steem Keychain, skip step 5 and 6 above when setting up, and delete lines 73-74 in [welcome.html file](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/welcome.html#L73-L74).
 
 # Supported file formats
 
@@ -62,6 +62,12 @@ To get list of hashes of uploaded files:
 
 * `user` *(optional)*: Steem account username
 * `hashtype` *(required)*: Type of hash to obtain. Valid values: `videos`, `thumbnails`, `sprites`, `images`, `video240`, `video480`, `video720`, `video1080`.
+
+To get update logs:
+```
+/updatelogs
+```
+*(There are no arguments to be specifed in the URL for this API call)*
 
 # How to contribute?
 
