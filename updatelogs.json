@@ -1,0 +1,27 @@
+[
+    {
+        "created": "27 October 2018",
+        "version": "0.8.0",
+        "description": "Original release",
+        "steemitLink": "https://steemit.com/onelovedtube/@techcoderx/introducing-onelovedtube-ipfs-video-uploader-an-alternative-way-of-posting-videos-onto-dtube",
+        "payout": "$17.34"
+    }, {
+        "created": "26 November 2018",
+        "version": "0.8.1",
+        "description": "Progress bars, metadata drafts and more!",
+        "steemitLink": "https://steemit.com/onelovedtube/@techcoderx/onelovedtube-alternative-ipfs-video-uploader-update-v0-8-1-progress-bars-metadata-drafts-and-more",
+        "payout": "$21.26"
+    }, {
+        "created": "20 December 2018",
+        "version": "0.8.2",
+        "description": "Introducing hashes and usage APIs",
+        "steemitLink": "https://steemit.com/onelovedtube/@techcoderx/onelovedtube-ipfs-video-uploader-0-8-2-say-hello-to-apis",
+        "payout": "$1.37"
+    }, {
+        "created": "17 January 2019",
+        "version": "0.8.3",
+        "description": "Mobile optimizations, multi-resolution upload support and more!",
+        "steemitLink": "https://steemit.com/onelovedtube/@techcoderx/onelovedtube-ipfs-uploader-0-8-3-mobile-optimizations-multi-resolution-upload-support-and-more",
+        "payout": "$51.02"
+    }
+]

@@ -10,6 +10,7 @@ const Steem = require('steem');
 const sanitize = require('sanitize-filename');
 const Config = require('./config.json');
 const Keys = require('./.auth.json');
+const UpdateLogs = require('./updateLogs.json');
 const Express = require('express');
 const Parser = require('body-parser');
 const CORS = require('cors');
@@ -540,6 +541,11 @@ app.get('/hashes', CORS(), (request,response) => {
     
     return response.send(hashesToReturn);
 });
+
+app.get('/updatelogs',(request,response) => {
+    // Send all update logs to client to be displayed on homepage
+    response.send(UpdateLogs);
+})
 
 function loadWebpage(HTMLFile,response) {
     fs.readFile(HTMLFile,function(error, data) {

@@ -274,6 +274,26 @@ textarea {
     margin-right: 50px;
 }
 
+.updatelog {
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 25px;
+    padding: 20px;
+    width: 80vw;
+    background-color: rgb(23, 31, 201);
+    color: #ffffff;
+    border-radius: 10px;
+}
+
+.updatelog a { 
+    color: #ffffff;
+    font-size: 25px;
+}
+.updatelog a:visited { color: #ffffff; }
+.updatelog a:hover { color: #ffffff; }
+.updatelog a:active { color: #ffffff; }
+
 /* Signup/Login buttons */
 .styledButton {
 	background-color:#ffffff;
@@ -349,6 +369,7 @@ textarea {
 #updates {
     text-align: center;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding-bottom: 20px;
 }
 
 #updates h3 {
