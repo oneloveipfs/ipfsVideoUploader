@@ -23,5 +23,11 @@
         "description": "Mobile optimizations, multi-resolution upload support and more!",
         "steemitLink": "https://steemit.com/onelovedtube/@techcoderx/onelovedtube-ipfs-uploader-0-8-3-mobile-optimizations-multi-resolution-upload-support-and-more",
         "payout": "$51.02"
+    }, {
+        "created": "16 February 2019",
+        "version": "0.8.4",
+        "description": "Keychain auth support, updated homepage and more!",
+        "steemitLink": "https://steemit.com/onelovedtube/@techcoderx/onelovedtube-ipfs-uploader-v0-8-4-keychain-auth-support-updated-homepage-and-more",
+        "payout": "Pending"
     }
 ]
