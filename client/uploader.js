@@ -275,6 +275,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
                 duration: duration,
                 filesize: filesize,
                 spritehash: spriteHash,
+                provider: 'onelovedtube/0.8.4',
             },
             content: {
                 videohash: sourceHash,
