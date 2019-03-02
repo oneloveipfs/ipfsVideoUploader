@@ -19,6 +19,7 @@ if (token == null) {
         } else {
             username = authResponse.data.user
             document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + username
+            retrieveDraft()
         }
     })
 } else {
@@ -36,26 +37,7 @@ if (token == null) {
             }
 
             // Retrieve metadata from draft if any
-            var savedTitle = localStorage.getItem('OneLoveTitle');
-            var savedDescription = localStorage.getItem('OneLoveDescription');
-            var savedTags = localStorage.getItem('OneLoveTags');
-            var savedPostBody = localStorage.getItem('OneLovePostBody');
-
-            if (savedTitle != null) {
-                document.getElementById('title').value = savedTitle;
-            }
-
-            if (savedDescription != null) {
-                document.getElementById('description').value = savedDescription;
-            }
-
-            if (savedTags != null) {
-                document.getElementById('tags').value = savedTags;
-            }
-
-            if (savedPostBody != null) {
-                document.getElementById('postBody').value = savedPostBody;
-            }
+            retrieveDraft()
         });
     });
 }
@@ -385,4 +367,27 @@ function saveAsDraft() {
     localStorage.setItem('OneLoveTags',document.getElementById('tags').value);
     localStorage.setItem('OneLovePostBody',document.getElementById('postBody').value);
     alert('Metadata saved as draft!')
+}
+
+function retrieveDraft() {
+    let savedTitle = localStorage.getItem('OneLoveTitle')
+    let savedDescription = localStorage.getItem('OneLoveDescription')
+    let savedTags = localStorage.getItem('OneLoveTags')
+    let savedPostBody = localStorage.getItem('OneLovePostBody')
+
+    if (savedTitle != null) {
+        document.getElementById('title').value = savedTitle
+    }
+
+    if (savedDescription != null) {
+        document.getElementById('description').value = savedDescription
+    }
+
+    if (savedTags != null) {
+        document.getElementById('tags').value = savedTags
+    }
+
+    if (savedPostBody != null) {
+        document.getElementById('postBody').value = savedPostBody
+    }
 }
