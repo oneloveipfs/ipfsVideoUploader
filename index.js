@@ -377,7 +377,7 @@ app.post('/videoupload', (request,response) => {
 
             if (results.video1080hash != undefined) {
                 if (hashes[username].video1080 == undefined) {
-                    hashes[username].video1080 = [results.video240hash]
+                    hashes[username].video1080 = [results.video1080hash]
                 } else {
                     if (!hashes[username]['video1080'].includes(results.video1080hash))
                         hashes[username]['video1080'].push(results.video1080hash)
