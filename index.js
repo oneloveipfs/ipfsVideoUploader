@@ -21,6 +21,11 @@ const ipfsAPI = IPFS('localhost',5001,{protocol: 'http'})
 const upload = Multer({ dest: './uploaded/' });
 const imgUpload = Multer({ dest: './imguploads/', limits: { fileSize: 7340032 } })
 
+// If whitelist file doesn't exist create it
+if (Config.whitelistEnabled == true && !fs.existsSync('whitelist.txt')) {
+    fs.writeFileSync('./whitelist.txt','')
+}
+
 // Cache usage data in a variable
 var usageData = {};
 if (Config.UsageLogs == true) {
@@ -48,6 +53,15 @@ if (Config.useHTTPS == true) {
     }
 }
 
+// Prohibit access to certain files through HTTP
+app.get('/index.js',(req,res) => {return res.status(404).redirect('/404')})
+app.get('/generateKeys.js',(req,res) => {return res.status(404).redirect('/404')})
+app.get('/getLoginLink.js',(req,res) => {return res.status(404).redirect('/404')})
+app.get('/whitelist.txt',(req,res) => {return res.status(404).redirect('/404')})
+app.get('/config.json',(req,res) => {return res.status(404).redirect('/404')})
+app.get('/package.json',(req,res) => {return res.status(404).redirect('/404')})
+app.get('/package-lock.json',(req,res) => {return res.status(404).redirect('/404')})
+
 app.use(Express.static(__dirname, { dotfiles: 'deny' }));
 app.use(Parser.text())
 
@@ -68,6 +82,7 @@ app.get('/', (request,response) => {
 });
 
 app.get('/reviews', (request,response) => {
+    // Review page
     loadWebpage('./client/reviews.html',response)
 })
 
@@ -83,7 +98,7 @@ app.get('/404', (request,response) => {
 
 app.get('/checkuser', CORS(), (request,response) => {
     // Check if user is in whitelist
-    if (Config.whitelistEnabled == true && fs.existsSync('whitelist.txt')) {
+    if (Config.whitelistEnabled == true) {
         fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
             let whitelistedUsers = readList.split('\n')
             if (!whitelistedUsers.includes(request.query.user)) {
@@ -104,7 +119,7 @@ app.get('/login',(request,response) => {
         response.send({error: 'Username not specified!'})
         return
     }
-    if (Config.whitelistEnabled == true && fs.existsSync('whitelist.txt')) {
+    if (Config.whitelistEnabled == true) {
         fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
             let whitelistedUsers = readList.split('\n')
             if (!whitelistedUsers.includes(request.query.user)) {
@@ -121,7 +136,7 @@ app.get('/login',(request,response) => {
 app.post('/logincb',(request,response) => {
     // Keychain Auth Callback
     let decoded = Crypto.AES.decrypt(request.body,Keys.AESKey).toString(Crypto.enc.Utf8).split(':')
-    if (Config.whitelistEnabled == true && fs.existsSync('whitelist.txt')) {
+    if (Config.whitelistEnabled == true) {
         fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
             let whitelistedUsers = readList.split('\n')
             if (!whitelistedUsers.includes(decoded[0])) {
@@ -140,7 +155,7 @@ app.get('/auth',(request,response) => {
     JWT.verify(access_token,Keys.JWTKey,(err,result) => {
         if (err != null) {
             response.send({error: 'Login error: ' + err})
-        } else if (Config.whitelistEnabled == true && fs.existsSync('whitelist.txt')) {
+        } else if (Config.whitelistEnabled == true) {
             fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
                 let whitelistedUsers = readList.split('\n')
                 if (!whitelistedUsers.includes(result.user)) {
