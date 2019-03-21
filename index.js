@@ -35,16 +35,14 @@ if (Config.UsageLogs == true) {
 // Cache hashes data in a variable
 var hashes = JSON.parse(fs.readFileSync('hashes.json','utf8'));
 
-// Setup HTTPS if needed
-var privateKey;
-var certificate;
-var ca;
-var credentials;
+var uploadTokens = []
 
+// Setup HTTPS if needed
+let credentials;
 if (Config.useHTTPS == true) {
-    privateKey = fs.readFileSync(Config.HTTPS_PrivKey_Dir,'utf8');
-    certificate = fs.readFileSync(Config.HTTPS_Cert_Dir,'utf8');
-    ca = fs.readFileSync(Config.HTTPS_CertAuth_Dir,'utf8');
+    let privateKey = fs.readFileSync(Config.HTTPS_PrivKey_Dir,'utf8');
+    let certificate = fs.readFileSync(Config.HTTPS_Cert_Dir,'utf8');
+    let ca = fs.readFileSync(Config.HTTPS_CertAuth_Dir,'utf8');
 
     credentials = {
         key: privateKey,
@@ -170,6 +168,20 @@ app.get('/auth',(request,response) => {
     })
 })
 
+app.get('/uploadRequest',(request,response) => {
+    let username = request.query.user
+    fs.readFile('whitelist.txt','utf8',(err,readList) => {
+        let whitelistedUsers = readList.split('\n')
+        if (!whitelistedUsers.includes(username)) return response.send({error: 'Looks like you do not have access to the uploader!'})
+        let generatedToken = username + '_' + Steem.formatter.createSuggestedPassword()
+        uploadTokens.push(generatedToken)
+        Steem.api.getAccounts([username],(err,res) => {
+            let encrypted_token = Steem.memo.encode(Keys.wifMessage,res[0].posting.key_auths[0][0],'#' + generatedToken)
+            response.send({encrypted_token: encrypted_token})
+        })
+    })
+})
+
 app.post('/videoupload', (request,response) => {
     upload.fields([
         {name: 'VideoUpload', maxCount: 1},
@@ -180,7 +192,7 @@ app.post('/videoupload', (request,response) => {
         {name: 'Video1080Upload', maxCount: 1},
     ])(request,response,function(err) {
         request.socket.setTimeout(0)
-        if (err != null) throw err;
+        if (err != null) return response.send({error: err});
 
         let username = request.body.Username; //steem username
         if (Config.UsageLogs == true) {
