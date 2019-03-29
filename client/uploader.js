@@ -184,9 +184,15 @@ function submitVideo() {
             updateProgressBar(progressPercent);
         }
     };
-    axios.post('/videoupload',formdata,contentType).then(function(response) {
+    axios.post('/uploadVideo',formdata,contentType).then(function(response) {
         var uploaderResponse = response.data;
         console.log(uploaderResponse);
+
+        if (uploaderResponse.error != null) {
+            reenableFields()
+            progressbar.style.display = "none"
+            return alert(uploaderResponse.error)
+        }
 
         progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
 
@@ -343,7 +349,7 @@ function uploadImage() {
             updateProgressBar(progressPercent);
         }
     };
-    axios.post('/imageupload',imgFormData,contentType).then(function(response) {
+    axios.post('/uploadArticleImg',imgFormData,contentType).then(function(response) {
         console.log(response);
         progressbar.style.display = "none";
         document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + '](https://cloudflare-ipfs.com/ipfs/' + response.data.imghash + ')');

@@ -37,6 +37,15 @@ var hashes = JSON.parse(fs.readFileSync('hashes.json','utf8'));
 
 var uploadTokens = []
 
+var whitelist = fs.readFileSync('whitelist.txt','utf8').split('\n')
+
+fs.watchFile('whitelist.txt',() => {
+    fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
+        if (err) return console.log('Error while updating whitelist: ' + err)
+        whitelist = readList.split('\n')
+    })
+})
+
 // Setup HTTPS if needed
 let credentials;
 if (Config.useHTTPS == true) {
@@ -97,14 +106,11 @@ app.get('/404', (request,response) => {
 app.get('/checkuser', CORS(), (request,response) => {
     // Check if user is in whitelist
     if (Config.whitelistEnabled == true) {
-        fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
-            let whitelistedUsers = readList.split('\n')
-            if (!whitelistedUsers.includes(request.query.user)) {
-                response.send({isInWhitelist: false})
-            } else {
-                response.send({isInWhitelist: true})
-            }
-        })
+        if (!whitelist.includes(request.query.user)) {
+            response.send({isInWhitelist: false})
+        } else {
+            response.send({isInWhitelist: true})
+        }
     } else {
         response.send({isInWhitelist: true})
     }
@@ -118,14 +124,11 @@ app.get('/login',(request,response) => {
         return
     }
     if (Config.whitelistEnabled == true) {
-        fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
-            let whitelistedUsers = readList.split('\n')
-            if (!whitelistedUsers.includes(request.query.user)) {
-                response.send({error: 'Looks like you do not have access to the uploader!'})
-            } else {
-                generateEncryptedMemo(request.query.user,response)
-            }
-        })
+        if (!whitelist.includes(request.query.user)) {
+            response.send({error: 'Looks like you do not have access to the uploader!'})
+        } else {
+            generateEncryptedMemo(request.query.user,response)
+        }
     } else {
         generateEncryptedMemo(request.query.user,response)
     }
@@ -135,14 +138,11 @@ app.post('/logincb',(request,response) => {
     // Keychain Auth Callback
     let decoded = Crypto.AES.decrypt(request.body,Keys.AESKey).toString(Crypto.enc.Utf8).split(':')
     if (Config.whitelistEnabled == true) {
-        fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
-            let whitelistedUsers = readList.split('\n')
-            if (!whitelistedUsers.includes(decoded[0])) {
-                response.send({error: 'Looks like you do not have access to the uploader!'})
-            } else {
-                generateJWT(decoded,response)
-            }
-        })
+        if (!whitelist.includes(decoded[0])) {
+            response.send({error: 'Looks like you do not have access to the uploader!'})
+        } else {
+            generateJWT(decoded,response)
+        }
     } else {
         generateJWT(decoded,response)
     }
@@ -154,14 +154,11 @@ app.get('/auth',(request,response) => {
         if (err != null) {
             response.send({error: 'Login error: ' + err})
         } else if (Config.whitelistEnabled == true) {
-            fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
-                let whitelistedUsers = readList.split('\n')
-                if (!whitelistedUsers.includes(result.user)) {
-                    response.send({error: 'Looks like you do not have access to the uploader!'})
-                } else {
-                    response.send(result)
-                }
-            })
+            if (!whitelist.includes(result.user)) {
+                response.send({error: 'Looks like you do not have access to the uploader!'})
+            } else {
+                response.send(result)
+            }
         } else {
             response.send(result)
         }
@@ -170,19 +167,16 @@ app.get('/auth',(request,response) => {
 
 app.get('/uploadRequest',(request,response) => {
     let username = request.query.user
-    fs.readFile('whitelist.txt','utf8',(err,readList) => {
-        let whitelistedUsers = readList.split('\n')
-        if (!whitelistedUsers.includes(username)) return response.send({error: 'Looks like you do not have access to the uploader!'})
-        let generatedToken = username + '_' + Steem.formatter.createSuggestedPassword()
-        uploadTokens.push(generatedToken)
-        Steem.api.getAccounts([username],(err,res) => {
-            let encrypted_token = Steem.memo.encode(Keys.wifMessage,res[0].posting.key_auths[0][0],'#' + generatedToken)
-            response.send({encrypted_token: encrypted_token})
-        })
+    if (!whitelist.includes(username)) return response.send({error: 'Looks like you do not have access to the uploader!'})
+    let generatedToken = username + '_' + Steem.formatter.createSuggestedPassword()
+    uploadTokens.push(generatedToken)
+    Steem.api.getAccounts([username],(err,res) => {
+        let encrypted_token = Steem.memo.encode(Keys.wifMessage,res[0].posting.key_auths[0][0],'#' + generatedToken)
+        response.send({encrypted_token: encrypted_token})
     })
 })
 
-app.post('/videoupload', (request,response) => {
+app.post('/uploadVideo', (request,response) => {
     upload.fields([
         {name: 'VideoUpload', maxCount: 1},
         {name: 'SnapUpload', maxCount: 1},
@@ -435,7 +429,7 @@ app.post('/videoupload', (request,response) => {
     });
 });
 
-app.post('/imageupload',imgUpload.single('postImg'),(request,response) => {
+app.post('/uploadArticleImg',imgUpload.single('postImg'),(request,response) => {
     let username = request.body.username; //steem username
     if (Config.UsageLogs == true) {
         if (typeof username != 'string') {
