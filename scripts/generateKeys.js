@@ -7,4 +7,4 @@ let auth = {
     JWTKey: Steem.formatter.createSuggestedPassword()
 }
 
-fs.writeFileSync('./.auth.json',JSON.stringify(auth))
+fs.writeFileSync(__dirname + '/../.auth.json',JSON.stringify(auth))

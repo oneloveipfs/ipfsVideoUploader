@@ -17,7 +17,7 @@ const CORS = require('cors');
 const https = require('https');
 const app = Express();
 
-const ipfsAPI = IPFS('localhost',5001,{protocol: 'http'})
+const ipfsAPI = IPFS('localhost',Config.IPFS_API_PORT,{protocol: 'http'})
 const upload = Multer({ dest: './uploaded/' });
 const imgUpload = Multer({ dest: './imguploads/', limits: { fileSize: 7340032 } })
 
@@ -188,14 +188,8 @@ app.post('/uploadVideo', (request,response) => {
         request.socket.setTimeout(0)
         if (err != null) return response.send({error: err});
 
+        // TODO: Obtain the actual username from API authentication
         let username = request.body.Username; //steem username
-        if (Config.UsageLogs == true) {
-            if (typeof username != 'string') {
-                throw "Username submitted to upload server is not a string!"
-            } else if ((username == undefined || null) || (username == '')) {
-                throw "We can't process your upload because our server doesn't know who you are!"
-            }
-        }
 
         // Add video to IPFS
         let sourceVideoFilename = sanitize(request.files.VideoUpload[0].filename);
@@ -224,7 +218,7 @@ app.post('/uploadVideo', (request,response) => {
                 })
             },
             spritehash: (cb) => {
-                Shell.exec('./dtube-sprite.sh ' + videoPathName + ' uploaded/' + sourceVideoFilename + '.jpg',() => {
+                Shell.exec('./scripts/dtube-sprite.sh ' + videoPathName + ' uploaded/' + sourceVideoFilename + '.jpg',() => {
                     fs.readFile('uploaded/' + sourceVideoFilename + '.jpg',(err,data) => {
                         ipfsAPI.add(data,{trickle: true},(err,file) => cb(err,file[0].hash))
                     })
@@ -431,13 +425,6 @@ app.post('/uploadVideo', (request,response) => {
 
 app.post('/uploadArticleImg',imgUpload.single('postImg'),(request,response) => {
     let username = request.body.username; //steem username
-    if (Config.UsageLogs == true) {
-        if (typeof username != 'string') {
-            throw "Username submitted to upload server is not a string!"
-        } else if ((username == undefined || null) || (username == '')) {
-            throw "We can't process your upload because our server doesn't know who you are!"
-        }
-    }
     let uploadedImg = request.file.filename;
     fs.readFile('imguploads/' + uploadedImg,(err,data) => ipfsAPI.add(data,{trickle: true},(err,file) => {
         if (Config.UsageLogs == true) {
@@ -582,6 +569,7 @@ function loadWebpage(HTMLFile,response) {
     });
 }
 
+// TODO: Modularize these functions in seperate JS files
 function generateEncryptedMemo(username,response) {
     // Generate encrypted text to be decrypted by Keychain on client
     let encrypted_message = Crypto.AES.encrypt(username + ':oneloveipfs_login_' + Date.now(),Keys.AESKey).toString()

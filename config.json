@@ -8,6 +8,7 @@
     "SteemConnectApp": "ipfsuploader.app",
     "callbackURL": "https://uploader.oneloved.tube/upload",
 
+    "IPFS_API_PORT": 5001,
     "HTTP_PORT": 3000,
     "whitelistEnabled": true,
     "UsageLogs": true,
