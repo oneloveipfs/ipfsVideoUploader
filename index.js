@@ -35,10 +35,8 @@ if (Config.UsageLogs == true) {
 // Cache hashes data in a variable
 var hashes = JSON.parse(fs.readFileSync('hashes.json','utf8'));
 
-var uploadTokens = []
-
+// Cache whitelist in a variable, and update variable when fs detects a file change
 var whitelist = fs.readFileSync('whitelist.txt','utf8').split('\n')
-
 fs.watchFile('whitelist.txt',() => {
     fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
         if (err) return console.log('Error while updating whitelist: ' + err)
@@ -162,17 +160,6 @@ app.get('/auth',(request,response) => {
         } else {
             response.send(result)
         }
-    })
-})
-
-app.get('/uploadRequest',(request,response) => {
-    let username = request.query.user
-    if (!whitelist.includes(username)) return response.send({error: 'Looks like you do not have access to the uploader!'})
-    let generatedToken = username + '_' + Steem.formatter.createSuggestedPassword()
-    uploadTokens.push(generatedToken)
-    Steem.api.getAccounts([username],(err,res) => {
-        let encrypted_token = Steem.memo.encode(Keys.wifMessage,res[0].posting.key_auths[0][0],'#' + generatedToken)
-        response.send({encrypted_token: encrypted_token})
     })
 })
 
@@ -423,56 +410,63 @@ app.post('/uploadVideo', (request,response) => {
     });
 });
 
-app.post('/uploadArticleImg',imgUpload.single('postImg'),(request,response) => {
-    let username = request.body.username; //steem username
-    let uploadedImg = request.file.filename;
-    fs.readFile('imguploads/' + uploadedImg,(err,data) => ipfsAPI.add(data,{trickle: true},(err,file) => {
-        if (Config.UsageLogs == true) {
-            // Log usage data for image uploads
-            if (usageData[username] == undefined) {
-                // New user?
-                usageData[username] = {};
+app.post('/uploadImage',(request,response) => {
+    let imgType = request.query.type;
+    if (!imgType) return response.send({error: 'Image upload type not specified!'})
+    if (imgType != 'images' && imgType != 'thumbnails') return response.send({error: 'Invalid image upload type specified!'})
+
+    imgUpload.single('postImg')(request,response,(err) => {
+        if (err) return response.send({error: err})
+        let username = request.body.username; //steem username
+        let uploadedImg = request.file.filename;
+        fs.readFile('imguploads/' + uploadedImg,(err,data) => ipfsAPI.add(data,{trickle: true},(err,file) => {
+            if (Config.UsageLogs == true) {
+                // Log usage data for image uploads
+                if (usageData[username] == undefined) {
+                    // New user?
+                    usageData[username] = {};
+                }
+
+                var imgUsage = usageData[username][imgType];
+                if (imgUsage == undefined) {
+                    usageData[username][imgType] = request.file.size;
+                } else {
+                    usageData[username][imgType] = imgUsage + request.file.size;
+                }
+
+                fs.writeFile('usage.json',JSON.stringify(usageData),() => {});
             }
 
-            var imgUsage = usageData[username]['images'];
-            if (imgUsage == undefined) {
-                usageData[username]['images'] = request.file.size;
-            } else {
-                usageData[username]['images'] = imgUsage + request.file.size;
+            // Log IPFS hashes by Steem account
+            if (hashes[username] == undefined) {
+                hashes[username] = {
+                    videos: [],
+                    thumbnails: [],
+                    sprites: [],
+                    images: [],
+                }
             }
 
-            fs.writeFile('usage.json',JSON.stringify(usageData),() => {});
-        }
-
-        // Log IPFS hashes by Steem account
-        if (hashes[username] == undefined) {
-            hashes[username] = {
-                videos: [],
-                thumbnails: [],
-                sprites: [],
-                images: [],
+            // Patch for empty images array
+            if (hashes[username][imgType] == undefined) {
+                hashes[username][imgType] = [];
             }
-        }
 
-        // Patch for empty images array
-        if (hashes[username].images == undefined) {
-            hashes[username].images = [];
-        }
+            // If hash is not in database, add the hash into database
+            if (!hashes[username][imgType].includes(file[0].hash))
+                hashes[username][imgType].push(file[0].hash);
+            
+            fs.writeFile('hashes.json',JSON.stringify(hashes),(err) => {
+                if (err != null)
+                    console.log('Error saving image hash logs: ' + err);
+            });
 
-        // If hash is not in database, add the hash into database
-        if (!hashes[username]['images'].includes(file[0].hash))
-            hashes[username]['images'].push(file[0].hash);
-        
-        fs.writeFile('hashes.json',JSON.stringify(hashes),(err) => {
-            if (err != null)
-                console.log('Error saving image hash logs: ' + err);
-        });
-
-        // Send image IPFS hash back to client
-        response.send({
-            imghash: file[0].hash
-        })
-    }))
+            // Send image IPFS hash back to client
+            response.send({
+                imghash: file[0].hash
+            })
+        }))
+    })
 })
 
 app.get('/usage', CORS(), (request,response) => {

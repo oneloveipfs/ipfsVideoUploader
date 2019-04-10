@@ -349,7 +349,7 @@ function uploadImage() {
             updateProgressBar(progressPercent);
         }
     };
-    axios.post('/uploadArticleImg',imgFormData,contentType).then(function(response) {
+    axios.post('/uploadImage?type=images',imgFormData,contentType).then(function(response) {
         console.log(response);
         progressbar.style.display = "none";
         document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + '](https://cloudflare-ipfs.com/ipfs/' + response.data.imghash + ')');
