@@ -10,7 +10,7 @@ const Steem = require('steem');
 const sanitize = require('sanitize-filename');
 const Config = require('./config.json');
 const Keys = require('./.auth.json');
-const UpdateLogs = require('./updatelogs.json');
+const UpdateLogs = require('./db/updatelogs.json');
 const Express = require('express');
 const Parser = require('body-parser');
 const CORS = require('cors');
@@ -29,11 +29,11 @@ if (Config.whitelistEnabled == true && !fs.existsSync('whitelist.txt')) {
 // Cache usage data in a variable
 var usageData = {};
 if (Config.UsageLogs == true) {
-    usageData = JSON.parse(fs.readFileSync('usage.json','utf8'));
+    usageData = JSON.parse(fs.readFileSync('db/usage.json','utf8'));
 }
 
 // Cache hashes data in a variable
-var hashes = JSON.parse(fs.readFileSync('hashes.json','utf8'));
+var hashes = JSON.parse(fs.readFileSync('db/hashes.json','utf8'));
 
 // Cache whitelist in a variable, and update variable when fs detects a file change
 var whitelist = fs.readFileSync('whitelist.txt','utf8').split('\n')
@@ -60,8 +60,8 @@ if (Config.useHTTPS == true) {
 
 // Prohibit access to certain files through HTTP
 app.get('/index.js',(req,res) => {return res.status(404).redirect('/404')})
-app.get('/generateKeys.js',(req,res) => {return res.status(404).redirect('/404')})
-app.get('/getLoginLink.js',(req,res) => {return res.status(404).redirect('/404')})
+app.get('/scripts/generateKeys.js',(req,res) => {return res.status(404).redirect('/404')})
+app.get('/scripts/getLoginLink.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/whitelist.txt',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/config.json',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package.json',(req,res) => {return res.status(404).redirect('/404')})
@@ -327,7 +327,7 @@ app.post('/uploadVideo', (request,response) => {
                             usageData[username]['video1080'] = video1080Usage + request.files.Video1080Upload[0].size
                     }
 
-                    fs.writeFile('usage.json',JSON.stringify(usageData),() => {});
+                    fs.writeFile('db/usage.json',JSON.stringify(usageData),() => {});
                 }
             });
 
@@ -386,7 +386,7 @@ app.post('/uploadVideo', (request,response) => {
                 }
             }
 
-            fs.writeFile('hashes.json',JSON.stringify(hashes),(err) => {
+            fs.writeFile('db/hashes.json',JSON.stringify(hashes),(err) => {
                 if (err != null)
                     console.log('Error saving hash logs: ' + err);
             });
@@ -434,7 +434,7 @@ app.post('/uploadImage',(request,response) => {
                     usageData[username][imgType] = imgUsage + request.file.size;
                 }
 
-                fs.writeFile('usage.json',JSON.stringify(usageData),() => {});
+                fs.writeFile('db/usage.json',JSON.stringify(usageData),() => {});
             }
 
             // Log IPFS hashes by Steem account
@@ -456,7 +456,7 @@ app.post('/uploadImage',(request,response) => {
             if (!hashes[username][imgType].includes(file[0].hash))
                 hashes[username][imgType].push(file[0].hash);
             
-            fs.writeFile('hashes.json',JSON.stringify(hashes),(err) => {
+            fs.writeFile('db/hashes.json',JSON.stringify(hashes),(err) => {
                 if (err != null)
                     console.log('Error saving image hash logs: ' + err);
             });
