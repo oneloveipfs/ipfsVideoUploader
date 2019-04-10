@@ -41,34 +41,6 @@ If you do not wish to support SteemConnect authentication and use only Steem Key
 
 IPFS works the best for videos with .mp4, therefore only mp4 files will be supported at this moment. Both .jpg and .png file formats are supported for thumbnail uploads.
 
-# GET API
-
-To check if Steem user is in the whitelist:
-```
-/checkuser?user=STEEM_USERNAME
-```
-* `user` *(required)*: Steem account username
-
-To get usage info for specific Steem user:
-```
-/usage?user=STEEM_USERNAME
-```
-* `user` *(required)*: Steem account username
-
-To get list of hashes of uploaded files:
-```
-/hashes?user=STEEM_USERNAME&hashtype=videos,thumbnails,sprites
-```
-
-* `user` *(optional)*: Steem account username
-* `hashtype` *(required)*: Type of hash to obtain. Valid values: `videos`, `thumbnails`, `sprites`, `images`, `video240`, `video480`, `video720`, `video1080`.
-
-To get update logs:
-```
-/updatelogs
-```
-*(There are no arguments to be specifed in the URL for this API call)*
-
 # How to contribute?
 
 If you found any ways to improve on the code, or found any bugs, feel free to create a pull request on the GitHub repository. You can also contact me on Discord `techcoderx#7481` if you have any enquiries.
