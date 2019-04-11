@@ -3,6 +3,11 @@
   "version": "2.1.0",
   "description": "Alternative IPFS uploader for DTube videos.",
   "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "sc2link": "node scripts/getLoginLink.js",
+    "keygen": "node scripts/generateKeys.js"
+  },
   "author": "techcoderx",
   "license": "GPLv3",
   "dependencies": {

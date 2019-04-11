@@ -1,5 +1,5 @@
 const sc2 = require('steemconnect');
-const Config = require('./config.json');
+const Config = require('./../config.json');
 
 var api = sc2.Initialize({
     app: Config.SteemConnectApp,
@@ -8,4 +8,4 @@ var api = sc2.Initialize({
     scope: ['comment','comment_options']
 });
 var link = api.getLoginURL();
-console.log(link);
+console.log('Your SteemConnect authentication link: ' + link);
