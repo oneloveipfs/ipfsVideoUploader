@@ -328,7 +328,7 @@ function uploadImage() {
     }
 
     var imgFormData = new FormData();
-    imgFormData.append('postImg',postImg[0]);
+    imgFormData.append('image',postImg[0]);
     imgFormData.append('username',username);
 
     restrictImg();

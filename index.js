@@ -7,10 +7,12 @@ const async = require('async');
 const Crypto = require('crypto-js')
 const JWT = require('jsonwebtoken');
 const Steem = require('steem');
+const SteemConnect = require('steemconnect')
 const sanitize = require('sanitize-filename');
 const Config = require('./config.json');
 const Keys = require('./.auth.json');
 const UpdateLogs = require('./db/updatelogs.json');
+const db = require('./dbManager')
 const Express = require('express');
 const Parser = require('body-parser');
 const CORS = require('cors');
@@ -25,15 +27,6 @@ const imgUpload = Multer({ dest: './imguploads/', limits: { fileSize: 7340032 } 
 if (Config.whitelistEnabled == true && !fs.existsSync('whitelist.txt')) {
     fs.writeFileSync('./whitelist.txt','')
 }
-
-// Cache usage data in a variable
-var usageData = {};
-if (Config.UsageLogs == true) {
-    usageData = JSON.parse(fs.readFileSync('db/usage.json','utf8'));
-}
-
-// Cache hashes data in a variable
-var hashes = JSON.parse(fs.readFileSync('db/hashes.json','utf8'));
 
 // Cache whitelist in a variable, and update variable when fs detects a file change
 var whitelist = fs.readFileSync('whitelist.txt','utf8').split('\n')
@@ -60,6 +53,7 @@ if (Config.useHTTPS == true) {
 
 // Prohibit access to certain files through HTTP
 app.get('/index.js',(req,res) => {return res.status(404).redirect('/404')})
+app.get('/dbManager.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/scripts/generateKeys.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/scripts/getLoginLink.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/whitelist.txt',(req,res) => {return res.status(404).redirect('/404')})
@@ -264,132 +258,60 @@ app.post('/uploadVideo', (request,response) => {
             fs.stat('uploaded/' + sanitize(sourceVideoFilename) + '.jpg',(err,stat) => {
                 if (Config.UsageLogs == true) {
                     // Log usage data if no errors and if logging is enabled
-                    if (usageData[username] == undefined) {
-                        // New user?
-                        usageData[username] = {};
-                    }
-
-                    var videoUsage = usageData[username]['videos'];
-                    if (videoUsage == undefined) {
-                        usageData[username]['videos'] = videoSize;
-                    } else {
-                        usageData[username]['videos'] = videoUsage + videoSize;
-                    }
-
-                    var snapUsage = usageData[username]['thumbnails'];
-                    if (snapUsage == undefined) {
-                        usageData[username]['thumbnails'] = snapSize;
-                    } else {
-                        usageData[username]['thumbnails'] = snapUsage + snapSize;
-                    }
+                    db.recordUsage(username,'videos',videoSize)
+                    db.recordUsage(username,'thumbnails',snapSize)
 
                     if (err != null) {
                         console.log('Error getting sprite filesize: ' + err);
                     } else {
-                        var spriteUsage = usageData[username]['sprites'];
-                        if (spriteUsage == undefined) {
-                            usageData[username]['sprites'] = stat['size'];
-                        } else {
-                            usageData[username]['sprites'] = spriteUsage + stat['size'];
-                        }
+                        db.recordUsage(username,'sprites',stat['size'])
                     }
 
                     // Log encoded video disk usage only if available
                     if (results.video240hash != undefined) {
-                        var video240Usage = usageData[username]['video240']
-                        if (video240Usage == undefined)
-                            usageData[username]['video240'] = request.files.Video240Upload[0].size
-                        else
-                            usageData[username]['video240'] = video240Usage + request.files.Video240Upload[0].size
+                        db.recordUsage(username,'video240',request.files.Video240Upload[0].size)
                     }
 
                     if (results.video480hash != undefined) {
-                        var video480Usage = usageData[username]['video480']
-                        if (video480Usage == undefined)
-                            usageData[username]['video480'] = request.files.Video480Upload[0].size
-                        else
-                            usageData[username]['video480'] = video480Usage + request.files.Video480Upload[0].size
+                        db.recordUsage(username,'video480',request.files.Video480Upload[0].size)
                     }
 
                     if (results.video720hash != undefined) {
-                        var video720Usage = usageData[username]['video720']
-                        if (video720Usage == undefined)
-                            usageData[username]['video720'] = request.files.Video720Upload[0].size
-                        else
-                            usageData[username]['video720'] = video720Usage + request.files.Video720Upload[0].size
+                        db.recordUsage(username,'video720',request.files.Video720Upload[0].size)
                     }
 
                     if (results.video1080hash != undefined) {
-                        var video1080Usage = usageData[username]['video1080']
-                        if (video1080Usage == undefined)
-                            usageData[username]['video1080'] = request.files.Video1080Upload[0].size
-                        else
-                            usageData[username]['video1080'] = video1080Usage + request.files.Video1080Upload[0].size
+                        db.recordUsage(username,'video1080',request.files.Video1080Upload[0].size)
                     }
 
-                    fs.writeFile('db/usage.json',JSON.stringify(usageData),() => {});
+                    db.writeUsageData()
                 }
             });
 
             // Log IPFS hashes by Steem account
-            if (hashes[username] == undefined) {
-                hashes[username] = {
-                    videos: [],
-                    thumbnails: [],
-                    sprites: [],
-                    images: [],
-                }
-            }
-            
             // If hash is not in database, add the hash into database
-            if (!hashes[username]['videos'].includes(results.videohash))
-                hashes[username]['videos'].push(results.videohash)
-            if (!hashes[username]['thumbnails'].includes(results.snaphash))
-                hashes[username]['thumbnails'].push(results.snaphash)
-            if (!hashes[username]['sprites'].includes(results.spritehash))
-                hashes[username]['sprites'].push(results.spritehash)
+            db.recordHash(username,'videos',results.videohash)
+            db.recordHash(username,'thumbnails',results.snaphash)
+            db.recordHash(username,'sprites',results.spritehash)
 
             // Add encoded video hashes into database if available
             if (results.video240hash != undefined) {
-                if (hashes[username].video240 == undefined) {
-                    hashes[username].video240 = [results.video240hash]
-                } else {
-                    if (!hashes[username]['video240'].includes(results.video240hash))
-                        hashes[username]['video240'].push(results.video240hash)
-                }
+                db.recordHash(username,'video240',results.video240hash)
             }
 
             if (results.video480hash != undefined) {
-                if (hashes[username].video480 == undefined) {
-                    hashes[username].video480 = [results.video480hash]
-                } else {
-                    if (!hashes[username]['video480'].includes(results.video480hash))
-                        hashes[username]['video480'].push(results.video480hash)
-                }
+                db.recordHash(username,'video480',results.video480hash)
             }
 
             if (results.video720hash != undefined) {
-                if (hashes[username].video720 == undefined) {
-                    hashes[username].video720 = [results.video720hash]
-                } else {
-                    if (!hashes[username]['video720'].includes(results.video720hash))
-                        hashes[username]['video720'].push(results.video720hash)
-                }
+                db.recordHash(username,'video720',results.video720hash)
             }
 
             if (results.video1080hash != undefined) {
-                if (hashes[username].video1080 == undefined) {
-                    hashes[username].video1080 = [results.video1080hash]
-                } else {
-                    if (!hashes[username]['video1080'].includes(results.video1080hash))
-                        hashes[username]['video1080'].push(results.video1080hash)
-                }
+                db.recordHash(username,'video1080',results.video1080hash)
             }
 
-            fs.writeFile('db/hashes.json',JSON.stringify(hashes),(err) => {
-                if (err != null)
-                    console.log('Error saving hash logs: ' + err);
-            });
+            db.writeHashesData()
 
             getDuration(videoPathName).then((videoDuration) => {
                 // Send IPFS hashes, duration and filesize back to client
@@ -415,51 +337,21 @@ app.post('/uploadImage',(request,response) => {
     if (!imgType) return response.send({error: 'Image upload type not specified!'})
     if (imgType != 'images' && imgType != 'thumbnails') return response.send({error: 'Invalid image upload type specified!'})
 
-    imgUpload.single('postImg')(request,response,(err) => {
+    imgUpload.single('image')(request,response,(err) => {
         if (err) return response.send({error: err})
         let username = request.body.username; //steem username
         let uploadedImg = request.file.filename;
         fs.readFile('imguploads/' + uploadedImg,(err,data) => ipfsAPI.add(data,{trickle: true},(err,file) => {
             if (Config.UsageLogs == true) {
                 // Log usage data for image uploads
-                if (usageData[username] == undefined) {
-                    // New user?
-                    usageData[username] = {};
-                }
-
-                var imgUsage = usageData[username][imgType];
-                if (imgUsage == undefined) {
-                    usageData[username][imgType] = request.file.size;
-                } else {
-                    usageData[username][imgType] = imgUsage + request.file.size;
-                }
-
-                fs.writeFile('db/usage.json',JSON.stringify(usageData),() => {});
+                db.recordUsage(username,imgType,request.file.size)
+                db.writeUsageData()
             }
 
             // Log IPFS hashes by Steem account
-            if (hashes[username] == undefined) {
-                hashes[username] = {
-                    videos: [],
-                    thumbnails: [],
-                    sprites: [],
-                    images: [],
-                }
-            }
-
-            // Patch for empty images array
-            if (hashes[username][imgType] == undefined) {
-                hashes[username][imgType] = [];
-            }
-
             // If hash is not in database, add the hash into database
-            if (!hashes[username][imgType].includes(file[0].hash))
-                hashes[username][imgType].push(file[0].hash);
-            
-            fs.writeFile('db/hashes.json',JSON.stringify(hashes),(err) => {
-                if (err != null)
-                    console.log('Error saving image hash logs: ' + err);
-            });
+            db.recordHash(username,imgType,file[0].hash)
+            db.writeHashesData()
 
             // Send image IPFS hash back to client
             response.send({
@@ -473,7 +365,9 @@ app.get('/usage', CORS(), (request,response) => {
     // API to get usage info
     if (Config.UsageLogs != true) return response.send('Logs are disabled therefore API is not available for usage.');
     if (request.query.user == undefined || request.query.user == '') return response.send('Steem username is not defined!');
-    response.send(usageData[request.query.user]);
+    db.getUsage(request.query.user,(result) => {
+        response.send(result)
+    })
 })
 
 app.get('/hashes', CORS(), (request,response) => {
@@ -486,62 +380,24 @@ app.get('/hashes', CORS(), (request,response) => {
 
     typerequested.split(',');
 
-    var hashesToReturn = {};
     if (request.query.user == undefined || request.query.user == '') {
         // Steem user not specified, return all hashes (either all videos, snaps or sprites, or all three)
-        function getAllHashes(hashType) {
-            var hashArrToReturn = [];
-            for(var key in hashes) {
-                if (hashes.hasOwnProperty(key) && hashes[key][hashType] != undefined) {
-                    hashArrToReturn = hashArrToReturn.concat(hashes[key][hashType]);
-                }
-            }
-            return hashArrToReturn;
-        }
-        if (typerequested.includes('videos'))
-            hashesToReturn.videos = getAllHashes('videos');
-        if (typerequested.includes('thumbnails'))
-            hashesToReturn.thumbnails = getAllHashes('thumbnails');
-        if (typerequested.includes('sprites'))
-            hashesToReturn.sprites = getAllHashes('sprites');
-        if (typerequested.includes('images'))
-            hashesToReturn.images = getAllHashes('images');
-        if (typerequested.includes('video240'))
-            hashesToReturn.video240 = getAllHashes('video240')
-        if (typerequested.includes('video480'))
-            hashesToReturn.video480 = getAllHashes('video480')
-        if (typerequested.includes('video720'))
-            hashesToReturn.video720 = getAllHashes('video720')
-        if (typerequested.includes('video1080'))
-            hashesToReturn.video1080 = getAllHashes('video1080')
-        
-        return response.send(hashesToReturn);
+        db.getHashes(typerequested,(obtainedHashes) => {
+            return response.send(obtainedHashes);
+        })
     }
 
     // Steem username specified does not exist in our record
-    if (!hashes.hasOwnProperty(request.query.user)) {
-        return response.send('Steem user specified doesn\'t exist in our record.');
-    }
-
-    // BOTH valid Steem username and hash type request are specified
-    if (typerequested.includes('videos'))
-        hashesToReturn.videos = hashes[request.query.user]['videos'];
-    if (typerequested.includes('thumbnails'))
-        hashesToReturn.thumbnails = hashes[request.query.user]['thumbnails'];
-    if (typerequested.includes('sprites'))
-        hashesToReturn.sprites = hashes[request.query.user]['sprites'];
-    if (typerequested.includes('images'))
-        hashesToReturn.images = hashes[request.query.user]['images'];
-    if (typerequested.includes('video240'))
-        hashesToReturn.video240 = hashes[request.query.user]['video240'];
-    if (typerequested.includes('video480'))
-        hashesToReturn.video480 = hashes[request.query.user]['video480'];
-    if (typerequested.includes('video720'))
-        hashesToReturn.video720 = hashes[request.query.user]['video720'];
-    if (typerequested.includes('video1080'))
-        hashesToReturn.video1080 = hashes[request.query.user]['video1080'];
-    
-    return response.send(hashesToReturn);
+    db.userExistInHashesDB(request.query.user,(result) => {
+        if (result == false) {
+            return response.send('Steem user specified doesn\'t exist in our record.')
+        } else {
+            // BOTH valid Steem username and hash type request are specified
+            db.getHashesByUser(typerequested,request.query.user,(obtainedHashes) => {
+                return response.send(obtainedHashes);
+            })
+        }
+    })
 });
 
 app.get('/updatelogs',(request,response) => {
@@ -565,7 +421,7 @@ function loadWebpage(HTMLFile,response) {
 
 // TODO: Modularize these functions in seperate JS files
 function generateEncryptedMemo(username,response) {
-    // Generate encrypted text to be decrypted by Keychain on client
+    // Generate encrypted text to be decrypted by Keychain or posting key on client
     let encrypted_message = Crypto.AES.encrypt(username + ':oneloveipfs_login_' + Date.now(),Keys.AESKey).toString()
     Steem.api.getAccounts([username],(err,res) => {
         let encrypted_memo = Steem.memo.encode(Keys.wifMessage,res[0].posting.key_auths[0][0],'#' + encrypted_message)
