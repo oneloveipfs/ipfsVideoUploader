@@ -4,15 +4,12 @@ const Shell = require('shelljs');
 const getDuration = require('get-video-duration');
 const fs = require('fs');
 const async = require('async');
-const Crypto = require('crypto-js')
-const JWT = require('jsonwebtoken');
-const Steem = require('steem');
 const SteemConnect = require('steemconnect')
 const sanitize = require('sanitize-filename');
 const Config = require('./config.json');
-const Keys = require('./.auth.json');
 const UpdateLogs = require('./db/updatelogs.json');
 const db = require('./dbManager')
+const Auth = require('./authManager')
 const Express = require('express');
 const Parser = require('body-parser');
 const CORS = require('cors');
@@ -54,6 +51,7 @@ if (Config.useHTTPS == true) {
 // Prohibit access to certain files through HTTP
 app.get('/index.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/dbManager.js',(req,res) => {return res.status(404).redirect('/404')})
+app.get('/authManager.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/scripts/generateKeys.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/scripts/getLoginLink.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/whitelist.txt',(req,res) => {return res.status(404).redirect('/404')})
@@ -97,63 +95,48 @@ app.get('/404', (request,response) => {
 
 app.get('/checkuser', CORS(), (request,response) => {
     // Check if user is in whitelist
-    if (Config.whitelistEnabled == true) {
-        if (!whitelist.includes(request.query.user)) {
-            response.send({isInWhitelist: false})
-        } else {
-            response.send({isInWhitelist: true})
-        }
-    } else {
-        response.send({isInWhitelist: true})
-    }
+    if (Config.whitelistEnabled == true)
+        if (!whitelist.includes(request.query.user)) 
+            return response.send({isInWhitelist: false})
+
+    response.send({isInWhitelist: true})
 });
 
 app.get('/login',(request,response) => {
     // Steem Keychain Auth
-    if ((request.query.user == null || undefined) || request.query.user == '') {
+    if ((request.query.user == null || undefined) || request.query.user == '')
         // Username not specified, throw an error
-        response.send({error: 'Username not specified!'})
-        return
-    }
-    if (Config.whitelistEnabled == true) {
-        if (!whitelist.includes(request.query.user)) {
-            response.send({error: 'Looks like you do not have access to the uploader!'})
-        } else {
-            generateEncryptedMemo(request.query.user,response)
-        }
-    } else {
-        generateEncryptedMemo(request.query.user,response)
-    }
+        return response.send({error: 'Username not specified!'})
+
+    if (Config.whitelistEnabled == true)
+        if (!whitelist.includes(request.query.user))
+            return response.send({error: 'Looks like you do not have access to the uploader!'})
+
+    Auth.generateEncryptedMemo(request.query.user,(err,memo) => {
+        if (err) return response.send({error: err})
+        response.send({encrypted_memo: memo, error: null})
+    })
 });
 
 app.post('/logincb',(request,response) => {
     // Keychain Auth Callback
-    let decoded = Crypto.AES.decrypt(request.body,Keys.AESKey).toString(Crypto.enc.Utf8).split(':')
-    if (Config.whitelistEnabled == true) {
-        if (!whitelist.includes(decoded[0])) {
-            response.send({error: 'Looks like you do not have access to the uploader!'})
-        } else {
-            generateJWT(decoded,response)
-        }
-    } else {
-        generateJWT(decoded,response)
-    }
+    Auth.decryptMessage(request.body,(decoded) => {
+        if (Config.whitelistEnabled == true)
+            if (!whitelist.includes(decoded[0]))
+                return response.send({error: 'Looks like you do not have access to the uploader!'})
+
+        Auth.generateJWT(decoded[0],(err,token) => {
+            if (err) return response.send({error: err})
+            response.send({access_token: token, error: null})
+        })
+    })
 })
 
 app.get('/auth',(request,response) => {
     let access_token = request.query.access_token
-    JWT.verify(access_token,Keys.JWTKey,(err,result) => {
-        if (err != null) {
-            response.send({error: 'Login error: ' + err})
-        } else if (Config.whitelistEnabled == true) {
-            if (!whitelist.includes(result.user)) {
-                response.send({error: 'Looks like you do not have access to the uploader!'})
-            } else {
-                response.send(result)
-            }
-        } else {
-            response.send(result)
-        }
+    Auth.verifyAuth(access_token,(err,res) => {
+        if (err) return response.send({error: err})
+        else return response.send(res)
     })
 })
 
@@ -417,33 +400,6 @@ function loadWebpage(HTMLFile,response) {
             response.end();
         }
     });
-}
-
-// TODO: Modularize these functions in seperate JS files
-function generateEncryptedMemo(username,response) {
-    // Generate encrypted text to be decrypted by Keychain or posting key on client
-    let encrypted_message = Crypto.AES.encrypt(username + ':oneloveipfs_login_' + Date.now(),Keys.AESKey).toString()
-    Steem.api.getAccounts([username],(err,res) => {
-        let encrypted_memo = Steem.memo.encode(Keys.wifMessage,res[0].posting.key_auths[0][0],'#' + encrypted_message)
-        response.send({encrypted_memo: encrypted_memo, error: null})
-    })
-}
-
-function generateJWT(data,response) {
-    // Generate access token to be sent as response
-    JWT.sign({
-        user: data[0],
-        app: 'oneloveipfs',
-        iat: data[1].split('_')[2] / 1000,
-        exp: (data[1].split('_')[2] / 1000) + 604800
-    },Keys.JWTKey,(err,token) => {
-        if (err != null) {
-            console.log('Error signing JWT: ' + err)
-            response.send({error: 'Error generating access token: ' + err})
-        } else {
-            response.send({access_token: token, error: null})
-        }
-    })
 }
 
 app.use(function (req,res) {
