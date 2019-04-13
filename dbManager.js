@@ -18,20 +18,19 @@ let db = {
     },
     // Log usage data and IPFS hashes
     recordUsage: (username,type,size) => {
-        if (usageData[username] == undefined) {
+        if (!usageData[username]) {
             // New user?
             usageData[username] = {}
         }
 
-        let usage = usageData[username][type]
-        if (usage == undefined) {
-            usage = size
+        if (!usageData[username][type]) {
+            usageData[username][type] = size
         } else {
-            usage = usage + size
+            usageData[username][type] = usageData[username][type] + size
         }
     },
     recordHash: (username,type,hash) => {
-        if (hashes[username] == undefined) {
+        if (!hashes[username]) {
             hashes[username] = {
                 videos: [],
                 thumbnails: [],
@@ -40,7 +39,7 @@ let db = {
             }
         }
 
-        if (hashes[username][type] == undefined) {
+        if (!hashes[username][type]) {
             hashes[username][type] = []
         }
 

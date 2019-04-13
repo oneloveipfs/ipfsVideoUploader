@@ -1,8 +1,18 @@
 const Steem = require('steem')
 const JWT = require('jsonwebtoken')
 const Crypto = require('crypto-js')
+const fs = require('fs')
 const Keys = require('./.auth.json')
 const Config = require('./config.json')
+
+// Cache whitelist in a variable, and update variable when fs detects a file change
+let whitelist = fs.readFileSync('whitelist.txt','utf8').split('\n')
+fs.watchFile('whitelist.txt',() => {
+    fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
+        if (err) return console.log('Error while updating whitelist: ' + err)
+        whitelist = readList.split('\n')
+    })
+})
 
 let auth = {
     generateEncryptedMemo: (username,cb) => {
@@ -32,7 +42,7 @@ let auth = {
         JWT.verify(access_token,Keys.JWTKey,(err,result) => {
             if (err != null)
                 cb('Login error: ' + err)
-            else if (Config.whitelistEnabled == true)
+            else if (Config.whitelistEnabled === true)
                 if (!whitelist.includes(result.user))
                     return cb('Looks like you do not have access to the uploader!')
             
@@ -42,7 +52,8 @@ let auth = {
     decryptMessage: (message,cb) => {
         let decrypted = Crypto.AES.decrypt(message,Keys.AESKey).toString(Crypto.enc.Utf8).split(':')
         cb(decrypted)
-    }
+    },
+    whitelist: () => {return whitelist}
 }
 
 module.exports = auth
