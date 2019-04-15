@@ -61,12 +61,14 @@ function keychainLogin() {
                     window.location.href = '/upload?access_token=' + cbResponse.data.access_token + '&keychain=true'
                 }
             }).catch((err) => {
-                alert(err)
+                if (err.response.data.error) alert(err.response.data.error)
+                else alert(err)
                 cancelLoginBtn()
             })
         })
     }).catch((err) => {
-        alert(err)
+        if (err.response.data.error) alert(err.response.data.error)
+        else alert(err)
         cancelLoginBtn()
     })
 }

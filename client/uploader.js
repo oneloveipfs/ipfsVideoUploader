@@ -21,6 +21,13 @@ if (token == null) {
             document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + username
             retrieveDraft()
         }
+    }).catch((error) => {
+        if (error.response.data.error)
+            alert(error.response.data.error)
+        else
+            alert(error)
+        document.getElementById('loggedInUser').innerHTML = 'Login failed'
+        restrict()
     })
 } else {
     // SteemConnect login
@@ -223,7 +230,10 @@ function submitVideo() {
             });
         }
     }).catch(function(err) {
-        alert('Upload error: ' + err);
+        if (err.response.data.error)
+            alert('Upload error: ' + err.response.data.error)
+        else
+            alert('Upload error: ' + err);
         progressbar.style.display = "none";
         reenableFields();
     });
@@ -354,7 +364,10 @@ function uploadImage() {
         document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + '](https://cloudflare-ipfs.com/ipfs/' + response.data.imghash + ')');
         reenableFieldsImg();
     }).catch(function(err) {
-        alert('Upload error: ' + err);
+        if (err.response.data.error)
+            alert('Upload error: ' + err.response.data.error)
+        else
+            alert('Upload error: ' + err);
         progressbar.style.display = "none";
         reenableFieldsImg();
     })

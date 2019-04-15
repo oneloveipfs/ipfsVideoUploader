@@ -157,8 +157,8 @@ let uploadOps = {
     },
     uploadImage: (username,request,response) => {
         let imgType = request.query.type
-        if (!imgType) return response.send({error: 'Image upload type not specified!'})
-        if (imgType != 'images' && imgType != 'thumbnails') return response.send({error: 'Invalid image upload type specified!'})
+        if (!imgType) return response.status(400).send({error: 'Image upload type not specified!'})
+        if (imgType != 'images' && imgType != 'thumbnails') return response.status(400).send({error: 'Invalid image upload type specified!'})
 
         imgUpload.single('image')(request,response,(err) => {
             if (err) return response.send({error: err})

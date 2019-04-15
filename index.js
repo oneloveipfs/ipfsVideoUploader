@@ -5,6 +5,7 @@ const db = require('./dbManager')
 const Auth = require('./authManager')
 const fs = require('fs')
 const Express = require('express')
+const RateLimiter = require('express-rate-limit')
 const Parser = require('body-parser')
 const CORS = require('cors')
 const https = require('https')
@@ -35,6 +36,29 @@ app.get('/whitelist.txt',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/config.json',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package.json',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package-lock.json',(req,res) => {return res.status(404).redirect('/404')})
+
+// Rate limit
+const AuthAPILimiter = RateLimiter({
+    max: 5,
+    windowMs: 60000, // 5 login attempts every 60 seconds
+    message: "You have too many login attempts!",
+    skipSuccessfulRequests: true
+})
+
+const VideoUploadAPILimiter = RateLimiter({
+    max: 5,
+    windowMs: 30000 // 5 requests every 30 seconds
+})
+
+const ImageUploadAPILimiter = RateLimiter({
+    max: 10,
+    windowMs: 30000 // 10 requests every 30 seconds
+})
+
+const APILimiter = RateLimiter({
+    max: 1,
+    windowMs: 1000 // 1 request per second
+})
 
 app.use(Express.static(__dirname, { dotfiles: 'deny' }));
 app.use(Parser.text())
@@ -70,7 +94,7 @@ app.get('/404', (request,response) => {
     loadWebpage('./client/404.html',response);
 })
 
-app.get('/checkuser', CORS(), (request,response) => {
+app.get('/checkuser', CORS(), APILimiter, (request,response) => {
     // Check if user is in whitelist
     if (Config.whitelistEnabled)
         if (!Auth.whitelist().includes(request.query.user)) 
@@ -79,15 +103,15 @@ app.get('/checkuser', CORS(), (request,response) => {
     response.send({isInWhitelist: true})
 });
 
-app.get('/login',(request,response) => {
+app.get('/login',AuthAPILimiter,(request,response) => {
     // Steem Keychain Auth
     if ((request.query.user === undefined) || request.query.user === '')
         // Username not specified, throw an error
-        return response.send({error: 'Username not specified!'})
+        return response.status(400).send({error: 'Username not specified!'})
 
     if (Config.whitelistEnabled)
         if (!Auth.whitelist().includes(request.query.user))
-            return response.send({error: 'Looks like you do not have access to the uploader!'})
+            return response.status(403).send({error: 'Looks like you do not have access to the uploader!'})
 
     Auth.generateEncryptedMemo(request.query.user,(err,memo) => {
         if (err) return response.send({error: err})
@@ -95,12 +119,12 @@ app.get('/login',(request,response) => {
     })
 });
 
-app.post('/logincb',(request,response) => {
+app.post('/logincb',AuthAPILimiter,(request,response) => {
     // Keychain Auth Callback
     Auth.decryptMessage(request.body,(decoded) => {
         if (Config.whitelistEnabled)
             if (!Auth.whitelist().includes(decoded[0]))
-                return response.send({error: 'Looks like you do not have access to the uploader!'})
+                return response.status(403).send({error: 'Looks like you do not have access to the uploader!'})
 
         Auth.generateJWT(decoded[0],(err,token) => {
             if (err) return response.send({error: err})
@@ -109,23 +133,23 @@ app.post('/logincb',(request,response) => {
     })
 })
 
-app.get('/auth',(request,response) => {
+app.get('/auth',AuthAPILimiter,(request,response) => {
     let access_token = request.query.access_token
     Auth.verifyAuth(access_token,(err,res) => {
-        if (err) return response.send({error: err})
+        if (err) return response.status(401).send({error: err})
         else return response.send(res)
     })
 })
 
-app.post('/uploadVideo',(request,response) => {
+app.post('/uploadVideo',VideoUploadAPILimiter,(request,response) => {
     Authenticate(request,response,(user) => FileUploader.uploadVideo(user,request,response))
 })
 
-app.post('/uploadImage',(request,response) => {
+app.post('/uploadImage',ImageUploadAPILimiter,(request,response) => {
     Authenticate(request,response,(user) => FileUploader.uploadImage(user,request,response))
 })
 
-app.get('/usage', CORS(), (request,response) => {
+app.get('/usage',APILimiter, CORS(), (request,response) => {
     // API to get usage info
     if (!Config.UsageLogs) return response.send('Logs are disabled therefore API is not available for usage.');
     if (request.query.user === undefined || request.query.user === '') return response.send('Steem username is not defined!');
@@ -134,7 +158,7 @@ app.get('/usage', CORS(), (request,response) => {
     })
 })
 
-app.get('/hashes', CORS(), (request,response) => {
+app.get('/hashes',APILimiter, CORS(), (request,response) => {
     // API to get IPFS hashes of uploaded files
     let typerequested = request.query.hashtype;
     if (typerequested === '' || typerequested === undefined) {
@@ -162,7 +186,7 @@ app.get('/hashes', CORS(), (request,response) => {
         })
 });
 
-app.get('/updatelogs',(request,response) => {
+app.get('/updatelogs',APILimiter,(request,response) => {
     // Send all update logs to client to be displayed on homepage
     response.send(UpdateLogs);
 })
@@ -183,17 +207,17 @@ function loadWebpage(HTMLFile,response) {
 
 function Authenticate(request,response,next) {
     let access_token = request.query.access_token
-    if (Config.whitelistEnabled && !access_token) return response.send({error: 'Missing API auth credentials'})
+    if (Config.whitelistEnabled && !access_token) return response.status(400).send({error: 'Missing API auth credentials'})
     if (Config.whitelistEnabled && request.query.scauth === 'true') {
         // Handle SteemConnect access token
         Auth.scAuth(access_token,(user) => {
-            if (err) return response.send({ error: err })
+            if (err) return response.status(401).send({ error: err })
             else next(user)
         })
     } else {
         // Handle access token from /logincb
         Auth.verifyAuth(access_token,(err,result) => {
-            if (err) return response.send({ error: err })
+            if (err) return response.status(401).send({ error: err })
             else next(result.user)
         })
     }
