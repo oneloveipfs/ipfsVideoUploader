@@ -1,9 +1,14 @@
 const Steem = require('steem')
+const SteemConnect = require('steemconnect')
 const JWT = require('jsonwebtoken')
 const Crypto = require('crypto-js')
 const fs = require('fs')
 const Keys = require('./.auth.json')
 const Config = require('./config.json')
+
+// If whitelist file doesn't exist create it
+if (Config.whitelistEnabled && !fs.existsSync('whitelist.txt'))
+    fs.writeFileSync('./whitelist.txt','')
 
 // Cache whitelist in a variable, and update variable when fs detects a file change
 let whitelist = fs.readFileSync('whitelist.txt','utf8').split('\n')
@@ -47,6 +52,16 @@ let auth = {
                     return cb('Looks like you do not have access to the uploader!')
             
             cb(null,result)
+        })
+    },
+    scAuth: (access_token,cb) => {
+        if (!access_token) return cb('Missing access token')
+        let scapi = SteemConnect.Initialize({ accessToken: access_token })
+        scapi.me((err,result) => {
+            if (err) return cb(err)
+            if (!whitelist.includes(result.account.name))
+                return cb('Looks like you do not have access to the uploader!')
+            cb(null,result.account.name)
         })
     },
     decryptMessage: (message,cb) => {

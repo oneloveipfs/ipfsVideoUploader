@@ -157,7 +157,6 @@ function submitVideo() {
     var formdata = new FormData();
     formdata.append('VideoUpload',sourceVideo[0]);
     formdata.append('SnapUpload',snap[0]);
-    formdata.append('Username',username);
 
     if (video240.length > 0)
         formdata.append('Video240Upload',video240[0]);
@@ -184,7 +183,7 @@ function submitVideo() {
             updateProgressBar(progressPercent);
         }
     };
-    axios.post('/uploadVideo',formdata,contentType).then(function(response) {
+    axios.post('/uploadVideo?access_token=' + token,formdata,contentType).then(function(response) {
         var uploaderResponse = response.data;
         console.log(uploaderResponse);
 
@@ -349,7 +348,7 @@ function uploadImage() {
             updateProgressBar(progressPercent);
         }
     };
-    axios.post('/uploadImage?type=images',imgFormData,contentType).then(function(response) {
+    axios.post('/uploadImage?type=images&access_token=' + token,imgFormData,contentType).then(function(response) {
         console.log(response);
         progressbar.style.display = "none";
         document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + '](https://cloudflare-ipfs.com/ipfs/' + response.data.imghash + ')');

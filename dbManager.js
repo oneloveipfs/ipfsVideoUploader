@@ -2,8 +2,8 @@
 const fs = require('fs')
 
 // Cache JSON data into variables
-var usageData = JSON.parse(fs.readFileSync('db/usage.json','utf8'));
-var hashes = JSON.parse(fs.readFileSync('db/hashes.json','utf8'));
+let usageData = JSON.parse(fs.readFileSync('db/usage.json','utf8'))
+let hashes = JSON.parse(fs.readFileSync('db/hashes.json','utf8'))
 
 let possibleTypes = ['videos','thumbnails','sprites','images','video240','video480','video720','video1080']
 
