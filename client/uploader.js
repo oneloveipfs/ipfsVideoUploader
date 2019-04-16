@@ -49,20 +49,45 @@ if (token == null) {
     });
 }
 
+// Setup subtitles tab
+const allLangCodes = languages.getAllLanguageCode()
+let langOptions = ''
+let langNameList = []
+for(let i = 0; i < allLangCodes.length; i++) {
+    let langName = languages.getLanguageInfo(allLangCodes[i]).name
+    langOptions += '<option value="' + langName + '">'
+    langNameList.push(langName)
+}
+setTimeout(() => document.getElementById('languages').innerHTML = langOptions,200)
+
 function tabBasicsClicked() {
-    document.getElementById('advanced').style.display = "none";
-    document.getElementById('basics').style.display = "block";
+    document.getElementById('advanced').style.display = "none"
+    document.getElementById('subtitles').style.display = "none"
+    document.getElementById('basics').style.display = "block"
     document.getElementById('tabAdvanced').style.backgroundColor = "transparent"
-    document.getElementById('tabBasics').style.backgroundColor = "#2196F3";
-    return true;
+    document.getElementById('tabSubtitles').style.backgroundColor = "transparent"
+    document.getElementById('tabBasics').style.backgroundColor = "#2196F3"
+    return true
 }
 
 function tabAdvancedClicked() {
-    document.getElementById('advanced').style.display = "block";
-    document.getElementById('basics').style.display = "none";
+    document.getElementById('advanced').style.display = "block"
+    document.getElementById('subtitles').style.display = "none"
+    document.getElementById('basics').style.display = "none"
     document.getElementById('tabAdvanced').style.backgroundColor = "#2196F3"
-    document.getElementById('tabBasics').style.backgroundColor = "transparent";
-    return true;
+    document.getElementById('tabSubtitles').style.backgroundColor = "transparent"
+    document.getElementById('tabBasics').style.backgroundColor = "transparent"
+    return true
+}
+
+function tabSubtitlesClicked() {
+    document.getElementById('advanced').style.display = "none"
+    document.getElementById('subtitles').style.display = "block"
+    document.getElementById('basics').style.display = "none"
+    document.getElementById('tabAdvanced').style.backgroundColor = "transparent"
+    document.getElementById('tabSubtitles').style.backgroundColor = "#2196F3"
+    document.getElementById('tabBasics').style.backgroundColor = "transparent"
+    return true
 }
 
 function restrict() {
@@ -379,6 +404,33 @@ function updateProgressBar(progress) {
     progressbarInner.innerHTML = 'Uploading... (' + progress + '%)';
 }
 
+// Subtitles
+function subtitleFileSelected() {
+    if (document.getElementById('subtitleUpload').files.length == 0)
+        document.getElementById('chooseSubBtn').innerHTML = 'Choose subtitle file'
+    else
+        document.getElementById('chooseSubBtn').innerHTML = 'Change subtitle file'
+}
+
+function uploadSubtitle() {
+    let subtitleFile = document.getElementById('subtitleUpload').files
+    let selectedLanguage = document.getElementById('newLanguageField').value
+
+    if (selectedLanguage == '')
+        return alert('Please select a language for your subtitle!')
+    if (!langNameList.includes(selectedLanguage))
+        return alert('Selected language is invalid!')
+    if (subtitleFile.length == 0)
+        return alert('Please choose a WebVTT subtitle file to upload.')
+    
+    document.getElementById('newLanguageField').disabled = true
+    document.getElementById('chooseSubBtn').disabled = true
+    document.getElementById('uploadSubBtn').disabled = true
+
+    return true
+}
+
+// Drafts
 function saveAsDraft() {
     localStorage.setItem('OneLoveTitle',document.getElementById('title').value);
     localStorage.setItem('OneLoveDescription',document.getElementById('description').value);

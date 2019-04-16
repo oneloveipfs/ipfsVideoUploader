@@ -118,7 +118,7 @@ h2 {
 
 .tabs {
     font-size: 25px; 
-    padding: 6px 10%;
+    padding: 6px 6%;
     align-content: center
 }
 
@@ -225,6 +225,26 @@ textarea {
     padding-left: 5px;
     padding-top: 5px;
     font-size: 12px;
+}
+
+#newLanguageField {
+    width: 35%;
+}
+
+#chooseSubBtn {
+    padding: 6px 20px;
+    font-size: 15px;
+    text-align: center;
+    width: 25%;
+    margin-top: 1px;
+}
+
+#uploadSubBtn {
+    padding: 6px 15px;
+    font-size: 15px;
+    text-align: center;
+    width: 22%;
+    margin-top: 1px;
 }
 
 #logoBanner {
@@ -586,8 +606,26 @@ td {
         width: auto;
     }
 
+    #newLanguageField {
+        width: 100%;
+    }
+
+    #chooseSubBtn {
+        margin-top: 5px;
+        margin-left: auto;
+        margin-right: auto;
+        width: 89.5%;
+    }
+
+    #uploadSubBtn {
+        margin-left: auto;
+        margin-right: auto;
+        width: 93%;
+    }
+
     .tabs {
-        padding: 6px 7%;
+        padding: 6px 5%;
+        font-size: 17px;
     }
 
     .popup-content {

@@ -7,6 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/steemconnect@latest"></script>
+        <script src="client/languages.js"></script>
         <script src="client/uploader.js"></script>
     </head>
     <body>
@@ -15,6 +16,7 @@
         <div id="uploadForm">
             <div id="tab">
                 <a class="tabs" id="tabBasics" onclick="tabBasicsClicked()">Basics</a>
+                <a class="tabs" id="tabSubtitles" onclick="tabSubtitlesClicked()">Subtitles</a>
                 <a class="tabs" id="tabAdvanced" onclick="tabAdvancedClicked()">Advanced</a>
             </div>
             <div id="basics"> <!-- Basics tab -->
@@ -28,6 +30,18 @@
                     <input type="checkbox" name="powerup" id="powerup">
                     <span class="slider round"></span>
                 </label><h3 class="poweruptext"> Power Up 100%</h3><br><br>
+            </div>
+            <div id="subtitles"> <!-- Subtitles tab -->
+                <h3>Add subtitles to your video</h3>
+                <h5>You may wish to create subtitles for your videos for multiple languages. To create your subtitles, use a subtitle creator tool and upload the subtitle file here.<br><br>Only WebVTT files are accepted as this is the only format DTube supports right now!</h5>
+                <h4>Upload a new subtitle<br>
+                    <input list="languages" class="meta" id="newLanguageField" placeholder="Choose language">
+                    <input type="file" id="subtitleUpload" style="display: none" onchange="subtitleFileSelected()">
+                    <a onclick="document.getElementById('subtitleUpload').click();return true;" id="chooseSubBtn" class="styledButton">Choose subtitle file</a>
+                    <a onclick="uploadSubtitle()" id="uploadSubBtn" class="styledButton">Upload subtitle</a>
+                </h4>
+                <datalist id="languages"></datalist>
+                <h4>Your subtitles</h4>
             </div>
             <div id="advanced"> <!-- Advanced tab -->
                 <h3>Upload user encoded videos</h3>
