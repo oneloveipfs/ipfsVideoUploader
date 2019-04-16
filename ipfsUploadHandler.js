@@ -23,7 +23,8 @@ let uploadOps = {
             {name: 'Video1080Upload', maxCount: 1},
         ])(request,response,function(err) {
             request.socket.setTimeout(0)
-            if (err) return response.send({error: err})
+            if (err) return response.status(400).send({error: err})
+            if (!request.files.VideoUpload) return response.status(400).send({error: 'Source video upload not found.'})
     
             // Add video to IPFS
             let sourceVideoFilename = sanitize(request.files.VideoUpload[0].filename)
@@ -161,7 +162,8 @@ let uploadOps = {
         if (imgType != 'images' && imgType != 'thumbnails') return response.status(400).send({error: 'Invalid image upload type specified!'})
 
         imgUpload.single('image')(request,response,(err) => {
-            if (err) return response.send({error: err})
+            if (err) return response.status(400).send({error: err})
+            if (!request.file) return response.status(400).send({error: 'No files have been uploaded.'})
             let uploadedImg = request.file.filename
             fs.readFile('imguploads/' + uploadedImg,(err,data) => ipfsAPI.add(data,{trickle: true},(err,file) => {
                 if (Config.UsageLogs) {
