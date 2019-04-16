@@ -5,6 +5,7 @@ const getDuration = require('get-video-duration')
 const fs = require('fs')
 const async = require('async')
 const sanitize = require('sanitize-filename')
+const WebVTT = require('node-webvtt')
 const Config = require('./config.json')
 const db = require('./dbManager')
 
@@ -182,6 +183,29 @@ let uploadOps = {
                     imghash: file[0].hash
                 })
             }))
+        })
+    },
+    uploadSubtitles: (username,request,response) => {
+        try {
+            WebVTT.parse(request.body)
+        } catch (err) {
+            return response.status(400).send({error: 'Subtitle error: ' + err})
+        }
+
+        let subtitleBuffer = new Buffer.from(request.body,'utf8')
+        ipfsAPI.add(subtitleBuffer,(err,result) => {
+            if (err) return response.status(500).send({error: 'IPFS error: ' + err})
+            if (Config.UsageLogs) {
+                db.recordUsage(username,'subtitles',result[0].size)
+                db.writeUsageData()
+            }
+
+            db.recordHash(username,'subtitles',result[0].hash)
+            db.writeHashesData()
+
+            response.send({
+                hash: result[0].hash
+            })
         })
     }
 }

@@ -149,6 +149,10 @@ app.post('/uploadImage',ImageUploadAPILimiter,(request,response) => {
     Authenticate(request,response,(user) => FileUploader.uploadImage(user,request,response))
 })
 
+app.post('/uploadSubtitle',APILimiter,(request,response) => {
+    Authenticate(request,response,(user) => FileUploader.uploadSubtitles(user,request,response))
+})
+
 app.get('/usage',APILimiter, CORS(), (request,response) => {
     // API to get usage info
     if (!Config.UsageLogs) return response.send('Logs are disabled therefore API is not available for usage.');

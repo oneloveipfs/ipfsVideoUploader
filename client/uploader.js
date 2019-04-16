@@ -60,6 +60,11 @@ for(let i = 0; i < allLangCodes.length; i++) {
 }
 setTimeout(() => document.getElementById('languages').innerHTML = langOptions,200)
 
+let subtitleList = []
+let savedSubtitles = localStorage.getItem('OneLoveSubtitles')
+if (savedSubtitles != null)
+    subtitleList = savedSubtitles
+
 function tabBasicsClicked() {
     document.getElementById('advanced').style.display = "none"
     document.getElementById('subtitles').style.display = "none"
@@ -128,6 +133,12 @@ function reenableFieldsImg() {
     document.getElementById('postImgBtn').disabled = false;
     document.getElementById('draftBtn').disabled = false;
     document.getElementById('submitbutton').disabled = false;
+}
+
+function reenableSubtitleFields() {
+    document.getElementById('newLanguageField').disabled = false
+    document.getElementById('chooseSubBtn').disabled = false
+    document.getElementById('uploadSubBtn').disabled = false
 }
 
 function submitVideo() {
@@ -312,6 +323,10 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
         tags: SteemTags,
         app: 'onelovedtube/0.8.4',
     }
+
+    if (subtitleList.length > 0)
+        jsonMeta.video.content.subtitles = subtitleList
+
     return jsonMeta;
 }
 
@@ -405,11 +420,18 @@ function updateProgressBar(progress) {
 }
 
 // Subtitles
+let chosenSubtitleContent = ''
+
 function subtitleFileSelected() {
-    if (document.getElementById('subtitleUpload').files.length == 0)
+    if (document.getElementById('subtitleUpload').files.length == 0) {
         document.getElementById('chooseSubBtn').innerHTML = 'Choose subtitle file'
-    else
+        chosenSubtitleContent = ''
+    } else {
         document.getElementById('chooseSubBtn').innerHTML = 'Change subtitle file'
+        let reader = new FileReader()
+        reader.onload = (r) => chosenSubtitleContent = r.target.result
+        reader.readAsText(document.getElementById('subtitleUpload').files[0])
+    }
 }
 
 function uploadSubtitle() {
@@ -427,6 +449,31 @@ function uploadSubtitle() {
     document.getElementById('chooseSubBtn').disabled = true
     document.getElementById('uploadSubBtn').disabled = true
 
+    const contentType = {
+        headers: {
+            "content-type": "text/plain"
+        }
+    }
+
+    axios.post('/uploadSubtitle?access_token=' + token,chosenSubtitleContent,contentType).then((response) => {
+        let selectedLangCode = langNameList.indexOf(selectedLanguage)
+        subtitleList.push({
+            lang: allLangCodes[selectedLangCode],
+            hash: response.data.hash
+        })
+        console.log(subtitleList)
+
+        // Reset fields
+        document.getElementById('chooseSubBtn').innerHTML = 'Choose subtitle file'
+        document.getElementById('newLanguageField').value = ''
+        chosenSubtitleContent = ''
+        reenableSubtitleFields()
+    }).catch((err) => {
+        reenableSubtitleFields()
+        if (err.response.data.error) alert(err.response.data.error)
+        else alert(err)
+    })
+
     return true
 }
 
@@ -436,6 +483,7 @@ function saveAsDraft() {
     localStorage.setItem('OneLoveDescription',document.getElementById('description').value);
     localStorage.setItem('OneLoveTags',document.getElementById('tags').value);
     localStorage.setItem('OneLovePostBody',document.getElementById('postBody').value);
+    localStorage.setItem('OneLoveSubtitles',subtitleList)
     alert('Metadata saved as draft!')
 }
 

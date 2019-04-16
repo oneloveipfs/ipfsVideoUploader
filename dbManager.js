@@ -5,7 +5,7 @@ const fs = require('fs')
 let usageData = JSON.parse(fs.readFileSync('db/usage.json','utf8'))
 let hashes = JSON.parse(fs.readFileSync('db/hashes.json','utf8'))
 
-let possibleTypes = ['videos','thumbnails','sprites','images','video240','video480','video720','video1080']
+let possibleTypes = ['videos','thumbnails','sprites','images','video240','video480','video720','video1080','subtitles']
 
 let db = {
     // Check if user exist in hashes db
