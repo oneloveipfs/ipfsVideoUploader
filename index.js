@@ -214,7 +214,7 @@ function Authenticate(request,response,next) {
     if (Config.whitelistEnabled && !access_token) return response.status(400).send({error: 'Missing API auth credentials'})
     if (Config.whitelistEnabled && request.query.scauth === 'true') {
         // Handle SteemConnect access token
-        Auth.scAuth(access_token,(user) => {
+        Auth.scAuth(access_token,(err,user) => {
             if (err) return response.status(401).send({ error: err })
             else next(user)
         })

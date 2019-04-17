@@ -61,9 +61,11 @@ for(let i = 0; i < allLangCodes.length; i++) {
 setTimeout(() => document.getElementById('languages').innerHTML = langOptions,200)
 
 let subtitleList = []
-let savedSubtitles = localStorage.getItem('OneLoveSubtitles')
-if (savedSubtitles != null)
+let savedSubtitles = JSON.parse(localStorage.getItem('OneLoveSubtitles'))
+if (savedSubtitles != null) {
     subtitleList = savedSubtitles
+    setTimeout(() => updateSubtitle(),250)
+}
 
 function tabBasicsClicked() {
     document.getElementById('advanced').style.display = "none"
@@ -519,7 +521,7 @@ function saveAsDraft() {
     localStorage.setItem('OneLoveDescription',document.getElementById('description').value);
     localStorage.setItem('OneLoveTags',document.getElementById('tags').value);
     localStorage.setItem('OneLovePostBody',document.getElementById('postBody').value);
-    localStorage.setItem('OneLoveSubtitles',subtitleList)
+    localStorage.setItem('OneLoveSubtitles',JSON.stringify(subtitleList))
     alert('Metadata saved as draft!')
 }
 
