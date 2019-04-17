@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "sc2link": "node scripts/getLoginLink.js",
-    "keygen": "node scripts/generateKeys.js"
+    "keygen": "node scripts/generateKeys.js",
+    "test": "mocha"
   },
   "author": "techcoderx",
   "license": "GPLv3",
@@ -28,5 +29,9 @@
     "shelljs": "^0.8.2",
     "steem": "^0.7.4",
     "steemconnect": "^2.0.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^6.1.3"
   }
 }
