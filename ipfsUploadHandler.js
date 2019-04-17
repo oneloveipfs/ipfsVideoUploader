@@ -32,29 +32,43 @@ let uploadOps = {
             let videoPathName = 'uploaded/' + sourceVideoFilename + '.mp4'
             fs.renameSync('uploaded/' + sourceVideoFilename,videoPathName)
     
-            let snapFilename = request.files.SnapUpload[0].filename
-            let snapPathName = request.files.SnapUpload[0].mimetype === 'image/jpeg' ? 'uploaded/' + snapFilename + '.jpg'
-                              :request.files.SnapUpload[0].mimetype === 'image/png' ? 'uploaded/' + snapFilename + '.png'
-                              : 'uploaded/' + snapFilename
-            
-            fs.renameSync('uploaded/' + snapFilename,snapPathName)
-    
             // Generate sprite from source video, and add all uploaded files to IPFS
             let ipfsops = {
                 videohash: (cb) => {
                     fs.readFile(videoPathName,(err,data) => {
-                        ipfsAPI.add(data,{trickle: true},(err,file) => cb(err,file[0].hash))
-                    })
-                },
-                snaphash: (cb) => {
-                    fs.readFile(snapPathName,(err,data) => {
-                        ipfsAPI.add(data,{trickle: false},(err,file) => cb(err,file[0].hash))
+                        if (err) return cb(err)
+                        ipfsAPI.add(data,{trickle: true},(err,file) => {
+                            if (err) return cb(err)
+                            cb(null,file[0].hash)
+                        })
                     })
                 },
                 spritehash: (cb) => {
                     Shell.exec('./scripts/dtube-sprite.sh ' + videoPathName + ' uploaded/' + sourceVideoFilename + '.jpg',() => {
                         fs.readFile('uploaded/' + sourceVideoFilename + '.jpg',(err,data) => {
-                            ipfsAPI.add(data,{trickle: true},(err,file) => cb(err,file[0].hash))
+                            if (err) return cb(err)
+                            ipfsAPI.add(data,{trickle: true},(err,file) => {
+                                if (err) return cb(err)
+                                cb(null,file[0].hash)
+                            })
+                        })
+                    })
+                }
+            }
+
+            if (request.files.SnapUpload) {
+                ipfsops.snaphash = (cb) => {
+                    let snapFilename = request.files.SnapUpload[0].filename
+                    let snapPathName = request.files.SnapUpload[0].mimetype === 'image/jpeg' ? 'uploaded/' + snapFilename + '.jpg'
+                                      :request.files.SnapUpload[0].mimetype === 'image/png' ? 'uploaded/' + snapFilename + '.png'
+                                      : 'uploaded/' + snapFilename
+                    
+                    fs.rename('uploaded/' + snapFilename,snapPathName,() => {})
+                    fs.readFile(snapPathName,(err,data) => {
+                        if (err) return cb(err)
+                        ipfsAPI.add(data,{trickle: false},(err,file) => {
+                            if (err) return cb(err)
+                            cb(null,file[0].hash)
                         })
                     })
                 }
@@ -66,7 +80,11 @@ let uploadOps = {
                     let video240PathName = 'uploaded/' + sourceVideoFilename + '_240.mp4'
                     fs.renameSync('uploaded/' + request.files.Video240Upload[0].filename,video240PathName)
                     fs.readFile(video240PathName,(err,data) => {
-                        ipfsAPI.add(data,{trickle: true},(err,file) => cb(err,file[0].hash))
+                        if (err) return cb(err)
+                        ipfsAPI.add(data,{trickle: true},(err,file) => {
+                            if (err) return cb(err)
+                            cb(null,file[0].hash)
+                        })
                     })
                 }
             }
@@ -76,7 +94,11 @@ let uploadOps = {
                     let video480PathName = 'uploaded/' + sourceVideoFilename + '_480.mp4'
                     fs.renameSync('uploaded/' + request.files.Video480Upload[0].filename,video480PathName)
                     fs.readFile(video480PathName,(err,data) => {
-                        ipfsAPI.add(data,{trickle: true},(err,file) => cb(err,file[0].hash))
+                        if (err) return cb(err)
+                        ipfsAPI.add(data,{trickle: true},(err,file) => {
+                            if (err) return cb(err)
+                            cb(null,file[0].hash)
+                        })
                     })
                 }
             }
@@ -86,7 +108,11 @@ let uploadOps = {
                     let video720PathName = 'uploaded/' + sourceVideoFilename + '_720.mp4'
                     fs.renameSync('uploaded/' + request.files.Video720Upload[0].filename,video720PathName)
                     fs.readFile(video720PathName,(err,data) => {
-                        ipfsAPI.add(data,{trickle: true},(err,file) => cb(err,file[0].hash))
+                        if (err) return cb(err)
+                        ipfsAPI.add(data,{trickle: true},(err,file) => {
+                            if (err) return cb(err)
+                            cb(err,file[0].hash)
+                        })
                     })
                 }
             }
@@ -96,7 +122,11 @@ let uploadOps = {
                     let video1080PathName = 'uploaded/' + sourceVideoFilename + '_1080.mp4'
                     fs.renameSync('uploaded/' + request.files.Video1080Upload[0].filename,video1080PathName)
                     fs.readFile(video1080PathName,(err,data) => {
-                        ipfsAPI.add(data,{trickle: true},(err,file) => cb(err,file[0].hash))
+                        if (err) return cb(err)
+                        ipfsAPI.add(data,{trickle: true},(err,file) => {
+                            if (err) return cb(err)
+                            cb(null,file[0].hash)
+                        })
                     })
                 }
             }
@@ -107,11 +137,10 @@ let uploadOps = {
                 console.log(results)
                 // Get video duration and file size
                 let videoSize = request.files.VideoUpload[0].size
-                let snapSize = request.files.SnapUpload[0].size
                 if (Config.UsageLogs) fs.stat('uploaded/' + sanitize(sourceVideoFilename) + '.jpg',(err,stat) => {
                     // Log usage data if no errors and if logging is enabled
                     db.recordUsage(username,'videos',videoSize)
-                    db.recordUsage(username,'thumbnails',snapSize)
+                    if (results.snaphash) db.recordUsage(username,'thumbnails',request.files.SnapUpload[0].size)
     
                     !err ? db.recordUsage(username,'sprites',stat['size']) 
                         : console.log('Error getting sprite filesize: ' + err)
@@ -128,7 +157,7 @@ let uploadOps = {
                 // Log IPFS hashes by Steem account
                 // If hash is not in database, add the hash into database
                 db.recordHash(username,'videos',results.videohash)
-                db.recordHash(username,'thumbnails',results.snaphash)
+                if (results.snaphash) db.recordHash(username,'thumbnails',results.snaphash)
                 db.recordHash(username,'sprites',results.spritehash)
     
                 // Add encoded video hashes into database if available

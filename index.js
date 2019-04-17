@@ -62,6 +62,7 @@ const APILimiter = RateLimiter({
 
 app.use(Express.static(__dirname, { dotfiles: 'deny' }));
 app.use(Parser.text())
+app.use(CORS())
 
 // HTTP to HTTPS redirect
 if (Config.useHTTPS) {
@@ -94,7 +95,7 @@ app.get('/404', (request,response) => {
     loadWebpage('./client/404.html',response);
 })
 
-app.get('/checkuser', CORS(), APILimiter, (request,response) => {
+app.get('/checkuser', APILimiter, (request,response) => {
     // Check if user is in whitelist
     if (Config.whitelistEnabled)
         if (!Auth.whitelist().includes(request.query.user)) 
@@ -153,7 +154,7 @@ app.post('/uploadSubtitle',APILimiter,(request,response) => {
     Authenticate(request,response,(user) => FileUploader.uploadSubtitles(user,request,response))
 })
 
-app.get('/usage',APILimiter, CORS(), (request,response) => {
+app.get('/usage',APILimiter, (request,response) => {
     // API to get usage info
     if (!Config.UsageLogs) return response.send('Logs are disabled therefore API is not available for usage.');
     if (request.query.user === undefined || request.query.user === '') return response.send('Steem username is not defined!');
@@ -162,7 +163,7 @@ app.get('/usage',APILimiter, CORS(), (request,response) => {
     })
 })
 
-app.get('/hashes',APILimiter, CORS(), (request,response) => {
+app.get('/hashes',APILimiter, (request,response) => {
     // API to get IPFS hashes of uploaded files
     let typerequested = request.query.hashtype;
     if (typerequested === '' || typerequested === undefined) {
