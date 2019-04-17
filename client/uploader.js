@@ -225,8 +225,12 @@ function submitVideo() {
             var progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
             updateProgressBar(progressPercent);
         }
-    };
-    axios.post('/uploadVideo?access_token=' + token,formdata,contentType).then(function(response) {
+    }
+
+    let call = '/uploadVideo?access_token=' + token
+    if (iskeychain !== 'true')
+        call += '&scauth=true'
+    axios.post(call,formdata,contentType).then(function(response) {
         var uploaderResponse = response.data;
         console.log(uploaderResponse);
 
@@ -397,8 +401,12 @@ function uploadImage() {
             var progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
             updateProgressBar(progressPercent);
         }
-    };
-    axios.post('/uploadImage?type=images&access_token=' + token,imgFormData,contentType).then(function(response) {
+    }
+
+    let call = '/uploadImage?type=images&access_token=' + token
+    if (iskeychain !== 'true')
+        call += '&scauth=true'
+    axios.post(call,imgFormData,contentType).then(function(response) {
         console.log(response);
         progressbar.style.display = "none";
         document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + '](https://cloudflare-ipfs.com/ipfs/' + response.data.imghash + ')');
@@ -455,7 +463,10 @@ function uploadSubtitle() {
         }
     }
 
-    axios.post('/uploadSubtitle?access_token=' + token,chosenSubtitleContent,contentType).then((response) => {
+    let call = '/uploadSubtitle?access_token=' + token
+    if (iskeychain !== 'true')
+        call += '&scauth=true'
+    axios.post(call,chosenSubtitleContent,contentType).then((response) => {
         let selectedLangCode = langNameList.indexOf(selectedLanguage)
         subtitleList.push({
             lang: allLangCodes[selectedLangCode],
