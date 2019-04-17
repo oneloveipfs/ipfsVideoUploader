@@ -135,6 +135,10 @@ h2 {
     display: none;
 }
 
+#subtitles {
+    display: none;
+}
+
 #postBody {
     height: 200px;
 }
@@ -245,6 +249,25 @@ textarea {
     text-align: center;
     width: 22%;
     margin-top: 1px;
+}
+
+/* Render uploaded subtitles list in a table */
+.subList tr td {
+    font-size: 15px;
+}
+
+.subListLang {
+    width: 400px;
+    text-align: left;
+}
+
+.subListPrev {
+    width: 200px;
+    padding-right: 5px;
+}
+
+.subListDel {
+    width: 100px;
 }
 
 #logoBanner {
@@ -621,6 +644,14 @@ td {
         margin-left: auto;
         margin-right: auto;
         width: 93%;
+    }
+
+    .subListPrev a {
+        font-size: 11px;
+    }
+
+    .subListDel a {
+        font-size: 11px;
     }
 
     .tabs {

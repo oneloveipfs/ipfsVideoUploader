@@ -477,8 +477,8 @@ function uploadSubtitle() {
         // Reset fields
         document.getElementById('chooseSubBtn').innerHTML = 'Choose subtitle file'
         document.getElementById('newLanguageField').value = ''
-        chosenSubtitleContent = ''
         reenableSubtitleFields()
+        updateSubtitle()
     }).catch((err) => {
         reenableSubtitleFields()
         if (err.response.data.error) alert(err.response.data.error)
@@ -486,6 +486,31 @@ function uploadSubtitle() {
     })
 
     return true
+}
+
+function updateSubtitle() {
+    let subtitleTableList = document.getElementById('subList')
+    let subTableHtml = ''
+    for (let i = 0; i < subtitleList.length; i++) {
+        subTableHtml += '<tr>'
+        subTableHtml += '<td class="subListLang">' + languages.getLanguageInfo(subtitleList[i].lang).name + '</td>'
+        subTableHtml += '<td class="subListPrev"><a class="roundedBtn" id="subPrevBtn' + i + '" onclick="previewBtnClicked(this.id)">Preview subtitle</a></td>'
+        subTableHtml += '<td class="subListDel"><a class="roundedBtn" id="subDelBtn' + i + '" onclick="deleteBtnClicked(this.id)">Remove</a></td>'
+        subTableHtml += '</tr>'
+    }
+    subtitleTableList.innerHTML = subTableHtml
+}
+
+function previewBtnClicked(id) {
+    let pos = Number(id.replace('subPrevBtn',''))
+    let subtitleHash = subtitleList[pos].hash
+    window.open('https://cloudflare-ipfs.com/ipfs/' + subtitleHash,'name','width=600,height=400')
+}
+
+function deleteBtnClicked(id) {
+    let pos = Number(id.replace('subDelBtn',''))
+    subtitleList.splice(pos,1)
+    updateSubtitle()
 }
 
 // Drafts
