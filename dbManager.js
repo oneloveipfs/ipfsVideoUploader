@@ -53,16 +53,16 @@ let db = {
     getHashes: (types,cb) => {
         let hashesToReturn = {}
         function getAllHashes(hashType) {
-            var hashArrToReturn = [];
-            for(var key in hashes) {
+            let hashArrToReturn = []
+            for(let key in hashes) {
                 if (hashes.hasOwnProperty(key) && hashes[key][hashType] != undefined) {
-                    hashArrToReturn = hashArrToReturn.concat(hashes[key][hashType]);
+                    hashArrToReturn = hashArrToReturn.concat(hashes[key][hashType])
                 }
             }
-            return hashArrToReturn;
+            return hashArrToReturn
         }
 
-        for (var i = 0; i < possibleTypes.length; i++) {
+        for (let i = 0; i < possibleTypes.length; i++) {
             if (types.includes(possibleTypes[i]))
                 hashesToReturn[possibleTypes[i]] = getAllHashes(possibleTypes[i])
         }
@@ -72,7 +72,7 @@ let db = {
     getHashesByUser: (types,username,cb) => {
         let hashesToReturn = {}
 
-        for (var i = 0; i < possibleTypes.length; i++) {
+        for (let i = 0; i < possibleTypes.length; i++) {
             if (types.includes(possibleTypes[i]))
                 hashesToReturn[possibleTypes[i]] = hashes[username][possibleTypes[i]]
         }
@@ -84,13 +84,13 @@ let db = {
         fs.writeFile('db/usage.json',JSON.stringify(usageData),(err) => {
             if (err)
                 console.log('Error saving usage logs: ' + err)
-        });
+        })
     },
     writeHashesData: () => {
         fs.writeFile('db/hashes.json',JSON.stringify(hashes),(err) => {
             if (err)
-                console.log('Error saving hash logs: ' + err);
-        });
+                console.log('Error saving hash logs: ' + err)
+        })
     }
 }
 

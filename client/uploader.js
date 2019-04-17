@@ -1,14 +1,14 @@
 // Load Steem Connect access token to client
-var username;
+let username
 let url = new URL(window.location.href)
 let token = url.searchParams.get('access_token') // Access token for logged in user
 let iskeychain = url.searchParams.get('keychain')
 if (token == null) {
     // Not logged in or no access token
     window.setTimeout(function() {
-        document.getElementById('loggedInUser').innerHTML = 'You are not logged in!';
-        restrict();
-    },100);
+        document.getElementById('loggedInUser').innerHTML = 'You are not logged in!'
+        restrict()
+    },100)
 } else if (iskeychain == 'true') {
     // Steem Keychain Login
     axios.get('/auth?access_token=' + token).then((authResponse) => {
@@ -31,22 +31,21 @@ if (token == null) {
     })
 } else {
     // SteemConnect login
-    var api = sc2.Initialize({ accessToken: token });
-    api.me(function(err,res) {
-        username = res.account.name; // Account name
-        document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + username;
+    let api = sc2.Initialize({ accessToken: token })
+    api.me((err,res) => {
+        username = res.account.name // Account name
+        document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + username
         axios.get('/checkuser?user=' + username).then(function(response) {
-            console.log(response);
+            console.log(response)
             if (response.data.isInWhitelist == false) {
-                restrict();
-                alert('Looks like you do not have access to the uploader!');
-                return;
+                restrict()
+                return alert('Looks like you do not have access to the uploader!')
             }
 
             // Retrieve metadata from draft if any
             retrieveDraft()
-        });
-    });
+        })
+    })
 }
 
 // Setup subtitles tab
@@ -62,7 +61,7 @@ setTimeout(() => document.getElementById('languages').innerHTML = langOptions,20
 
 let subtitleList = []
 let savedSubtitles = JSON.parse(localStorage.getItem('OneLoveSubtitles'))
-if (savedSubtitles != null) {
+if (savedSubtitles) {
     subtitleList = savedSubtitles
     setTimeout(() => updateSubtitle(),250)
 }
@@ -98,134 +97,100 @@ function tabSubtitlesClicked() {
 }
 
 function restrict() {
-    document.getElementById('sourcevideo').disabled = true;
-    document.getElementById('snapfile').disabled = true;
-    document.getElementById('title').disabled = true;
-    document.getElementById('description').disabled = true;
-    document.getElementById('tags').disabled = true;
-    document.getElementById('powerup').disabled = true;
-    document.getElementById('postBody').disabled = true;
-    document.getElementById('postImgBtn').disabled = true;
-    document.getElementById('draftBtn').disabled = true;
-    document.getElementById('submitbutton').disabled = true;
+    const toDisable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton']
+    for (let i = 0; i < toDisable.length; i++) document.getElementById(toDisable[i].disabled = true)
 }
 
 function restrictImg() {
-    document.getElementById('postBody').disabled = true;
-    document.getElementById('postImgBtn').disabled = true;
-    document.getElementById('draftBtn').disabled = true;
-    document.getElementById('submitbutton').disabled = true;
+    const toDisable = ['postBody','postImgBtn','draftBtn','submitbutton']
+    for (let i = 0; i < toDisable.length; i++) document.getElementById(toDisable[i].disabled = true)
 }
 
 function reenableFields() {
-    document.getElementById('sourcevideo').disabled = false;
-    document.getElementById('snapfile').disabled = false;
-    document.getElementById('title').disabled = false;
-    document.getElementById('description').disabled = false;
-    document.getElementById('tags').disabled = false;
-    document.getElementById('powerup').disabled = false;
-    document.getElementById('postBody').disabled = false;
-    document.getElementById('postImgBtn').disabled = false;
-    document.getElementById('draftBtn').disabled = false;
-    document.getElementById('submitbutton').disabled = false;
+    const toEnable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton']
+    for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i].disabled = false)
 }
 
 function reenableFieldsImg() {
-    document.getElementById('postBody').disabled = false;
-    document.getElementById('postImgBtn').disabled = false;
-    document.getElementById('draftBtn').disabled = false;
-    document.getElementById('submitbutton').disabled = false;
+    const toEnable = ['postBody','postImgBtn','draftBtn','submitbutton']
+    for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i].disabled = false)
 }
 
 function reenableSubtitleFields() {
-    document.getElementById('newLanguageField').disabled = false
-    document.getElementById('chooseSubBtn').disabled = false
-    document.getElementById('uploadSubBtn').disabled = false
+    const toEnable = ['newLanguageField','chooseSubBtn','uploadSubBtn']
+    for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i].disabled = false)
 }
 
 function submitVideo() {
     // Validate data entered
-    let postBody = document.getElementById('postBody').value;
-    let description = document.getElementById('description').value;
-    let powerup = document.getElementById('powerup').checked;
-    let permlink = generatePermlink();
+    let postBody = document.getElementById('postBody').value
+    let description = document.getElementById('description').value
+    let powerup = document.getElementById('powerup').checked
+    let permlink = generatePermlink()
 
-    let sourceVideo = document.getElementById('sourcevideo').files;
-    let snap = document.getElementById('snapfile').files;
+    let sourceVideo = document.getElementById('sourcevideo').files
+    let snap = document.getElementById('snapfile').files
 
-    let video240 = document.getElementById('video240p').files;
-    let video480 = document.getElementById('video480p').files;
-    let video720 = document.getElementById('video720p').files;
-    let video1080 = document.getElementById('video1080p').files;
+    let video240 = document.getElementById('video240p').files
+    let video480 = document.getElementById('video480p').files
+    let video720 = document.getElementById('video720p').files
+    let video1080 = document.getElementById('video1080p').files
 
-    let title = document.getElementById('title').value;
-    if (title.length > 256) {
-        alert('Title is too long!');
-        return;
-    }
-    let tag = document.getElementById('tags').value;
-    if (/^[a-z0-9- _]*$/.test(tag) == false){
-        alert('Invalid tags!')
-        return;
-    }
+    let title = document.getElementById('title').value
+    if (title.length > 256)
+        return alert('Title is too long!')
 
-    let tags = tag.split(' ');
-    if (tags.length > 4) {
-        alert('Please do not use more than 4 tags!');
-        return;
-    }
+    let tag = document.getElementById('tags').value
+    if (/^[a-z0-9- _]*$/.test(tag) == false)
+        return alert('Invalid tags!')
+
+    let tags = tag.split(' ')
+    if (tags.length > 4)
+        return alert('Please do not use more than 4 tags!')
 
     // Check for empty fields
-    if (sourceVideo.length == 0) {
-        alert('Please upload a video!');
-        return;
-    }
+    if (sourceVideo.length == 0)
+        return alert('Please upload a video!')
 
-    if (snap.length == 0) {
-        alert('Please upload a thumbnail for your video!');
-        return;
-    }
+    if (snap.length == 0)
+        return alert('Please upload a thumbnail for your video!')
 
-    if (title.length == 0) {
-        alert('Please enter a title!');
-        return;
-    }
+    if (title.length == 0)
+        return alert('Please enter a title!')
 
-    if (tag.length == 0) {
-        alert('Please enter some tags (up to 4) for your video!');
-        return;
-    }
+    if (tag.length == 0)
+        return alert('Please enter some tags (up to 4) for your video!')
 
-    restrict();
+    restrict()
 
     // Upload video
-    var formdata = new FormData();
-    formdata.append('VideoUpload',sourceVideo[0]);
-    formdata.append('SnapUpload',snap[0]);
+    let formdata = new FormData()
+    formdata.append('VideoUpload',sourceVideo[0])
+    formdata.append('SnapUpload',snap[0])
 
     if (video240.length > 0)
-        formdata.append('Video240Upload',video240[0]);
+        formdata.append('Video240Upload',video240[0])
     if (video480.length > 0)
-        formdata.append('Video480Upload',video480[0]);
+        formdata.append('Video480Upload',video480[0])
     if (video720.length > 0)
-        formdata.append('Video720Upload',video720[0]);
+        formdata.append('Video720Upload',video720[0])
     if (video1080.length > 0)
-        formdata.append('Video1080Upload',video1080[0]);
+        formdata.append('Video1080Upload',video1080[0])
 
-    var progressbar = document.getElementById('progressBarBack');
-    var progressbarInner = document.getElementById('progressBarFront');
-    progressbar.style.display = "block";
-    progressbarInner.innerHTML = "Uploading... (0%)";
+    let progressbar = document.getElementById('progressBarBack')
+    let progressbarInner = document.getElementById('progressBarFront')
+    progressbar.style.display = "block"
+    progressbarInner.innerHTML = "Uploading... (0%)"
 
-    var contentType = {
+    let contentType = {
         headers: {
             "content-type": "multipart/form-data"
         },
         onUploadProgress: function (progressEvent) {
-            console.log(progressEvent);
+            console.log(progressEvent)
 
-            var progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
-            updateProgressBar(progressPercent);
+            let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+            updateProgressBar(progressPercent)
         }
     }
 
@@ -233,8 +198,8 @@ function submitVideo() {
     if (iskeychain !== 'true')
         call += '&scauth=true'
     axios.post(call,formdata,contentType).then(function(response) {
-        var uploaderResponse = response.data;
-        console.log(uploaderResponse);
+        let uploaderResponse = response.data
+        console.log(uploaderResponse)
 
         if (uploaderResponse.error != null) {
             reenableFields()
@@ -282,13 +247,13 @@ function submitVideo() {
 }
 
 function generatePermlink() {
-    var permlink = "";
-    var possible = "abcdefghijklmnopqrstuvwxyz0123456789";
+    let permlink = ""
+    let possible = "abcdefghijklmnopqrstuvwxyz0123456789"
 
-    for (var i = 0; i < 8; i++) {
-        permlink += possible.charAt(Math.floor(Math.random() * possible.length));
+    for (let i = 0; i < 8; i++) {
+        permlink += possible.charAt(Math.floor(Math.random() * possible.length))
     }
-    return permlink;
+    return permlink
 }
 
 function buildPostBody(author,permlink,postBody,videoHash,snapHash,description) {
@@ -301,10 +266,10 @@ function buildPostBody(author,permlink,postBody,videoHash,snapHash,description) 
 
 function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,DTubeTags,duration,filesize,author,permlink) {
     // 'dtube' tag as first tag for Steemit post
-    var SteemTags = ['dtube'];
+    let SteemTags = ['dtube']
     SteemTags = SteemTags.concat(DTubeTags);
 
-    var jsonMeta = {
+    let jsonMeta = {
         video: {
             info: {
                 title: title,
@@ -338,9 +303,9 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
 
 function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,tags,duration,filesize,powerUp,dtubefees) {
     // Power up all rewards or not
-    var percentSBD = 10000;
+    let percentSBD = 10000
     if (powerUp == true) {
-        percentSBD = 0;
+        percentSBD = 0
     }
 
     // Create transaction to post on Steem blockchain
@@ -371,8 +336,8 @@ function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,
                 }]
             ]
         }]
-    ];
-    return operations;
+    ]
+    return operations
 }
 
 function uploadImage() {
@@ -382,25 +347,25 @@ function uploadImage() {
         return;
     }
 
-    var imgFormData = new FormData();
-    imgFormData.append('image',postImg[0]);
-    imgFormData.append('username',username);
+    let imgFormData = new FormData()
+    imgFormData.append('image',postImg[0])
+    imgFormData.append('username',username)
 
     restrictImg();
 
-    var progressbar = document.getElementById('progressBarBack');
-    var progressbarInner = document.getElementById('progressBarFront');
+    let progressbar = document.getElementById('progressBarBack')
+    let progressbarInner = document.getElementById('progressBarFront')
     progressbar.style.display = "block";
     progressbarInner.innerHTML = "Uploading... (0%)";
 
-    var contentType = {
+    let contentType = {
         headers: {
             "content-type": "multipart/form-data"
         },
         onUploadProgress: function (progressEvent) {
             console.log(progressEvent);
 
-            var progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+            let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
             updateProgressBar(progressPercent);
         }
     }
@@ -424,9 +389,9 @@ function uploadImage() {
 }
 
 function updateProgressBar(progress) {
-    var progressbarInner = document.getElementById('progressBarFront');
-    progressbarInner.style.width = progress + '%';
-    progressbarInner.innerHTML = 'Uploading... (' + progress + '%)';
+    let progressbarInner = document.getElementById('progressBarFront')
+    progressbarInner.style.width = progress + '%'
+    progressbarInner.innerHTML = 'Uploading... (' + progress + '%)'
 }
 
 // Subtitles
@@ -517,10 +482,10 @@ function deleteBtnClicked(id) {
 
 // Drafts
 function saveAsDraft() {
-    localStorage.setItem('OneLoveTitle',document.getElementById('title').value);
-    localStorage.setItem('OneLoveDescription',document.getElementById('description').value);
-    localStorage.setItem('OneLoveTags',document.getElementById('tags').value);
-    localStorage.setItem('OneLovePostBody',document.getElementById('postBody').value);
+    localStorage.setItem('OneLoveTitle',document.getElementById('title').value)
+    localStorage.setItem('OneLoveDescription',document.getElementById('description').value)
+    localStorage.setItem('OneLoveTags',document.getElementById('tags').value)
+    localStorage.setItem('OneLovePostBody',document.getElementById('postBody').value)
     localStorage.setItem('OneLoveSubtitles',JSON.stringify(subtitleList))
     alert('Metadata saved as draft!')
 }

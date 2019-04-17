@@ -1,4 +1,4 @@
-var keychainAuthBtnDisabled = false
+let keychainAuthBtnDisabled = false
 
 function loginBtnClicked() {
     // Show popup window of login options
