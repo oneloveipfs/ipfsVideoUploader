@@ -51,6 +51,7 @@ The client decrypts the returned string of `encrypted_memo` using the posting ke
 ```
 
 * `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or SteemConnect login access token.
+* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a SteemConnect access token.
 * Content type: multipart/form-data
 * File inputs:
     - `VideoUpload`: Source video file
@@ -83,11 +84,28 @@ The client decrypts the returned string of `encrypted_memo` using the posting ke
     - `images` -> Treats the image file as a photo that is part of Steem article body.
     - `thumbnails` -> Treats the image file as the thumbnail of a video.
 * `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or SteemConnect login access token.
+* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a SteemConnect access token.
 * Content type: multipart/form-data
 * File input: `image`
 * Output data example:
 ```
 {
     imghash: "QmUKHnTN3TR8zS2s2xUqvv6rzcwogh4T64Un3u4B2UBkt8"
+}
+```
+
+#### To upload a subtitle:
+```
+/uploadSubtitle?access_token=AUTH_TOKEN
+```
+
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or SteemConnect login access token.
+* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a SteemConnect access token.
+* Content type: text/plain
+* Text input must be a valid WebVTT subtitles or else it will return an error.
+* Output data example:
+```
+{
+    hash: "QmUgU4GRZKA5EbhyxeUXWg7K5yc5CghfAuDEQFN9BNxPHR"
 }
 ```

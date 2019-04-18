@@ -14,7 +14,15 @@
 Ignore this section if you do not wish to support SteemConnect authentication.
 
 #### General settings
+* `IPFS_API_PORT`: Specify port that IPFS daemon listens to for IPFS API calls.
 * `HTTP_PORT`: Specify port to listen to HTTP requests. If `useHTTPS` is enabled, all HTTP requests will be redirected to HTTPS.
 * `whitelistEnabled`: When set to false, whitelist checks will be ignored.
 * `UsageLogs`: When set to true, disk usage data by Steem accounts will be logged.
+* `tokenExpiry`: Speficy time in ms of access token expiry from time of issuance.
 * `dtubefees`: Specify beneficiaries to @dtube account (100 represents 1%, 1000 represents 10%)
+
+#### Unit tests settings
+
+These values do not affect the functionality of the app in production.
+* `hashType`: Specify hash types in an array to run database unit tests with..
+* `user`: Speficy Steem username to run unit tests with.

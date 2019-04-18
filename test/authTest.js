@@ -1,7 +1,7 @@
 const assert = require('chai').assert
 const Auth = require('../authManager')
 const Keys = require('../.auth.json')
-const user = 'techcoderx'
+const user = require('../config.json').test.user
 
 describe('Auth',() => {
     if(Keys.wifMessage && Keys.wifMessage != "")
