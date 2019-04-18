@@ -12,10 +12,11 @@ if (Config.whitelistEnabled && !fs.existsSync('whitelist.txt'))
 
 // Cache whitelist in a variable, and update variable when fs detects a file change
 let whitelist = fs.readFileSync('whitelist.txt','utf8').split('\n')
-fs.watchFile('whitelist.txt',() => {
+let whitelistWatcher = fs.watch('whitelist.txt',() => {
     fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
         if (err) return console.log('Error while updating whitelist: ' + err)
         whitelist = readList.split('\n')
+        console.log(whitelist)
     })
 })
 
@@ -68,7 +69,11 @@ let auth = {
         let decrypted = Crypto.AES.decrypt(message,Keys.AESKey).toString(Crypto.enc.Utf8).split(':')
         cb(decrypted)
     },
-    whitelist: () => {return whitelist}
+    whitelist: () => {return whitelist},
+    stopWatchingOnWhitelist: () => {
+        // For unit testing only
+        whitelistWatcher.close()
+    }
 }
 
 module.exports = auth
