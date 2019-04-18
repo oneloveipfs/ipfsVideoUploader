@@ -13,5 +13,10 @@
     "whitelistEnabled": true,
     "UsageLogs": true,
     "tokenExpiry": 86400,
-    "dtubefees": 200
+    "dtubefees": 200,
+
+    "test": {
+        "hashType": ["videos","thumbnails","sprites","images","video240","video480","video720","video1080","subtitles"],
+        "user": "techcoderx"
+    }
 }
