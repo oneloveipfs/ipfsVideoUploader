@@ -190,12 +190,15 @@ let uploadOps = {
         let imgType = request.query.type
         if (!imgType) return response.status(400).send({error: 'Image upload type not specified!'})
         if (imgType != 'images' && imgType != 'thumbnails') return response.status(400).send({error: 'Invalid image upload type specified!'})
+        let trickleDagAdd = false
+        if (imgType === 'images')
+            trickleDagAdd = true
 
         imgUpload.single('image')(request,response,(err) => {
             if (err) return response.status(400).send({error: err})
             if (!request.file) return response.status(400).send({error: 'No files have been uploaded.'})
             let uploadedImg = request.file.filename
-            fs.readFile('imguploads/' + uploadedImg,(err,data) => ipfsAPI.add(data,{trickle: true},(err,file) => {
+            fs.readFile('imguploads/' + uploadedImg,(err,data) => ipfsAPI.add(data,{trickle: trickleDagAdd},(err,file) => {
                 if (Config.UsageLogs) {
                     // Log usage data for image uploads
                     db.recordUsage(username,imgType,request.file.size)

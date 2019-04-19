@@ -279,7 +279,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
                 duration: duration,
                 filesize: filesize,
                 spritehash: spriteHash,
-                provider: 'onelovedtube/0.8.4',
+                provider: 'onelovedtube/0.8.5',
             },
             content: {
                 videohash: sourceHash,
@@ -292,7 +292,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
             },
         },
         tags: SteemTags,
-        app: 'onelovedtube/0.8.4',
+        app: 'onelovedtube/0.8.5',
     }
 
     if (subtitleList.length > 0)
@@ -349,7 +349,6 @@ function uploadImage() {
 
     let imgFormData = new FormData()
     imgFormData.append('image',postImg[0])
-    imgFormData.append('username',username)
 
     restrictImg();
 
