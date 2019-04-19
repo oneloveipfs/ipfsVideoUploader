@@ -7,11 +7,16 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/steemconnect@latest"></script>
+        <script src="//cdn.steemjs.com/lib/latest/steem.min.js"></script>
         <script src="client/languages.js"></script>
         <script src="client/uploader.js"></script>
+        <script src="client/thumbnailSwapper.js"></script>
     </head>
     <body>
-        <div id='header'><h1 id="siteTitle"><a href="/" class="title"><img id="logoBanner" src="public/logo.png" alt="onelovedtube logo"></a>  <div id="headTitleText">OneLoveDTube Uploader</div></h1></div>
+        <div id='header'>
+            <h1 id="siteTitle"><a href="/" class="title"><img id="logoBanner" src="public/logo.png" alt="onelovedtube logo"></a>  <div id="headTitleText">OneLoveDTube Uploader</div></h1>
+            <a onclick="modeBtnClicked()" id="modeBtn" class="styledButton">New Upload</a>
+        </div>
         <div id='content' class="uploadcontent">
         <div id="uploadForm">
             <div id="tab">
@@ -62,6 +67,19 @@
             <h4 id="loggedInUser">Detecting login...</h4>
             <div id="progressBarBack">
                 <div id="progressBarFront">Uploading... (0%)</div>
+            </div>
+        </div>
+        <div id="thumbnailSwapper">
+            <h3>Link to d.tube video to swap thumbnail:</h3>
+            <input type="text" class="meta" placeholder="Paste d.tube link here" id="thumbnailSwapLink">
+            <a onclick="submitLink()" class="roundedBtn" id="linkSubmitBtn">Submit Link</a>
+            <div id="linkResult">
+                <table><tr>
+                    <td id="currentSnap"></td>
+                    <td id="videoInfo"></td>
+                </tr></table>
+                <h3 id="newSnapField">Upload new thumbnail to replace (7MB max): <input type="file" accept="image/jpg,image/png" id="newSnap"></h3>
+                <input class="styledButton" type="submit" value="Submit!" id="swapSubmitBtn" onclick="changeThumbnail()"><br>
             </div>
         </div>
         </div>

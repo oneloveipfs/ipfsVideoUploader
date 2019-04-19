@@ -3,7 +3,7 @@ let username
 let url = new URL(window.location.href)
 let token = url.searchParams.get('access_token') // Access token for logged in user
 let iskeychain = url.searchParams.get('keychain')
-if (token == null) {
+if (!token) {
     // Not logged in or no access token
     window.setTimeout(function() {
         document.getElementById('loggedInUser').innerHTML = 'You are not logged in!'
@@ -97,28 +97,28 @@ function tabSubtitlesClicked() {
 }
 
 function restrict() {
-    const toDisable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton']
-    for (let i = 0; i < toDisable.length; i++) document.getElementById(toDisable[i].disabled = true)
+    const toDisable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton','newLanguageField','chooseSubBtn','uploadSubBtn','thumbnailSwapLink','linkSubmitBtn','newSnap','swapSubmitBtn']
+    for (let i = 0; i < toDisable.length; i++) document.getElementById(toDisable[i]).disabled = true
 }
 
 function restrictImg() {
     const toDisable = ['postBody','postImgBtn','draftBtn','submitbutton']
-    for (let i = 0; i < toDisable.length; i++) document.getElementById(toDisable[i].disabled = true)
+    for (let i = 0; i < toDisable.length; i++) document.getElementById(toDisable[i]).disabled = true
 }
 
 function reenableFields() {
-    const toEnable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton']
-    for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i].disabled = false)
+    const toEnable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton','newLanguageField','chooseSubBtn','uploadSubBtn','thumbnailSwapLink','linkSubmitBtn','newSnap','swapSubmitBtn']
+    for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i]).disabled = false
 }
 
 function reenableFieldsImg() {
     const toEnable = ['postBody','postImgBtn','draftBtn','submitbutton']
-    for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i].disabled = false)
+    for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i]).disabled = false
 }
 
 function reenableSubtitleFields() {
     const toEnable = ['newLanguageField','chooseSubBtn','uploadSubBtn']
-    for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i].disabled = false)
+    for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i]).disabled = false
 }
 
 function submitVideo() {
