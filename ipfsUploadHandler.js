@@ -63,12 +63,13 @@ let uploadOps = {
                                       :request.files.SnapUpload[0].mimetype === 'image/png' ? 'uploaded/' + snapFilename + '.png'
                                       : 'uploaded/' + snapFilename
                     
-                    fs.rename('uploaded/' + snapFilename,snapPathName,() => {})
-                    fs.readFile(snapPathName,(err,data) => {
-                        if (err) return cb(err)
-                        ipfsAPI.add(data,{trickle: false},(err,file) => {
+                    fs.rename('uploaded/' + snapFilename,snapPathName,() => {
+                        fs.readFile(snapPathName,(err,data) => {
                             if (err) return cb(err)
-                            cb(null,file[0].hash)
+                            ipfsAPI.add(data,{trickle: false},(err,file) => {
+                                if (err) return cb(err)
+                                cb(null,file[0].hash)
+                            })
                         })
                     })
                 }
