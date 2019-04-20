@@ -134,6 +134,7 @@ function changeThumbnail() {
             })
         } else {
             // Broadcast with SteemConnect
+            let api2 = sc2.Initialize({ accessToken: token2 })
             api2.broadcast(tx,(error) => {
                 if (error) {
                     alert('Failed to update thumbnail on Steem: ' + response.error + '\n\nThe IPFS hash of your new thumbnail is ' + newSnapHash)
