@@ -1,10 +1,9 @@
 const Steem = require('steem')
 const fs = require('fs')
+const currentConfig = require('../.auth.json')
 
-let auth = {
-    wifMessage: Steem.auth.getPrivateKeys('randomvlogs',Steem.formatter.createSuggestedPassword(),['Posting']).Posting,
-    AESKey: Steem.formatter.createSuggestedPassword(),
-    JWTKey: Steem.formatter.createSuggestedPassword()
-}
+currentConfig.wifMessage = Steem.auth.getPrivateKeys('randomvlogs',Steem.formatter.createSuggestedPassword(),['Posting']).Posting
+currentConfig.AESKey = Steem.formatter.createSuggestedPassword()
+currentConfig.JWTKey = Steem.formatter.createSuggestedPassword()
 
-fs.writeFileSync(__dirname + '/../.auth.json',JSON.stringify(auth))
+fs.writeFileSync(__dirname + '/../.auth.json',JSON.stringify(currentConfig,null,4))

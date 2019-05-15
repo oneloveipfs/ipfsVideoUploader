@@ -3,6 +3,7 @@ const UpdateLogs = require('./db/updatelogs.json')
 const FileUploader = require('./ipfsUploadHandler')
 const db = require('./dbManager')
 const Auth = require('./authManager')
+const WooCommerce = require('woocommerce-api')
 const fs = require('fs')
 const Express = require('express')
 const RateLimiter = require('express-rate-limit')
@@ -61,8 +62,16 @@ const APILimiter = RateLimiter({
 })
 
 app.use(Express.static(__dirname, { dotfiles: 'deny' }));
-app.use(Parser.text())
 app.use(CORS())
+
+// body parser
+const rawBodySaver = (req, res, buf, encoding) => {
+    if (buf && buf.length) {
+      req.rawBody = buf.toString(encoding || 'utf8');
+    }
+}
+
+app.use(Parser.text())
 
 // HTTP to HTTPS redirect
 if (Config.useHTTPS) {
@@ -73,6 +82,12 @@ if (Config.useHTTPS) {
            res.redirect(301,'https://' + req.headers.host + req.url);
         }
     });
+}
+
+// Setup WooCommerce
+let WooCommerceAPI
+if (Config.WooCommerceEnabled === true) {
+    WooCommerceAPI = new WooCommerce(Config.WooCommerceConfig)
 }
 
 app.get('/', (request,response) => {
@@ -194,6 +209,30 @@ app.get('/hashes',APILimiter, (request,response) => {
 app.get('/updatelogs',APILimiter,(request,response) => {
     // Send all update logs to client to be displayed on homepage
     response.send(UpdateLogs);
+})
+
+app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(req,res) => {
+    if (!Config.WooCommerceEnabled) return res.status(404).end()
+    Auth.WCVerifyWebhook(req.rawBody,req.header('X-WC-Webhook-Signature'),(isValid) => {
+        if (!isValid) return res.status(403).send('Invalid webhook')
+
+        // Send a 200 response code if webhook is legitimate
+        res.status(200).send('works')
+
+        // Check if user has paid, then process order
+        // When WooCommerce detects a payment, order status updates to processing
+        if (req.body.status === 'processing') {
+            let getUsername = req.body.meta_data.find(user => user.key === '_billing_steem_account_name')
+            if (getUsername !== undefined) {
+                Auth.whitelistAdd(getUsername.value,() => {})
+
+                // Complete order
+                WooCommerceAPI.put('orders/' + req.body.id,{ status: 'completed' },() => {
+                    console.log('Order ID ' + req.body.id + ' has been processed successfully!')
+                })
+            }
+        }
+    })
 })
 
 function loadWebpage(HTMLFile,response) {

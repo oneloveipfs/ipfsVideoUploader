@@ -1,5 +1,6 @@
 {
     "wifMessage": "",
     "AESKey": "",
-    "JWTKey": ""
+    "JWTKey": "",
+    "WCWebhookSecret": ""
 }

@@ -21,6 +21,14 @@ describe('Auth',() => {
         done()
     })
 
+    it ('whitelistAdd() should add new user to whitelist',function(done) {
+        let newUser = 'testy'
+        Auth.whitelistAdd(newUser,() => {
+            assert.equal(Auth.whitelist().includes(newUser),true)
+            done()
+        })
+    })
+
     if(Keys.JWTKey && Keys.JWTKey != "") {
         let testToken
 

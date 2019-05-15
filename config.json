@@ -15,6 +15,15 @@
     "tokenExpiry": 86400,
     "dtubefees": 200,
 
+    "WooCommerceEnabled": true,
+    "WooCommerceConfig": {
+        "url": "https://oneloveipfs.com",
+        "consumerKey": "",
+        "consumerSecret": "",
+        "wpAPI": true,
+        "version": "wc/v1"
+    },
+
     "test": {
         "hashType": ["videos","thumbnails","sprites","images","video240","video480","video720","video1080","subtitles"],
         "user": "techcoderx"
