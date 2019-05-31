@@ -31,7 +31,7 @@ if (!token) {
     })
 } else {
     // SteemConnect login
-    let api = sc2.Initialize({ accessToken: token })
+    let api = steemconnect.Initialize({ accessToken: token })
     api.me((err,res) => {
         username = res.account.name // Account name
         document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + res.account.name
