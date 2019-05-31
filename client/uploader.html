@@ -9,20 +9,20 @@
         <script src="https://cdn.jsdelivr.net/npm/steemconnect@latest"></script>
         <script src="//cdn.steemjs.com/lib/latest/steem.min.js"></script>
         <script src="client/languages.js"></script>
-        <script src="client/uploader.js"></script>
-        <script src="client/thumbnailSwapper.js"></script>
+        <script type="module" src="client/uploader.js"></script>
+        <script type="module" src="client/thumbnailSwapper.js"></script>
     </head>
     <body>
         <div id='header'>
             <h1 id="siteTitle"><a href="/" class="title"><img id="logoBanner" src="public/logo.png" alt="onelovedtube logo"></a>  <div id="headTitleText">OneLoveDTube Uploader</div></h1>
-            <a onclick="modeBtnClicked()" id="modeBtn" class="styledButton">New Upload</a>
+            <a id="modeBtn" class="styledButton">New Upload</a>
         </div>
         <div id='content' class="uploadcontent">
         <div id="uploadForm">
             <div id="tab">
-                <a class="tabs" id="tabBasics" onclick="tabBasicsClicked()">Basics</a>
-                <a class="tabs" id="tabSubtitles" onclick="tabSubtitlesClicked()">Subtitles</a>
-                <a class="tabs" id="tabAdvanced" onclick="tabAdvancedClicked()">Advanced</a>
+                <a class="tabs" id="tabBasics">Basics</a>
+                <a class="tabs" id="tabSubtitles">Subtitles</a>
+                <a class="tabs" id="tabAdvanced">Advanced</a>
             </div>
             <div id="basics"> <!-- Basics tab -->
                 <h3>Upload a video (mp4 file accepted): <input type="file" accept="video/mp4" name="VideoUpload" id="sourcevideo"></h3>
@@ -41,9 +41,9 @@
                 <h5>You may wish to create subtitles for your videos for multiple languages. To create your subtitles, use a subtitle creator tool and upload the subtitle file here.<br><br>Only WebVTT files are accepted as this is the only format DTube supports right now!</h5>
                 <h4>Upload a new subtitle<br>
                     <input list="languages" class="meta" id="newLanguageField" placeholder="Choose language">
-                    <input type="file" id="subtitleUpload" style="display: none" onchange="subtitleFileSelected()">
+                    <input type="file" id="subtitleUpload" style="display: none">
                     <a onclick="document.getElementById('subtitleUpload').click();return true;" id="chooseSubBtn" class="styledButton">Choose subtitle file</a>
-                    <a onclick="uploadSubtitle()" id="uploadSubBtn" class="styledButton">Upload subtitle</a>
+                    <a id="uploadSubBtn" class="styledButton">Upload subtitle</a>
                 </h4>
                 <datalist id="languages"></datalist>
                 <h4>Your subtitles</h4>
@@ -58,12 +58,12 @@
                 <h4>1080p video: <input type="file" accept="video/mp4" name="Video1080Upload" id="video1080p"></h4>
                 <h3>STEEM Article Body: <br>
                 <textarea id="postBody" name="postBody"></textarea></h3>
-                <input type="file" accept="image/*" onchange="uploadImage()" id="postImg" style="display: none">
+                <input type="file" accept="image/*" id="postImg" style="display: none">
                 <a onclick="document.getElementById('postImg').click();return true;" id="postImgBtn" class="roundedBtn">Upload an image for article body</a>
                 <h5>Maximum file size for image: 7MB</h5>
             </div>
-            <input class="styledButton" type="submit" value="Upload!" id="submitbutton" onclick="submitVideo()">
-            <input class="styledButton" type="button" value="Save draft" id="draftBtn" onclick="saveAsDraft()">
+            <input class="styledButton" type="submit" value="Upload!" id="submitbutton">
+            <input class="styledButton" type="button" value="Save draft" id="draftBtn">
             <h4 id="loggedInUser">Detecting login...</h4>
             <div id="progressBarBack">
                 <div id="progressBarFront">Uploading... (0%)</div>
@@ -72,14 +72,14 @@
         <div id="thumbnailSwapper">
             <h3>Link to d.tube video to swap thumbnail:</h3>
             <input type="text" class="meta" placeholder="Paste d.tube link here" id="thumbnailSwapLink">
-            <a onclick="submitLink()" class="roundedBtn" id="linkSubmitBtn">Submit Link</a>
+            <a class="roundedBtn" id="linkSubmitBtn">Submit Link</a>
             <div id="linkResult">
                 <table><tr>
                     <td id="currentSnap"></td>
                     <td id="videoInfo"></td>
                 </tr></table>
                 <h3 id="newSnapField">Upload new thumbnail to replace (7MB max): <input type="file" accept="image/jpg,image/png" id="newSnap"></h3>
-                <input class="styledButton" type="submit" value="Submit!" id="swapSubmitBtn" onclick="changeThumbnail()"><br>
+                <input class="styledButton" type="submit" value="Submit!" id="swapSubmitBtn"><br>
             </div>
         </div>
         </div>

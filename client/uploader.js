@@ -1,52 +1,5 @@
-// Load Steem Connect access token to client
-let username
-let url = new URL(window.location.href)
-let token = url.searchParams.get('access_token') // Access token for logged in user
-let iskeychain = url.searchParams.get('keychain')
-if (!token) {
-    // Not logged in or no access token
-    window.setTimeout(function() {
-        document.getElementById('loggedInUser').innerHTML = 'You are not logged in!'
-        restrict()
-    },100)
-} else if (iskeychain == 'true') {
-    // Steem Keychain Login
-    axios.get('/auth?access_token=' + token).then((authResponse) => {
-        if (authResponse.data.error != null) {
-            alert(authResponse.data.error)
-            document.getElementById('loggedInUser').innerHTML = 'Not authorized'
-            restrict()
-        } else {
-            username = authResponse.data.user
-            document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + username
-            retrieveDraft()
-        }
-    }).catch((error) => {
-        if (error.response.data.error)
-            alert(error.response.data.error)
-        else
-            alert(error)
-        document.getElementById('loggedInUser').innerHTML = 'Login failed'
-        restrict()
-    })
-} else {
-    // SteemConnect login
-    let api = sc2.Initialize({ accessToken: token })
-    api.me((err,res) => {
-        username = res.account.name // Account name
-        document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + username
-        axios.get('/checkuser?user=' + username).then(function(response) {
-            console.log(response)
-            if (response.data.isInWhitelist == false) {
-                restrict()
-                return alert('Looks like you do not have access to the uploader!')
-            }
-
-            // Retrieve metadata from draft if any
-            retrieveDraft()
-        })
-    })
-}
+// Load auth details
+import { username, token, iskeychain, restrict } from './auth.js'
 
 // Setup subtitles tab
 const allLangCodes = languages.getAllLanguageCode()
@@ -57,7 +10,6 @@ for(let i = 0; i < allLangCodes.length; i++) {
     langOptions += '<option value="' + langName + '">'
     langNameList.push(langName)
 }
-setTimeout(() => document.getElementById('languages').innerHTML = langOptions,200)
 
 let subtitleList = []
 let savedSubtitles = JSON.parse(localStorage.getItem('OneLoveSubtitles'))
@@ -66,40 +18,283 @@ if (savedSubtitles) {
     setTimeout(() => updateSubtitle(),250)
 }
 
-function tabBasicsClicked() {
-    document.getElementById('advanced').style.display = "none"
-    document.getElementById('subtitles').style.display = "none"
-    document.getElementById('basics').style.display = "block"
-    document.getElementById('tabAdvanced').style.backgroundColor = "transparent"
-    document.getElementById('tabSubtitles').style.backgroundColor = "transparent"
-    document.getElementById('tabBasics').style.backgroundColor = "#2196F3"
-    return true
-}
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('languages').innerHTML = langOptions
 
-function tabAdvancedClicked() {
-    document.getElementById('advanced').style.display = "block"
-    document.getElementById('subtitles').style.display = "none"
-    document.getElementById('basics').style.display = "none"
-    document.getElementById('tabAdvanced').style.backgroundColor = "#2196F3"
-    document.getElementById('tabSubtitles').style.backgroundColor = "transparent"
-    document.getElementById('tabBasics').style.backgroundColor = "transparent"
-    return true
-}
+    document.getElementById('tabBasics').onclick = () => {
+        document.getElementById('advanced').style.display = "none"
+        document.getElementById('subtitles').style.display = "none"
+        document.getElementById('basics').style.display = "block"
+        document.getElementById('tabAdvanced').style.backgroundColor = "transparent"
+        document.getElementById('tabSubtitles').style.backgroundColor = "transparent"
+        document.getElementById('tabBasics').style.backgroundColor = "#2196F3"
+        return true
+    }
 
-function tabSubtitlesClicked() {
-    document.getElementById('advanced').style.display = "none"
-    document.getElementById('subtitles').style.display = "block"
-    document.getElementById('basics').style.display = "none"
-    document.getElementById('tabAdvanced').style.backgroundColor = "transparent"
-    document.getElementById('tabSubtitles').style.backgroundColor = "#2196F3"
-    document.getElementById('tabBasics').style.backgroundColor = "transparent"
-    return true
-}
+    document.getElementById('tabAdvanced').onclick = () => {
+        document.getElementById('advanced').style.display = "block"
+        document.getElementById('subtitles').style.display = "none"
+        document.getElementById('basics').style.display = "none"
+        document.getElementById('tabAdvanced').style.backgroundColor = "#2196F3"
+        document.getElementById('tabSubtitles').style.backgroundColor = "transparent"
+        document.getElementById('tabBasics').style.backgroundColor = "transparent"
+        return true
+    }
 
-function restrict() {
-    const toDisable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton','newLanguageField','chooseSubBtn','uploadSubBtn','thumbnailSwapLink','linkSubmitBtn','newSnap','swapSubmitBtn']
-    for (let i = 0; i < toDisable.length; i++) document.getElementById(toDisable[i]).disabled = true
-}
+    document.getElementById('tabSubtitles').onclick = () => {
+        document.getElementById('advanced').style.display = "none"
+        document.getElementById('subtitles').style.display = "block"
+        document.getElementById('basics').style.display = "none"
+        document.getElementById('tabAdvanced').style.backgroundColor = "transparent"
+        document.getElementById('tabSubtitles').style.backgroundColor = "#2196F3"
+        document.getElementById('tabBasics').style.backgroundColor = "transparent"
+        return true
+    }
+
+    document.getElementById('submitbutton').onclick = () => {
+        // Validate data entered
+        let postBody = document.getElementById('postBody').value
+        let description = document.getElementById('description').value
+        let powerup = document.getElementById('powerup').checked
+        let permlink = generatePermlink()
+
+        let sourceVideo = document.getElementById('sourcevideo').files
+        let snap = document.getElementById('snapfile').files
+
+        let video240 = document.getElementById('video240p').files
+        let video480 = document.getElementById('video480p').files
+        let video720 = document.getElementById('video720p').files
+        let video1080 = document.getElementById('video1080p').files
+
+        let title = document.getElementById('title').value
+        if (title.length > 256)
+            return alert('Title is too long!')
+
+        let tag = document.getElementById('tags').value
+        if (/^[a-z0-9- _]*$/.test(tag) == false)
+            return alert('Invalid tags!')
+
+        let tags = tag.split(' ')
+        if (tags.length > 4)
+            return alert('Please do not use more than 4 tags!')
+
+        // Check for empty fields
+        if (sourceVideo.length == 0)
+            return alert('Please upload a video!')
+
+        if (snap.length == 0)
+            return alert('Please upload a thumbnail for your video!')
+
+        if (title.length == 0)
+            return alert('Please enter a title!')
+
+        if (tag.length == 0)
+            return alert('Please enter some tags (up to 4) for your video!')
+
+        restrict()
+
+        // Upload video
+        let formdata = new FormData()
+        formdata.append('VideoUpload',sourceVideo[0])
+        formdata.append('SnapUpload',snap[0])
+
+        if (video240.length > 0)
+            formdata.append('Video240Upload',video240[0])
+        if (video480.length > 0)
+            formdata.append('Video480Upload',video480[0])
+        if (video720.length > 0)
+            formdata.append('Video720Upload',video720[0])
+        if (video1080.length > 0)
+            formdata.append('Video1080Upload',video1080[0])
+
+        let progressbar = document.getElementById('progressBarBack')
+        let progressbarInner = document.getElementById('progressBarFront')
+        progressbar.style.display = "block"
+        progressbarInner.innerHTML = "Uploading... (0%)"
+
+        let contentType = {
+            headers: {
+                "content-type": "multipart/form-data"
+            },
+            onUploadProgress: function (progressEvent) {
+                console.log(progressEvent)
+
+                let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+                updateProgressBar(progressPercent)
+            }
+        }
+
+        let call = '/uploadVideo?access_token=' + token
+        if (iskeychain !== 'true')
+            call += '&scauth=true'
+        axios.post(call,formdata,contentType).then(function(response) {
+            let uploaderResponse = response.data
+            console.log(uploaderResponse)
+
+            if (uploaderResponse.error != null) {
+                reenableFields()
+                progressbar.style.display = "none"
+                return alert(uploaderResponse.error)
+            }
+
+            progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
+
+            // Post to Steem blockchain
+            let transaction = generatePost(username,permlink,postBody,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup,uploaderResponse.dtubefees);
+            if (iskeychain == 'true') {
+                // Broadcast with Keychain
+                steem_keychain.requestBroadcast(username,transaction,'Posting',(response) => {
+                    if (response.error != null) {
+                        alert('Failed to post on DTube: ' + response.error + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
+                        progressbar.style.display = "none";
+                        reenableFields();
+                    } else {
+                        localStorage.clear();
+                        window.location.replace('https://d.tube/v/' + username + '/' + permlink);
+                    }
+                })
+            } else {
+                // Broadcast with SteemConnect
+                let api = sc2.Initialize({ accessToken: token })
+                api.broadcast(transaction,function(err) {
+                    if (err != null) {
+                        alert('Failed to post on DTube: ' + err + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
+                        progressbar.style.display = "none";
+                        reenableFields();
+                    } else {
+                        localStorage.clear();
+                        window.location.replace('https://d.tube/v/' + username + '/' + permlink);
+                    }
+                });
+            }
+        }).catch(function(err) {
+            if (err.response.data.error)
+                alert('Upload error: ' + err.response.data.error)
+            else
+                alert('Upload error: ' + err);
+            progressbar.style.display = "none";
+            reenableFields();
+        });
+    }
+
+    document.getElementById('postImg').onchange = () => {
+        let postImg = document.getElementById('postImg').files;
+        if (postImg.length == 0) {
+            // do not upload if no images are selected
+            return;
+        }
+
+        let imgFormData = new FormData()
+        imgFormData.append('image',postImg[0])
+
+        restrictImg();
+
+        let progressbar = document.getElementById('progressBarBack')
+        let progressbarInner = document.getElementById('progressBarFront')
+        progressbar.style.display = "block";
+        progressbarInner.innerHTML = "Uploading... (0%)";
+
+        let contentType = {
+            headers: {
+                "content-type": "multipart/form-data"
+            },
+            onUploadProgress: function (progressEvent) {
+                console.log(progressEvent);
+
+                let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+                updateProgressBar(progressPercent);
+            }
+        }
+
+        let call = '/uploadImage?type=images&access_token=' + token
+        if (iskeychain !== 'true')
+            call += '&scauth=true'
+        axios.post(call,imgFormData,contentType).then(function(response) {
+            console.log(response);
+            progressbar.style.display = "none";
+            document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + '](https://cloudflare-ipfs.com/ipfs/' + response.data.imghash + ')');
+            reenableFieldsImg();
+        }).catch(function(err) {
+            if (err.response.data.error)
+                alert('Upload error: ' + err.response.data.error)
+            else
+                alert('Upload error: ' + err);
+            progressbar.style.display = "none";
+            reenableFieldsImg();
+        })
+    }
+
+    // Subtitles
+    let chosenSubtitleContent = ''
+
+    document.getElementById('subtitleUpload').onchange = () => {
+        if (document.getElementById('subtitleUpload').files.length == 0) {
+            document.getElementById('chooseSubBtn').innerHTML = 'Choose subtitle file'
+            chosenSubtitleContent = ''
+        } else {
+            document.getElementById('chooseSubBtn').innerHTML = 'Change subtitle file'
+            let reader = new FileReader()
+            reader.onload = (r) => chosenSubtitleContent = r.target.result
+            reader.readAsText(document.getElementById('subtitleUpload').files[0])
+        }
+    }
+
+    document.getElementById('uploadSubBtn').onclick = () => {
+        let subtitleFile = document.getElementById('subtitleUpload').files
+        let selectedLanguage = document.getElementById('newLanguageField').value
+
+        if (selectedLanguage == '')
+            return alert('Please select a language for your subtitle!')
+        if (!langNameList.includes(selectedLanguage))
+            return alert('Selected language is invalid!')
+        if (subtitleFile.length == 0)
+            return alert('Please choose a WebVTT subtitle file to upload.')
+        
+        document.getElementById('newLanguageField').disabled = true
+        document.getElementById('chooseSubBtn').disabled = true
+        document.getElementById('uploadSubBtn').disabled = true
+
+        const contentType = {
+            headers: {
+                "content-type": "text/plain"
+            }
+        }
+
+        let call = '/uploadSubtitle?access_token=' + token
+        if (iskeychain !== 'true')
+            call += '&scauth=true'
+        axios.post(call,chosenSubtitleContent,contentType).then((response) => {
+            let selectedLangCode = langNameList.indexOf(selectedLanguage)
+            subtitleList.push({
+                lang: allLangCodes[selectedLangCode],
+                hash: response.data.hash
+            })
+            console.log(subtitleList)
+
+            // Reset fields
+            document.getElementById('chooseSubBtn').innerHTML = 'Choose subtitle file'
+            document.getElementById('newLanguageField').value = ''
+            reenableSubtitleFields()
+            updateSubtitle()
+        }).catch((err) => {
+            reenableSubtitleFields()
+            if (err.response.data.error) alert(err.response.data.error)
+            else alert(err)
+        })
+
+        return true
+    }
+
+    // Drafts
+    document.getElementById('draftBtn').onclick = () => {
+        localStorage.setItem('OneLoveTitle',document.getElementById('title').value)
+        localStorage.setItem('OneLoveDescription',document.getElementById('description').value)
+        localStorage.setItem('OneLoveTags',document.getElementById('tags').value)
+        localStorage.setItem('OneLovePostBody',document.getElementById('postBody').value)
+        localStorage.setItem('OneLoveSubtitles',JSON.stringify(subtitleList))
+        alert('Metadata saved as draft!')
+    }
+})
 
 function restrictImg() {
     const toDisable = ['postBody','postImgBtn','draftBtn','submitbutton']
@@ -119,132 +314,6 @@ function reenableFieldsImg() {
 function reenableSubtitleFields() {
     const toEnable = ['newLanguageField','chooseSubBtn','uploadSubBtn']
     for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i]).disabled = false
-}
-
-function submitVideo() {
-    // Validate data entered
-    let postBody = document.getElementById('postBody').value
-    let description = document.getElementById('description').value
-    let powerup = document.getElementById('powerup').checked
-    let permlink = generatePermlink()
-
-    let sourceVideo = document.getElementById('sourcevideo').files
-    let snap = document.getElementById('snapfile').files
-
-    let video240 = document.getElementById('video240p').files
-    let video480 = document.getElementById('video480p').files
-    let video720 = document.getElementById('video720p').files
-    let video1080 = document.getElementById('video1080p').files
-
-    let title = document.getElementById('title').value
-    if (title.length > 256)
-        return alert('Title is too long!')
-
-    let tag = document.getElementById('tags').value
-    if (/^[a-z0-9- _]*$/.test(tag) == false)
-        return alert('Invalid tags!')
-
-    let tags = tag.split(' ')
-    if (tags.length > 4)
-        return alert('Please do not use more than 4 tags!')
-
-    // Check for empty fields
-    if (sourceVideo.length == 0)
-        return alert('Please upload a video!')
-
-    if (snap.length == 0)
-        return alert('Please upload a thumbnail for your video!')
-
-    if (title.length == 0)
-        return alert('Please enter a title!')
-
-    if (tag.length == 0)
-        return alert('Please enter some tags (up to 4) for your video!')
-
-    restrict()
-
-    // Upload video
-    let formdata = new FormData()
-    formdata.append('VideoUpload',sourceVideo[0])
-    formdata.append('SnapUpload',snap[0])
-
-    if (video240.length > 0)
-        formdata.append('Video240Upload',video240[0])
-    if (video480.length > 0)
-        formdata.append('Video480Upload',video480[0])
-    if (video720.length > 0)
-        formdata.append('Video720Upload',video720[0])
-    if (video1080.length > 0)
-        formdata.append('Video1080Upload',video1080[0])
-
-    let progressbar = document.getElementById('progressBarBack')
-    let progressbarInner = document.getElementById('progressBarFront')
-    progressbar.style.display = "block"
-    progressbarInner.innerHTML = "Uploading... (0%)"
-
-    let contentType = {
-        headers: {
-            "content-type": "multipart/form-data"
-        },
-        onUploadProgress: function (progressEvent) {
-            console.log(progressEvent)
-
-            let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
-            updateProgressBar(progressPercent)
-        }
-    }
-
-    let call = '/uploadVideo?access_token=' + token
-    if (iskeychain !== 'true')
-        call += '&scauth=true'
-    axios.post(call,formdata,contentType).then(function(response) {
-        let uploaderResponse = response.data
-        console.log(uploaderResponse)
-
-        if (uploaderResponse.error != null) {
-            reenableFields()
-            progressbar.style.display = "none"
-            return alert(uploaderResponse.error)
-        }
-
-        progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
-
-        // Post to Steem blockchain
-        let transaction = generatePost(username,permlink,postBody,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup,uploaderResponse.dtubefees);
-        if (iskeychain == 'true') {
-            // Broadcast with Keychain
-            steem_keychain.requestBroadcast(username,transaction,'Posting',(response) => {
-                if (response.error != null) {
-                    alert('Failed to post on DTube: ' + response.error + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
-                    progressbar.style.display = "none";
-                    reenableFields();
-                } else {
-                    localStorage.clear();
-                    window.location.replace('https://d.tube/v/' + username + '/' + permlink);
-                }
-            })
-        } else {
-            // Broadcast with SteemConnect
-            let api = sc2.Initialize({ accessToken: token })
-            api.broadcast(transaction,function(err) {
-                if (err != null) {
-                    alert('Failed to post on DTube: ' + err + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
-                    progressbar.style.display = "none";
-                    reenableFields();
-                } else {
-                    localStorage.clear();
-                    window.location.replace('https://d.tube/v/' + username + '/' + permlink);
-                }
-            });
-        }
-    }).catch(function(err) {
-        if (err.response.data.error)
-            alert('Upload error: ' + err.response.data.error)
-        else
-            alert('Upload error: ' + err);
-        progressbar.style.display = "none";
-        reenableFields();
-    });
 }
 
 function generatePermlink() {
@@ -341,118 +410,10 @@ function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,
     return operations
 }
 
-function uploadImage() {
-    let postImg = document.getElementById('postImg').files;
-    if (postImg.length == 0) {
-        // do not upload if no images are selected
-        return;
-    }
-
-    let imgFormData = new FormData()
-    imgFormData.append('image',postImg[0])
-
-    restrictImg();
-
-    let progressbar = document.getElementById('progressBarBack')
-    let progressbarInner = document.getElementById('progressBarFront')
-    progressbar.style.display = "block";
-    progressbarInner.innerHTML = "Uploading... (0%)";
-
-    let contentType = {
-        headers: {
-            "content-type": "multipart/form-data"
-        },
-        onUploadProgress: function (progressEvent) {
-            console.log(progressEvent);
-
-            let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
-            updateProgressBar(progressPercent);
-        }
-    }
-
-    let call = '/uploadImage?type=images&access_token=' + token
-    if (iskeychain !== 'true')
-        call += '&scauth=true'
-    axios.post(call,imgFormData,contentType).then(function(response) {
-        console.log(response);
-        progressbar.style.display = "none";
-        document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + '](https://cloudflare-ipfs.com/ipfs/' + response.data.imghash + ')');
-        reenableFieldsImg();
-    }).catch(function(err) {
-        if (err.response.data.error)
-            alert('Upload error: ' + err.response.data.error)
-        else
-            alert('Upload error: ' + err);
-        progressbar.style.display = "none";
-        reenableFieldsImg();
-    })
-}
-
 function updateProgressBar(progress) {
     let progressbarInner = document.getElementById('progressBarFront')
     progressbarInner.style.width = progress + '%'
     progressbarInner.innerHTML = 'Uploading... (' + progress + '%)'
-}
-
-// Subtitles
-let chosenSubtitleContent = ''
-
-function subtitleFileSelected() {
-    if (document.getElementById('subtitleUpload').files.length == 0) {
-        document.getElementById('chooseSubBtn').innerHTML = 'Choose subtitle file'
-        chosenSubtitleContent = ''
-    } else {
-        document.getElementById('chooseSubBtn').innerHTML = 'Change subtitle file'
-        let reader = new FileReader()
-        reader.onload = (r) => chosenSubtitleContent = r.target.result
-        reader.readAsText(document.getElementById('subtitleUpload').files[0])
-    }
-}
-
-function uploadSubtitle() {
-    let subtitleFile = document.getElementById('subtitleUpload').files
-    let selectedLanguage = document.getElementById('newLanguageField').value
-
-    if (selectedLanguage == '')
-        return alert('Please select a language for your subtitle!')
-    if (!langNameList.includes(selectedLanguage))
-        return alert('Selected language is invalid!')
-    if (subtitleFile.length == 0)
-        return alert('Please choose a WebVTT subtitle file to upload.')
-    
-    document.getElementById('newLanguageField').disabled = true
-    document.getElementById('chooseSubBtn').disabled = true
-    document.getElementById('uploadSubBtn').disabled = true
-
-    const contentType = {
-        headers: {
-            "content-type": "text/plain"
-        }
-    }
-
-    let call = '/uploadSubtitle?access_token=' + token
-    if (iskeychain !== 'true')
-        call += '&scauth=true'
-    axios.post(call,chosenSubtitleContent,contentType).then((response) => {
-        let selectedLangCode = langNameList.indexOf(selectedLanguage)
-        subtitleList.push({
-            lang: allLangCodes[selectedLangCode],
-            hash: response.data.hash
-        })
-        console.log(subtitleList)
-
-        // Reset fields
-        document.getElementById('chooseSubBtn').innerHTML = 'Choose subtitle file'
-        document.getElementById('newLanguageField').value = ''
-        reenableSubtitleFields()
-        updateSubtitle()
-    }).catch((err) => {
-        reenableSubtitleFields()
-        if (err.response.data.error) alert(err.response.data.error)
-        else alert(err)
-    })
-
-    return true
 }
 
 function updateSubtitle() {
@@ -461,54 +422,26 @@ function updateSubtitle() {
     for (let i = 0; i < subtitleList.length; i++) {
         subTableHtml += '<tr>'
         subTableHtml += '<td class="subListLang">' + languages.getLanguageInfo(subtitleList[i].lang).name + '</td>'
-        subTableHtml += '<td class="subListPrev"><a class="roundedBtn" id="subPrevBtn' + i + '" onclick="previewBtnClicked(this.id)">Preview subtitle</a></td>'
-        subTableHtml += '<td class="subListDel"><a class="roundedBtn" id="subDelBtn' + i + '" onclick="deleteBtnClicked(this.id)">Remove</a></td>'
+        subTableHtml += '<td class="subListPrev"><a class="roundedBtn subPrevBtn" id="subPrevBtn' + i + '">Preview subtitle</a></td>'
+        subTableHtml += '<td class="subListDel"><a class="roundedBtn subDelBtn" id="subDelBtn' + i + '">Remove</a></td>'
         subTableHtml += '</tr>'
     }
     subtitleTableList.innerHTML = subTableHtml
-}
 
-function previewBtnClicked(id) {
-    let pos = Number(id.replace('subPrevBtn',''))
-    let subtitleHash = subtitleList[pos].hash
-    window.open('https://cloudflare-ipfs.com/ipfs/' + subtitleHash,'name','width=600,height=400')
-}
-
-function deleteBtnClicked(id) {
-    let pos = Number(id.replace('subDelBtn',''))
-    subtitleList.splice(pos,1)
-    updateSubtitle()
-}
-
-// Drafts
-function saveAsDraft() {
-    localStorage.setItem('OneLoveTitle',document.getElementById('title').value)
-    localStorage.setItem('OneLoveDescription',document.getElementById('description').value)
-    localStorage.setItem('OneLoveTags',document.getElementById('tags').value)
-    localStorage.setItem('OneLovePostBody',document.getElementById('postBody').value)
-    localStorage.setItem('OneLoveSubtitles',JSON.stringify(subtitleList))
-    alert('Metadata saved as draft!')
-}
-
-function retrieveDraft() {
-    let savedTitle = localStorage.getItem('OneLoveTitle')
-    let savedDescription = localStorage.getItem('OneLoveDescription')
-    let savedTags = localStorage.getItem('OneLoveTags')
-    let savedPostBody = localStorage.getItem('OneLovePostBody')
-
-    if (savedTitle != null) {
-        document.getElementById('title').value = savedTitle
+    let allSubtitlePrevBtnElems = document.querySelectorAll('a.subPrevBtn')
+    
+    for (let i = 0; i < allSubtitlePrevBtnElems.length; i++) {
+        document.getElementById(allSubtitlePrevBtnElems[i].id).onclick = () => {
+            window.open('https://cloudflare-ipfs.com/ipfs/' + subtitleList[i].hash,'name','width=600,height=400')
+        }
     }
 
-    if (savedDescription != null) {
-        document.getElementById('description').value = savedDescription
-    }
+    let allSubtitleDelBtnElems = document.querySelectorAll('a.subDelBtn')
 
-    if (savedTags != null) {
-        document.getElementById('tags').value = savedTags
-    }
-
-    if (savedPostBody != null) {
-        document.getElementById('postBody').value = savedPostBody
+    for (let i = 0; i < allSubtitleDelBtnElems.length; i++) {
+        document.getElementById(allSubtitleDelBtnElems[i].id).onclick = () => {
+            subtitleList.splice(i,1)
+            updateSubtitle()
+        }
     }
 }
