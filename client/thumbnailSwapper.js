@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let resultHTMLToAppend2 = '<h4>Title: ' + result.title + '<br><br>'
             resultHTMLToAppend2 += 'Permlink: ' + split[1] + '<br><br>'
             resultHTMLToAppend2 += 'Current thumbnail hash: ' + jsonmeta.video.info.snaphash + '</h4>'
-            document.getElementById('videoInfo').innerHTML = resultHTMLToAppend2
+            document.getElementById('videoInfo').innerHTML = HtmlSanitizer.SanitizeHtml(resultHTMLToAppend2)
             document.getElementById('newSnapField').style.display = 'block'
             document.getElementById('swapSubmitBtn').style.display = 'block'
         })
@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         alert('Failed to update thumbnail on Steem: ' + response.error + '\n\nThe IPFS hash of your new thumbnail is ' + newSnapHash)
                         reenableSnapSwapFields()
                     } else {
-                        alert('Thumbnail has been updated successfully! Click OK to view your updated post on Steemit with your new thumbnail!\n\nIf you need to remove your old thumbnail from our server to reclaim your disk usage, please contact us with your old hash that you want us to remove: ' + oldSnapLink.split('/ipfs/')[1])
+                        alert('Thumbnail has been updated successfully! Click OK to view your updated post on Steemit with your new thumbnail!\n\nIf you need to remove your old thumbnail from our servers to reclaim your disk usage, please contact us with your old hash that you want us to remove: ' + oldSnapLink.split('/ipfs/')[1])
                         window.location.assign('https://steemit.com/@' + selectedAuthor + '/' + selectedPermlink)
                     }
                 })
