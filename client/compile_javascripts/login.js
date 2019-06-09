@@ -1,6 +1,8 @@
-let keychainAuthBtnDisabled = false
+const jAvalon = require('javalon')
 
-function loginBtnClicked() {
+document.addEventListener('DOMContentLoaded', () => {
+    let keychainAuthBtnDisabled = document.getElementById('keychainAuthBtn').disabled
+    document.getElementById('authButton').onclick = function loginBtnClicked() {
     // Show popup window of login options
     document.getElementById('loginPopup').style.display = "block"
 }
@@ -20,19 +22,46 @@ function dismissPopup(event,popupelement) {
     }
 }
 
-function keychainLogin() {
+document.getElementById('keychainAuthBtn').onclick = async function keychainLogin() {
     if (keychainAuthBtnDisabled == true) {
         return
     }
     let keychainLoginBtn = document.getElementById('keychainAuthBtn')
     let username = document.getElementById('loginUsername').value.toLowerCase().replace('@','')
+    let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
+    let avalonKey = document.getElementById('avalonLoginKey').value
+
     if (!window.steem_keychain) {
         alert('Steem Keychain is not installed!')
         return
     }
+
     steem_keychain.requestHandshake(() => console.log('Handshake received!'))
     keychainLoginBtn.innerText = "Logging In..."
     keychainAuthBtnDisabled = true
+
+    // Avalon login
+    let avalonLoginPromise = new Promise((resolve,reject) => {
+        jAvalon.getAccount(avalonUsername,(err,result) => {
+            if (err) return reject(err)
+            let avalonPubKey = jAvalon.privToPub(avalonKey)
+            if (result.pub === avalonPubKey) return resolve(true)
+            resolve(false)
+        })
+    })
+    
+    try {
+        let avalonLoginResult = await avalonLoginPromise
+        if (avalonLoginResult != true) {
+            cancelLoginBtn()
+            return alert('Avalon key is invalid!')
+        }
+    } catch (e) {
+        cancelLoginBtn()
+        return alert('Avalon login error: ' + e)
+    }
+    
+    // Steem Keychain login
     axios.get('/login?user=' + username).then((response) => {
         if (response.data.error != null) {
             alert(response.data.error)
@@ -78,3 +107,4 @@ function cancelLoginBtn() {
     keychainLoginBtn.innerText = "Login with Steem Keychain"
     keychainAuthBtnDisabled = false
 }
+})

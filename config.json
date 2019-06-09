@@ -15,7 +15,7 @@
     "tokenExpiry": 86400,
     "dtubefees": 200,
 
-    "WooCommerceEnabled": true,
+    "WooCommerceEnabled": false,
     "WooCommerceConfig": {
         "url": "https://oneloveipfs.com",
         "consumerKey": "",

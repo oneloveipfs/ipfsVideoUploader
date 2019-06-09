@@ -11,7 +11,7 @@
     <body>
         <div id='header'>
             <h1 id="siteTitle"><a href="/" class="title"><img id="logoBanner" src="public/logo.png" alt="onelovedtube logo"></a>  <div id="headTitleText">OneLoveDTube Uploader</div></h1>
-            <a onclick="loginBtnClicked()" id="authButton" class="styledButton">Log In</a>
+            <a id="authButton" class="styledButton">Log In</a>
         </div>
         <div id='content'>
             <div id="whatOurCustomersSay">
@@ -46,8 +46,11 @@
                     <h2>Login</h2>
                 </div>
                 <div class="popup-body">
-                    <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginUsername"><br><br>
-                    <a onclick="keychainLogin()" class="roundedBtn" id="keychainAuthBtn">Login with Steem Keychain</a>
+                    <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginUsername" class="loginFields"><br>
+                    <input type="text" placeholder="AVALON Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginUsername" class="loginFields">
+                    <h5 id="sameAvalonUsername"><a onclick="document.getElementById('avalonLoginUsername').value = document.getElementById('loginUsername').value">Same as Steem username</a></h5>
+                    <input type="password" placeholder="AVALON Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginKey" class="loginFields"><br>
+                    <a class="roundedBtn" id="keychainAuthBtn">Login with Steem Keychain</a>
                     <h3>OR</h3>
                     <a class="roundedBtn" href="https://steemconnect.com/oauth2/authorize?client_id=ipfsuploader.app&redirect_uri=https%3A%2F%2Fuploader.oneloved.tube%2Fupload&scope=comment,comment_options">Login with SteemConnect</a>
                 </div>
