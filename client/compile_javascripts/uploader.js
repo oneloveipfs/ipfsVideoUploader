@@ -1,5 +1,10 @@
 // Load auth details
-import { username, token, iskeychain, restrict } from './auth.js'
+let username
+const Auth = require('./auth')
+Auth.steem().then((result) => {
+    username = result
+    Auth.avalon()
+})
 
 // Setup subtitles tab
 const allLangCodes = languages.getAllLanguageCode()
@@ -91,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tag.length == 0)
             return alert('Please enter some tags (up to 4) for your video!')
 
-        restrict()
+        Auth.restrict()
 
         // Upload video
         let formdata = new FormData()
@@ -124,8 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        let call = '/uploadVideo?access_token=' + token
-        if (iskeychain !== 'true')
+        let call = '/uploadVideo?access_token=' + Auth.token
+        if (Auth.iskeychain !== 'true')
             call += '&scauth=true'
         axios.post(call,formdata,contentType).then(function(response) {
             let uploaderResponse = response.data
@@ -141,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Post to Steem blockchain
             let transaction = generatePost(username,permlink,postBody,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup,uploaderResponse.dtubefees);
-            if (iskeychain == 'true') {
+            if (Auth.iskeychain == 'true') {
                 // Broadcast with Keychain
                 steem_keychain.requestBroadcast(username,transaction,'Posting',(response) => {
                     if (response.error != null) {
@@ -155,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             } else {
                 // Broadcast with SteemConnect
-                let api = steemconnect.Initialize({ accessToken: token })
+                let api = steemconnect.Client({ accessToken: Auth.token })
                 api.broadcast(transaction,function(err) {
                     if (err != null) {
                         alert('Failed to post on DTube: ' + err + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
@@ -206,8 +211,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        let call = '/uploadImage?type=images&access_token=' + token
-        if (iskeychain !== 'true')
+        let call = '/uploadImage?type=images&access_token=' + Auth.token
+        if (Auth.iskeychain !== 'true')
             call += '&scauth=true'
         axios.post(call,imgFormData,contentType).then(function(response) {
             console.log(response);
@@ -260,8 +265,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        let call = '/uploadSubtitle?access_token=' + token
-        if (iskeychain !== 'true')
+        let call = '/uploadSubtitle?access_token=' + Auth.token
+        if (Auth.iskeychain !== 'true')
             call += '&scauth=true'
         axios.post(call,chosenSubtitleContent,contentType).then((response) => {
             let selectedLangCode = langNameList.indexOf(selectedLanguage)

@@ -1,10 +1,9 @@
 const sc2 = require('steemconnect');
 const Config = require('./../config.json');
 
-var api = sc2.Initialize({
+var api = sc2.Client({
     app: Config.SteemConnectApp,
     callbackURL: Config.callbackURL,
-    accessToken: Config.clientSecret,
     scope: ['comment','comment_options']
 });
 var link = api.getLoginURL();

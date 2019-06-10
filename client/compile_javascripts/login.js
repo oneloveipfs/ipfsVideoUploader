@@ -87,6 +87,12 @@ document.getElementById('keychainAuthBtn').onclick = async function keychainLogi
                     alert(cbResponse.data.error)
                     cancelLoginBtn()
                 } else {
+                    /*
+                        Storing Avalon login details in sessionStorage so that we can
+                        access this in the upload page to sign transactions later.
+                    */
+                    sessionStorage.setItem('OneLoveAvalonUser',avalonUsername)
+                    sessionStorage.setItem('OneLoveAvalonKey',avalonKey)
                     window.location.href = '/upload?access_token=' + cbResponse.data.access_token + '&keychain=true'
                 }
             }).catch((err) => {

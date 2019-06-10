@@ -1,5 +1,8 @@
-// TODO: Modularize authentication
-import { username, token, iskeychain } from './auth.js'
+let username
+const Auth = require('./auth')
+Auth.steem().then((result) => {
+    username = result
+})
 
 let steemPostToModify
 let selectedAuthor
@@ -77,8 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        let call = '/uploadImage?type=thumbnails&access_token=' + token
-        if (iskeychain !== 'true')
+        let call = '/uploadImage?type=thumbnails&access_token=' + Auth.token
+        if (Auth.iskeychain !== 'true')
             call += '&scauth=true'
         axios.post(call,snapFormData,contentType).then(function(response) {
             let newSnapHash = response.data.imghash
@@ -107,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 ]
             ]
 
-            if (iskeychain === 'true') {
+            if (Auth.iskeychain === 'true') {
                 // Broadcast with Steem Keychain
                 steem_keychain.requestBroadcast(username,tx,'Posting',(response) => {
                     if (response.error) {
@@ -120,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             } else {
                 // Broadcast with SteemConnect
-                let api2 = sc2.Initialize({ accessToken: token })
+                let api2 = steemconnect.Client({ accessToken: Auth.token })
                 api2.broadcast(tx,(error) => {
                     if (error) {
                         alert('Failed to update thumbnail on Steem: ' + response.error + '\n\nThe IPFS hash of your new thumbnail is ' + newSnapHash)
