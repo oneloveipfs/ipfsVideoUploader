@@ -73,10 +73,7 @@ async function avalon() {
     let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
     let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
 
-    if (!avalonUser || !avalonKey) {
-        alert('Error retrieving Avalon login. Please sign in again.')
-        return restrict()
-    }
+    if (!avalonUser || !avalonKey) return
 
     let avalonLoginPromise = new Promise((resolve,reject) => {
         jAvalon.getAccount(avalonUser,(err,result) => {

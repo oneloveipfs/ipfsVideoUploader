@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return alert(uploaderResponse.error)
             }
 
-            progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
+            progressbarInner.innerHTML = 'Submitting video to the blockchain...'
 
             // Post to Steem blockchain
             let transaction = generatePost(username,permlink,postBody,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup,uploaderResponse.dtubefees);
@@ -354,7 +354,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
                 duration: duration,
                 filesize: filesize,
                 spritehash: spriteHash,
-                provider: 'onelovedtube/0.8.5',
+                provider: 'onelovedtube/0.9',
             },
             content: {
                 videohash: sourceHash,
@@ -367,7 +367,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
             },
         },
         tags: SteemTags,
-        app: 'onelovedtube/0.8.5',
+        app: 'onelovedtube/0.9',
     }
 
     if (subtitleList.length > 0)

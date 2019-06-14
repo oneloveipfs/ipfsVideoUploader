@@ -41,26 +41,35 @@ document.getElementById('keychainAuthBtn').onclick = async function keychainLogi
     keychainAuthBtnDisabled = true
 
     // Avalon login
-    let avalonLoginPromise = new Promise((resolve,reject) => {
-        jAvalon.getAccount(avalonUsername,(err,result) => {
-            if (err) return reject(err)
-            let avalonPubKey = jAvalon.privToPub(avalonKey)
-            if (result.pub === avalonPubKey) return resolve(true)
-            resolve(false)
+    if (avalonUsername !== '' && avalonKey !== '') {
+        let avalonLoginPromise = new Promise((resolve,reject) => {
+            jAvalon.getAccount(avalonUsername,(err,result) => {
+                if (err) return reject(err)
+                let avalonPubKey = jAvalon.privToPub(avalonKey)
+                if (result.pub === avalonPubKey) return resolve(true)
+                resolve(false)
+            })
         })
-    })
-    
-    try {
-        let avalonLoginResult = await avalonLoginPromise
-        if (avalonLoginResult != true) {
+        
+        try {
+            let avalonLoginResult = await avalonLoginPromise
+            if (avalonLoginResult != true) {
+                cancelLoginBtn()
+                return alert('Avalon key is invalid!')
+            }
+        } catch (e) {
             cancelLoginBtn()
-            return alert('Avalon key is invalid!')
+            return alert('Avalon login error: ' + e)
         }
-    } catch (e) {
-        cancelLoginBtn()
-        return alert('Avalon login error: ' + e)
+        
+        // Storing Avalon login in sessionStorage so that we can access this in the upload page to sign transactions later.
+        sessionStorage.setItem('OneLoveAvalonUser',avalonUsername)
+        sessionStorage.setItem('OneLoveAvalonKey',avalonKey)
+    } else {
+        // If Avalon username or password not provided, clear existing login (if any) from sessionStorage
+        sessionStorage.clear()
     }
-    
+
     // Steem Keychain login
     axios.get('/login?user=' + username).then((response) => {
         if (response.data.error != null) {
@@ -87,12 +96,6 @@ document.getElementById('keychainAuthBtn').onclick = async function keychainLogi
                     alert(cbResponse.data.error)
                     cancelLoginBtn()
                 } else {
-                    /*
-                        Storing Avalon login details in sessionStorage so that we can
-                        access this in the upload page to sign transactions later.
-                    */
-                    sessionStorage.setItem('OneLoveAvalonUser',avalonUsername)
-                    sessionStorage.setItem('OneLoveAvalonKey',avalonKey)
                     window.location.href = '/upload?access_token=' + cbResponse.data.access_token + '&keychain=true'
                 }
             }).catch((err) => {
