@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             } else {
                 // Broadcast with SteemConnect
-                let api2 = steemconnect.Client({ accessToken: Auth.token })
+                let api2 = new steemconnect.Client({ accessToken: Auth.token })
                 api2.broadcast(tx,(error) => {
                     if (error) {
                         alert('Failed to update thumbnail on Steem: ' + response.error + '\n\nThe IPFS hash of your new thumbnail is ' + newSnapHash)

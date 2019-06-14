@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return alert(uploaderResponse.error)
             }
 
-            progressbarInner.innerHTML = 'Submitting video to the blockchain...'
+            progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
 
             // Post to Steem blockchain
             let transaction = generatePost(username,permlink,postBody,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup,uploaderResponse.dtubefees);
@@ -159,7 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         let avalontag = ''
                         if (tags.length !== 0)
                             avalontag = tags[0]
-                        broadcastAvalon(buildJsonMetadataAvalon(uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spriteHash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,uploaderResponse.duration,uploaderResponse.filesize),avalontag,uploaderResponse.ipfshash,1,() =>  {
+                        progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
+                        broadcastAvalon(buildJsonMetadataAvalon(uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spriteHash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,uploaderResponse.duration,uploaderResponse.filesize),avalontag,uploaderResponse.ipfshash,() =>  {
                             localStorage.clear()
                             window.location.replace('https://d.tube/v/' + username + '/' + permlink)
                         })
@@ -171,7 +172,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             } else {
                 // Broadcast with SteemConnect
-                let api = steemconnect.Client({ accessToken: Auth.token })
+                let api = new steemconnect.Client({ accessToken: Auth.token })
                 api.broadcast(transaction,function(err) {
                     if (err != null) {
                         alert('Failed to post on DTube: ' + err + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
@@ -182,7 +183,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         let avalontag = ''
                         if (tags.length !== 0)
                             avalontag = tags[0]
-                        broadcastAvalon(buildJsonMetadataAvalon(uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spriteHash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,uploaderResponse.duration,uploaderResponse.filesize),avalontag,uploaderResponse.ipfshash,1,() =>  {
+                        progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
+                        broadcastAvalon(buildJsonMetadataAvalon(uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spriteHash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,uploaderResponse.duration,uploaderResponse.filesize),avalontag,uploaderResponse.ipfshash,() =>  {
                             localStorage.clear()
                             window.location.replace('https://d.tube/v/' + username + '/' + permlink)
                         })
@@ -200,6 +202,15 @@ document.addEventListener('DOMContentLoaded', () => {
             progressbar.style.display = "none";
             reenableFields();
         });
+    }
+
+    document.getElementById('avalonvw').oninput = () => {
+        let avalonVW = document.getElementById('avalonvw').value
+        document.getElementById('avalonvwlabel').innerText = 'Avalon vote weight: ' + avalonVW + '%'
+        if (avalonVW > 10)
+            document.getElementById('avalonhighvwalert').style.display = 'block'
+        else
+            document.getElementById('avalonhighvwalert').style.display = 'none'
     }
 
     document.getElementById('postImg').onchange = () => {
@@ -462,7 +473,7 @@ function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,
     return operations
 }
 
-async function broadcastAvalon(json,tag,permlink,weight,cb) {
+async function broadcastAvalon(json,tag,permlink,cb) {
     let avalonGetAccPromise = new Promise((resolve,reject) => {
         jAvalon.getAccount(sessionStorage.getItem('OneLoveAvalonUser'),(err,user) => {
             if (err) return reject(err)
@@ -477,7 +488,7 @@ async function broadcastAvalon(json,tag,permlink,weight,cb) {
             data: {
                 link: permlink,
                 json: json,
-                vt: Math.floor(jAvalon.votingPower(avalonAcc)*weight/100),
+                vt: Math.floor(jAvalon.votingPower(avalonAcc)*(document.getElementById('avalonvw').value)/100),
                 tag: tag
             }
         }

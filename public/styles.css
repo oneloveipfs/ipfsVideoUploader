@@ -58,7 +58,7 @@ h2 {
 .popup-content {
     position: relative;
     background-color: rgb(207, 207, 207);
-    margin: 10% auto;
+    margin: 5% auto;
     width: 500px;
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
@@ -94,6 +94,19 @@ h2 {
 @keyframes animatetop {
     from {top: -300px; opacity: 0}
     to {top: 0; opacity: 1}
+}
+
+.warningbox {
+    width: 96.5%;
+    border: solid;
+    border-width: 2px;
+    border-radius: 5px;
+    border-color: goldenrod;
+    background-color: gold;
+    margin-bottom: 15px;
+    text-align: left;
+    padding: 10px;
+    font-size: 16px;
 }
 
 .loginFields {
@@ -199,10 +212,67 @@ h2 {
 	top:1px;
 }
 
+.curvedbox {
+    width: 97.5%;
+    border: solid;
+    border-width: 2px;
+    border-radius: 15px;
+    margin-bottom: 10px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#avalonZone {
+    display: none;
+}
+
+#avalonvwlabel {
+    margin-block-start: 0.5em;
+    margin-block-end: 0.5em;
+}
+
+.slidecontainer {
+    width: 100%;
+}
+
+.rangeslider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 15px;
+    border-radius: 5px;
+    background: #979797;
+    outline: none;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    margin-block-end: 1.5em;
+}
+  
+.rangeslider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%; 
+    background: #2196F3;
+    cursor: pointer;
+}
+  
+.rangeslider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: #2196F3;
+    cursor: pointer;
+}
+
+#avalonhighvwalert {
+    display: none;
+}
 
 #progressBarBack {
     width: 100%;
-    background-color: gray;
+    background-color: #979797;
     border-radius: 5px;
     display: none;
 }
@@ -303,6 +373,7 @@ textarea {
     right: 0.5vw;
 }
 
+/* Thumbnail swapper tool */
 #thumbnailSwapper {
     display: none;
 }
@@ -546,7 +617,7 @@ td {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: #979797;
     -webkit-transition: .4s;
     transition: .4s;
   }

@@ -68,13 +68,14 @@
                     <h2>Login</h2>
                 </div>
                 <div class="popup-body">
-                    <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginUsername" class="loginFields"><br>
+                    <div class="warningbox">Avalon blockchain is in its testnet phrase, which means all content posted and tokens earned on Avalon may be lost during a chain reset. If you do not want to post your content on Avalon, leave Avalon username and key fields blank.</div>
+                    <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginUsername" class="loginFields">
                     <input type="text" placeholder="AVALON Username (optional)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginUsername" class="loginFields">
                     <h5 id="sameAvalonUsername"><a onclick="document.getElementById('avalonLoginUsername').value = document.getElementById('loginUsername').value">Same as Steem username</a></h5>
                     <input type="password" placeholder="AVALON Key (optional)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginKey" class="loginFields"><br>
-                    <a class="roundedBtn" id="keychainAuthBtn">Login with Steem Keychain</a>
+                    <a class="roundedBtn" id="proceedAuthBtn">Login with Steem Keychain</a>
                     <h3>OR</h3>
-                    <a class="roundedBtn" href="https://steemconnect.com/oauth2/authorize?client_id=ipfsuploader.app&redirect_uri=https%3A%2F%2Fuploader.oneloved.tube%2Fupload&scope=comment,comment_options">Login with SteemConnect</a>
+                    <a class="roundedBtn" id="altAuthBtn">Login with SteemConnect</a>
                 </div>
             </div>
         </div>

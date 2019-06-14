@@ -41,7 +41,7 @@ async function steem() {
     } else {
         // SteemConnect login
         let steemconnectLoginPromise = new Promise((resolve,reject) => {
-            let api = steemconnect.Client({ accessToken: token })
+            let api = new steemconnect.Client({ accessToken: token })
             api.me((err,res) => {
                 if (err) {
                     alert(err)
@@ -59,6 +59,9 @@ async function steem() {
                     // Retrieve metadata from draft if any
                     retrieveDraft()
                     resolve(res.account.name)
+                }).catch((error) => {
+                    alert('Authentication error: ' + error)
+                    return resolve(null)
                 })
             })
         })
@@ -96,6 +99,7 @@ async function avalon() {
     }
 
     document.getElementById('loggedInUser').innerHTML += ', and ' + avalonUser + ' on Avalon'
+    document.getElementById('avalonZone').style.display = 'block'
 }
 
 function restrict() {

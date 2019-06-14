@@ -1,7 +1,7 @@
 const jAvalon = require('javalon')
 
 document.addEventListener('DOMContentLoaded', () => {
-    let keychainAuthBtnDisabled = document.getElementById('keychainAuthBtn').disabled
+    let proceedAuthBtnDisabled = document.getElementById('proceedAuthBtn').disabled
     document.getElementById('authButton').onclick = function loginBtnClicked() {
     // Show popup window of login options
     document.getElementById('loginPopup').style.display = "block"
@@ -22,23 +22,25 @@ function dismissPopup(event,popupelement) {
     }
 }
 
-document.getElementById('keychainAuthBtn').onclick = async function keychainLogin() {
-    if (keychainAuthBtnDisabled == true) {
+document.getElementById('proceedAuthBtn').onclick = async function proceedLogin() {
+    if (proceedAuthBtnDisabled == true) {
         return
     }
-    let keychainLoginBtn = document.getElementById('keychainAuthBtn')
+    let sclogin = false
+    let keychainLoginBtn = document.getElementById('proceedAuthBtn')
     let username = document.getElementById('loginUsername').value.toLowerCase().replace('@','')
     let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
     let avalonKey = document.getElementById('avalonLoginKey').value
 
-    if (!window.steem_keychain) {
+    if (!window.steem_keychain && document.getElementById('proceedAuthBtn').innerText === 'Login with Steem Keychain') {
         alert('Steem Keychain is not installed!')
         return
     }
 
-    steem_keychain.requestHandshake(() => console.log('Handshake received!'))
+    if (window.steem_keychain) steem_keychain.requestHandshake(() => console.log('Handshake received!'))
+    if (document.getElementById('proceedAuthBtn').innerText === 'Proceed to SteemConnect') sclogin = true
     keychainLoginBtn.innerText = "Logging In..."
-    keychainAuthBtnDisabled = true
+    proceedAuthBtnDisabled = true
 
     // Avalon login
     if (avalonUsername !== '' && avalonKey !== '') {
@@ -54,11 +56,11 @@ document.getElementById('keychainAuthBtn').onclick = async function keychainLogi
         try {
             let avalonLoginResult = await avalonLoginPromise
             if (avalonLoginResult != true) {
-                cancelLoginBtn()
+                cancelLoginBtn(sclogin)
                 return alert('Avalon key is invalid!')
             }
         } catch (e) {
-            cancelLoginBtn()
+            cancelLoginBtn(sclogin)
             return alert('Avalon login error: ' + e)
         }
         
@@ -70,18 +72,23 @@ document.getElementById('keychainAuthBtn').onclick = async function keychainLogi
         sessionStorage.clear()
     }
 
+    // Proceed to SteemConnect login page if SteemConnect login chosen
+    if (sclogin === true) {
+        return window.location.href = 'https://steemconnect.com/oauth2/authorize?client_id=ipfsuploader.app&redirect_uri=https%3A%2F%2Fuploader.oneloved.tube%2Fupload&scope=comment,comment_options'
+    }
+
     // Steem Keychain login
     axios.get('/login?user=' + username).then((response) => {
         if (response.data.error != null) {
             alert(response.data.error)
-            cancelLoginBtn()
+            cancelLoginBtn(sclogin)
             return
         }
         steem_keychain.requestVerifyKey(username,response.data.encrypted_memo,'Posting',(loginResponse) => {
             console.log(loginResponse)
             if (loginResponse.error != null) {
                 alert(loginResponse.message)
-                cancelLoginBtn()
+                cancelLoginBtn(sclogin)
                 return
             }
             let encrypted_message = loginResponse.result.substr(1)   
@@ -94,26 +101,43 @@ document.getElementById('keychainAuthBtn').onclick = async function keychainLogi
             axios.post('/logincb',encrypted_message,contentType).then((cbResponse) => {
                 if (cbResponse.data.error != null) {
                     alert(cbResponse.data.error)
-                    cancelLoginBtn()
+                    cancelLoginBtn(sclogin)
                 } else {
                     window.location.href = '/upload?access_token=' + cbResponse.data.access_token + '&keychain=true'
                 }
             }).catch((err) => {
                 if (err.response.data.error) alert(err.response.data.error)
                 else alert(err)
-                cancelLoginBtn()
+                cancelLoginBtn(sclogin)
             })
         })
     }).catch((err) => {
         if (err.response.data.error) alert(err.response.data.error)
         else alert(err)
-        cancelLoginBtn()
+        cancelLoginBtn(sclogin)
     })
 }
 
-function cancelLoginBtn() {
-    let keychainLoginBtn = document.getElementById('keychainAuthBtn')
-    keychainLoginBtn.innerText = "Login with Steem Keychain"
-    keychainAuthBtnDisabled = false
+document.getElementById('altAuthBtn').onclick = () => {
+    if (document.getElementById('altAuthBtn').innerText === 'Login with SteemConnect') {
+        document.getElementById('loginUsername').style.display = 'none'
+        document.getElementById('sameAvalonUsername').style.display = 'none'
+        document.getElementById('proceedAuthBtn').innerText = 'Proceed to SteemConnect'
+        document.getElementById('altAuthBtn').innerText = 'Login with Steem Keychain'
+    } else {
+        document.getElementById('loginUsername').style.display = 'inline'
+        document.getElementById('sameAvalonUsername').style.display = 'block'
+        document.getElementById('proceedAuthBtn').innerText = 'Login with Steem Keychain'
+        document.getElementById('altAuthBtn').innerText = 'Login with SteemConnect'
+    }
+}
+
+function cancelLoginBtn(sc) {
+    let keychainLoginBtn = document.getElementById('proceedAuthBtn')
+    if (sc === true)
+        keychainLoginBtn.innerText = "Proceed to SteemConnect"
+    else
+        keychainLoginBtn.innerText = "Login with Steem Keychain"
+    proceedAuthBtnDisabled = false
 }
 })

@@ -63,6 +63,13 @@
                 <a onclick="document.getElementById('postImg').click();return true;" id="postImgBtn" class="roundedBtn">Upload an image for article body</a>
                 <h5>Maximum file size for image: 7MB</h5>
             </div>
+            <div id="avalonZone" class="curvedbox">
+                <h3 id="avalonvwlabel">Avalon vote weight: 1%</h3>
+                <div class="slidecontainer">
+                    <input type="range" min="1" max="100" value="1" class="rangeslider" id="avalonvw">
+                </div>
+                <div class="warningbox" id="avalonhighvwalert">Using more than 10% of your Avalon voting power will drain your vote tokens in your Avalon blockchain account significantly.</div>
+            </div>
             <input class="styledButton" type="submit" value="Upload!" id="submitbutton">
             <input class="styledButton" type="button" value="Save draft" id="draftBtn">
             <h4 id="loggedInUser">Detecting login...</h4>
