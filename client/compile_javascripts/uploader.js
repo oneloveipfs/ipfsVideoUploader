@@ -1,6 +1,7 @@
 // Load auth details
 let username
 const Auth = require('./auth')
+const jAvalon = require('javalon')
 Auth.steem().then((result) => {
     username = result
     Auth.avalon()
@@ -153,9 +154,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         alert('Failed to post on DTube: ' + response.error + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
                         progressbar.style.display = "none";
                         reenableFields();
+                    } else if (sessionStorage.getItem('OneLoveAvalonUser') !== null) {
+                        // Broadcast to Avalon as well if Avalon login exists
+                        let avalontag = ''
+                        if (tags.length !== 0)
+                            avalontag = tags[0]
+                        broadcastAvalon(buildJsonMetadataAvalon(uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spriteHash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,uploaderResponse.duration,uploaderResponse.filesize),avalontag,uploaderResponse.ipfshash,1,() =>  {
+                            localStorage.clear()
+                            window.location.replace('https://d.tube/v/' + username + '/' + permlink)
+                        })
                     } else {
-                        localStorage.clear();
-                        window.location.replace('https://d.tube/v/' + username + '/' + permlink);
+                        // If Avalon login not found, redirect to d.tube watch page right away
+                        localStorage.clear()
+                        window.location.replace('https://d.tube/v/' + username + '/' + permlink)
                     }
                 })
             } else {
@@ -166,6 +177,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         alert('Failed to post on DTube: ' + err + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
                         progressbar.style.display = "none";
                         reenableFields();
+                    } else if (sessionStorage.getItem('OneLoveAvalonUser') !== null) {
+                        // Broadcast to Avalon as well if Avalon login exists
+                        let avalontag = ''
+                        if (tags.length !== 0)
+                            avalontag = tags[0]
+                        broadcastAvalon(buildJsonMetadataAvalon(uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spriteHash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,uploaderResponse.duration,uploaderResponse.filesize),avalontag,uploaderResponse.ipfshash,1,() =>  {
+                            localStorage.clear()
+                            window.location.replace('https://d.tube/v/' + username + '/' + permlink)
+                        })
                     } else {
                         localStorage.clear();
                         window.location.replace('https://d.tube/v/' + username + '/' + permlink);
@@ -340,6 +360,7 @@ function buildPostBody(author,permlink,postBody,videoHash,snapHash,description) 
 }
 
 function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,DTubeTags,duration,filesize,author,permlink) {
+    // TODO: Update json_metadata for dtube 0.9+ for Steem + SCOT
     // 'dtube' tag as first tag for Steemit post
     let SteemTags = ['dtube']
     SteemTags = SteemTags.concat(DTubeTags);
@@ -374,6 +395,32 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
         jsonMeta.video.content.subtitles = subtitleList
 
     return jsonMeta;
+}
+
+function buildJsonMetadataAvalon(sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,duration,filesize) {
+    let jsonMeta = {
+        videoId: sourceHash,
+        duration: duration,
+        title: title,
+        description: description,
+        filesize: filesize,
+        ipfs: {
+            snaphash: snapHash,
+            spritehash: spriteHash,
+            videohash: sourceHash,
+            video240hash: video240Hash,
+            video480hash: video480Hash,
+            video720hash: video720Hash,
+            video1080hash: video1080Hash
+        },
+        thumbnailUrl: 'https://snap1.d.tube/ipfs/' + snapHash,
+        providerName: 'IPFS'
+    }
+
+    if (subtitleList.length > 0)
+        jsonMeta.ipfs.subtitles = subtitleList
+
+    return jsonMeta
 }
 
 function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,tags,duration,filesize,powerUp,dtubefees) {
@@ -413,6 +460,37 @@ function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,
         }]
     ]
     return operations
+}
+
+async function broadcastAvalon(json,tag,permlink,weight,cb) {
+    let avalonGetAccPromise = new Promise((resolve,reject) => {
+        jAvalon.getAccount(sessionStorage.getItem('OneLoveAvalonUser'),(err,user) => {
+            if (err) return reject(err)
+            resolve(user)
+        })
+    })
+
+    try {
+        let avalonAcc = await avalonGetAccPromise
+        let tx = {
+            type: 4,
+            data: {
+                link: permlink,
+                json: json,
+                vt: Math.floor(jAvalon.votingPower(avalonAcc)*weight/100),
+                tag: tag
+            }
+        }
+        let signedtx = jAvalon.sign(sessionStorage.getItem('OneLoveAvalonKey'),avalonAcc.name,tx)
+        jAvalon.sendTransaction(signedtx,(err,result) => {
+            if (err) alert('Steem broadcast successful however there is an error with Avalon: ' + err)
+            cb()
+        })
+    } catch (e) {
+        // Alert any Avalon errors after successful Steem tx broadcast then proceed to watch page as usual
+        alert('Steem broadcast successful however there is an error with Avalon: ' + e)
+        cb()
+    }
 }
 
 function updateProgressBar(progress) {
