@@ -373,6 +373,51 @@ textarea {
     right: 0.5vw;
 }
 
+/* Beneficiaries */
+#newBeneficiaryUser {
+    width: 253px;
+}
+
+#newBeneficiaryPercent {
+    width: 57px;
+}
+
+#appendBeneficiaryBtn {
+    font-size: 15px;
+    font-weight: bold;
+    width: 30px;
+    height: 26px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 5.5px;
+    padding-bottom: 0px;
+    margin: 0px;
+    text-align: center;
+}
+
+#beneficiaryTableList {
+    width: 100%;
+}
+
+#beneficiaryTableList tr td {
+    font-size: 15px;
+}
+
+.beneficiaryAccLabel {
+    text-align: left;
+    width: 100%;
+}
+
+.beneficiaryDelBtn {
+    width: 90px;
+}
+
+#totalBeneficiariesLabel {
+    font-size: 15px;
+    margin-block-start: 0.25em;
+    font-weight: normal;
+}
+
 /* Thumbnail swapper tool */
 #thumbnailSwapper {
     display: none;
@@ -773,6 +818,10 @@ td {
     .tabs {
         padding: 6px 5%;
         font-size: 17px;
+    }
+
+    #newBeneficiaryUser {
+        width: calc(100% - 150px);
     }
 
     .popup-content {

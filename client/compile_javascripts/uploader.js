@@ -24,6 +24,14 @@ if (savedSubtitles) {
     setTimeout(() => updateSubtitle(),250)
 }
 
+// Beneficiaries
+let beneficiaryList = [{
+    account: 'dtube',
+    weight: 200
+}]
+let totalBeneficiaries = 200
+let beneficiaryAccList = ['dtube']
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('languages').innerHTML = langOptions
 
@@ -321,6 +329,36 @@ document.addEventListener('DOMContentLoaded', () => {
         return true
     }
 
+    document.getElementById('appendBeneficiaryBtn').onclick = () => {
+        let account = document.getElementById('newBeneficiaryUser').value
+        let percentage = Math.floor(document.getElementById('newBeneficiaryPercent').value * 100)
+        let weightRemaining = 10000 - totalBeneficiaries - percentage
+
+        if (account === username) return alert('You can\'t set a beneficiary to your own account!')
+        if (beneficiaryAccList.includes(account)) return alert('Account specified already added as beneficiaries.')
+        if (percentage <= 0) return alert('Beneficiary percentage must be more than 0.')
+        if (weightRemaining < 0) return alert('You can\'t set beneficiaries totalling more than 100%!')
+
+        steem.api.getAccounts([account],(err,result) => {
+            if (err) return alert('Error while validating account: ' + err)
+            if (result.length === 0) return alert('Beneficiary account specified doesn\'t exist!')
+
+            totalBeneficiaries += percentage
+            beneficiaryAccList.push(result[0].name)
+
+            // If account name and percentage valid, add account to beneficiaries list and update table
+            beneficiaryList.push({
+                account: result[0].name,
+                weight: percentage
+            })
+            updateBeneficiaries()
+            
+            // Reset new beneficiary text fields
+            document.getElementById('newBeneficiaryUser').value = ''
+            document.getElementById('newBeneficiaryPercent').value = ''
+        })
+    }
+
     // Drafts
     document.getElementById('draftBtn').onclick = () => {
         localStorage.setItem('OneLoveTitle',document.getElementById('title').value)
@@ -386,7 +424,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
                 duration: duration,
                 filesize: filesize,
                 spritehash: spriteHash,
-                provider: 'onelovedtube/0.9',
+                provider: 'onelovedtube/0.9b1',
             },
             content: {
                 videohash: sourceHash,
@@ -399,7 +437,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
             },
         },
         tags: SteemTags,
-        app: 'onelovedtube/0.9',
+        app: 'onelovedtube/0.9b1',
     }
 
     if (subtitleList.length > 0)
@@ -462,10 +500,7 @@ function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,
             allow_curation_rewards: true,
             extensions: [
                 [0, {
-                    beneficiaries: [{
-                        account: 'dtube',
-                        weight: dtubefees
-                    }]
+                    beneficiaries: beneficiaryList
                 }]
             ]
         }]
@@ -536,6 +571,30 @@ function updateSubtitle() {
         document.getElementById(allSubtitleDelBtnElems[i].id).onclick = () => {
             subtitleList.splice(i,1)
             updateSubtitle()
+        }
+    }
+}
+
+function updateBeneficiaries() {
+    let beneficiaryTableList = document.getElementById('beneficiaryTableList')
+    let beneficiaryListHtml = ''
+    for (let i = 1; i < beneficiaryList.length; i++) {
+        beneficiaryListHtml += '<tr>'
+        beneficiaryListHtml += '<td class="beneficiaryAccLabel">' + beneficiaryList[i].account + ' (' + beneficiaryList[i].weight / 100 + '%)</td>'
+        beneficiaryListHtml += '<td><a class="roundedBtn beneficiaryDelBtn" id="beneficiaryDelBtn' + i + '">Remove</a></td>'
+        beneficiaryListHtml += '</tr>'
+    }
+    beneficiaryTableList.innerHTML = beneficiaryListHtml
+    document.getElementById('totalBeneficiariesLabel').innerText = 'Total beneficiaries: ' + totalBeneficiaries / 100 + '%'
+
+    let allBeneficiaryDelBtnElems = document.querySelectorAll('a.beneficiaryDelBtn')
+
+    for (let i = 0; i < allBeneficiaryDelBtnElems.length; i++) {
+        document.getElementById(allBeneficiaryDelBtnElems[i].id).onclick = () => {
+            beneficiaryAccList.splice(i+1,1)
+            totalBeneficiaries -= beneficiaryList[i+1].weight
+            beneficiaryList.splice(i+1,1)
+            updateBeneficiaries()
         }
     }
 }
