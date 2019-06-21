@@ -49,6 +49,11 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
                 if (err) return reject(err)
                 let avalonPubKey = jAvalon.privToPub(avalonKey)
                 if (result.pub === avalonPubKey) return resolve(true)
+
+                // Login with "Posting key" (recommended)
+                for (let i = 0; i < result.keys.length; i++) {
+                    if (arrContainsInt(result.keys[i].types,4) === true && result.keys[i].pub === avalonPubKey) return resolve(true)
+                }
                 resolve(false)
             })
         })
@@ -141,3 +146,9 @@ function cancelLoginBtn(sc) {
     proceedAuthBtnDisabled = false
 }
 })
+
+function arrContainsInt(arr,value) {
+    for (var i = 0; i < arr.length; i++) {
+        if (arr[i] === value) return true
+    }
+}
