@@ -16,6 +16,9 @@ let db = {
             cb(true)
         }
     },
+    getPossibleTypes: () => {
+        return possibleTypes
+    },
     // Log usage data and IPFS hashes
     recordUsage: (username,type,size) => {
         if (!usageData[username]) {
@@ -49,6 +52,16 @@ let db = {
     // Retrieve usage and hashes data
     getUsage: (username,cb) => {
         cb(usageData[username])
+    },
+    getAllUsage: (type,cb) => {
+        let totalUse = 0
+        for (let key in usageData) {
+            if(usageData.hasOwnProperty(key)) {
+                let use = usageData[key][type]
+                if (!isNaN(use)) totalUse += use
+            }
+        }
+        cb(totalUse)
     },
     getHashes: (types,cb) => {
         let hashesToReturn = {}

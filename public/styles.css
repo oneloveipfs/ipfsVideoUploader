@@ -556,6 +556,18 @@ textarea {
     width: 85vw;
 }
 
+#homeStats {
+    text-align: center;
+    font-family: Geneva, Verdana, sans-serif;
+    font-size: 40px;
+    padding-left: 6vw;
+    padding-right: 6vw;
+    padding-right: 6vw;
+    padding-top: 30px;
+    padding-bottom: 30px;
+    background-color: rgb(68, 240, 34);
+}
+
 #whatOurCustomersSay {
     text-align: center;
     padding-top: 1px;
@@ -733,6 +745,10 @@ td {
     #homepageTable img {
         width: 150px;
         height: 150px;
+    }
+
+    #homeStats {
+        font-size: 25px;
     }
 
     #whatOurCustomersSay h1 {

@@ -5,6 +5,7 @@ const db = require('./dbManager')
 const Auth = require('./authManager')
 const WooCommerce = require('woocommerce-api')
 const fs = require('fs')
+const async = require('async')
 const Express = require('express')
 const RateLimiter = require('express-rate-limit')
 const Parser = require('body-parser')
@@ -175,6 +176,37 @@ app.get('/usage',APILimiter, (request,response) => {
     if (request.query.user === undefined || request.query.user === '') return response.send('Steem username is not defined!');
     db.getUsage(request.query.user,(result) => {
         response.send(result)
+    })
+})
+
+app.get('/totalUsage',(request,response) => {
+    let getUseOps = {}
+    let possibleTypes = db.getPossibleTypes()
+
+    for(let i = 0; i < possibleTypes.length; i++) {
+        getUseOps[possibleTypes[i]] = (cb) => {
+            db.getAllUsage(possibleTypes[i],(total) => {
+                cb(null,total)
+            })
+        }
+    }
+
+    async.parallel(getUseOps,(err,result) => {
+        let allUse = result
+        allUse.total = 0
+        for(let i = 0; i < possibleTypes.length; i++) {
+            allUse.total += result[possibleTypes[i]]
+        }
+        response.send(allUse)
+    })
+})
+
+app.get('/totalUploadCount',(request,response) => {
+    // Get unique video uploads by number of source video hashes stored in db
+    db.getHashes('videos',(obtainedHashes) => {
+        response.send({
+            count: obtainedHashes.videos.length
+        })
     })
 })
 
