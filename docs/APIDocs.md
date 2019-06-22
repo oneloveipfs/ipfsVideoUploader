@@ -12,6 +12,18 @@
 ```
 * `user` *(required)*: Steem account username
 
+#### To get total usage data for all users:
+```
+/totalUsage
+```
+*(There are no arguments to be specifed in the URL for this API call)*
+
+#### To obtain number of uploads for all users:
+```
+/totalUploadCount
+```
+*(There are no arguments to be specifed in the URL for this API call)*
+
 #### To get list of hashes of uploaded files:
 ```
 /hashes?user=STEEM_USERNAME&hashtype=videos,thumbnails,sprites

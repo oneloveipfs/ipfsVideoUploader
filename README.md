@@ -29,17 +29,19 @@ This is an alternative IPFS uploader to upload videos onto DTube. Includes a bas
 
 5. Run `npm run sc2link` to generate SteemConnect login link (if SteemConnect is used).
 
-6. Replace the login link with the one you obtained from step 3 [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/welcome.html#L74) (if SteemConnect is used).
+6. Replace the login link with the one you obtained from step 3 [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/compile_javascripts/login.js#L82) (if SteemConnect is used).
 
-7. If `whitelistEnabled` is set to `true`, add some Steem accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Steem user)
+7. Compile client side JavaScripts. `npm run build`
 
-8. Run the app by typing `npm start`. Your app will listen to ports you specify in `config.json` file.
+8. If `whitelistEnabled` is set to `true`, add some Steem accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Steem user)
+
+9. Run the app by typing `npm start`. Your app will listen to ports you specify in `config.json` file.
 
 All uploaded files will be saved in the `uploaded` folder within the repo. Image files (for Steem article body) will be saved in the `imguploads` folder.
 
 # Removing support for SteemConnect
 
-If you do not wish to support SteemConnect authentication and use only Steem Keychain, skip step 5 and 6 above when setting up, and delete lines 73-74 in [welcome.html file](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/welcome.html#L73-L74).
+If you do not wish to support SteemConnect authentication and use only Steem Keychain, skip step 5 and 6 above when setting up, and delete lines 80-81 in [welcome.html file](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/welcome.html#L80-L81), and delete lines 126-138 in [login.html file](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/compile_javascripts/login.js#L126-L138). Recompile the client side JavaScripts by running `npm run build`.
 
 # Supported file formats
 
