@@ -35,5 +35,11 @@
         "description": "Getting ready for the new DTube.",
         "steemitLink": "https://steemit.com/onelovedtube/@techcoderx/onelovedtube-ipfs-uploader-v0-8-5-getting-ready-for-the-new-dtube",
         "payout": "$31.21"
+    }, {
+        "created": "24 June 2019",
+        "version": "0.9b1",
+        "description": "Introducing support for Avalon testnet.",
+        "steemitLink": "https://steemit.com/onelovedtube/@techcoderx/onelovedtube-uploader-v0-9-beta-1-introducing-support-for-avalon-testnet",
+        "payout": "Pending"
     }
 ]

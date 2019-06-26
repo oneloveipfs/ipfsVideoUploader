@@ -33,6 +33,13 @@ let totalBeneficiaries = 200
 let beneficiaryAccList = ['dtube']
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Hide Avalon first curated tag info if not logged in with Avalon
+    let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
+    let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
+    if (!avalonUser || !avalonKey) {
+        document.getElementById('tagInfo1').style.display = 'none'
+    }
+
     document.getElementById('languages').innerHTML = langOptions
 
     document.getElementById('tabBasics').onclick = () => {
@@ -168,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (tags.length !== 0)
                             avalontag = tags[0]
                         progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
-                        broadcastAvalon(buildJsonMetadataAvalon(uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spriteHash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,uploaderResponse.duration,uploaderResponse.filesize),avalontag,uploaderResponse.ipfshash,() =>  {
+                        broadcastAvalon(buildJsonMetadataAvalon(uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spriteHash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,uploaderResponse.duration,uploaderResponse.filesize,username,permlink),avalontag,uploaderResponse.ipfshash,() =>  {
                             localStorage.clear()
                             window.location.replace('https://d.tube/v/' + username + '/' + permlink)
                         })
@@ -192,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (tags.length !== 0)
                             avalontag = tags[0]
                         progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
-                        broadcastAvalon(buildJsonMetadataAvalon(uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spriteHash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,uploaderResponse.duration,uploaderResponse.filesize),avalontag,uploaderResponse.ipfshash,() =>  {
+                        broadcastAvalon(buildJsonMetadataAvalon(uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spriteHash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,uploaderResponse.duration,uploaderResponse.filesize,username,permlink),avalontag,uploaderResponse.ipfshash,() =>  {
                             localStorage.clear()
                             window.location.replace('https://d.tube/v/' + username + '/' + permlink)
                         })
@@ -415,30 +422,12 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
     SteemTags = SteemTags.concat(DTubeTags);
 
     let jsonMeta = {
-        video: {
-            info: {
-                title: title,
-                snaphash: snapHash,
-                author: author,
-                permlink: permlink,
-                duration: duration,
-                filesize: filesize,
-                spritehash: spriteHash,
-                provider: 'onelovedtube/0.9b1',
-            },
-            content: {
-                videohash: sourceHash,
-                video240hash: video240Hash,
-                video480hash: video480Hash,
-                video720hash: video720Hash,
-                video1080hash: video1080Hash,
-                description: description,
-                tags: DTubeTags,
-            },
-        },
+        video: buildJsonMetadataAvalon(sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,duration,filesize,author,permlink),
         tags: SteemTags,
-        app: 'onelovedtube/0.9b1',
+        app: 'onelovedtube/0.9',
     }
+
+    jsonMeta.video.refs = ['dtc/' + author + '/' + permlink]
 
     if (subtitleList.length > 0)
         jsonMeta.video.content.subtitles = subtitleList
@@ -446,7 +435,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
     return jsonMeta;
 }
 
-function buildJsonMetadataAvalon(sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,duration,filesize) {
+function buildJsonMetadataAvalon(sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,duration,filesize,author,permlink) {
     let jsonMeta = {
         videoId: sourceHash,
         duration: duration,
@@ -463,7 +452,10 @@ function buildJsonMetadataAvalon(sourceHash,snapHash,spriteHash,video240Hash,vid
             video1080hash: video1080Hash
         },
         thumbnailUrl: 'https://snap1.d.tube/ipfs/' + snapHash,
-        providerName: 'IPFS'
+        providerName: 'IPFS',
+        refs: [
+            'steem/' + author + '/' + permlink
+        ]
     }
 
     if (subtitleList.length > 0)
