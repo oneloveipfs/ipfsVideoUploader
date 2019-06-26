@@ -427,7 +427,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
         app: 'onelovedtube/0.9',
     }
 
-    jsonMeta.video.refs = ['dtc/' + author + '/' + permlink]
+    jsonMeta.video.refs = ['dtc/' + author + '/' + sourceHash]
 
     if (subtitleList.length > 0)
         jsonMeta.video.content.subtitles = subtitleList
