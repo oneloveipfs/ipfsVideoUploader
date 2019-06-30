@@ -32,10 +32,12 @@ let beneficiaryList = [{
 let totalBeneficiaries = 200
 let beneficiaryAccList = ['dtube']
 
+// Load Avalon login
+let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
+let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
+
 document.addEventListener('DOMContentLoaded', () => {
     // Hide Avalon first curated tag info if not logged in with Avalon
-    let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
-    let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
     if (!avalonUser || !avalonKey) {
         document.getElementById('tagInfo1').style.display = 'none'
     }
@@ -169,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         alert('Failed to post on DTube: ' + response.error + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
                         progressbar.style.display = "none";
                         reenableFields();
-                    } else if (sessionStorage.getItem('OneLoveAvalonUser') !== null) {
+                    } else if (avalonUser !== null) {
                         // Broadcast to Avalon as well if Avalon login exists
                         let avalontag = ''
                         if (tags.length !== 0)
@@ -193,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         alert('Failed to post on DTube: ' + err + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
                         progressbar.style.display = "none";
                         reenableFields();
-                    } else if (sessionStorage.getItem('OneLoveAvalonUser') !== null) {
+                    } else if (avalonUser !== null) {
                         // Broadcast to Avalon as well if Avalon login exists
                         let avalontag = ''
                         if (tags.length !== 0)
@@ -427,7 +429,10 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
         app: 'onelovedtube/0.9',
     }
 
-    jsonMeta.video.refs = ['dtc/' + author + '/' + sourceHash]
+    if (avalonUser !== null)
+        jsonMeta.video.refs = ['dtc/' + avalonUser + '/' + sourceHash]
+    else
+        jsonMeta.video.refs = []
 
     if (subtitleList.length > 0)
         jsonMeta.video.content.subtitles = subtitleList
@@ -502,7 +507,7 @@ function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,
 
 async function broadcastAvalon(json,tag,permlink,cb) {
     let avalonGetAccPromise = new Promise((resolve,reject) => {
-        jAvalon.getAccount(sessionStorage.getItem('OneLoveAvalonUser'),(err,user) => {
+        jAvalon.getAccount(avalonUser,(err,user) => {
             if (err) return reject(err)
             resolve(user)
         })
