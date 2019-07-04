@@ -1,12 +1,19 @@
 let username
 const Auth = require('./auth')
+const jAvalon = require('javalon')
 Auth.steem().then((result) => {
     username = result
 })
 
+// Load Avalon login
+let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
+let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
+
 let steemPostToModify
+let avalonPostToModify
 let selectedAuthor
 let selectedPermlink
+let chainSource
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('modeBtn').onclick = () => {
@@ -33,28 +40,101 @@ document.addEventListener('DOMContentLoaded', () => {
         let split = linkInput.value.replace('/#!','').replace('https://d.tube/v/','').split('/')
         if (split.length != 2)
             return alert('Link provided is an invalid d.tube video link format.')
-        if (split[0] !== username)
+        if (split[0] !== username && split[0] !== avalonUser)
             return alert('DTube video selected is not your video!')
-        steem.api.getContent(split[0],split[1],(err,result) => {
-            if (err) return document.getElementById('linkResult').innerHTML = '<h4>Steem error: ' + err + '</h4>'
-            console.log(result)
-            let jsonmeta = JSON.parse(result.json_metadata)
-            if (!jsonmeta.video)
-                return alert('Link provided is actually not a DTube video!')
-            if (!jsonmeta.video.info)
-                return alert('Failed to retrieve DTube video info.')
+        async.parallel({
+            steem: (cb) => {
+                steem.api.getContent(split[0],split[1],(err,res) => {
+                    if (err) return cb(err)
+                    cb(null,res)
+                })
+            },
+            avalon: (cb) => {
+                jAvalon.getContent(split[0],split[1],(err,res) => {
+                    if (err) return cb(err)
+                    cb(null,res)
+                })
+            }
+        },(errors,results) => {
+            console.log(results)
+            let noAvalonWarningShown = document.getElementById('thumbnailSwapNoAvalon').style.display
+            if (results.avalon === undefined && results.steem && results.steem.author === split[0] && results.steem.permlink === split[1] && results.steem.json_metadata !== "") {
+                // Valid Steem link
+                if (results.steem.author !== username)
+                    return alert('DTube video selected is not your video!')
+                let jsonmeta = JSON.parse(results.steem.json_metadata)
+                if (!jsonmeta.video)
+                    return alert('Link provided is actually not a DTube video!')
 
-            steemPostToModify = result
-            selectedAuthor = split[0]
-            selectedPermlink = split[1]
-            
-            document.getElementById('currentSnap').innerHTML = '<img class="snapImgPreview" src="https://snap1.d.tube/ipfs/' + jsonmeta.video.info.snaphash + '">'
-            let resultHTMLToAppend2 = '<h4>Title: ' + result.title + '<br><br>'
-            resultHTMLToAppend2 += 'Permlink: ' + split[1] + '<br><br>'
-            resultHTMLToAppend2 += 'Current thumbnail hash: ' + jsonmeta.video.info.snaphash + '</h4>'
-            document.getElementById('videoInfo').innerHTML = HtmlSanitizer.SanitizeHtml(resultHTMLToAppend2)
-            document.getElementById('newSnapField').style.display = 'block'
-            document.getElementById('swapSubmitBtn').style.display = 'block'
+                chainSource = 'steem'
+
+                if (jsonmeta.video.info) {
+                    // DTube 0.7 / 0.8
+                    steemPostToModify = results.steem
+                    selectedAuthor = split[0]
+                    selectedPermlink = split[1]
+                    noAvalonWarningShown = 'none'
+
+                    document.getElementById('currentSnap').innerHTML = '<img class="snapImgPreview" src="https://snap1.d.tube/ipfs/' + jsonmeta.video.info.snaphash + '">'
+                    let resultHTMLToAppend2 = '<h4>Title: ' + results.steem.title + '<br><br>'
+                    resultHTMLToAppend2 += 'Permlink: ' + split[1] + '<br><br>'
+                    resultHTMLToAppend2 += 'Current thumbnail hash: ' + jsonmeta.video.info.snaphash + '</h4>'
+                    document.getElementById('videoInfo').innerHTML = HtmlSanitizer.SanitizeHtml(resultHTMLToAppend2)
+                    document.getElementById('newSnapField').style.display = 'block'
+                    document.getElementById('swapSubmitBtn').style.display = 'block'
+                } else if (jsonmeta.video.providerName !== 'IPFS') {
+                    // DTube 0.9+ non-IPFS uploads
+                    return alert('DTube video selected must be an IPFS upload.')
+                } else if (jsonmeta.video.ipfs) {
+                    // DTube 0.9+ IPFS uploads
+                    steemPostToModify = results.steem
+                    selectedAuthor = split[0]
+                    selectedPermlink = split[1]
+
+                    if (!avalonUser || !avalonKey) noAvalonWarningShown = 'block'
+
+                    document.getElementById('currentSnap').innerHTML = '<img class="snapImgPreview" src="https://snap1.d.tube/ipfs/' + jsonmeta.video.ipfs.snaphash + '">'
+                    let resultHTMLToAppend2 = '<h4>Title: ' + results.steem.title + '<br><br>'
+                    resultHTMLToAppend2 += 'Permlink: ' + split[1] + '<br><br>'
+                    resultHTMLToAppend2 += 'Current thumbnail hash: ' + jsonmeta.video.ipfs.snaphash + '</h4>'
+                    document.getElementById('videoInfo').innerHTML = HtmlSanitizer.SanitizeHtml(resultHTMLToAppend2)
+                    document.getElementById('newSnapField').style.display = 'block'
+                    document.getElementById('swapSubmitBtn').style.display = 'block'
+                } else {
+                    return alert('Failed to retrieve DTube video info.')
+                }
+            } else if (results.avalon && results.avalon.json) {
+                // Valid Avalon link (DTube 0.9+)
+                if (results.avalon.json.providerName !== 'IPFS')
+                    return alert('DTube video selected must be an IPFS upload.')
+
+                avalonPostToModify = results.avalon
+                selectedAuthor = split[0]
+                selectedPermlink = split[1]
+                chainSource = 'dtc'
+
+                if (!avalonUser || !avalonKey) noAvalonWarningShown = 'block'
+
+                document.getElementById('currentSnap').innerHTML = '<img class="snapImgPreview" src="https://snap1.d.tube/ipfs/' + results.avalon.json.ipfs.snaphash + '">'
+                let resultHTMLToAppend2 = '<h4>Title: ' + results.avalon.json.title + '<br><br>'
+                resultHTMLToAppend2 += 'Permlink: ' + split[1] + '<br><br>'
+                resultHTMLToAppend2 += 'Current thumbnail hash: ' + results.avalon.json.ipfs.snaphash + '</h4>'
+                document.getElementById('videoInfo').innerHTML = HtmlSanitizer.SanitizeHtml(resultHTMLToAppend2)
+                document.getElementById('newSnapField').style.display = 'block'
+                document.getElementById('swapSubmitBtn').style.display = 'block'
+            } else if (errors) {
+                // Error handling
+                if (errors.steem)
+                    return alert('Error retrieving video info from Steem: ' + errors.steem)
+                else if (errors.avalon == 'SyntaxError: Unexpected token N in JSON at position 0')
+                    return alert('Invalid link provided.')
+                else if (errors.avalon)
+                    return alert('Error retrieving video info from Avalon: ' + errors.avalon)
+                else
+                    return alert('Unknown error while retrieving video info.')
+            } else {
+                return alert('Unknown error while retrieving video info.')
+            }
         })
     }
 
@@ -89,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Edit json_metadata
             let jsonmeta = JSON.parse(steemPostToModify.json_metadata)
             jsonmeta.video.info.snaphash = newSnapHash
-            jsonmeta.app = 'onelovedtube/0.8.5'
+            jsonmeta.app = 'onelovedtube/0.9'
             console.log(jsonmeta)
 
             // Edit Steem article body

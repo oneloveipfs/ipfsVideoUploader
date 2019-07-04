@@ -6,6 +6,7 @@
         <title>OneLoveDTube Uploader</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/async/3.1.0/async.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/steemconnect@latest"></script>
         <script src="//cdn.steemjs.com/lib/latest/steem.min.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/jitbit/HtmlSanitizer@master/HtmlSanitizer.js"></script>
@@ -86,6 +87,7 @@
             </div>
         </div>
         <div id="thumbnailSwapper">
+            <div class="warningbox" id="thumbnailSwapNoAvalon">As you are not logged in with Avalon, the post on Avalon blockchain will not be updated. Therefore, only the Steem post will be updated with the new thumbnail.</div>
             <h3>Link to d.tube video to swap thumbnail:</h3>
             <input type="text" class="meta" placeholder="Paste d.tube link here" id="thumbnailSwapLink">
             <a class="roundedBtn" id="linkSubmitBtn">Submit Link</a>

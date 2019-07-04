@@ -427,6 +427,11 @@ textarea {
     display: none;
 }
 
+#thumbnailSwapNoAvalon {
+    margin-block-start: 1em;
+    display: none;
+}
+
 #linkSubmitBtn {
     margin-top: 10px;
 }
