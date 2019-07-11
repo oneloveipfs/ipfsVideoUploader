@@ -83,39 +83,55 @@ pin_recursive() {
 }
 
 echo $HASHES | jq -r 'select(.videos) | .videos[]' | while read h; do
-    pin_recursive $h
+    if [ $h != "null" ]; then
+        pin_recursive $h
+    fi
 done
 
 echo $HASHES | jq -r 'select(.thumbnails) | .thumbnails[]' | while read h; do
-    if [[ $PINNED != *"$h"* ]]; then
-        wget -q ${GATEWAY}/ipfs/$h
-        ipfs add $h --silent
-        ipfs pin add $h
+    if [ $h != "null" ]; then
+        if [[ $PINNED != *"$h"* ]]; then
+            wget -q ${GATEWAY}/ipfs/$h
+            ipfs add $h --silent
+            ipfs pin add $h
+        fi
     fi
 done
 
 echo $HASHES | jq -r 'select(.sprites) | .sprites[]' | while read h; do
-    pin_recursive $h
+    if [ $h != "null" ]; then
+        pin_recursive $h
+    fi
 done
 
 echo $HASHES | jq -r 'select(.images) | .images[]' | while read h; do
-    pin_recursive $h
+    if [ $h != "null" ]; then
+        pin_recursive $h
+    fi
 done
 
 echo $HASHES | jq -r 'select(.video240) | .video240[]' | while read h; do
-    pin_recursive $h
+    if [ $h != "null" ]; then
+        pin_recursive $h
+    fi
 done
 
 echo $HASHES | jq -r 'select(.video480) | .video480[]' | while read h; do
-    pin_recursive $h
+    if [ $h != "null" ]; then
+        pin_recursive $h
+    fi
 done
 
 echo $HASHES | jq -r 'select(.video720) | .video720[]' | while read h; do
-    pin_recursive $h
+    if [ $h != "null" ]; then
+        pin_recursive $h
+    fi
 done
 
 echo $HASHES | jq -r 'select(.video1080) | .video1080[]' | while read h; do
-    pin_recursive $h
+    if [ $h != "null" ]; then
+        pin_recursive $h
+    fi
 done
 
 echo
