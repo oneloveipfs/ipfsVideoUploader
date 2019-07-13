@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },(errors,results) => {
             console.log(results)
-            if (results.avalon === undefined && results.steem && results.steem.author === split[0] && results.steem.permlink === split[1] && results.steem.json_metadata !== "") {
+            if (results.avalon === undefined && results.steem && results.steem.author === split[0] && results.steem.permlink === split[1]) {
                 // Valid Steem link
                 if (results.steem.author !== username)
                     return alert('DTube video selected is not your video!')
