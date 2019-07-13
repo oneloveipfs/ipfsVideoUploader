@@ -460,7 +460,8 @@ function buildJsonMetadataAvalon(sourceHash,snapHash,spriteHash,video240Hash,vid
         providerName: 'IPFS',
         refs: [
             'steem/' + author + '/' + permlink
-        ]
+        ],
+        app: 'onelovedtube/0.9'
     }
 
     if (subtitleList.length > 0)

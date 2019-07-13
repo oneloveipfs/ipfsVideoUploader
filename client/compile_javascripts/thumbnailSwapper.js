@@ -13,7 +13,6 @@ let steemPostToModify
 let avalonPostToModify
 let selectedAuthor
 let selectedPermlink
-let chainSource
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('modeBtn').onclick = () => {
@@ -40,8 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let split = linkInput.value.replace('/#!','').replace('https://d.tube/v/','').split('/')
         if (split.length != 2)
             return alert('Link provided is an invalid d.tube video link format.')
-        if (split[0] !== username && split[0] !== avalonUser)
-            return alert('DTube video selected is not your video!')
         async.parallel({
             steem: (cb) => {
                 steem.api.getContent(split[0],split[1],(err,res) => {
@@ -57,7 +54,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },(errors,results) => {
             console.log(results)
-            let noAvalonWarningShown = document.getElementById('thumbnailSwapNoAvalon').style.display
             if (results.avalon === undefined && results.steem && results.steem.author === split[0] && results.steem.permlink === split[1] && results.steem.json_metadata !== "") {
                 // Valid Steem link
                 if (results.steem.author !== username)
@@ -66,14 +62,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!jsonmeta.video)
                     return alert('Link provided is actually not a DTube video!')
 
-                chainSource = 'steem'
-
                 if (jsonmeta.video.info) {
                     // DTube 0.7 / 0.8
                     steemPostToModify = results.steem
                     selectedAuthor = split[0]
                     selectedPermlink = split[1]
-                    noAvalonWarningShown = 'none'
+                    document.getElementById('thumbnailSwapNoAvalon').style.display = 'none'
 
                     document.getElementById('currentSnap').innerHTML = '<img class="snapImgPreview" src="https://snap1.d.tube/ipfs/' + jsonmeta.video.info.snaphash + '">'
                     let resultHTMLToAppend2 = '<h4>Title: ' + results.steem.title + '<br><br>'
@@ -91,7 +85,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     selectedAuthor = split[0]
                     selectedPermlink = split[1]
 
-                    if (!avalonUser || !avalonKey) noAvalonWarningShown = 'block'
+                    // Get associated post on Avalon blockchain
+                    if (!avalonUser || !avalonKey) { 
+                        document.getElementById('thumbnailSwapNoAvalon').style.display = 'block' 
+                    } else {
+                        for (let i = 0; i < jsonmeta.video.refs.length; i++) {
+                            let ref = jsonmeta.video.refs[i].split('/')
+                            if (ref[0] === 'dtc') jAvalon.getContent(ref[1],ref[2],(err,post) => {
+                                if (err) return alert('Error while getting associated Avalon post: ' + JSON.stringify(err))
+                                if (post.author !== avalonUser) {
+                                    alert('Looks like you\'re logged in with an Avalon account that doesn\'nt correspond with the author of the associated Avalon post. Changes made will only be reflected on the Steem blockchain.')
+                                } else {
+                                    avalonPostToModify = post
+                                }
+                                console.log(avalonPostToModify)
+                            })
+                            break
+                        }
+                    }
 
                     document.getElementById('currentSnap').innerHTML = '<img class="snapImgPreview" src="https://snap1.d.tube/ipfs/' + jsonmeta.video.ipfs.snaphash + '">'
                     let resultHTMLToAppend2 = '<h4>Title: ' + results.steem.title + '<br><br>'
@@ -105,15 +116,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } else if (results.avalon && results.avalon.json) {
                 // Valid Avalon link (DTube 0.9+)
+                if (!avalonUser || !avalonKey)
+                    return alert('You need to be logged in with your Avalon blockchain account to make thumbnail swaps of DTube videos posted onto Avalon.')
+                if (results.avalon.author !== avalonUser)
+                    return alert('Looks like this is not your DTube video! Please login again with the correct Avalon account that matches the author of this Avalon post.')
                 if (results.avalon.json.providerName !== 'IPFS')
                     return alert('DTube video selected must be an IPFS upload.')
 
                 avalonPostToModify = results.avalon
                 selectedAuthor = split[0]
                 selectedPermlink = split[1]
-                chainSource = 'dtc'
 
-                if (!avalonUser || !avalonKey) noAvalonWarningShown = 'block'
+                for (let i = 0; i < results.avalon.json.refs.length; i++) {
+                    let ref = results.avalon.json.refs[i].split('/')
+                    if (ref[0] === 'steem') steem.api.getContent(ref[1],ref[2],(err,post) => {
+                        if (err) return alert('Error while getting associated Steem post: ' + JSON.stringify(err))
+                        steemPostToModify = post
+                        console.log(steemPostToModify)
+                    })
+                }
 
                 document.getElementById('currentSnap').innerHTML = '<img class="snapImgPreview" src="https://snap1.d.tube/ipfs/' + results.avalon.json.ipfs.snaphash + '">'
                 let resultHTMLToAppend2 = '<h4>Title: ' + results.avalon.json.title + '<br><br>'
@@ -166,55 +187,109 @@ document.addEventListener('DOMContentLoaded', () => {
         axios.post(call,snapFormData,contentType).then(function(response) {
             let newSnapHash = response.data.imghash
 
-            // Edit json_metadata
-            let jsonmeta = JSON.parse(steemPostToModify.json_metadata)
-            jsonmeta.video.info.snaphash = newSnapHash
-            jsonmeta.app = 'onelovedtube/0.9'
-            console.log(jsonmeta)
+            let snapSwapOps = {}
+            if (steemPostToModify) snapSwapOps.steem = (cb) => {
+                // Edit json_metadata
+                let jsonmeta = JSON.parse(steemPostToModify.json_metadata)
+                if (jsonmeta.video.info) {
+                    // DTube 0.8
+                    jsonmeta.video.info.snaphash = newSnapHash
+                } else {
+                    // DTube 0.9+
+                    jsonmeta.video.ipfs.snaphash = newSnapHash
+                    jsonmeta.video.thumbnailUrl = 'https://snap1.d.tube/ipfs/' + newSnapHash
+                }
+                jsonmeta.app = 'onelovedtube/0.9'
 
-            // Edit Steem article body
-            let oldSnapLink = steemPostToModify.body.match(/\bhttps?:\/\/\S+/gi)[1].replace('\'></a></center><hr>','')
-            let editedBody = steemPostToModify.body.replace(oldSnapLink,'https://cloudflare-ipfs.com/ipfs/' + newSnapHash)
-            console.log(editedBody)
+                // Edit Steem article body
+                let oldSnapLink = steemPostToModify.body.match(/\bhttps?:\/\/\S+/gi)[1].replace('\'></a></center><hr>','')
+                let editedBody = steemPostToModify.body.replace(oldSnapLink,'https://cloudflare-ipfs.com/ipfs/' + newSnapHash)
+                console.log(editedBody)
 
-            let tx = [
-                [ 'comment', {
-                        parent_author: steemPostToModify.parent_author,
-                        parent_permlink: steemPostToModify.parent_permlink,
-                        author: steemPostToModify.author,
-                        permlink: steemPostToModify.permlink,
-                        title: steemPostToModify.title,
-                        body: editedBody,
-                        json_metadata: JSON.stringify(jsonmeta),
-                    }
+                let tx = [
+                    [ 'comment', {
+                            parent_author: steemPostToModify.parent_author,
+                            parent_permlink: steemPostToModify.parent_permlink,
+                            author: steemPostToModify.author,
+                            permlink: steemPostToModify.permlink,
+                            title: steemPostToModify.title,
+                            body: editedBody,
+                            json_metadata: JSON.stringify(jsonmeta),
+                        }
+                    ]
                 ]
-            ]
 
-            if (Auth.iskeychain === 'true') {
-                // Broadcast with Steem Keychain
-                steem_keychain.requestBroadcast(username,tx,'Posting',(response) => {
-                    if (response.error) {
-                        alert('Failed to update thumbnail on Steem: ' + response.error + '\n\nThe IPFS hash of your new thumbnail is ' + newSnapHash)
-                        reenableSnapSwapFields()
-                    } else {
-                        alert('Thumbnail has been updated successfully! Click OK to view your updated post on Steemit with your new thumbnail!\n\nIf you need to remove your old thumbnail from our server to reclaim your disk usage, please contact us with your old hash that you want us to remove: ' + oldSnapLink.split('/ipfs/')[1])
-                        window.location.assign('https://steemit.com/@' + selectedAuthor + '/' + selectedPermlink)
-                    }
-                })
-            } else {
-                // Broadcast with SteemConnect
-                let api2 = new steemconnect.Client({ accessToken: Auth.token })
-                api2.broadcast(tx,(error) => {
-                    if (error) {
-                        alert('Failed to update thumbnail on Steem: ' + response.error + '\n\nThe IPFS hash of your new thumbnail is ' + newSnapHash)
-                        reenableSnapSwapFields()
-                    } else {
-                        alert('Thumbnail has been updated successfully! Click OK to view your updated post on Steemit with your new thumbnail!\n\nIf you need to remove your old thumbnail from our servers to reclaim your disk usage, please contact us with your old hash that you want us to remove: ' + oldSnapLink.split('/ipfs/')[1])
-                        window.location.assign('https://steemit.com/@' + selectedAuthor + '/' + selectedPermlink)
-                    }
-                })
+                if (Auth.iskeychain === 'true') {
+                    // Broadcast with Steem Keychain
+                    steem_keychain.requestBroadcast(username,tx,'Posting',(response) => {
+                        if (response.error) {
+                            cb(response.error)
+                        } else {
+                            cb(null,response)
+                        }
+                    })
+                } else {
+                    // Broadcast with SteemConnect
+                    let api2 = new steemconnect.Client({ accessToken: Auth.token })
+                    api2.broadcast(tx,(error) => {
+                        if (error) {
+                            cb('SteemConnect error: ' + error)
+                        } else {
+                            cb(null,'SteemConnect broadcast success!')
+                        }
+                    })
+                }
+                reenableSnapSwapFields()
             }
-            reenableSnapSwapFields()
+
+            if (avalonPostToModify) snapSwapOps.avalon = (cb) => {
+                let jsonAvalon = avalonPostToModify.json
+                jsonAvalon.thumbnailUrl = 'https://snap1.d.tube/ipfs/' + newSnapHash
+                jsonAvalon.ipfs.snaphash = newSnapHash
+                jsonAvalon.app = 'onelovedtube/0.9'
+
+                let avalonSwapTx = {
+                    type: 4,
+                    data: {
+                        link: avalonPostToModify.link,
+                        json: jsonAvalon,
+                        vt: 1,
+                        tag: avalonPostToModify.votes[0].tag
+                    }
+                }
+
+                try {
+                    let signedSwapTx = jAvalon.sign(avalonKey,avalonUser,avalonSwapTx)
+                    jAvalon.sendTransaction(signedSwapTx,(err,result) => {
+                        if (err) return cb('Avalon error: ' + err)
+                        cb(null,result)
+                    })
+                } catch (e) {
+                    cb('Avalon error: ' + e)
+                }
+            }
+
+            async.parallel(snapSwapOps,(errors,results) => {
+                if (errors) {
+                    console.log(errors)
+                    if (errors.steem && errors.avalon) {
+                        alert('Failed to broadcast thumbnail changes onto the blockchains. Check your browser console for error details. The IPFS hash of your new thumbnail is ' + newSnapHash + '.')
+                        reenableSnapSwapFields()
+                    } else if (errors.steem) {
+                        alert('Failed to broadcast thumbnail changes onto Steem blockchain but Avalon broadcast was a success. You will be redirected to the DTube watch page. Error details: ' + JSON.stringify(errors))
+                        window.location.assign('https://d.tube/#!/v/' + selectedAuthor + '/' + selectedPermlink)
+                    } else if (errors.avalon) {
+                        alert('Failed to broadcast thumbnail changes onto Avalon blockchain but Steem broadcast was a success. You will be redirected to the DTube watch page. Error details: ' + JSON.stringify(errors))
+                        window.location.assign('https://d.tube/#!/v/' + selectedAuthor + '/' + selectedPermlink)
+                    } else {
+                        alert('Unknown error occured while broadcasting thumbnail changes. Check your browser console for error details. The IPFS hash of your new thumbnail is ' + newSnapHash + '.')
+                        reenableSnapSwapFields()
+                    }
+                } else {
+                    alert('Thumbnail changes broadcasted successfully! You will be redirected to the DTube watch page.')
+                    window.location.assign('https://d.tube/#!/v/' + selectedAuthor + '/' + selectedPermlink)
+                }
+            })
         }).catch(function(err) {
             if (err.response.data.error)
                 alert('Upload error: ' + err.response.data.error)
