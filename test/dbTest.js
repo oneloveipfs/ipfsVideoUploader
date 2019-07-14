@@ -24,6 +24,13 @@ describe('Database',() => {
         })
     })
 
+    it('getAllUsage should return numbers representing total usage data for specific hash type for all users in bytes',(done) => {
+        db.getAllUsage(Config.test.hashType[0],(result) => {
+            assert.typeOf(result,'number')
+            done()
+        })
+    })
+
     it('getHashes should return arrray of strings representing hashes',(done) => {
         db.getHashes(Config.test.hashType,(result) => {
             for (let key in result) {
@@ -57,7 +64,6 @@ describe('Database',() => {
                     assert.typeOf(result[key],'array')
                     if (result[key].length > 0) for (let i = 0; i < result[key].length; i++) {
                         assert.typeOf(result[key][i],'string')
-                        assert.equal(result[key][i],hashes[Config.test.user][key])
                     }
                 }
             }
