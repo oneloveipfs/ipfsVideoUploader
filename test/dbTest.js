@@ -70,4 +70,12 @@ describe('Database',() => {
             done()
         })
     })
+
+    it('Possible hash types should be an array with strings',(done) => {
+        assert.typeOf(db.getPossibleTypes(),'array')
+        for(let i = 0; i < db.getPossibleTypes().length; i++) {
+            assert.typeOf(db.getPossibleTypes()[i],'string')
+        }
+        done()
+    })
 })
