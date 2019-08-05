@@ -216,6 +216,15 @@ h2 {
 	top:1px;
 }
 
+.dropdownArrow {
+    border: solid #666666;
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+    transform: rotate(45deg) translate(0px,-5px);
+    -webkit-transform: rotate(45deg) translate(0px,-5px);
+}
+
 .curvedbox {
     width: 97.5%;
     border: solid;

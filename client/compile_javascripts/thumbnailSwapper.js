@@ -23,12 +23,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (uploader.style.display == 'none') {
             uploader.style.display = 'block'
             thumbnailSwapper.style.display = 'none'
-            modeSwitchBtn.innerHTML = 'New Upload'
+            modeSwitchBtn.innerHTML = 'New Upload <i class="dropdownArrow"></i>'
     
         } else {
             uploader.style.display = 'none'
             thumbnailSwapper.style.display = 'block'
-            modeSwitchBtn.innerHTML = 'Thumbnail Swap'
+            modeSwitchBtn.innerHTML = 'Thumbnail Swap <i class="dropdownArrow"></i>'
         }
     }
 

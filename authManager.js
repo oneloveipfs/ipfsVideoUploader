@@ -69,14 +69,6 @@ let auth = {
         let decrypted = Crypto.AES.decrypt(message,Keys.AESKey).toString(Crypto.enc.Utf8).split(':')
         cb(decrypted)
     },
-    WCVerifyWebhook: (raw,signature,cb) => {
-        let hash = Crypto.HmacSHA256(raw,Keys.WCWebhookSecret)
-        let b64Hash = Crypto.enc.Base64.stringify(hash)
-        if (b64Hash === signature)
-            cb(true)
-        else
-            cb(false)
-    },
     whitelist: () => {return whitelist},
     whitelistAdd: (username,cb) => {
         if (!whitelist.includes(username)) {

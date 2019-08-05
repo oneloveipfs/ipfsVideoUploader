@@ -23,6 +23,38 @@
         "wpAPI": true,
         "version": "wc/v1"
     },
+    "WooCommerceSettings": {
+        "Tiers": [
+            {
+                "wcpid": -1,
+                "name": "Trial",
+                "price": 0.00,
+                "quota": 0
+            },
+            {
+                "wcpid": 206,
+                "name": "Starter",
+                "price": 10.00,
+                "quota": 32212254720
+            },
+            {
+                "wcpid": 371,
+                "name": "Creator",
+                "price": 50.00,
+                "quota": 161061273600
+            },
+            {
+                "wcpid": 376,
+                "name": "Enterprise",
+                "price": 60.00,
+                "quota": 268435456000
+            }
+        ],
+        "Referral": {
+            "quotaBonus": 536870912,
+            "maxBonus": 5368709120
+        }
+    },
 
     "test": {
         "hashType": ["videos","thumbnails","sprites","images","video240","video480","video720","video1080","subtitles"],

@@ -3,6 +3,7 @@ const UpdateLogs = require('./db/updatelogs.json')
 const FileUploader = require('./ipfsUploadHandler')
 const db = require('./dbManager')
 const Auth = require('./authManager')
+const WC = require('./wcHelper')
 const WooCommerce = require('woocommerce-api')
 const fs = require('fs')
 const async = require('async')
@@ -245,7 +246,7 @@ app.get('/updatelogs',APILimiter,(request,response) => {
 
 app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(req,res) => {
     if (!Config.WooCommerceEnabled) return res.status(404).end()
-    Auth.WCVerifyWebhook(req.rawBody,req.header('X-WC-Webhook-Signature'),(isValid) => {
+    WC.VerifyWebhook(req.rawBody,req.header('X-WC-Webhook-Signature'),(isValid) => {
         if (!isValid) return res.status(403).send('Invalid webhook')
 
         // Send a 200 response code if webhook is legitimate
@@ -255,13 +256,23 @@ app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlenco
         // When WooCommerce detects a payment, order status updates to processing
         if (req.body.status === 'processing') {
             let getUsername = req.body.meta_data.find(user => user.key === '_billing_steem_account_name')
-            if (getUsername !== undefined) {
+            let getTier = Config.WooCommerceSettings.Tiers.findIndex(tier => tier.wcpid === req.body.line_items[0].product_id)
+            if (getUsername !== undefined || getUsername !== '' || getTier !== -1) {
                 Auth.whitelistAdd(getUsername.value,() => {})
+                WC.AddUser(getUsername.value,req.body.customer_id,getTier,0)
 
                 // Complete order
                 WooCommerceAPI.put('orders/' + req.body.id,{ status: 'completed' },() => {
                     console.log('Order ID ' + req.body.id + ' has been processed successfully!')
                 })
+
+                // Referrals
+                let getReferral = req.body.meta_data.find(refUser => refUser.key === '_billing_referral_username')
+                if (getReferral !== undefined || getReferral !== '') {
+                    WC.AddReferral(getUsername.value,getReferral.value)
+                }
+
+                WC.WriteWCUserData()
             }
         }
     })
