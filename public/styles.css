@@ -128,7 +128,7 @@ h2 {
     width: fit-content;
 }
 
-#uploadForm, #thumbnailSwapper {
+#uploadForm, #thumbnailSwapper, #wcinfo {
     margin-left: auto;
     margin-right: auto;
     width: 700px;
@@ -224,6 +224,25 @@ h2 {
     transform: rotate(45deg) translate(0px,-5px);
     -webkit-transform: rotate(45deg) translate(0px,-5px);
 }
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    z-index: 1;
+    right: 15px;
+    transform: translate(0px,-30px);
+  }
+  
+  /* Links inside the dropdown */
+  .dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    font-family: Geneva, Verdana, sans-serif;
+    display: block;
+  }
+
+  .dropdown-content a:hover {background-color: #ddd}
 
 .curvedbox {
     width: 97.5%;
@@ -470,6 +489,15 @@ textarea {
 
 #swapSubmitBtn {
     display: none;
+}
+
+#wcinfo {
+    display: none;
+}
+
+#wcinfo h2 {
+    font-size: 30px;
+    text-align: center;
 }
 
 .madeBy {
@@ -818,7 +846,7 @@ td {
         margin-top: 10px;
     }
 
-    #uploadForm, #thumbnailSwapper {
+    #uploadForm, #thumbnailSwapper, #wcinfo {
         margin-left: 15px;
         margin-right: 25px;
         width: auto;

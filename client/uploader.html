@@ -13,11 +13,19 @@
         <script src="client/languages.js"></script>
         <script type="module" src="client/uploader.js"></script>
         <script type="module" src="client/thumbnailSwapper.js"></script>
+        <script src="client/wcinfo.js"></script>
     </head>
     <body>
         <div id='header'>
             <h1 id="siteTitle"><a href="/" class="title"><img id="logoBanner" src="public/logo.png" alt="onelovedtube logo"></a>  <div id="headTitleText">OneLoveDTube Uploader</div></h1>
-            <a id="modeBtn" class="styledButton">New Upload <i class="dropdownArrow"></i></a>
+            <div class="dropdown">
+                <a id="modeBtn" class="styledButton">Menu <i class="dropdownArrow"></i></a>
+                <div id="dropdownbox" class="dropdown-content">
+                    <a id="newUploadModeBtn">New upload</a>
+                    <a id="snapSwapModeBtn">Thumbnail Swap</a>
+                    <a id="subDetModeBtn">Subscription details</a>
+                </div>
+            </div>
         </div>
         <div id='content' class="uploadcontent">
         <div id="uploadForm">
@@ -99,6 +107,8 @@
                 <h3 id="newSnapField">Upload new thumbnail to replace (7MB max): <input type="file" accept="image/jpeg,image/png" id="newSnap"></h3>
                 <input class="styledButton" type="submit" value="Submit!" id="swapSubmitBtn"><br>
             </div>
+        </div>
+        <div id="wcinfo"> <!-- User info page (e.g. WC subscription package, quota available etc.) -->
         </div>
         </div>
         <div id='footer'><h4 class="madeBy">Made by <a target="_blank" rel="noreferrer" href=https://d.tube/c/techcoderx>@techcoderx</a> - <a target="_blank" rel="noreferrer" href=https://github.com/techcoderx/ipfsVideoUploader>Source Code</a> - <a target="_blank" rel="noreferrer" href="https://discord.gg/Sc4utKr">Discord</a> - <a target="_blank" rel="noreferrer" href="https://github.com/techcoderx/ipfsVideoUploader/blob/master/docs/FAQ.md">FAQ</a></h4></div>

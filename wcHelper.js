@@ -42,6 +42,10 @@ let WCMethods = {
             let det = Customers[username]
             det.package = Config.WooCommerceSettings.Tiers[det.tier]
             det.avail = WCMethods.TotalQuota(username)
+            det.bonus = Customers[username].referred.length * Config.WooCommerceSettings.Referral.quotaBonus
+
+            if (det.bonus > Config.WooCommerceSettings.Referral.maxBonus)
+                det.bonus = Config.WooCommerceSettings.Referral.maxBonus
             return det
         } else return {}
     },

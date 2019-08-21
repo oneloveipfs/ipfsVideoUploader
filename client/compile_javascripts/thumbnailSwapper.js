@@ -14,22 +14,37 @@ let avalonPostToModify
 let selectedAuthor
 let selectedPermlink
 
+let uploader = document.getElementById('uploadForm')
+let thumbnailSwapper = document.getElementById('thumbnailSwapper')
+let wcinfo = document.getElementById('wcinfo')
+
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('modeBtn').onclick = () => {
-        let uploader = document.getElementById('uploadForm')
-        let thumbnailSwapper = document.getElementById('thumbnailSwapper')
-        let modeSwitchBtn = document.getElementById('modeBtn')
-    
-        if (uploader.style.display == 'none') {
-            uploader.style.display = 'block'
-            thumbnailSwapper.style.display = 'none'
-            modeSwitchBtn.innerHTML = 'New Upload <i class="dropdownArrow"></i>'
-    
-        } else {
-            uploader.style.display = 'none'
-            thumbnailSwapper.style.display = 'block'
-            modeSwitchBtn.innerHTML = 'Thumbnail Swap <i class="dropdownArrow"></i>'
-        }
+        if (document.getElementById("dropdownbox").style.display === 'block')
+            document.getElementById("dropdownbox").style.display = 'none'
+        else
+            document.getElementById("dropdownbox").style.display = 'block'
+    }
+
+    document.getElementById('newUploadModeBtn').onclick = () => {
+        uploader.style.display = 'block'
+        thumbnailSwapper.style.display = 'none'
+        wcinfo.style.display = 'none'
+        document.getElementById("dropdownbox").style.display = 'none'
+    }
+
+    document.getElementById('snapSwapModeBtn').onclick = () => {
+        uploader.style.display = 'none'
+        thumbnailSwapper.style.display = 'block'
+        wcinfo.style.display = 'none'
+        document.getElementById("dropdownbox").style.display = 'none'
+    }
+
+    document.getElementById('subDetModeBtn').onclick = () => {
+        uploader.style.display = 'none'
+        thumbnailSwapper.style.display = 'none'
+        wcinfo.style.display = 'block'
+        document.getElementById("dropdownbox").style.display = 'none'
     }
 
     document.getElementById('linkSubmitBtn').onclick = () => {
@@ -299,6 +314,12 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 })
+
+// Close the dropdown menu if the user clicks outside of it
+window.onclick = (event) => {
+    if(!event.target.matches('#modeBtn'))
+        document.getElementById('dropdownbox').style.display = 'none'
+}
 
 function reenableSnapSwapFields() {
     const toEnable = ['linkSubmitBtn','thumbnailSwapLink','newSnap','swapSubmitBtn']
