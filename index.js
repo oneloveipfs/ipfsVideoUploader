@@ -244,6 +244,7 @@ app.get('/updatelogs',APILimiter,(request,response) => {
     response.send(UpdateLogs);
 })
 
+// WooCommerce API calls
 app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(req,res) => {
     if (!Config.WooCommerceEnabled) return res.status(404).end()
     WC.VerifyWebhook(req.rawBody,req.header('X-WC-Webhook-Signature'),(isValid) => {
@@ -275,6 +276,12 @@ app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlenco
                 WC.WriteWCUserData()
             }
         }
+    })
+})
+
+app.get('/wc_user_info',APILimiter,(req,res) => {
+    Authenticate(req,res,(user) => {
+        return res.send(WC.User(user))
     })
 })
 
