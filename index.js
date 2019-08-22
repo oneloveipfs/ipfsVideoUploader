@@ -292,6 +292,7 @@ app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlenco
 })
 
 app.get('/wc_user_info',APILimiter,(req,res) => {
+    if (!Config.WooCommerceEnabled) return res.status(404).end()
     Authenticate(req,res,(user) => {
         WC.User(user,(err,info) => {
             if (err) res.status(400).send(err)

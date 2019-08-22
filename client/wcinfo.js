@@ -19,6 +19,11 @@ if (token == null || token == '') {
         infoToDisplay += '<br>Subscription tier: ' + result.data.package.name
         infoToDisplay += '<br>Price: $' + result.data.package.price + '/month'
         infoToDisplay += '<br>Referral count: ' + result.data.referred.length
+
+        if (result.data.due) {
+            let DueDate = new Date(result.data.due)
+            infoToDisplay += '<br>Next payment: ' + moment(DueDate).utc(DueDate).local().format('MMMM DD YYYY h:mm:ss a')
+        }
         infoToDisplay += '<br><br>Available balance: ' + humanReadableSize(result.data.avail) + ' (' + Math.ceil(result.data.avail / totalAllocatedQuota * 10000) / 100 + '% free)'
         infoToDisplay += '<br>Total quota: ' + humanReadableSize(totalAllocatedQuota) + '</h3>'
         infoToDisplay += '<h4>Purchased quota: ' + humanReadableSize(result.data.package.quota)
