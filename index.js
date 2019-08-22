@@ -244,6 +244,18 @@ app.get('/updatelogs',APILimiter,(request,response) => {
     response.send(UpdateLogs);
 })
 
+app.post('/botusage',Parser.json(),(req,res) => {
+    if (!Config.WooCommerceEnabled) return res.status(404).end()
+    Auth.webhookAuth(req.body.token,(err,valid) => {
+        if (err || valid == false) return res.status(403).send('Failed to verify webhook.')
+        res.status(200).send()
+        if (WC.UserExists(req.body.username)) {
+            WC.UpdateBotUsage(req.body.username,req.body.size)
+            WC.WriteWCUserData()
+        }
+    })
+})
+
 // WooCommerce API calls
 app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(req,res) => {
     if (!Config.WooCommerceEnabled) return res.status(404).end()
@@ -281,7 +293,10 @@ app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlenco
 
 app.get('/wc_user_info',APILimiter,(req,res) => {
     Authenticate(req,res,(user) => {
-        return res.send(WC.User(user))
+        WC.User(user,(err,info) => {
+            if (err) res.status(400).send(err)
+            return res.send(info)
+        })
     })
 })
 

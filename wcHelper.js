@@ -37,17 +37,24 @@ let WCMethods = {
         Customers[username].referredBy = referrer
         Customers[referrer].referred.push(username)
     },
-    User: (username) => {
+    User: (username,cb) => {
         if (Customers[username] != undefined) {
             let det = Customers[username]
             det.package = Config.WooCommerceSettings.Tiers[det.tier]
-            det.avail = WCMethods.TotalQuota(username)
             det.bonus = Customers[username].referred.length * Config.WooCommerceSettings.Referral.quotaBonus
 
             if (det.bonus > Config.WooCommerceSettings.Referral.maxBonus)
                 det.bonus = Config.WooCommerceSettings.Referral.maxBonus
-            return det
-        } else return {}
+
+            WCMethods.AvailableQuota(username,(usage) => {
+                det.avail = usage
+                cb(null,det)
+            })
+        } else cb(null,{})
+    },
+    UserExists: (username) => {
+        if (Customers[username] == undefined) return false 
+        else return true
     },
     TotalQuota: (username) => {
         // Calculates actual total quota taking offsets and referral bonus into account
@@ -61,9 +68,12 @@ let WCMethods = {
         
         return baseQuota + offsetQuota + bonusQuota
     },
+    UpdateBotUsage: (username,use) => {
+        Customers[username].botuse = use
+    },
     AvailableQuota: (username,cb) => {
         db.getTotalUsage(username,(usage) => {
-            cb(WCMethods.TotalQuota(username) - usage)
+            cb(WCMethods.TotalQuota(username) - usage - Customers[username].botuse)
         })
     },
     WriteWCUserData: () => {

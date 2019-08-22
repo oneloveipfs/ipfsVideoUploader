@@ -1,6 +1,7 @@
 const Steem = require('steem')
 const SteemConnect = require('steemconnect')
 const JWT = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 const Crypto = require('crypto-js')
 const fs = require('fs')
 const Keys = require('./.auth.json')
@@ -77,6 +78,13 @@ let auth = {
                 cb()
             })
         } else cb()
+    },
+    webhookAuth: (token,cb) => {
+        // For custom webhooks
+        bcrypt.compare(token,Keys.customwebhooktoken,(err,result) => {
+            if (err) cb(err)
+            else cb(null,result)
+        })
     },
     stopWatchingOnWhitelist: () => {
         // For unit testing only

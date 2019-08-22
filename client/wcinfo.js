@@ -7,28 +7,33 @@ let geturl = '/wc_user_info?access_token=' + token
 
 if (iskeychain !== 'true') geturl += '&scauth=true'
 
-axios.get(geturl).then((result) => {
+if (token == null || token == '') {
+    document.addEventListener('DOMContentLoaded', () => document.getElementById('wcinfo').innerHTML = '<h3>Please login to view your account details.</h3>')
+} else axios.get(geturl).then((result) => {
     if (result.data == {}) {
         return document.getElementById('wcinfo').innerHTML = '<h3>User is not a registered OneLoveIPFS customer!</h3>'
     } else {
+        let totalAllocatedQuota = result.data.package.quota + result.data.bonus + result.data.quotaOffset
         let infoToDisplay = '<h2>OneLoveIPFS account details</h2>'
         infoToDisplay += '<h3>User ID: ' + result.data.id
         infoToDisplay += '<br>Subscription tier: ' + result.data.package.name
         infoToDisplay += '<br>Price: $' + result.data.package.price + '/month'
         infoToDisplay += '<br>Referral count: ' + result.data.referred.length
-        infoToDisplay += '<br><br>Purchased quota: ' + humanReadableSize(result.data.package.quota)
+        infoToDisplay += '<br><br>Available balance: ' + humanReadableSize(result.data.avail) + ' (' + Math.ceil(result.data.avail / totalAllocatedQuota * 10000) / 100 + '% free)'
+        infoToDisplay += '<br>Total quota: ' + humanReadableSize(totalAllocatedQuota) + '</h3>'
+        infoToDisplay += '<h4>Purchased quota: ' + humanReadableSize(result.data.package.quota)
         infoToDisplay += '<br>Referral bonus: ' + humanReadableSize(result.data.bonus)
         infoToDisplay += '<br>Other bonus: ' + humanReadableSize(result.data.quotaOffset)
-        infoToDisplay += '<br>Available balance: ' + humanReadableSize(result.data.avail)
-        infoToDisplay += '</h3>'
+        infoToDisplay += '<br><br>File upload disk usage: ' + humanReadableSize(totalAllocatedQuota - result.data.avail - result.data.botuse)
+        infoToDisplay += '<br>Discord pinning bot disk usage: ' + humanReadableSize(result.data.botuse) + '</h4>'
         infoToDisplay += '<h5>If you think that the quota balance is incorrect, please contact techcoderx#7481 on Discord to request for a recomputation of your disk usage information.</h5>'
         document.getElementById('wcinfo').innerHTML = HtmlSanitizer.SanitizeHtml(infoToDisplay)
     }
 }).catch((error) => {
     if (error.response.data.error)
-        alert(error.response.data.error)
+    document.getElementById('wcinfo').innerHTML = '<h3>' + JSON.stringify(error.response.data.error) + '</h3>'
     else
-        alert(error)
+        document.getElementById('wcinfo').innerHTML = '<h3>There is an error retrieving your OneLoveIPFS account details. Please login again. If error still persists, please contact techcoderx#7481 on Discord.</h3>'
 })
 
 function humanReadableSize(size) {

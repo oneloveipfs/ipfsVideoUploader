@@ -9,7 +9,14 @@ describe('WooCommerce Methods',() => {
     })
 
     it('WC.Users should return an object',(done) => {
-        assert.typeOf(WC.User(Config.test.user),'object')
+        WC.User(Config.test.user,(err,info) => {
+            if (!err) assert.typeOf(info,'object')
+            done()
+        })
+    })
+
+    it('WC.UserExists should return a boolean',(done) => {
+        assert.typeOf(WC.UserExists(Config.test.user),'boolean')
         done()
     })
 })
