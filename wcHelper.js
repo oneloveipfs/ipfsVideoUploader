@@ -33,7 +33,7 @@ let WCMethods = {
     AddReferral: (username,referrer) => {
         if (Customers[username] == undefined || Customers[referrer] == undefined) return
         Customers[username].referredBy = referrer
-        if (!Customers[referrer].referred.contains(username)) Customers[referrer].referred.push(username)
+        if (!Customers[referrer].referred.includes(username)) Customers[referrer].referred.push(username)
     },
     User: async (username,cb) => {
         if (Customers[username] != undefined) {
@@ -83,7 +83,9 @@ let WCMethods = {
     },
     AvailableQuota: (username,cb) => {
         db.getTotalUsage(username,(usage) => {
-            cb(WCMethods.TotalQuota(username) - usage - Customers[username].botuse)
+            let botusage = Customers[username].botuse
+            if (botusage == undefined) botusage = 0
+            cb(WCMethods.TotalQuota(username) - usage - botusage)
         })
     },
     WriteWCUserData: () => {
