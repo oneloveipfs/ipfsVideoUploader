@@ -38,7 +38,7 @@ let WCMethods = {
     User: async (username,cb) => {
         if (Customers[username] != undefined) {
             let det = Customers[username]
-            det.package = Config.WooCommerceSettings.Tiers[det.tier]
+            det.plan = Config.WooCommerceSettings.Tiers[det.tier]
             det.bonus = Customers[username].referred.length * Config.WooCommerceSettings.Referral.quotaBonus
 
             if (det.bonus > Config.WooCommerceSettings.Referral.maxBonus)

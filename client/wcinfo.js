@@ -14,11 +14,11 @@ if (token == null || token == '') {
     if (result.data == {}) {
         return document.getElementById('wcinfo').innerHTML = '<h3>User is not a registered OneLoveIPFS customer!</h3>'
     } else {
-        let totalAllocatedQuota = result.data.package.quota + result.data.bonus + result.data.quotaOffset
+        let totalAllocatedQuota = result.data.plan.quota + result.data.bonus + result.data.quotaOffset
         let infoToDisplay = '<h2>OneLoveIPFS account details</h2>'
         infoToDisplay += '<h3>User ID: ' + result.data.id
-        infoToDisplay += '<br>Subscription tier: ' + result.data.package.name
-        infoToDisplay += '<br>Price: $' + result.data.package.price + '/month'
+        infoToDisplay += '<br>Subscription tier: ' + result.data.plan.name
+        infoToDisplay += '<br>Price: $' + result.data.plan.price + '/month'
         infoToDisplay += '<br>Referral count: ' + result.data.referred.length
 
         if (result.data.due) {
@@ -30,7 +30,7 @@ if (token == null || token == '') {
         }
         infoToDisplay += '<br><br>Available balance: ' + humanReadableSize(result.data.avail) + ' (' + Math.ceil(result.data.avail / totalAllocatedQuota * 10000) / 100 + '% free)'
         infoToDisplay += '<br>Total quota: ' + humanReadableSize(totalAllocatedQuota) + '</h3>'
-        infoToDisplay += '<h4>Purchased quota: ' + humanReadableSize(result.data.package.quota)
+        infoToDisplay += '<h4>Purchased quota: ' + humanReadableSize(result.data.plan.quota)
         infoToDisplay += '<br>Referral bonus: ' + humanReadableSize(result.data.bonus)
         infoToDisplay += '<br>Other bonus: ' + humanReadableSize(result.data.quotaOffset)
         infoToDisplay += '<br><br>File upload disk usage: ' + humanReadableSize(totalAllocatedQuota - result.data.avail - result.data.botuse)
