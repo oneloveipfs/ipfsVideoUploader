@@ -7,8 +7,9 @@ let geturl = '/wc_user_info?access_token=' + token
 
 if (iskeychain !== 'true') geturl += '&scauth=true'
 
+document.addEventListener('DOMContentLoaded', () => {
 if (token == null || token == '') {
-    document.addEventListener('DOMContentLoaded', () => document.getElementById('wcinfo').innerHTML = '<h3>Please login to view your account details.</h3>')
+    document.getElementById('wcinfo').innerHTML = '<h3>Please login to view your account details.</h3>'
 } else axios.get(geturl).then((result) => {
     if (result.data == {}) {
         return document.getElementById('wcinfo').innerHTML = '<h3>User is not a registered OneLoveIPFS customer!</h3>'
@@ -21,8 +22,11 @@ if (token == null || token == '') {
         infoToDisplay += '<br>Referral count: ' + result.data.referred.length
 
         if (result.data.due) {
+            let DateNow = new Date()
             let DueDate = new Date(result.data.due)
             infoToDisplay += '<br>Next payment: ' + moment(DueDate).utc(DueDate).local().format('MMMM DD YYYY h:mm:ss a')
+            if (DateNow > DueDate)
+                document.getElementById('pymtnotification').style.display = 'block'
         }
         infoToDisplay += '<br><br>Available balance: ' + humanReadableSize(result.data.avail) + ' (' + Math.ceil(result.data.avail / totalAllocatedQuota * 10000) / 100 + '% free)'
         infoToDisplay += '<br>Total quota: ' + humanReadableSize(totalAllocatedQuota) + '</h3>'
@@ -39,6 +43,7 @@ if (token == null || token == '') {
     document.getElementById('wcinfo').innerHTML = '<h3>' + JSON.stringify(error.response.data.error) + '</h3>'
     else
         document.getElementById('wcinfo').innerHTML = '<h3>There is an error retrieving your OneLoveIPFS account details. Please login again. If error still persists, please contact techcoderx#7481 on Discord.</h3>'
+})
 })
 
 function humanReadableSize(size) {
