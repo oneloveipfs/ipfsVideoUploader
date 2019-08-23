@@ -274,20 +274,23 @@ app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlenco
             let getTier = Config.WooCommerceSettings.Tiers.findIndex(tier => tier.wcpid === req.body.line_items[0].product_id)
             if (getUsername !== undefined || getUsername !== '' || getTier !== -1) {
                 Auth.whitelistAdd(getUsername.value,() => {})
-                WC.AddUser(getUsername.value,req.body.customer_id,getTier,0)
 
                 // Complete order
                 WooCommerceAPI.put('orders/' + req.body.id,{ status: 'completed' },() => {
                     console.log('Order ID ' + req.body.id + ' has been processed successfully!')
                 })
 
-                // Referrals
-                let getReferral = req.body.meta_data.find(refUser => refUser.key === '_billing_referral_username')
-                if (getReferral !== undefined || getReferral !== '') {
-                    WC.AddReferral(getUsername.value,getReferral.value)
-                }
+                if (!WC.UserExists(getUsername.value)) {
+                    WC.AddUser(getUsername.value,req.body.customer_id,getTier,0)
 
-                WC.WriteWCUserData()
+                    // Referrals
+                    let getReferral = req.body.meta_data.find(refUser => refUser.key === '_billing_referral_username')
+                    if (getReferral !== undefined || getReferral !== '') {
+                        WC.AddReferral(getUsername.value,getReferral.value)
+                    }
+
+                    WC.WriteWCUserData()
+                }
             }
         }
     })
