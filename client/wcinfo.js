@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 if (token == null || token == '') {
     document.getElementById('wcinfo').innerHTML = '<h3>Please login to view your account details.</h3>'
 } else axios.get(geturl).then((result) => {
-    if (result.data == {}) {
+    if (isEmpty(result.data)) {
         return document.getElementById('wcinfo').innerHTML = '<h3>User is not a registered OneLoveIPFS customer!</h3>'
     } else {
         let totalAllocatedQuota = result.data.plan.quota + result.data.bonus + result.data.quotaOffset
@@ -58,4 +58,12 @@ function humanReadableSize(size) {
         readable = Math.floor(size / 10.24) / 100 + ' KB'
 
     return readable
+}
+
+function isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
 }
