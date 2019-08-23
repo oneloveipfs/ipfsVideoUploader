@@ -47,6 +47,17 @@
 
 The client decrypts the returned string of `encrypted_memo` using the posting key of `STEEM_USERNAME`, then sends the decrypted string back to the server with `/logincb` POST API call to obtain the access token.
 
+## WooCommerce related GET API
+These API calls will only be enabled if `WooCommerceEnabled` is set to `true` in config.json.
+
+#### To get WooCommerce customer info
+```
+/wc_user_info?access_token=AUTH_TOKEN
+```
+
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or SteemConnect login access token.
+* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a SteemConnect access token.
+
 # POST API
 
 #### To obtain access token of a login:
@@ -75,7 +86,6 @@ The client decrypts the returned string of `encrypted_memo` using the posting ke
 * Output data example:
 ```
 {
-    dtubefees: 200,
     duration: 666.967,
     filesize: 553986721,
     ipfshash: "QmXEVRMFWJtGodYdcQQ5EEVJE7VTsq4rPcoBet4KLonF1r",
@@ -121,3 +131,30 @@ The client decrypts the returned string of `encrypted_memo` using the posting ke
     hash: "QmUgU4GRZKA5EbhyxeUXWg7K5yc5CghfAuDEQFN9BNxPHR"
 }
 ```
+
+## WooCommerce related POST API
+These API calls will only be enabled if `WooCommerceEnabled` is set to `true` in config.json.
+
+#### IPFS Bot usage webhook (currently used in [IPFS Discord pinning bot](https://github.com/techcoderx/DTube-IPFS-Bot))
+This webhook syncs the bot usage data with the uploader so that the correct available quota balance is shown on the account details page.
+```
+/botusage
+```
+
+* Content type: application/json
+* JSON data specs:
+```
+{
+    token: "CustomWebhookPasswordFromKeygenOutput", // Webhook password from keygen output
+    username: "techcoderx", // steem username to be updated
+    size: 293892389 // new usage count in bytes
+}
+```
+
+#### Order update webhook
+This webhook automatically adds new customers to `whitelist.txt` and `wc.json` database once it detects a payment so that customers can authenticate immediately once they have paid. In addition, any referrals will be updated and new bonus quota allocation will be issued.
+```
+/wc_order_update
+```
+
+This webhook API method should be added to WooCommerce webhooks settings, with topic set to `Order updated`. Then, place the generated webhook secret in `.auth.json` file (under `WCWebhookSecret`).

@@ -13,7 +13,6 @@
     "whitelistEnabled": true,
     "UsageLogs": true,
     "tokenExpiry": 86400,
-    "dtubefees": 200,
 
     "WooCommerceEnabled": false,
     "WooCommerceConfig": {

@@ -43,6 +43,10 @@ All uploaded files will be saved in the `uploaded` folder within the repo. Image
 
 If you do not wish to support SteemConnect authentication and use only Steem Keychain, skip step 5 and 6 above when setting up, and delete lines 80-81 in [welcome.html file](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/welcome.html#L80-L81), and delete lines 126-138 in [login.html file](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/compile_javascripts/login.js#L126-L138). Recompile the client side JavaScripts by running `npm run build`.
 
+# Disabling WooCommerce support
+
+If you wish to disable WooCommerce integration, delete lines 13, 17, 27 and 112 in [uploader.html](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/uploader.html#L13) file. You may also need to delete lines 43-48 in [thumbnailSwapper.js](https://github.com/techcoderx/ipfsVideoUploader/blob/master/client/compile_javascripts/thumbnailSwapper.js#L43-L48) file.
+
 # Supported file formats
 
 IPFS works the best for videos with .mp4, therefore only mp4 files will be supported at this moment. Both .jpg and .png file formats are supported for thumbnail uploads.

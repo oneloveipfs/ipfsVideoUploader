@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
             progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
 
             // Post to Steem blockchain
-            let transaction = generatePost(username,permlink,postBody,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup,uploaderResponse.dtubefees);
+            let transaction = generatePost(username,permlink,postBody,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup);
             if (Auth.iskeychain == 'true') {
                 // Broadcast with Keychain
                 steem_keychain.requestBroadcast(username,transaction,'Posting',(response) => {
@@ -470,7 +470,7 @@ function buildJsonMetadataAvalon(sourceHash,snapHash,spriteHash,video240Hash,vid
     return jsonMeta
 }
 
-function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,tags,duration,filesize,powerUp,dtubefees) {
+function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,tags,duration,filesize,powerUp) {
     // Power up all rewards or not
     let percentSBD = 10000
     if (powerUp == true) {

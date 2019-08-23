@@ -33,7 +33,7 @@ let WCMethods = {
     AddReferral: (username,referrer) => {
         if (Customers[username] == undefined || Customers[referrer] == undefined) return
         Customers[username].referredBy = referrer
-        Customers[referrer].referred.push(username)
+        if (!Customers[referrer].referred.contains(username)) Customers[referrer].referred.push(username)
     },
     User: async (username,cb) => {
         if (Customers[username] != undefined) {

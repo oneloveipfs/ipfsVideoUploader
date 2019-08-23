@@ -180,8 +180,7 @@ let uploadOps = {
                         snaphash: results.snaphash,
                         spritehash: results.spritehash,
                         duration: videoDuration,
-                        filesize: videoSize,
-                        dtubefees: Config.dtubefees
+                        filesize: videoSize
                     })
                 })
             })
