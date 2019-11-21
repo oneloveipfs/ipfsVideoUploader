@@ -16,9 +16,9 @@
 
     "WooCommerceEnabled": false,
     "WooCommerceConfig": {
-        "url": "https://oneloveipfs.com",
         "consumerKey": "",
         "consumerSecret": "",
+        "url": "https://order.oneloveipfs.com",
         "wpAPI": true,
         "version": "wc/v1"
     },

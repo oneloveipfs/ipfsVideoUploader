@@ -19,6 +19,9 @@ let db = {
     getPossibleTypes: () => {
         return possibleTypes
     },
+    allUsersCount: () => {
+        return Object.keys(usageData).length
+    },
     // Log usage data and IPFS hashes
     recordUsage: (username,type,size) => {
         if (!usageData[username]) {

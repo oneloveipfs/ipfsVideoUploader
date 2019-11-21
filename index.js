@@ -208,7 +208,8 @@ app.get('/totalUploadCount',(request,response) => {
     // Get unique video uploads by number of source video hashes stored in db
     db.getHashes('videos',(obtainedHashes) => {
         response.send({
-            count: obtainedHashes.videos.length
+            count: obtainedHashes.videos.length,
+            usercount: db.allUsersCount()
         })
     })
 })
