@@ -78,7 +78,7 @@ These API calls will only be enabled if `WooCommerceEnabled` is set to `true` in
 * Content type: multipart/form-data
 * File inputs:
     - `VideoUpload`: Source video file
-    - `SnapUpload`: Thumbnail of the video
+    - `SnapUpload` *(optional)*: Thumbnail of the video
     - `Video240Upload` *(optional)*: 240p encoded video
     - `Video480Upload` *(optional)*: 480p encoded video
     - `Video720Upload` *(optional)*: 720p encoded video
