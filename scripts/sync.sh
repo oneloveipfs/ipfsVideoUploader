@@ -5,6 +5,7 @@ SERVER="https://uploader.oneloved.tube"
 GATEWAY="https://video.oneloveipfs.com"
 HASHTYPE=$1
 USER=$2
+CLEANUP=1 # Remove downloaded file after adding to IPFS
 
 # No hash type specified
 if [ $# -eq 0 ]
@@ -79,6 +80,9 @@ pin_recursive() {
         wget -q ${GATEWAY}/ipfs/$1
         ipfs add $1 -t --silent
         ipfs pin add $1
+	if [ $CLEANUP == 1 ]; then
+            rm $1
+        fi
     fi
 }
 
@@ -94,6 +98,9 @@ echo $HASHES | jq -r 'select(.thumbnails) | .thumbnails[]' | while read h; do
             wget -q ${GATEWAY}/ipfs/$h
             ipfs add $h --silent
             ipfs pin add $h
+	    if [ $CLEANUP == 1 ]; then
+                rm $h
+            fi
         fi
     fi
 done
