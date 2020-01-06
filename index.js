@@ -307,6 +307,17 @@ app.get('/wc_user_info',APILimiter,(req,res) => {
     })
 })
 
+app.get('/wc_user_info_admin',APILimiter,(req,res) => {
+    if (!Config.WooCommerceEnabled) return res.status(404).end()
+    Authenticate(req,res,(user) => {
+        if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
+        WC.User(req.query.user,(err,info) => {
+            if (err) res.status(400).send(err)
+            return res.send(info)
+        })
+    })
+})
+
 function loadWebpage(HTMLFile,response) {
     fs.readFile(HTMLFile,function(error, data) {
         if (error) {
