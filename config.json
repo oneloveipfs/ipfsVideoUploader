@@ -36,7 +36,7 @@
                 "wcpid": 7405,
                 "name": "Starter",
                 "price": 3.00,
-                "quota": 8589934592
+                "quota": 17179869184
             },
             {
                 "wcpid": 206,
