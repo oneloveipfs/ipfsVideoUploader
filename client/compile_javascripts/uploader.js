@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (tags.length !== 0)
                             avalontag = tags[0]
                         progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
-                        broadcastAvalon(buildJsonMetadataAvalon(uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spriteHash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,uploaderResponse.duration,uploaderResponse.filesize,username,permlink),avalontag,uploaderResponse.ipfshash,() =>  {
+                        broadcastAvalon(buildJsonMetadataAvalon(uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,uploaderResponse.duration,uploaderResponse.filesize,username,permlink),avalontag,uploaderResponse.ipfshash,() =>  {
                             localStorage.clear()
                             window.location.replace('https://d.tube/v/' + username + '/' + permlink)
                         })
@@ -454,14 +454,14 @@ function buildJsonMetadataAvalon(sourceHash,snapHash,spriteHash,video240Hash,vid
             video240hash: video240Hash,
             video480hash: video480Hash,
             video720hash: video720Hash,
-            video1080hash: video1080Hash
+            video1080hash: video1080Hash,
+            gateway: 'video.oneloveipfs.com' // Change this to your gateway
         },
         thumbnailUrl: 'https://snap1.d.tube/ipfs/' + snapHash,
         providerName: 'IPFS',
         refs: [
             'steem/' + author + '/' + permlink
-        ],
-        app: 'onelovedtube/0.9'
+        ]
     }
 
     if (subtitleList.length > 0)
