@@ -62,7 +62,7 @@ const ImageUploadAPILimiter = RateLimiter({
 
 const APILimiter = RateLimiter({
     max: 3,
-    windowMs: 1000 // 1 request per second
+    windowMs: 1000 // 3 requests per second
 })
 
 app.use(Express.static(__dirname, { dotfiles: 'deny' }));

@@ -1,10 +1,22 @@
 const jAvalon = require('javalon')
+let scconfig
 
 document.addEventListener('DOMContentLoaded', () => {
     let proceedAuthBtnDisabled = document.getElementById('proceedAuthBtn').disabled
     document.getElementById('authButton').onclick = function loginBtnClicked() {
     // Show popup window of login options
     document.getElementById('loginPopup').style.display = "block"
+
+    axios.get('/config').then((result) => {
+        scconfig = result.data
+
+        if (!scconfig.steemconnectEnabled) {
+            let tohide = document.getElementsByClassName("sclogin")
+            for (let i = 0; i < tohide.length; i++) {
+                tohide[i].style.display = "none"
+            }
+        }
+    })
 }
 
 window.onclick = (event) => {
@@ -79,7 +91,7 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
 
     // Proceed to SteemConnect login page if SteemConnect login chosen
     if (sclogin === true) {
-        return window.location.href = 'https://steemconnect.com/oauth2/authorize?client_id=ipfsuploader.app&redirect_uri=https%3A%2F%2Fuploader.oneloved.tube%2Fupload&scope=comment,comment_options'
+        return window.location.href = scconfig.steemconnectLoginURL
     }
 
     // Steem Keychain login
