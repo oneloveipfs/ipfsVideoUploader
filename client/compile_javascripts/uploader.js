@@ -36,11 +36,19 @@ let beneficiaryAccList = ['dtube']
 let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
 let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
 
+// Vars loaded from config
+let config;
+
 document.addEventListener('DOMContentLoaded', () => {
     // Hide Avalon first curated tag info if not logged in with Avalon
     if (!avalonUser || !avalonKey) {
         document.getElementById('tagInfo1').style.display = 'none'
     }
+
+    // Get configuration
+    axios.get('/config').then((result) => {
+        config = result.data
+    })
 
     document.getElementById('languages').innerHTML = langOptions
 
@@ -455,7 +463,7 @@ function buildJsonMetadataAvalon(sourceHash,snapHash,spriteHash,video240Hash,vid
             video480hash: video480Hash,
             video720hash: video720Hash,
             video1080hash: video1080Hash,
-            gateway: 'video.oneloveipfs.com' // Change this to your gateway
+            gateway: config.gateway
         },
         thumbnailUrl: 'https://snap1.d.tube/ipfs/' + snapHash,
         providerName: 'IPFS',

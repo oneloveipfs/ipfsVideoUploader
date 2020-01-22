@@ -61,7 +61,7 @@ const ImageUploadAPILimiter = RateLimiter({
 })
 
 const APILimiter = RateLimiter({
-    max: 1,
+    max: 3,
     windowMs: 1000 // 1 request per second
 })
 
@@ -245,6 +245,10 @@ app.get('/hashes',APILimiter, (request,response) => {
 app.get('/updatelogs',APILimiter,(request,response) => {
     // Send all update logs to client to be displayed on homepage
     response.send(UpdateLogs);
+})
+
+app.get('/config',APILimiter,(req,res) => {
+    res.send(Config.ClientConfig)
 })
 
 app.post('/botusage',Parser.json(),(req,res) => {
