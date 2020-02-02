@@ -2,7 +2,7 @@
     position: absolute;
     top:0;
     left:0;
-    height:80px;
+    height:50px;
     width:100%;
     padding:0;
     background: rgb(54,57,63);
@@ -10,8 +10,8 @@
 
 #content {
     position: absolute;
-    top:80px;
-    bottom:70px;
+    top:50px;
+    bottom:35px;
     left:0;
     width:100%;
     overflow-x: hidden;
@@ -22,7 +22,7 @@
     position: absolute;
     bottom:0;
     left:0;
-    height: 70px;
+    height: 35px;
     width:100%;
     padding:0;
     background: aqua;
@@ -388,8 +388,8 @@ textarea {
 }
 
 #logoBanner {
-    height: 70px;
-    width: 70px;
+    height: 35px;
+    width: 35px;
     vertical-align: middle;
 }
 
@@ -402,6 +402,7 @@ textarea {
 
 #headTitleText {
     display: inline-block;
+    font-size: 30px;
 }
 
 #authButton, #modeBtn {
@@ -507,6 +508,8 @@ textarea {
 
 .madeBy {
     font-family: "Comic Sans MS", Verdana, sans-serif;
+    margin-block-start: 6px;
+    margin-block-end: 5px;
 }
 
 /* Welcome page only */
