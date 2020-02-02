@@ -122,9 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tag.length == 0)
             return alert('Please enter some tags (up to 4) for your video!')
 
-        // Sort beneficiary list in ascending order
-        beneficiaryList.sort(beneficiarySorter)
-
         Auth.restrict()
 
         // Upload video
@@ -489,6 +486,10 @@ function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,
         percentSBD = 0
     }
 
+    // Sort beneficiary list in ascending order
+    let sortedBeneficiary = JSON.parse(JSON.stringify(beneficiaryList))
+    sortedBeneficiary.sort(beneficiarySorter)
+
     // Create transaction to post on Steem blockchain
     let operations = [
         [ 'comment', {
@@ -510,7 +511,7 @@ function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,
             allow_curation_rewards: true,
             extensions: [
                 [0, {
-                    beneficiaries: beneficiaryList
+                    beneficiaries: sortedBeneficiary
                 }]
             ]
         }]
