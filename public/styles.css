@@ -395,14 +395,19 @@ textarea {
 
 #siteTitle {
     color: lavender;
-    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-family: Impact, 'Arial Narrow Bold', sans-serif;
     margin-top: 5px;
     padding-left: 10px;
 }
 
 #headTitleText {
     display: inline-block;
-    font-size: 30px;
+    font-size: 28px;
+    margin-left: 5px;
+}
+
+.title:visited {
+    color: lavender;
 }
 
 #authButton, #modeBtn {
