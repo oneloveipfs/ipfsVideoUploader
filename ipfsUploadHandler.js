@@ -9,9 +9,19 @@ const WebVTT = require('node-webvtt')
 const Config = require('./config.json')
 const db = require('./dbManager')
 
-const ipfsAPI = IPFS('localhost',Config.IPFS_API_PORT,{protocol: 'http'})
+const ipfsAPI = IPFS({ host: 'localhost', port: '5001', protocol: 'http' })
 const upload = Multer({ dest: './uploaded/' })
 const imgUpload = Multer({ dest: './imguploads/', limits: { fileSize: 7340032 } })
+const { globSource } = IPFS
+
+async function addFile(dir,trickle,callback) {
+    let ipfsAdd = ipfsAPI.add(globSource(dir, {recursive: true}), { trickle: trickle })
+
+    for await (const file of ipfsAdd) {
+        callback(file.cid.toString())
+        break
+    }
+}
 
 let uploadOps = {
     uploadVideo: (username,request,response) => {
@@ -35,22 +45,14 @@ let uploadOps = {
             // Generate sprite from source video, and add all uploaded files to IPFS
             let ipfsops = {
                 videohash: (cb) => {
-                    fs.readFile(videoPathName,(err,data) => {
-                        if (err) return cb(err)
-                        ipfsAPI.add(data,{trickle: true},(err,file) => {
-                            if (err) return cb(err)
-                            cb(null,file[0].hash)
-                        })
+                    addFile(videoPathName,true,(hash) => {
+                        cb(null,hash)
                     })
                 },
                 spritehash: (cb) => {
                     Shell.exec('./scripts/dtube-sprite.sh ' + videoPathName + ' uploaded/' + sourceVideoFilename + '.jpg',() => {
-                        fs.readFile('uploaded/' + sourceVideoFilename + '.jpg',(err,data) => {
-                            if (err) return cb(err)
-                            ipfsAPI.add(data,{trickle: true},(err,file) => {
-                                if (err) return cb(err)
-                                cb(null,file[0].hash)
-                            })
+                        addFile('uploaded/' + sourceVideoFilename + '.jpg',true,(hash) => {
+                            cb(null,hash)
                         })
                     })
                 }
@@ -64,12 +66,8 @@ let uploadOps = {
                                       : 'uploaded/' + snapFilename
                     
                     fs.rename('uploaded/' + snapFilename,snapPathName,() => {
-                        fs.readFile(snapPathName,(err,data) => {
-                            if (err) return cb(err)
-                            ipfsAPI.add(data,{trickle: false},(err,file) => {
-                                if (err) return cb(err)
-                                cb(null,file[0].hash)
-                            })
+                        addFile(snapPathName,false,(hash) => {
+                            cb(null,hash)
                         })
                     })
                 }
@@ -80,12 +78,8 @@ let uploadOps = {
                 ipfsops.video240hash = (cb) => {
                     let video240PathName = 'uploaded/' + sourceVideoFilename + '_240.mp4'
                     fs.renameSync('uploaded/' + request.files.Video240Upload[0].filename,video240PathName)
-                    fs.readFile(video240PathName,(err,data) => {
-                        if (err) return cb(err)
-                        ipfsAPI.add(data,{trickle: true},(err,file) => {
-                            if (err) return cb(err)
-                            cb(null,file[0].hash)
-                        })
+                    addFile(video240PathName,true,(hash) => {
+                        cb(null,hash)
                     })
                 }
             }
@@ -94,12 +88,8 @@ let uploadOps = {
                 ipfsops.video480hash = (cb) => {
                     let video480PathName = 'uploaded/' + sourceVideoFilename + '_480.mp4'
                     fs.renameSync('uploaded/' + request.files.Video480Upload[0].filename,video480PathName)
-                    fs.readFile(video480PathName,(err,data) => {
-                        if (err) return cb(err)
-                        ipfsAPI.add(data,{trickle: true},(err,file) => {
-                            if (err) return cb(err)
-                            cb(null,file[0].hash)
-                        })
+                    addFile(video480PathName,true,(hash) => {
+                        cb(null,hash)
                     })
                 }
             }
@@ -108,12 +98,8 @@ let uploadOps = {
                 ipfsops.video720hash = (cb) => {
                     let video720PathName = 'uploaded/' + sourceVideoFilename + '_720.mp4'
                     fs.renameSync('uploaded/' + request.files.Video720Upload[0].filename,video720PathName)
-                    fs.readFile(video720PathName,(err,data) => {
-                        if (err) return cb(err)
-                        ipfsAPI.add(data,{trickle: true},(err,file) => {
-                            if (err) return cb(err)
-                            cb(err,file[0].hash)
-                        })
+                    addFile(video720PathName,true,(hash) => {
+                        cb(null,hash)
                     })
                 }
             }
@@ -122,12 +108,8 @@ let uploadOps = {
                 ipfsops.video1080hash = (cb) => {
                     let video1080PathName = 'uploaded/' + sourceVideoFilename + '_1080.mp4'
                     fs.renameSync('uploaded/' + request.files.Video1080Upload[0].filename,video1080PathName)
-                    fs.readFile(video1080PathName,(err,data) => {
-                        if (err) return cb(err)
-                        ipfsAPI.add(data,{trickle: true},(err,file) => {
-                            if (err) return cb(err)
-                            cb(null,file[0].hash)
-                        })
+                    addFile(video1080PathName,true,(hash) => {
+                        cb(null,hash)
                     })
                 }
             }
@@ -198,7 +180,7 @@ let uploadOps = {
             if (err) return response.status(400).send({error: err})
             if (!request.file) return response.status(400).send({error: 'No files have been uploaded.'})
             let uploadedImg = request.file.filename
-            fs.readFile('imguploads/' + uploadedImg,(err,data) => ipfsAPI.add(data,{trickle: trickleDagAdd},(err,file) => {
+            addFile('imguploads/' + uploadedImg,trickleDagAdd,(hash) => {
                 if (Config.UsageLogs) {
                     // Log usage data for image uploads
                     db.recordUsage(username,imgType,request.file.size)
@@ -207,17 +189,17 @@ let uploadOps = {
 
                 // Log IPFS hashes by Steem account
                 // If hash is not in database, add the hash into database
-                db.recordHash(username,imgType,file[0].hash)
+                db.recordHash(username,imgType,hash)
                 db.writeHashesData()
 
                 // Send image IPFS hash back to client
                 response.send({
-                    imghash: file[0].hash
+                    imghash: hash
                 })
-            }))
+            })
         })
     },
-    uploadSubtitles: (username,request,response) => {
+    uploadSubtitles: async (username,request,response) => {
         try {
             WebVTT.parse(request.body)
         } catch (err) {
@@ -225,20 +207,23 @@ let uploadOps = {
         }
 
         let subtitleBuffer = new Buffer.from(request.body,'utf8')
-        ipfsAPI.add(subtitleBuffer,(err,result) => {
-            if (err) return response.status(500).send({error: 'IPFS error: ' + err})
+        let ipfsAddSubtitleOp = ipfsAPI.add(subtitleBuffer)
+        
+        for await (const sub of ipfsAddSubtitleOp) {
             if (Config.UsageLogs) {
-                db.recordUsage(username,'subtitles',result[0].size)
+                db.recordUsage(username,'subtitles',sub.size)
                 db.writeUsageData()
             }
 
-            db.recordHash(username,'subtitles',result[0].hash)
+            db.recordHash(username,'subtitles',sub.cid.toString())
             db.writeHashesData()
 
             response.send({
-                hash: result[0].hash
+                hash: sub.cid.toString()
             })
-        })
+
+            break
+        }
     }
 }
 
