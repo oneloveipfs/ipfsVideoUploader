@@ -11,22 +11,8 @@ const Express = require('express')
 const RateLimiter = require('express-rate-limit')
 const Parser = require('body-parser')
 const CORS = require('cors')
-const https = require('https')
 const app = Express()
-
-// Setup HTTPS if needed
-let credentials;
-if (Config.useHTTPS) {
-    let privateKey = fs.readFileSync(Config.HTTPS_PrivKey_Dir,'utf8');
-    let certificate = fs.readFileSync(Config.HTTPS_Cert_Dir,'utf8');
-    let ca = fs.readFileSync(Config.HTTPS_CertAuth_Dir,'utf8');
-
-    credentials = {
-        key: privateKey,
-        cert: certificate,
-        ca: ca
-    }
-}
+const http = require('http').Server(app)
 
 // Prohibit access to certain files through HTTP
 app.get('/index.js',(req,res) => {return res.status(404).redirect('/404')})
@@ -76,17 +62,6 @@ const rawBodySaver = (req, res, buf, encoding) => {
 }
 
 app.use(Parser.text())
-
-// HTTP to HTTPS redirect
-if (Config.useHTTPS) {
-    app.use(function(req,res,next) {
-        if (req.secure) {
-           next(); 
-        } else {
-           res.redirect(301,'https://' + req.headers.host + req.url);
-        }
-    });
-}
 
 // Setup WooCommerce
 let WooCommerceAPI
@@ -356,5 +331,4 @@ function Authenticate(request,response,next) {
 
 app.use((req,res) => { return res.status(404).redirect('/404') })
 
-app.listen(Config.HTTP_PORT)
-if (Config.useHTTPS) https.createServer(credentials,app).listen(Config.HTTPS_PORT)
+http.listen(Config.HTTP_PORT)

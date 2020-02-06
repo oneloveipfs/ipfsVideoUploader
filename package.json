@@ -23,7 +23,7 @@
     "express-rate-limit": "^3.5.3",
     "fs": "0.0.1-security",
     "get-video-duration": "^0.3.0",
-    "https": "^1.0.0",
+    "http": "0.0.0",
     "ipfs-http-client": "^42.0.0",
     "javalon": "^1.0.19",
     "jsonwebtoken": "^8.5.1",
@@ -31,6 +31,7 @@
     "node-webvtt": "^1.5.0",
     "sanitize-filename": "^1.6.1",
     "shelljs": "^0.8.3",
+    "socket.io": "^2.3.0",
     "steem": "^0.7.5",
     "steemconnect": "^2.0.1",
     "woocommerce-api": "^1.4.2"
