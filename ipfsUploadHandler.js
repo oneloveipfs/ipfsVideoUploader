@@ -233,7 +233,7 @@ let uploadOps = {
                 hash: sub.cid.toString()
             }
             response.send(result)
-            ipsync.emit(result)
+            ipsync.emit('upload',result)
 
             break
         }
