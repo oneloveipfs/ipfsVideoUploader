@@ -14,6 +14,8 @@ const CORS = require('cors')
 const app = Express()
 const http = require('http').Server(app)
 
+FileUploader.IPSync.init(http)
+
 // Prohibit access to certain files through HTTP
 app.get('/index.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/dbManager.js',(req,res) => {return res.status(404).redirect('/404')})

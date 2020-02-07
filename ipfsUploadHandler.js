@@ -6,8 +6,12 @@ const fs = require('fs')
 const async = require('async')
 const sanitize = require('sanitize-filename')
 const WebVTT = require('node-webvtt')
+const Socket = require('socket.io')
 const Config = require('./config.json')
 const db = require('./dbManager')
+
+let SocketIO
+let ipsync
 
 const ipfsAPI = IPFS({ host: 'localhost', port: '5001', protocol: 'http' })
 const upload = Multer({ dest: './uploaded/' })
@@ -152,8 +156,9 @@ let uploadOps = {
                 db.writeHashesData()
     
                 getDuration(videoPathName).then((videoDuration) => {
-                    // Send IPFS hashes, duration and filesize back to client
-                    response.send({
+                    // Send IPFS hashes, duration and filesize back to client and IPSync
+                    let result = {
+                        username: username,
                         ipfshash: results.videohash,
                         ipfs240hash: results.video240hash,
                         ipfs480hash: results.video480hash,
@@ -163,7 +168,9 @@ let uploadOps = {
                         spritehash: results.spritehash,
                         duration: videoDuration,
                         filesize: videoSize
-                    })
+                    }
+                    response.send(result)
+                    ipsync.emit('upload',result)
                 })
             })
         })
@@ -192,10 +199,13 @@ let uploadOps = {
                 db.recordHash(username,imgType,hash)
                 db.writeHashesData()
 
-                // Send image IPFS hash back to client
-                response.send({
+                // Send image IPFS hash back to client and IPSync
+                let result = {
+                    username: username,
                     imghash: hash
-                })
+                }
+                response.send(result)
+                ipsync.emit('upload',result)
             })
         })
     },
@@ -218,11 +228,24 @@ let uploadOps = {
             db.recordHash(username,'subtitles',sub.cid.toString())
             db.writeHashesData()
 
-            response.send({
+            let result = {
+                username: username,
                 hash: sub.cid.toString()
-            })
+            }
+            response.send(result)
+            ipsync.emit(result)
 
             break
+        }
+    },
+    IPSync: {
+        init: (server) => {
+            SocketIO = Socket(server)
+            ipsync = SocketIO.of('/ipsync')
+
+            ipsync.on('connection',(socket) => {
+                socket.emit('message','Welcome to IPSync')
+            })
         }
     }
 }
