@@ -222,7 +222,7 @@ h2 {
 }
 
 .dropdownArrow {
-    border: solid #666666;
+    border: solid #ffffff;
     border-width: 0 3px 3px 0;
     display: inline-block;
     padding: 3px;
@@ -235,8 +235,8 @@ h2 {
     position: absolute;
     background-color: #f1f1f1;
     z-index: 1;
-    right: 15px;
-    transform: translate(0px,-30px);
+    right: 0px;
+    transform: translate(0px,-17px);
   }
   
   /* Links inside the dropdown */
@@ -394,7 +394,7 @@ textarea {
 }
 
 #siteTitle {
-    color: lavender;
+    color: #ffffff;
     font-family: Impact, 'Arial Narrow Bold', sans-serif;
     margin-top: 5px;
     padding-left: 10px;
@@ -407,13 +407,13 @@ textarea {
 }
 
 .title:visited {
-    color: lavender;
+    color: #ffffff;
 }
 
 #authButton, #modeBtn {
     position: absolute;
-    top: 0.5vw;
-    right: 0.5vw;
+    top: 0px;
+    right: 0px;
 }
 
 /* Beneficiaries */
@@ -558,27 +558,41 @@ textarea {
 .updatelog a:active { color: #ffffff; }
 
 /* Signup/Login buttons */
+.headerBtn {
+    color: #ffffff;
+    border-left: 2px solid #ffffff;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 20px;
+    height: 100%;
+    padding: 0px 25px;
+    transition-duration: 0.2s;
+}
+
+.headerBtn:hover {
+    color: rgb(54,57,63);
+    background-color: #ffffff;
+}
+
+.headerBtn p {
+    margin-block-start: 10px;
+    margin-block-end: 10px;
+}
+
 .styledButton {
-	background-color:#ffffff;
-	-moz-border-radius:5px;
-	-webkit-border-radius:5px;
-	border-radius:5px;
-	border:1px solid #dcdcdc;
+    color: black;
+    background-color: transparent;
+    border: 2px solid #555555;
 	display:inline-block;
 	cursor:pointer;
-	color:#666666;
-	font-family:Verdana;
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
 	font-size:20px;
 	padding:15px 40px;
-    text-decoration:none;
     margin: 5px;
+    transition-duration: 0.2s;
 }
 .styledButton:hover {
-	background-color:#f6f6f6;
-}
-.styledButton:active {
-	position:relative;
-	top:1px;
+    color: #ffffff;
+	background-color:#555555;
 }
 #buttons {
     margin-left: auto;

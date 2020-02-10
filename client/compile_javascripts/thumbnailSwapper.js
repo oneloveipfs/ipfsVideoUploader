@@ -26,6 +26,16 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById("dropdownbox").style.display = 'block'
     }
 
+    document.getElementById('modeBtn').onmouseover = () => {
+        document.getElementById('dropdownArrow').style.border = 'solid rgb(54,57,63)'
+        document.getElementById('dropdownArrow').style.borderWidth = '0 3px 3px 0'
+    }
+
+    document.getElementById('modeBtn').onmouseleave = () => {
+        document.getElementById('dropdownArrow').style.border = 'solid #ffffff'
+        document.getElementById('dropdownArrow').style.borderWidth = '0 3px 3px 0'
+    }
+
     document.getElementById('newUploadModeBtn').onclick = () => {
         uploader.style.display = 'block'
         thumbnailSwapper.style.display = 'none'
@@ -317,7 +327,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Close the dropdown menu if the user clicks outside of it
 window.onclick = (event) => {
-    if(!event.target.matches('#modeBtn'))
+    if(!event.target.matches('#modeBtn') && !event.target.matches('#headerMenu') && !event.target.matches('.dropdownArrow'))
         document.getElementById('dropdownbox').style.display = 'none'
 }
 
