@@ -106,8 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return alert('Invalid tags!')
 
         let tags = tag.split(' ')
-        if (tags.length > 4)
-            return alert('Please do not use more than 4 tags!')
+        if (tags.length > 7)
+            return alert('Please do not use more than 7 tags!')
 
         // Check for empty fields
         if (sourceVideo.length == 0)
