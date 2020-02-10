@@ -594,6 +594,10 @@ textarea {
     color: #ffffff;
 	background-color:#555555;
 }
+.styledButton:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
 #buttons {
     margin-left: auto;
     margin-right: auto;

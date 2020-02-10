@@ -202,7 +202,8 @@ let uploadOps = {
                 // Send image IPFS hash back to client and IPSync
                 let result = {
                     username: username,
-                    imghash: hash
+                    imghash: hash,
+                    imgtype: imgType
                 }
                 response.send(result)
                 ipsync.emit('upload',result)
