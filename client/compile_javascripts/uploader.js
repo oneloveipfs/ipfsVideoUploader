@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
         axios.post(call,imgFormData,contentType).then(function(response) {
             console.log(response);
             progressbar.style.display = "none";
-            document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + '](https://cloudflare-ipfs.com/ipfs/' + response.data.imghash + ')');
+            document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + '](https://ipfs.io/ipfs/' + response.data.imghash + ')');
             reenableFieldsImg();
         }).catch(function(err) {
             if (err.response.data.error)
@@ -420,9 +420,9 @@ function generatePermlink() {
 
 function buildPostBody(author,permlink,postBody,videoHash,snapHash,description) {
     if (postBody == '') {
-        return '<center><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'><img src=\'https://cloudflare-ipfs.com/ipfs/' + snapHash + '\'></a></center><hr>\n\n' + description + '\n\n<hr><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'> ▶️ DTube</a><br /><a href=\'https://ipfs.io/ipfs/' + videoHash + '\'> ▶️ IPFS</a>'
+        return '<center><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'><img src=\'https://ipfs.io/ipfs/' + snapHash + '\'></a></center><hr>\n\n' + description + '\n\n<hr><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'> ▶️ DTube</a><br /><a href=\'https://ipfs.io/ipfs/' + videoHash + '\'> ▶️ IPFS</a>'
     } else {
-        return '<center><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'><img src=\'https://cloudflare-ipfs.com/ipfs/' + snapHash + '\'></a></center><hr>\n\n' + postBody + '\n\n<hr><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'> ▶️ DTube</a><br /><a href=\'https://ipfs.io/ipfs/' + videoHash + '\'> ▶️ IPFS</a>'
+        return '<center><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'><img src=\'https://ipfs.io/ipfs/' + snapHash + '\'></a></center><hr>\n\n' + postBody + '\n\n<hr><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'> ▶️ DTube</a><br /><a href=\'https://ipfs.io/ipfs/' + videoHash + '\'> ▶️ IPFS</a>'
     }
 }
 
@@ -435,7 +435,7 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
     let jsonMeta = {
         video: buildJsonMetadataAvalon(sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,duration,filesize,author,permlink),
         tags: SteemTags,
-        app: 'onelovedtube/0.9',
+        app: 'onelovedtube/0.9.2',
     }
 
     if (avalonUser !== null)
@@ -572,7 +572,7 @@ function updateSubtitle() {
     
     for (let i = 0; i < allSubtitlePrevBtnElems.length; i++) {
         document.getElementById(allSubtitlePrevBtnElems[i].id).onclick = () => {
-            window.open('https://cloudflare-ipfs.com/ipfs/' + subtitleList[i].hash,'name','width=600,height=400')
+            window.open('https://ipfs.io/ipfs/' + subtitleList[i].hash,'name','width=600,height=400')
         }
     }
 
