@@ -941,6 +941,16 @@ td {
     }
 }
 
+@media screen and (max-width: 450px) {
+    #footer {
+        height: 57px;
+    }
+
+    #content {
+        bottom: 57px;
+    }
+}
+
 @media screen and (max-width: 360px) {
     .tabs {
         padding: 6px 3%;
