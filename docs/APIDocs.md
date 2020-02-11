@@ -86,6 +86,7 @@ These API calls will only be enabled if `WooCommerceEnabled` is set to `true` in
 * Output data example:
 ```
 {
+    username: "techcoderx",
     duration: 666.967,
     filesize: 553986721,
     ipfshash: "QmXEVRMFWJtGodYdcQQ5EEVJE7VTsq4rPcoBet4KLonF1r",
@@ -112,6 +113,8 @@ These API calls will only be enabled if `WooCommerceEnabled` is set to `true` in
 * Output data example:
 ```
 {
+    username: "techcoderx",
+    imgtype: "images",
     imghash: "QmUKHnTN3TR8zS2s2xUqvv6rzcwogh4T64Un3u4B2UBkt8"
 }
 ```
@@ -128,6 +131,7 @@ These API calls will only be enabled if `WooCommerceEnabled` is set to `true` in
 * Output data example:
 ```
 {
+    username: "techcoderx",
     hash: "QmUgU4GRZKA5EbhyxeUXWg7K5yc5CghfAuDEQFN9BNxPHR"
 }
 ```
@@ -158,3 +162,11 @@ This webhook automatically adds new customers to `whitelist.txt` and `wc.json` d
 ```
 
 This webhook API method should be added to WooCommerce webhooks settings, with topic set to `Order updated`. Then, place the generated webhook secret in `.auth.json` file (under `WCWebhookSecret`).
+
+# IPSync
+
+A [Socket.io](https://socket.io) endpoint that notifies other nodes of new uploads in real time.
+
+Endpoint: `/ipsync`
+
+An example of a client implementation may be found [here](https://github.com/techcoderx/ipsync-client).
