@@ -494,7 +494,8 @@ function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,
     let operations = [
         [ 'comment', {
                 parent_author: '',
-                parent_permlink: 'dtube',
+                parent_permlink: 'hive-196037',
+                category: 'hive-196037',
                 author: username,
                 permlink: permlink,
                 title: title,
