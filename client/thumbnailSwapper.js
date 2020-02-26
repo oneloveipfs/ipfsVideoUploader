@@ -1,24 +1,17 @@
-let username
-const Auth = require('./auth')
-const jAvalon = require('javalon')
-Auth.steem().then((result) => {
-    username = result
-})
-
 // Load Avalon login
-let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
-let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
+// let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
+// let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
 
 let steemPostToModify
 let avalonPostToModify
 let selectedAuthor
 let selectedPermlink
 
-let uploader = document.getElementById('uploadForm')
-let thumbnailSwapper = document.getElementById('thumbnailSwapper')
-let wcinfo = document.getElementById('wcinfo')
-
 document.addEventListener('DOMContentLoaded', () => {
+    let uploader = document.getElementById('uploadForm')
+    let thumbnailSwapper = document.getElementById('thumbnailSwapper')
+    let wcinfo = document.getElementById('wcinfo')
+
     document.getElementById('modeBtn').onclick = () => {
         if (document.getElementById("dropdownbox").style.display === 'block')
             document.getElementById("dropdownbox").style.display = 'none'
@@ -72,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             },
             avalon: (cb) => {
-                jAvalon.getContent(split[0],split[1],(err,res) => {
+                javalon.getContent(split[0],split[1],(err,res) => {
                     if (err) return cb(err)
                     cb(null,res)
                 })
@@ -116,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         for (let i = 0; i < jsonmeta.video.refs.length; i++) {
                             let ref = jsonmeta.video.refs[i].split('/')
-                            if (ref[0] === 'dtc') jAvalon.getContent(ref[1],ref[2],(err,post) => {
+                            if (ref[0] === 'dtc') javalon.getContent(ref[1],ref[2],(err,post) => {
                                 if (err) return alert('Error while getting associated Avalon post: ' + JSON.stringify(err))
                                 if (post.author !== avalonUser) {
                                     alert('Looks like you\'re logged in with an Avalon account that doesn\'nt correspond with the author of the associated Avalon post. Changes made will only be reflected on the Steem blockchain.')
@@ -284,8 +277,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 try {
-                    let signedSwapTx = jAvalon.sign(avalonKey,avalonUser,avalonSwapTx)
-                    jAvalon.sendTransaction(signedSwapTx,(err,result) => {
+                    let signedSwapTx = javalon.sign(avalonKey,avalonUser,avalonSwapTx)
+                    javalon.sendTransaction(signedSwapTx,(err,result) => {
                         if (err) return cb('Avalon error: ' + err)
                         cb(null,result)
                     })

@@ -1,10 +1,9 @@
 // Load Steem Connect access token to client
-const jAvalon = require('javalon')
 let url = new URL(window.location.href)
 let token = url.searchParams.get('access_token') // Access token for logged in user
 let iskeychain = url.searchParams.get('keychain')
 
-async function steem() {
+async function Steem() {
     if (!token) {
         // Not logged in or no access token
         window.setTimeout(function() {
@@ -71,7 +70,7 @@ async function steem() {
     }
 }
 
-async function avalon() {
+async function Avalon() {
     // Verify Avalon login
     let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
     let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
@@ -79,9 +78,9 @@ async function avalon() {
     if (!avalonUser || !avalonKey) return
 
     let avalonLoginPromise = new Promise((resolve,reject) => {
-        jAvalon.getAccount(avalonUser,(err,result) => {
+        javalon.getAccount(avalonUser,(err,result) => {
             if (err) return reject(err)
-            let avalonPubKey = jAvalon.privToPub(avalonKey)
+            let avalonPubKey = javalon.privToPub(avalonKey)
             if (result.pub === avalonPubKey) return resolve(true)
             
             // Login with "Posting key" (recommended)
@@ -141,9 +140,9 @@ function arrContainsInt(arr,value) {
     }
 }
 
-module.exports = {
-    steem,
-    avalon,
+window.Auth = {
+    Steem,
+    Avalon,
     token,
     iskeychain,
     restrict

@@ -1,10 +1,8 @@
 // Load auth details
 let username
-const Auth = require('./auth')
-const jAvalon = require('javalon')
-Auth.steem().then((result) => {
+Auth.Steem().then((result) => {
     username = result
-    Auth.avalon()
+    Auth.Avalon()
 })
 
 // Setup subtitles tab
@@ -522,7 +520,7 @@ function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,
 
 async function broadcastAvalon(json,tag,permlink,cb) {
     let avalonGetAccPromise = new Promise((resolve,reject) => {
-        jAvalon.getAccount(avalonUser,(err,user) => {
+        javalon.getAccount(avalonUser,(err,user) => {
             if (err) return reject(err)
             resolve(user)
         })
@@ -535,12 +533,12 @@ async function broadcastAvalon(json,tag,permlink,cb) {
             data: {
                 link: permlink,
                 json: json,
-                vt: Math.floor(jAvalon.votingPower(avalonAcc)*(document.getElementById('avalonvw').value)/100),
+                vt: Math.floor(javalon.votingPower(avalonAcc)*(document.getElementById('avalonvw').value)/100),
                 tag: tag
             }
         }
-        let signedtx = jAvalon.sign(sessionStorage.getItem('OneLoveAvalonKey'),avalonAcc.name,tx)
-        jAvalon.sendTransaction(signedtx,(err,result) => {
+        let signedtx = javalon.sign(sessionStorage.getItem('OneLoveAvalonKey'),avalonAcc.name,tx)
+        javalon.sendTransaction(signedtx,(err,result) => {
             if (err) alert('Steem broadcast successful however there is an error with Avalon: ' + err)
             cb()
         })

@@ -7,9 +7,7 @@
     "start": "node index.js",
     "sc2link": "node scripts/getLoginLink.js",
     "keygen": "node scripts/generateKeys.js",
-    "test": "mocha",
-    "build": "chmod +x scripts/compile.sh && ./scripts/compile.sh",
-    "watch": "watchify client/compile_javascripts/uploader.js -o client/uploader.js"
+    "test": "mocha"
   },
   "author": "techcoderx",
   "license": "GPLv3",
@@ -37,9 +35,7 @@
     "woocommerce-api": "^1.4.2"
   },
   "devDependencies": {
-    "browserify": "^16.3.0",
     "chai": "^4.2.0",
-    "mocha": "^6.1.4",
-    "watchify": "^3.11.1"
+    "mocha": "^6.1.4"
   }
 }

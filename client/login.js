@@ -1,4 +1,3 @@
-const jAvalon = require('javalon')
 let scconfig
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -57,9 +56,9 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
     // Avalon login
     if (avalonUsername !== '' && avalonKey !== '') {
         let avalonLoginPromise = new Promise((resolve,reject) => {
-            jAvalon.getAccount(avalonUsername,(err,result) => {
+            javalon.getAccount(avalonUsername,(err,result) => {
                 if (err) return reject(err)
-                let avalonPubKey = jAvalon.privToPub(avalonKey)
+                let avalonPubKey = javalon.privToPub(avalonKey)
                 if (result.pub === avalonPubKey) return resolve(true)
 
                 // Login with "Posting key" (recommended)
