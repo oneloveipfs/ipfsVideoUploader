@@ -1,6 +1,3 @@
 node_modules
 *.DS_Store
 .DS_Store
-client/uploader.js
-client/thumbnailSwapper.js
-client/login.js
