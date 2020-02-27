@@ -150,6 +150,37 @@ app.post('/uploadSubtitle',APILimiter,(request,response) => {
     Authenticate(request,response,(user) => FileUploader.uploadSubtitles(user,request,response))
 })
 
+app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(request,response) => {
+    console.log(JSON.stringify(request.headers) + '\n')
+    console.log(JSON.stringify(request.body) + '\n\n')
+
+    switch (request.headers['hook-name']) {
+        case "pre-create":
+            // Authenticate
+            let access_token = request.body.Upload.MetaData.access_token
+            console.log(access_token)
+            if (Config.whitelistEnabled && !access_token) return response.status(400).send({error: 'Missing API auth credentials'})
+            if (request.body.Upload.MetaData.keychain === 'true') {
+                Auth.verifyAuth(access_token,(err,result) => {
+                    if (err) return response.status(401).send({ error: err })
+                    else return response.status(200).send()
+                })
+            } else {
+                Auth.scAuth(access_token,(err,user) => {
+                    if (err) return response.status(401).send({ error: err })
+                    else return response.status(200).send()
+                })
+            }
+            break
+        case "post-finish":
+            response.status(200).send()
+            break
+        default:
+            response.status(200).send()
+            break
+    }
+})
+
 app.get('/usage',APILimiter, (request,response) => {
     // API to get usage info
     if (!Config.UsageLogs) return response.send('Logs are disabled therefore API is not available for usage.');

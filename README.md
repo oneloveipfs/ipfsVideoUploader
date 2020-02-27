@@ -31,11 +31,9 @@ This is an alternative IPFS uploader to upload videos onto DTube. Includes a bas
 
 6. Replace the login link with the one you obtained from step 5 in [config.json](https://github.com/techcoderx/ipfsVideoUploader/blob/master/config.json#L16) (if SteemConnect is used).
 
-7. Compile client side JavaScripts. `npm run build`
+7. If `whitelistEnabled` is set to `true`, add some Steem accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Steem user)
 
-8. If `whitelistEnabled` is set to `true`, add some Steem accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Steem user)
-
-9. Run the app by typing `npm start`. Your app will listen to ports you specify in `config.json` file.
+8. Run the app by typing `npm start`. Your app will listen to ports you specify in `config.json` file.
 
 All uploaded files will be saved in the `uploaded` folder within the repo. Image files (for Steem article body) will be saved in the `imguploads` folder.
 

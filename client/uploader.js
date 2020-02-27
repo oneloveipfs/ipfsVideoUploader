@@ -48,6 +48,13 @@ document.addEventListener('DOMContentLoaded', () => {
         config = result.data
     })
 
+    // Display warning if resumable uploads is unavailable
+    if (tus.isSupported) {
+        console.log('tus is supported')
+    } else {
+        console.log('tus is not supported')
+    }
+
     document.getElementById('languages').innerHTML = langOptions
 
     document.getElementById('tabBasics').onclick = () => {
@@ -95,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let video720 = document.getElementById('video720p').files
         let video1080 = document.getElementById('video1080p').files
 
+        /*
         let title = document.getElementById('title').value
         if (title.length > 256)
             return alert('Title is too long!')
@@ -126,7 +134,40 @@ document.addEventListener('DOMContentLoaded', () => {
         let formdata = new FormData()
         formdata.append('VideoUpload',sourceVideo[0])
         formdata.append('SnapUpload',snap[0])
+        */
 
+        let progressbar = document.getElementById('progressBarBack')
+        let progressbarInner = document.getElementById('progressBarFront')
+        progressbar.style.display = "block"
+        progressbarInner.innerHTML = "Uploading... (0%)"
+
+        let sourceUpload = new tus.Upload(sourceVideo[0], {
+            endpoint: 'http://localhost:1080/files',
+            retryDelays: [0,3000,5000,10000,20000],
+            metadata: {
+                access_token: Auth.token,
+                keychain: Auth.iskeychain
+            },
+            onError: (e) => {
+                console.log('tus error',e)
+            },
+            onProgress: (bu,bt) => {
+                let progressPercent = Math.round((bu / bt) * 100)
+                updateProgressBar(progressPercent)
+                console.log('Progress: ' + progressPercent + '%')
+            },
+            onSuccess: () => {
+                progressbarInner.innerHTML = "Video upload success"
+
+                let url = sourceUpload.url.toString().split('/')
+                console.log("Upload ID: " + url[url.length - 1]) // ID of upload
+            }
+        })
+
+        sourceUpload.start()
+        console.log('upload start called')
+
+        /*
         if (video240.length > 0)
             formdata.append('Video240Upload',video240[0])
         if (video480.length > 0)
@@ -224,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert('Upload error: ' + err);
             progressbar.style.display = "none";
             reenableFields();
-        });
+        });*/
     }
 
     document.getElementById('avalonvw').oninput = () => {

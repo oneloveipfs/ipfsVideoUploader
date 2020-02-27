@@ -1,4 +1,4 @@
-let scconfig
+let config
 
 document.addEventListener('DOMContentLoaded', () => {
     let proceedAuthBtnDisabled = document.getElementById('proceedAuthBtn').disabled
@@ -7,9 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('loginPopup').style.display = "block"
 
     axios.get('/config').then((result) => {
-        scconfig = result.data
+        config = result.data
 
-        if (!scconfig.steemconnectEnabled) {
+        if (!config.steemconnectEnabled) {
             let tohide = document.getElementsByClassName("sclogin")
             for (let i = 0; i < tohide.length; i++) {
                 tohide[i].style.display = "none"
