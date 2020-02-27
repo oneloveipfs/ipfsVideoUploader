@@ -25,6 +25,7 @@
     "ipfs-http-client": "^42.0.0",
     "javalon": "^1.0.19",
     "jsonwebtoken": "^8.5.1",
+    "mime-types": "^2.1.26",
     "multer": "^1.4.1",
     "node-webvtt": "^1.5.0",
     "sanitize-filename": "^1.6.1",

@@ -34,6 +34,9 @@ let beneficiaryAccList = ['dtube']
 let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
 let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
 
+// Socket.io connection to server
+let uplStat = io.connect('/uploadStat')
+
 // Vars loaded from config
 let config;
 
@@ -142,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         progressbarInner.innerHTML = "Uploading... (0%)"
 
         let sourceUpload = new tus.Upload(sourceVideo[0], {
-            endpoint: 'http://localhost:1080/files',
+            endpoint: config.tusdEndpoint,
             retryDelays: [0,3000,5000,10000,20000],
             metadata: {
                 access_token: Auth.token,

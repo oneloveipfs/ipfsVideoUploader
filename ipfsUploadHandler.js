@@ -6,12 +6,15 @@ const fs = require('fs')
 const async = require('async')
 const sanitize = require('sanitize-filename')
 const WebVTT = require('node-webvtt')
+const MimeType = require('mime-types')
 const Socket = require('socket.io')
 const Config = require('./config.json')
 const db = require('./dbManager')
 
 let SocketIO
 let ipsync
+let uplstatusio
+let usercount = 0
 
 const ipfsAPI = IPFS({ host: 'localhost', port: '5001', protocol: 'http' })
 const upload = Multer({ dest: './uploaded/' })
@@ -239,6 +242,9 @@ let uploadOps = {
             break
         }
     },
+    handleTusUpload: (json,cb) => {
+        cb()
+    },
     IPSync: {
         init: (server) => {
             SocketIO = Socket(server)
@@ -247,6 +253,18 @@ let uploadOps = {
             ipsync.on('connection',(socket) => {
                 socket.emit('message','Welcome to IPSync')
             })
+
+            // Upload status socket.io endpoint
+            uplstatusio = SocketIO.of('/uploadStat')
+
+            // Monitor number of connected users
+            uplstatusio.on('connection',(socket) => {
+                usercount++
+                socket.on('disconnect',() => usercount--)
+            })
+        },
+        activeCount: () => {
+            return usercount
         }
     }
 }

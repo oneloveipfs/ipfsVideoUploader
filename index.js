@@ -173,7 +173,9 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
             }
             break
         case "post-finish":
-            response.status(200).send()
+            FileUploader.handleTusUpload(request.body,(err,result) => {
+                response.status(200).send()
+            })
             break
         default:
             response.status(200).send()
@@ -257,6 +259,10 @@ app.get('/updatelogs',APILimiter,(request,response) => {
 
 app.get('/config',APILimiter,(req,res) => {
     res.send(Config.ClientConfig)
+})
+
+app.get('/activeusers',APILimiter,(req,res) => {
+    res.send({count: FileUploader.IPSync.activeCount()})
 })
 
 app.post('/botusage',Parser.json(),(req,res) => {
