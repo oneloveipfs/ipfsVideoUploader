@@ -293,6 +293,31 @@ let uploadOps = {
                     })
                 })
                 break
+            case 'video240':
+            case 'video480':
+            case 'video720':
+            case 'video1080':
+                addFile(filepath,true,(hash) => {
+                    if (Config.UsageLogs) {
+                        db.recordUsage(user,json.Upload.MetaData.type,json.Upload.Size)
+                        db.writeUsageData()
+                    }
+
+                    db.recordHash(user,json.Upload.MetaData.type,hash)
+                    db.writeHashesData()
+
+                    let result = { username: user }
+                    if (json.Upload.MetaData.type === 'video240') result.ipfs240hash = hash
+                    if (json.Upload.MetaData.type === 'video480') result.ipfs480hash = hash
+                    if (json.Upload.MetaData.type === 'video720') result.ipfs720hash = hash
+                    if (json.Upload.MetaData.type === 'video1080') result.ipfs1080hash = hash
+
+                    if (socketRegister[json.Upload.ID]) socketRegister[json.Upload.ID].emit('result',result)
+                    delete socketRegister[json.Upload.ID]
+                    ipsync.emit('upload',result)
+                    callback()
+                })
+                break
             default:
                 callback()
                 break
