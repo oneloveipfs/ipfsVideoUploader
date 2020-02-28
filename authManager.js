@@ -66,6 +66,20 @@ let auth = {
             cb(null,result.account.name)
         })
     },
+    authenticate: (access_token,keychain,cb) => {
+        if (Config.whitelistEnabled && !access_token) return cb('Missing API auth credentials') // response.status(400).send({error: 'Missing API auth credentials'})
+        if (keychain === 'true') {
+            auth.verifyAuth(access_token,(err,result) => {
+                if (err) return cb(err)
+                else return cb(null,result.user)
+            })
+        } else {
+            auth.scAuth(access_token,(err,user) => {
+                if (err) return cb(err)
+                else return cb(null,user)
+            })
+        }
+    },
     decryptMessage: (message,cb) => {
         let decrypted = Crypto.AES.decrypt(message,Keys.AESKey).toString(Crypto.enc.Utf8).split(':')
         cb(decrypted)

@@ -13,7 +13,8 @@
     "ClientConfig": {
         "gateway": "video.oneloveipfs.com",
         "steemconnectEnabled": true,
-        "steemconnectLoginURL": "https://steemconnect.com/oauth2/authorize?client_id=ipfsuploader.app&redirect_uri=https%3A%2F%2Fuploader.oneloved.tube%2Fupload&scope=comment,comment_options"
+        "steemconnectLoginURL": "https://steemconnect.com/oauth2/authorize?client_id=ipfsuploader.app&redirect_uri=https%3A%2F%2Fuploader.oneloved.tube%2Fupload&scope=comment,comment_options",
+        "tusdEndpoint": "http://localhost:1080/files"
     },
 
     "WooCommerceEnabled": false,

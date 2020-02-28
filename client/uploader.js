@@ -36,6 +36,9 @@ let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
 
 // Socket.io connection to server
 let uplStat = io.connect('/uploadStat')
+uplStat.on('result',(msg) => {
+    console.log(msg)
+})
 
 // Vars loaded from config
 let config;
@@ -149,7 +152,8 @@ document.addEventListener('DOMContentLoaded', () => {
             retryDelays: [0,3000,5000,10000,20000],
             metadata: {
                 access_token: Auth.token,
-                keychain: Auth.iskeychain
+                keychain: Auth.iskeychain,
+                type: 'videos'
             },
             onError: (e) => {
                 console.log('tus error',e)
@@ -164,6 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 let url = sourceUpload.url.toString().split('/')
                 console.log("Upload ID: " + url[url.length - 1]) // ID of upload
+                uplStat.emit('registerid',url[url.length - 1])
             }
         })
 

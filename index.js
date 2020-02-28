@@ -156,25 +156,23 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
 
     switch (request.headers['hook-name']) {
         case "pre-create":
+            // Upload type check
+            if(!db.getPossibleTypes().includes(request.body.Upload.MetaData.type)) return response.status(400).send({error: 'Invalid upload type'})
+
             // Authenticate
-            let access_token = request.body.Upload.MetaData.access_token
-            console.log(access_token)
-            if (Config.whitelistEnabled && !access_token) return response.status(400).send({error: 'Missing API auth credentials'})
-            if (request.body.Upload.MetaData.keychain === 'true') {
-                Auth.verifyAuth(access_token,(err,result) => {
-                    if (err) return response.status(401).send({ error: err })
-                    else return response.status(200).send()
-                })
-            } else {
-                Auth.scAuth(access_token,(err,user) => {
-                    if (err) return response.status(401).send({ error: err })
-                    else return response.status(200).send()
-                })
-            }
+            Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,(e) => {
+                if (e) return response.status(401).send({error: e})
+                return response.status(200).send()
+            })
             break
         case "post-finish":
-            FileUploader.handleTusUpload(request.body,(err,result) => {
-                response.status(200).send()
+            request.socket.setTimeout(0)
+
+            // Get user by access token then process upload
+            Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,(e,user) => {
+                FileUploader.handleTusUpload(request.body,user,(err,result) => {
+                    response.status(200).send()
+                })
             })
             break
         default:

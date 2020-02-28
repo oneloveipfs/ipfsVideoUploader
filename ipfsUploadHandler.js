@@ -16,6 +16,9 @@ let ipsync
 let uplstatusio
 let usercount = 0
 
+let uploadRegister = {}
+let socketRegister = {}
+
 const ipfsAPI = IPFS({ host: 'localhost', port: '5001', protocol: 'http' })
 const upload = Multer({ dest: './uploaded/' })
 const imgUpload = Multer({ dest: './imguploads/', limits: { fileSize: 7340032 } })
@@ -242,8 +245,58 @@ let uploadOps = {
             break
         }
     },
-    handleTusUpload: (json,cb) => {
-        cb()
+    handleTusUpload: (json,user,callback) => {
+        let filepath = json.Upload.Storage.Path
+        switch (json.Upload.MetaData.type) {
+            case 'videos':
+                let ipfsops = {
+                    videohash: (cb) => {
+                        addFile(filepath,true,(hash) => cb(null,hash))
+                    },
+                    spritehash: (cb) => {
+                        Shell.exec('./scripts/dtube-sprite.sh ' + filepath + ' uploaded/' + json.Upload.ID + '.jpg',() => {
+                            addFile('uploaded/' + json.Upload.ID + '.jpg',true,(hash) => {
+                                cb(null,hash)
+                            })
+                        })
+                    }
+                }
+
+                async.parallel(ipfsops,(errors,results) => {
+                    if (errors) console.log(errors)
+                    console.log(results)
+                    if (Config.UsageLogs) fs.stat('uploaded/' + json.Upload.ID + '.jpg',(err,stat) => {
+                        db.recordUsage(user,'videos',json.Upload.Size)
+                        !err ? db.recordUsage(user,'sprites',stat['size']) 
+                            : console.log('Error getting sprite filesize: ' + err)
+                        
+                        db.writeUsageData()
+                    })
+
+                    db.recordHash(user,'videos',results.videohash)
+                    db.recordHash(user,'sprites',results.spritehash)
+                    db.writeHashesData()
+
+                    getDuration(json.Upload.Storage.Path).then((videoDuration) => {
+                        let result = {
+                            username: user,
+                            ipfshash: results.videohash,
+                            spritehash: results.spritehash,
+                            duration: videoDuration,
+                            filesize: json.Upload.Size
+                        }
+
+                        if (socketRegister[json.Upload.ID]) socketRegister[json.Upload.ID].emit('result',result)
+                        delete socketRegister[json.Upload.ID]
+                        ipsync.emit('upload',result)
+                        callback()
+                    })
+                })
+                break
+            default:
+                callback()
+                break
+        }
     },
     IPSync: {
         init: (server) => {
@@ -260,7 +313,24 @@ let uploadOps = {
             // Monitor number of connected users
             uplstatusio.on('connection',(socket) => {
                 usercount++
-                socket.on('disconnect',() => usercount--)
+                socket.on('disconnect',() => {
+                    usercount--
+
+                    // Unregister socket from upload ID
+                    for (upls in socketRegister) {
+                        if (socketRegister[upls] == socket) {
+                            delete socketRegister[upls]
+                        }
+                    }
+                })
+                
+                // Register socket with upload ID
+                socket.on('registerid',(id) => {
+                    if (!uploadRegister[id])
+                        socketRegister[id] = socket
+                    else
+                        socket.emit('result',uploadRegister[id])
+                })
             })
         },
         activeCount: () => {
