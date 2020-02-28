@@ -16,7 +16,7 @@ let ipsync
 let uplstatusio
 let usercount = 0
 
-let uploadRegister = {}
+let uploadRegister = JSON.parse(fs.readFileSync('db/register.json','utf8'))
 let socketRegister = {}
 
 const ipfsAPI = IPFS({ host: 'localhost', port: '5001', protocol: 'http' })
@@ -288,6 +288,7 @@ let uploadOps = {
 
                         if (socketRegister[json.Upload.ID]) socketRegister[json.Upload.ID].emit('result',result)
                         delete socketRegister[json.Upload.ID]
+                        uploadRegister[json.Upload.ID] = result
                         ipsync.emit('upload',result)
                         callback()
                     })
@@ -314,6 +315,7 @@ let uploadOps = {
 
                     if (socketRegister[json.Upload.ID]) socketRegister[json.Upload.ID].emit('result',result)
                     delete socketRegister[json.Upload.ID]
+                    uploadRegister[json.Upload.ID] = result
                     ipsync.emit('upload',result)
                     callback()
                 })
@@ -322,6 +324,9 @@ let uploadOps = {
                 callback()
                 break
         }
+    },
+    writeUploadRegister: () => {
+        fs.writeFile('db/register.json',JSON.stringify(uploadRegister))
     },
     IPSync: {
         init: (server) => {
