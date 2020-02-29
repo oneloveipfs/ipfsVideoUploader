@@ -42,7 +42,7 @@
             </div>
             <div id="basics"> <!-- Basics tab -->
                 <h3>Upload a video (mp4 file accepted): <input type="file" accept="video/mp4" name="VideoUpload" id="sourcevideo"></h3>
-                <h3>Upload a thumbnail: <input type="file" accept="image/jpeg,image/png" name="SnapUpload" id="snapfile"></h3>
+                <h3>Upload a thumbnail (4MB maximum): <input type="file" accept="image/jpeg,image/png" name="SnapUpload" id="snapfile"></h3>
                 <h3>Title: <br><input type="text" id="title" name="title" class="meta"></h3>
                 <h3>Description: <br>
                 <textarea id="description" name="description"></textarea></h3>
@@ -84,7 +84,7 @@
                 <textarea id="postBody" name="postBody"></textarea></h3>
                 <input type="file" accept="image/*" id="postImg" style="display: none">
                 <a onclick="document.getElementById('postImg').click();return true;" id="postImgBtn" class="roundedBtn">Upload an image for article body</a>
-                <h5>Maximum file size for image: 7MB</h5>
+                <h5>Maximum file size for image: 4MB</h5>
                 <h3>Beneficiaries</h3>
                 <h5>By default, 2% beneficiary is set to @dtube Steem account to support their development and curation efforts. You may add up to 7 additional accounts below as beneficiaries of your Steem post.</h5>
                 <input type="text" id="newBeneficiaryUser" name="newBeneficiaryUser" class="meta" placeholder="New beneficiary username">

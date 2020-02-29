@@ -170,7 +170,8 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
 
             // Get user by access token then process upload
             Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,(e,user) => {
-                FileUploader.handleTusUpload(request.body,user,(err,result) => {
+                FileUploader.handleTusUpload(request.body,user,() => {
+                    FileUploader.writeUploadRegister()
                     response.status(200).send()
                 })
             })

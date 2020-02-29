@@ -326,7 +326,7 @@ let uploadOps = {
         }
     },
     writeUploadRegister: () => {
-        fs.writeFile('db/register.json',JSON.stringify(uploadRegister))
+        fs.writeFile('db/register.json',JSON.stringify(uploadRegister),() => {})
     },
     IPSync: {
         init: (server) => {

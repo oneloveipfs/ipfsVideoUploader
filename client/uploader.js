@@ -34,10 +34,15 @@ let beneficiaryAccList = ['dtube']
 let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
 let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
 
+// Post parameters (videohash, video240, video480 etc)
+let postparams = {}
+
 // Socket.io connection to server
 let uplStat = io.connect('/uploadStat')
-uplStat.on('result',(msg) => {
-    console.log(msg)
+uplStat.on('result',(r) => {
+    postparams = Object.assign(postparams,r)
+    postVideo()
+    console.log(postparams)
 })
 
 // Vars loaded from config
@@ -95,20 +100,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('submitbutton').onclick = () => {
         // Validate data entered
-        let postBody = document.getElementById('postBody').value
-        let description = document.getElementById('description').value
-        let powerup = document.getElementById('powerup').checked
-        let permlink = generatePermlink()
+        postparams.postBody = document.getElementById('postBody').value
+        postparams.description = document.getElementById('description').value
+        postparams.powerup = document.getElementById('powerup').checked
+        postparams.permlink = generatePermlink()
 
         let sourceVideo = document.getElementById('sourcevideo').files
         let snap = document.getElementById('snapfile').files
-
-        let video240 = document.getElementById('video240p').files
-        let video480 = document.getElementById('video480p').files
-        let video720 = document.getElementById('video720p').files
-        let video1080 = document.getElementById('video1080p').files
-
-        /*
         let title = document.getElementById('title').value
         if (title.length > 256)
             return alert('Title is too long!')
@@ -130,65 +128,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (title.length == 0)
             return alert('Please enter a title!')
+        postparams.title = title
 
         if (tag.length == 0)
-            return alert('Please enter some tags (up to 4) for your video!')
+            return alert('Please enter some tags (up to 7) for your video!')
+        postparams.tags = tags
 
-        Auth.restrict()
+        // Auth.restrict()
 
-        // Upload video
+        // Upload thumbnail
         let formdata = new FormData()
-        formdata.append('VideoUpload',sourceVideo[0])
-        formdata.append('SnapUpload',snap[0])
-        */
+        formdata.append('image',snap[0])
 
         let progressbar = document.getElementById('progressBarBack')
         let progressbarInner = document.getElementById('progressBarFront')
         progressbar.style.display = "block"
-        progressbarInner.innerHTML = "Uploading... (0%)"
-
-        let sourceUpload = new tus.Upload(sourceVideo[0], {
-            endpoint: config.tusdEndpoint,
-            retryDelays: [0,3000,5000,10000,20000],
-            metadata: {
-                access_token: Auth.token,
-                keychain: Auth.iskeychain,
-                type: 'videos'
-            },
-            onError: (e) => {
-                console.log('tus error',e)
-            },
-            onProgress: (bu,bt) => {
-                let progressPercent = Math.round((bu / bt) * 100)
-                updateProgressBar(progressPercent)
-                console.log('Progress: ' + progressPercent + '%')
-            },
-            onSuccess: () => {
-                progressbarInner.innerHTML = "Video upload success"
-
-                let url = sourceUpload.url.toString().split('/')
-                console.log("Upload ID: " + url[url.length - 1]) // ID of upload
-                uplStat.emit('registerid',url[url.length - 1])
-            }
-        })
-
-        sourceUpload.start()
-        console.log('upload start called')
-
-        /*
-        if (video240.length > 0)
-            formdata.append('Video240Upload',video240[0])
-        if (video480.length > 0)
-            formdata.append('Video480Upload',video480[0])
-        if (video720.length > 0)
-            formdata.append('Video720Upload',video720[0])
-        if (video1080.length > 0)
-            formdata.append('Video1080Upload',video1080[0])
-
-        let progressbar = document.getElementById('progressBarBack')
-        let progressbarInner = document.getElementById('progressBarFront')
-        progressbar.style.display = "block"
-        progressbarInner.innerHTML = "Uploading... (0%)"
+        progressbarInner.innerHTML = "Uploading thumbnail... (0%)"
 
         let contentType = {
             headers: {
@@ -198,11 +153,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log(progressEvent)
 
                 let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
-                updateProgressBar(progressPercent)
+                updateProgressBar(progressPercent,'Uploading thumbnail...')
             }
         }
 
-        let call = '/uploadVideo?access_token=' + Auth.token
+        let call = '/uploadImage?type=thumbnails&access_token=' + Auth.token
         if (Auth.iskeychain !== 'true')
             call += '&scauth=true'
         axios.post(call,formdata,contentType).then(function(response) {
@@ -215,6 +170,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 return alert(uploaderResponse.error)
             }
 
+            postparams = Object.assign(postparams,uploaderResponse)
+
+            // Upload all videos
+            uploadVideo(0,() => {
+                console.log('all videos uploaded successfully')
+            })
+
+            /*
             progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
 
             // Post to Steem blockchain
@@ -264,16 +227,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         localStorage.clear();
                         window.location.replace('https://d.tube/v/' + username + '/' + permlink);
                     }
-                });
-            }
+                })
+            }*/
         }).catch(function(err) {
             if (err.response.data.error)
-                alert('Upload error: ' + err.response.data.error)
+                alert('Upload error: ' + JSON.stringify(err.response.data.error))
             else
-                alert('Upload error: ' + err);
-            progressbar.style.display = "none";
-            reenableFields();
-        });*/
+                alert('Upload error: ' + JSON.stringify(err))
+            progressbar.style.display = "none"
+            reenableFields()
+        })
     }
 
     document.getElementById('avalonvw').oninput = () => {
@@ -435,6 +398,78 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 })
 
+function uploadVideo(resolution,next) {
+    let fInputElemName
+    let resolutionFType
+    let progressTxt
+    switch (resolution) {
+        case 0:
+            fInputElemName = 'sourcevideo'
+            resolutionFType = 'videos'
+            progressTxt = 'Uploading source video...'
+            break
+        case 1:
+            fInputElemName = 'video240p'
+            resolutionFType = 'video240'
+            progressTxt = 'Uploading 240p video...'
+            break
+        case 2:
+            fInputElemName = 'video480p'
+            resolutionFType = 'video480'
+            progressTxt = 'Uploading 480p video...'
+            break
+        case 3:
+            fInputElemName = 'video720p'
+            resolutionFType = 'video720'
+            progressTxt = 'Uploading 720p video...'
+            break
+        case 4:
+            fInputElemName = 'video1080p'
+            resolutionFType = 'video1080'
+            progressTxt = 'Uploading 1080p video...'
+            break
+        default:
+            return next()
+    }
+
+    let videoToUpload = document.getElementById(fInputElemName).files
+
+    if (videoToUpload.length < 1) return uploadVideo(resolution+1,next)
+
+    let progressbar = document.getElementById('progressBarBack')
+    let progressbarInner = document.getElementById('progressBarFront')
+    progressbar.style.display = "block"
+    progressbarInner.innerHTML = "Uploading... (0%)"
+
+    let videoUpload = new tus.Upload(videoToUpload[0], {
+        endpoint: config.tusdEndpoint,
+        retryDelays: [0,3000,5000,10000,20000],
+        metadata: {
+            access_token: Auth.token,
+            keychain: Auth.iskeychain,
+            type: resolutionFType
+        },
+        onError: (e) => {
+            console.log('tus error',e)
+        },
+        onProgress: (bu,bt) => {
+            let progressPercent = Math.round((bu / bt) * 100)
+            updateProgressBar(progressPercent,progressTxt)
+            console.log('Progress: ' + progressPercent + '%')
+        },
+        onSuccess: () => {
+            progressbarInner.innerHTML = "Processing video..."
+
+            let url = videoUpload.url.toString().split('/')
+            console.log("Upload ID: " + url[url.length - 1]) // ID of upload
+            uplStat.emit('registerid',url[url.length - 1])
+            uploadVideo(resolution+1,next)
+        }
+    })
+
+    videoUpload.start()
+}
+
 function restrictImg() {
     const toDisable = ['postBody','postImgBtn','draftBtn','submitbutton']
     for (let i = 0; i < toDisable.length; i++) document.getElementById(toDisable[i]).disabled = true
@@ -453,6 +488,22 @@ function reenableFieldsImg() {
 function reenableSubtitleFields() {
     const toEnable = ['newLanguageField','chooseSubBtn','uploadSubBtn']
     for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i]).disabled = false
+}
+
+function postVideo() {
+    let requiredFields = ['ipfshash','imghash','spritehash','duration','filesize']
+    let encodedVidInputs = ['video240p','video480p','video720p','video1080p']
+    let respectiveField = ['ipfs240hash','ipfs480hash','ipfs720hash','ipfs1080hash']
+
+    for (let i = 0; i < encodedVidInputs.length; i++) {
+        if (document.getElementById(encodedVidInputs[i]).files.length != 0) requiredFields.push(respectiveField[i])
+    }
+
+    for (let j = 0; j < requiredFields.length; j++) {
+        if (!postparams[requiredFields[j]]) return console.log('missing hash, not proceeding with broadcast')
+    }
+
+    console.log('post video')
 }
 
 function generatePermlink() {
@@ -598,10 +649,10 @@ async function broadcastAvalon(json,tag,permlink,cb) {
     }
 }
 
-function updateProgressBar(progress) {
+function updateProgressBar(progress,text) {
     let progressbarInner = document.getElementById('progressBarFront')
     progressbarInner.style.width = progress + '%'
-    progressbarInner.innerHTML = 'Uploading... (' + progress + '%)'
+    progressbarInner.innerHTML = text + ' (' + progress + '%)'
 }
 
 function updateSubtitle() {
