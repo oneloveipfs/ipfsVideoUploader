@@ -176,59 +176,6 @@ document.addEventListener('DOMContentLoaded', () => {
             uploadVideo(0,() => {
                 console.log('all videos uploaded successfully')
             })
-
-            /*
-            progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
-
-            // Post to Steem blockchain
-            let transaction = generatePost(username,permlink,postBody,uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,tags,uploaderResponse.duration,uploaderResponse.filesize,powerup);
-            if (Auth.iskeychain == 'true') {
-                // Broadcast with Keychain
-                steem_keychain.requestBroadcast(username,transaction,'Posting',(response) => {
-                    if (response.error != null) {
-                        alert('Failed to post on DTube: ' + response.error + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
-                        progressbar.style.display = "none";
-                        reenableFields();
-                    } else if (avalonUser !== null) {
-                        // Broadcast to Avalon as well if Avalon login exists
-                        let avalontag = ''
-                        if (tags.length !== 0)
-                            avalontag = tags[0]
-                        progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
-                        broadcastAvalon(buildJsonMetadataAvalon(uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spritehash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,uploaderResponse.duration,uploaderResponse.filesize,username,permlink),avalontag,uploaderResponse.ipfshash,() =>  {
-                            localStorage.clear()
-                            window.location.replace('https://d.tube/v/' + username + '/' + permlink)
-                        })
-                    } else {
-                        // If Avalon login not found, redirect to d.tube watch page right away
-                        localStorage.clear()
-                        window.location.replace('https://d.tube/v/' + username + '/' + permlink)
-                    }
-                })
-            } else {
-                // Broadcast with SteemConnect
-                let api = new steemconnect.Client({ accessToken: Auth.token })
-                api.broadcast(transaction,function(err) {
-                    if (err != null) {
-                        alert('Failed to post on DTube: ' + err + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + uploaderResponse.ipfshash + '\nThumbnail hash: ' + uploaderResponse.snaphash + '\nSprite hash: ' + uploaderResponse.spritehash + '\nVideo duration: ' + uploaderResponse.duration + '\nVideo filesize: ' + uploaderResponse.filesize);
-                        progressbar.style.display = "none";
-                        reenableFields();
-                    } else if (avalonUser !== null) {
-                        // Broadcast to Avalon as well if Avalon login exists
-                        let avalontag = ''
-                        if (tags.length !== 0)
-                            avalontag = tags[0]
-                        progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
-                        broadcastAvalon(buildJsonMetadataAvalon(uploaderResponse.ipfshash,uploaderResponse.snaphash,uploaderResponse.spriteHash,uploaderResponse.ipfs240hash,uploaderResponse.ipfs480hash,uploaderResponse.ipfs720hash,uploaderResponse.ipfs1080hash,title,description,uploaderResponse.duration,uploaderResponse.filesize,username,permlink),avalontag,uploaderResponse.ipfshash,() =>  {
-                            localStorage.clear()
-                            window.location.replace('https://d.tube/v/' + username + '/' + permlink)
-                        })
-                    } else {
-                        localStorage.clear();
-                        window.location.replace('https://d.tube/v/' + username + '/' + permlink);
-                    }
-                })
-            }*/
         }).catch(function(err) {
             if (err.response.data.error)
                 alert('Upload error: ' + JSON.stringify(err.response.data.error))
@@ -504,6 +451,58 @@ function postVideo() {
     }
 
     console.log('post video')
+    document.getElementById('progressBarFront').innerHTML = 'Submitting video to Steem blockchain...'
+
+    // Post to Steem blockchain
+    let transaction = generatePost()
+    console.log(transaction)
+    if (Auth.iskeychain == 'true') {
+        // Broadcast with Keychain
+        steem_keychain.requestBroadcast(username,transaction,'Posting',(response) => {
+            if (response.error != null) {
+                alert('Failed to post on DTube: ' + response.error + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + postparams.ipfshash + '\nThumbnail hash: ' + postparams.imghash + '\nSprite hash: ' + postparams.spritehash + '\nVideo duration: ' + postparams.duration)
+                progressbar.style.display = "none";
+                reenableFields();
+            } else if (avalonUser !== null) {
+                // Broadcast to Avalon as well if Avalon login exists
+                let avalontag = ''
+                if (postparams.tags.length !== 0)
+                    avalontag = postparams.tags[0]
+                progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
+                broadcastAvalon(buildJsonMetadataAvalon(),avalontag,postparams.ipfshash,() =>  {
+                    localStorage.clear()
+                    window.location.replace('https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash)
+                })
+            } else {
+                // If Avalon login not found, redirect to d.tube watch page right away
+                localStorage.clear()
+                window.location.replace('https://d.tube/v/' + username + '/' + postparams.permlink)
+            }
+        })
+    } else {
+        // Broadcast with SteemConnect
+        let api = new steemconnect.Client({ accessToken: Auth.token })
+        api.broadcast(transaction,(err) => {
+            if (err != null) {
+                alert('Failed to post on DTube: ' + err + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + postparams.ipfshash + '\nThumbnail hash: ' + postparams.imghash + '\nSprite hash: ' + postparams.spritehash + '\nVideo duration: ' + postparams.duration)
+                progressbar.style.display = "none";
+                reenableFields();
+            } else if (avalonUser !== null) {
+                // Broadcast to Avalon as well if Avalon login exists
+                let avalontag = ''
+                if (postparams.tags.length !== 0)
+                    avalontag = postparams.tags[0]
+                progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
+                broadcastAvalon(buildJsonMetadataAvalon(),avalontag,postparams.ipfshash,() =>  {
+                    localStorage.clear()
+                    window.location.replace('https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash)
+                })
+            } else {
+                localStorage.clear();
+                window.location.replace('https://d.tube/v/' + username + '/' + postparams.permlink)
+            }
+        })
+    }
 }
 
 function generatePermlink() {
@@ -524,20 +523,20 @@ function buildPostBody(author,permlink,postBody,videoHash,snapHash,description) 
     }
 }
 
-function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,DTubeTags,duration,filesize,author,permlink) {
+function buildJsonMetadata() {
     // TODO: Update json_metadata for dtube 0.9+ for Steem + SCOT
     // 'dtube' tag as first tag for Steemit post
     let SteemTags = ['dtube']
-    SteemTags = SteemTags.concat(DTubeTags);
+    SteemTags = SteemTags.concat(postparams.tags);
 
     let jsonMeta = {
-        video: buildJsonMetadataAvalon(sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,duration,filesize,author,permlink),
+        video: buildJsonMetadataAvalon(),
         tags: SteemTags,
         app: 'onelovedtube/0.9.2',
     }
 
     if (avalonUser !== null)
-        jsonMeta.video.refs = ['dtc/' + avalonUser + '/' + sourceHash]
+        jsonMeta.video.refs = ['dtc/' + avalonUser + '/' + postparams.ipfshash]
     else
         jsonMeta.video.refs = []
 
@@ -547,27 +546,27 @@ function buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480H
     return jsonMeta;
 }
 
-function buildJsonMetadataAvalon(sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,duration,filesize,author,permlink) {
+function buildJsonMetadataAvalon() {
     let jsonMeta = {
-        videoId: sourceHash,
-        duration: duration,
-        title: title,
-        description: description,
-        filesize: filesize,
+        videoId: postparams.ipfshash,
+        duration: postparams.duration,
+        title: postparams.title,
+        description: postparams.description,
+        filesize: postparams.filesize,
         ipfs: {
-            snaphash: snapHash,
-            spritehash: spriteHash,
-            videohash: sourceHash,
-            video240hash: video240Hash,
-            video480hash: video480Hash,
-            video720hash: video720Hash,
-            video1080hash: video1080Hash,
+            snaphash: postparams.imghash,
+            spritehash: postparams.spritehash,
+            videohash: postparams.ipfshash,
+            video240hash: postparams.ipfs240hash,
+            video480hash: postparams.ipfs480hash,
+            video720hash: postparams.ipfs720hash,
+            video1080hash: postparams.ipfs1080hash,
             gateway: config.gateway
         },
-        thumbnailUrl: 'https://snap1.d.tube/ipfs/' + snapHash,
+        thumbnailUrl: 'https://snap1.d.tube/ipfs/' + postparams.imghash,
         providerName: 'IPFS',
         refs: [
-            'steem/' + author + '/' + permlink
+            'steem/' + username + '/' + postparams.permlink
         ]
     }
 
@@ -577,10 +576,10 @@ function buildJsonMetadataAvalon(sourceHash,snapHash,spriteHash,video240Hash,vid
     return jsonMeta
 }
 
-function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,tags,duration,filesize,powerUp) {
+function generatePost() {
     // Power up all rewards or not
     let percentSBD = 10000
-    if (powerUp == true) {
+    if (postparams.powerup == true) {
         percentSBD = 0
     }
 
@@ -595,15 +594,15 @@ function generatePost(username,permlink,postBody,sourceHash,snapHash,spriteHash,
                 parent_permlink: 'hive-196037',
                 category: 'hive-196037',
                 author: username,
-                permlink: permlink,
-                title: title,
-                body: buildPostBody(username,permlink,postBody,sourceHash,snapHash,description),
-                json_metadata: JSON.stringify(buildJsonMetadata(sourceHash,snapHash,spriteHash,video240Hash,video480Hash,video720Hash,video1080Hash,title,description,tags,duration,filesize,username,permlink)),
+                permlink: postparams.permlink,
+                title: postparams.title,
+                body: buildPostBody(username,postparams.permlink,postparams.postBody,postparams.ipfshash,postparams.imghash,postparams.description),
+                json_metadata: JSON.stringify(buildJsonMetadata()),
             }
         ],
         [ "comment_options", {
             author: username,
-            permlink: permlink,
+            permlink: postparams.permlink,
             max_accepted_payout: '1000000.000 SBD',
             percent_steem_dollars: percentSBD,
             allow_votes: true,
