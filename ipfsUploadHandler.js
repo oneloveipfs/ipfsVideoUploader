@@ -10,6 +10,7 @@ const MimeType = require('mime-types')
 const Socket = require('socket.io')
 const Config = require('./config.json')
 const db = require('./dbManager')
+const Auth = require('./authManager')
 
 let SocketIO
 let ipsync
@@ -31,6 +32,32 @@ async function addFile(dir,trickle,callback) {
         callback(file.cid.toString())
         break
     }
+}
+
+function processSingleVideo(id,user,cb) {
+    let vpath = Config.tusdUploadDir + '/' + id
+    if (!fs.existsSync(vpath)) return cb({ error: 'Could not find upload' })
+    Shell.exec('./scripts/dtube-sprite.sh ' + vpath + ' uploaded/' + id + '.jpg',() => addFile('uploaded/' + id + '.jpg',true,(hash) => fs.stat('uploaded/' + id + '.jpg',(err,stat) => {
+        !err ? db.recordUsage(user,'sprites',stat['size']) 
+            : console.log('Error getting sprite filesize: ' + err)
+        
+        db.writeUsageData()
+        db.recordHash(user,hash)
+        db.writeHashesData()
+
+        getDuration(vpath).then((duration) => {
+            let result = {
+                username: user,
+                type: 'videos',
+                ipfshash: uploadRegister[id].hash,
+                spritehash: hash,
+                duration: duration
+            }
+
+            uploadRegister[id] = result
+            cb(result)
+        })
+    })))
 }
 
 let uploadOps = {
@@ -280,13 +307,14 @@ let uploadOps = {
                     getDuration(json.Upload.Storage.Path).then((videoDuration) => {
                         let result = {
                             username: user,
+                            type: 'videos',
                             ipfshash: results.videohash,
                             spritehash: results.spritehash,
                             duration: videoDuration,
                             filesize: json.Upload.Size
                         }
 
-                        if (socketRegister[json.Upload.ID]) socketRegister[json.Upload.ID].emit('result',result)
+                        if (socketRegister[json.Upload.ID] && socketRegister[json.Upload.ID].socket) socketRegister[json.Upload.ID].socket.emit('result',result)
                         delete socketRegister[json.Upload.ID]
                         uploadRegister[json.Upload.ID] = result
                         ipsync.emit('upload',result)
@@ -307,11 +335,11 @@ let uploadOps = {
                     db.recordHash(user,json.Upload.MetaData.type,hash)
                     db.writeHashesData()
 
-                    let result = { username: user }
-                    if (json.Upload.MetaData.type === 'video240') result.ipfs240hash = hash
-                    if (json.Upload.MetaData.type === 'video480') result.ipfs480hash = hash
-                    if (json.Upload.MetaData.type === 'video720') result.ipfs720hash = hash
-                    if (json.Upload.MetaData.type === 'video1080') result.ipfs1080hash = hash
+                    let result = { 
+                        username: user,
+                        type: json.Upload.MetaData.type,
+                        hash: hash
+                    }
 
                     if (socketRegister[json.Upload.ID]) socketRegister[json.Upload.ID].emit('result',result)
                     delete socketRegister[json.Upload.ID]
@@ -348,18 +376,46 @@ let uploadOps = {
 
                     // Unregister socket from upload ID
                     for (upls in socketRegister) {
-                        if (socketRegister[upls] == socket) {
+                        if (socketRegister[upls].socket == socket) {
                             delete socketRegister[upls]
                         }
                     }
                 })
                 
                 // Register socket with upload ID
-                socket.on('registerid',(id) => {
-                    if (!uploadRegister[id])
-                        socketRegister[id] = socket
-                    else
-                        socket.emit('result',uploadRegister[id])
+                socket.on('registerid',(info) => {
+                    if (!info) return socket.emit('result',{ error: 'Missing upload info' })
+                    if (!info.id) return socket.emit('result', { error: 'Missing upload ID' })
+                    if (!info.type) return socket.emit('result', { error: 'Missing upload type' })
+                    if (!info.access_token) return socket.emit('result', { error: 'Missing access token' })
+                    if (!db.getPossibleTypes().includes(info.type)) return socket.emit('result', { error: 'Invalid upload type requested' })
+
+                    // Authenticate & get username
+                    Auth.authenticate(info.access_token,info.keychain,(e,user) => {
+                        if (e) return socket.emit('result', { error: 'Auth error: ' + JSON.stringify(e) })
+                        
+                        // Upload ID not found in register, register socket
+                        if (!uploadRegister[info.id]) return socketRegister[info.id] = {
+                            socket: socket,
+                            ts: 0 // TODO: Clear sockets from cache after x minutes
+                        }
+
+                        // Upload ID exist in register and matches type requested, return result immediately
+                        if (info.type === uploadRegister[info.id].type) return socket.emit('result',uploadRegister[info.id])
+                        
+                        // Type requested does not match registered type
+                        // Encoded video hash requested, return only hash
+                        if (info.type !== 'videos') return socket.emit('result',{
+                            username: uploadRegister[info.id].username,
+                            type: info.type,
+                            hash: uploadRegister[info.id].hash
+                        })
+
+                        // Or else if "videos" type requested, generate sprites, duration etc
+                        processSingleVideo(info.id,user,(result) => {
+                            socket.emit('result',result)
+                        })
+                    })
                 })
             })
         },

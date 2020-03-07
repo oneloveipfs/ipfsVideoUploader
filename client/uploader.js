@@ -40,7 +40,26 @@ let postparams = {}
 // Socket.io connection to server
 let uplStat = io.connect('/uploadStat')
 uplStat.on('result',(r) => {
-    postparams = Object.assign(postparams,r)
+    if (r.error) return console.log('uplStat Error', r.error)
+    switch (r.type) {
+        case 'videos':
+            postparams = Object.assign(postparams,r)
+            break
+        case 'video240':
+            postparams.ipfs240hash = r.hash
+            break
+        case 'video480':
+            postparams.ipfs480hash = r.hash
+            break
+        case 'video720':
+            postparams.ipfs720hash = r.hash
+            break
+        case 'video1080':
+            postparams.ipfs1080hash = r.hash
+            break
+        default:
+            return console.log('uplStat Error: missing type in repsonse')
+    }
     postVideo()
     console.log(postparams)
 })
@@ -409,7 +428,12 @@ function uploadVideo(resolution,next) {
 
             let url = videoUpload.url.toString().split('/')
             console.log("Upload ID: " + url[url.length - 1]) // ID of upload
-            uplStat.emit('registerid',url[url.length - 1])
+            uplStat.emit('registerid',{
+                id: url[url.length - 1],
+                type: resolutionFType,
+                access_token: Auth.token,
+                keychain: Auth.iskeychain
+            })
             uploadVideo(resolution+1,next)
         }
     })
@@ -438,7 +462,7 @@ function reenableSubtitleFields() {
 }
 
 function postVideo() {
-    let requiredFields = ['ipfshash','imghash','spritehash','duration','filesize']
+    let requiredFields = ['ipfshash','imghash','spritehash','duration']
     let encodedVidInputs = ['video240p','video480p','video720p','video1080p']
     let respectiveField = ['ipfs240hash','ipfs480hash','ipfs720hash','ipfs1080hash']
 

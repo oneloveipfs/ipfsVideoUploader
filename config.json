@@ -17,6 +17,8 @@
         "tusdEndpoint": "http://localhost:1080/files"
     },
 
+    "tusdUploadDir": "/Users/techcoderx/tusfiles",
+
     "WooCommerceEnabled": false,
     "WooCommerceConfig": {
         "consumerKey": "",
