@@ -341,7 +341,7 @@ let uploadOps = {
                         hash: hash
                     }
 
-                    if (socketRegister[json.Upload.ID]) socketRegister[json.Upload.ID].emit('result',result)
+                    if (socketRegister[json.Upload.ID] && socketRegister[json.Upload.ID].socket) socketRegister[json.Upload.ID].socket.emit('result',result)
                     delete socketRegister[json.Upload.ID]
                     uploadRegister[json.Upload.ID] = result
                     ipsync.emit('upload',result)
@@ -408,7 +408,7 @@ let uploadOps = {
                         if (info.type !== 'videos') return socket.emit('result',{
                             username: uploadRegister[info.id].username,
                             type: info.type,
-                            hash: uploadRegister[info.id].hash
+                            hash: uploadRegister[info.id].hash || uploadRegister[info.id].ipfshash
                         })
 
                         // Or else if "videos" type requested, generate sprites, duration etc
