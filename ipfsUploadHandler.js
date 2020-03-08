@@ -397,7 +397,7 @@ let uploadOps = {
                         // Upload ID not found in register, register socket
                         if (!uploadRegister[info.id]) return socketRegister[info.id] = {
                             socket: socket,
-                            ts: 0 // TODO: Clear sockets from cache after x minutes
+                            ts: new Date().getTime() // TODO: Clear sockets from cache after x minutes
                         }
 
                         // Upload ID exist in register and matches type requested, return result immediately
@@ -418,6 +418,14 @@ let uploadOps = {
                     })
                 })
             })
+
+            // Clear sockets from register after x minutes if results not returned
+            setInterval(() => {
+                let currentTime = new Date().getTime()
+                for (ids in socketRegister) {
+                    if (Math.abs(socketRegister[ids].ts - currentTime) > Config.socketTimeout) delete socketRegister[ids]
+                }
+            },60000)
         },
         activeCount: () => {
             return usercount

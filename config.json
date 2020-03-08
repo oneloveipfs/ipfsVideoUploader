@@ -18,6 +18,7 @@
     },
 
     "tusdUploadDir": "/Users/techcoderx/tusfiles",
+    "socketTimeout": 600000,
 
     "WooCommerceEnabled": false,
     "WooCommerceConfig": {
