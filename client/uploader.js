@@ -665,12 +665,12 @@ async function broadcastAvalon(json,tag,permlink,cb) {
         }
         let signedtx = javalon.sign(sessionStorage.getItem('OneLoveAvalonKey'),avalonAcc.name,tx)
         javalon.sendTransaction(signedtx,(err,result) => {
-            if (err) alert('Steem broadcast successful however there is an error with Avalon: ' + err)
+            if (err) alert('Steem broadcast successful however there is an error with Avalon: ' + JSON.stringify(err))
             cb()
         })
     } catch (e) {
         // Alert any Avalon errors after successful Steem tx broadcast then proceed to watch page as usual
-        alert('Steem broadcast successful however there is an error with Avalon: ' + e)
+        alert('Steem broadcast successful however there is an error with Avalon: ' + JSON.stringify(e))
         cb()
     }
 }
