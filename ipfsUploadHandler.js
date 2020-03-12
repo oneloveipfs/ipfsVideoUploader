@@ -264,6 +264,7 @@ let uploadOps = {
 
             let result = {
                 username: username,
+                type: 'subtitles',
                 hash: sub.cid.toString()
             }
             response.send(result)

@@ -477,6 +477,9 @@ function postVideo() {
     console.log('post video')
     document.getElementById('progressBarFront').innerHTML = 'Submitting video to Steem blockchain...'
 
+    let progressbar = document.getElementById('progressBarBack')
+    let progressbarInner = document.getElementById('progressBarFront')
+
     // Post to Steem blockchain
     let transaction = generatePost()
     console.log(transaction)
