@@ -8,12 +8,12 @@
 
 #### macOS:
 ```
-sudo ./scripts/tusd_macos_install.sh # macOS
+sudo ./scripts/tusd_macos_install.sh
 ```
 
 #### Ubuntu:
 ```
-sudo ./scripts/tusd_ubuntu_install.sh # Ubuntu
+sudo ./scripts/tusd_ubuntu_install.sh
 ```
 
 #### To start `tusd`:
@@ -100,7 +100,7 @@ videoUpload.start()
 
 #### Result example:
 
-For `videos` upload:
+For `videos` upload type:
 ```
 {
     username: "techcoderx",

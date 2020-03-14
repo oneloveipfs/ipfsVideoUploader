@@ -11,6 +11,7 @@ This is an alternative IPFS uploader to upload videos onto DTube. Includes a bas
 * `npm` command line tools
 * `ffmpeg`, `imagemagick` and `bc` for sprite generation
 * `go-ipfs` with a running daemon
+* `tusd` running daemon, which can be installed and configured [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/docs/ResumableUploads.md#server-installation).
 
 ### Additional requirements
 
@@ -35,7 +36,7 @@ This is an alternative IPFS uploader to upload videos onto DTube. Includes a bas
 
 8. Run the app by typing `npm start`. Your app will listen to ports you specify in `config.json` file.
 
-All uploaded files will be saved in the `uploaded` folder within the repo. Image files (for Steem article body) will be saved in the `imguploads` folder.
+All uploaded files (through non-resumable upload APIs) will be saved in the `uploaded` folder within the repo. Image files (for Steem article body) will be saved in the `imguploads` folder. As for resumable uploads, you may define the directory in `config.json` file as well as the `tusd` daemon startup arguments.
 
 # Supported file formats
 
@@ -43,7 +44,7 @@ IPFS works the best for videos with .mp4, therefore only mp4 files will be suppo
 
 # RESTful HTTP API & IPSync
 
-API calls for authentication, file uploads, hashes and usage data are documented [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/docs/APIDocs.md).
+API calls for authentication, file uploads, hashes and usage data are documented [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/docs/APIDocs.md). Resumable video upload API documentation may be found [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/docs/ResumableUploads.md).
 
 # How to contribute?
 
