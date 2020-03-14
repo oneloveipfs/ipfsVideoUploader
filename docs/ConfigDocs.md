@@ -15,9 +15,14 @@ Ignore this section if you do not wish to support SteemConnect authentication.
 * `admins`: Array of Steem accounts which have access to administrator APIs.
 
 #### Client configuration
-* `gateway`: IPFS gateway domain to use as default gateway overwrite on DTube embed player. Do **not** include `https://` part.
+* `gateway`: IPFS gateway domain to use as default gateway overwrite on DTube embed player.
 * `steemconnectEnabled`: Set to true to enable SteemConnect authentication.
 * `steemconnectLoginURL`: SteemConnect URL to open in web browser for authentication.
+* `tusdEndpoint`: tusd HTTP endpoint for resumable file uploads.
+
+#### tusd settings
+* `tusdUploadDir`: Directory where `tusd` uploads are saved to.
+* `socketTimeout`: Timeout (in ms) where sockets will be cleared from register if upload ID is not being processed.
 
 #### WooCommerce settings
 * `WooCommerceEnabled`: When set to true, WooCommerce API will be used to enable additional functionalities (e.g. disk usage quota, bot sync through webhook etc.)
