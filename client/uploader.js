@@ -724,9 +724,9 @@ function updateBeneficiaries() {
 
     for (let i = 0; i < allBeneficiaryDelBtnElems.length; i++) {
         document.getElementById(allBeneficiaryDelBtnElems[i].id).onclick = () => {
-            beneficiaryAccList.splice(i+1,1)
-            totalBeneficiaries -= beneficiaryList[i+1].weight
-            beneficiaryList.splice(i+1,1)
+            beneficiaryAccList.splice(i,1)
+            totalBeneficiaries -= beneficiaryList[i].weight
+            beneficiaryList.splice(i,1)
             updateBeneficiaries()
         }
     }
