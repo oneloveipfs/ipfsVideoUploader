@@ -23,12 +23,9 @@ if (savedSubtitles) {
 }
 
 // Beneficiaries
-let beneficiaryList = [{
-    account: 'dtube',
-    weight: 200
-}]
-let totalBeneficiaries = 200
-let beneficiaryAccList = ['dtube']
+let beneficiaryList = []
+let totalBeneficiaries = 0
+let beneficiaryAccList = []
 
 // Load Avalon login
 let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
@@ -634,13 +631,14 @@ function generatePost() {
             percent_steem_dollars: percentSBD,
             allow_votes: true,
             allow_curation_rewards: true,
-            extensions: [
-                [0, {
-                    beneficiaries: sortedBeneficiary
-                }]
-            ]
+            extensions: []
         }]
     ]
+
+    if (sortedBeneficiary.length > 0)
+        operations[1][1].extensions.push([0, {
+            beneficiaries: sortedBeneficiary
+        }])
     return operations
 }
 
