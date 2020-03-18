@@ -712,7 +712,7 @@ function updateSubtitle() {
 function updateBeneficiaries() {
     let beneficiaryTableList = document.getElementById('beneficiaryTableList')
     let beneficiaryListHtml = ''
-    for (let i = 1; i < beneficiaryList.length; i++) {
+    for (let i = 0; i < beneficiaryList.length; i++) {
         beneficiaryListHtml += '<tr>'
         beneficiaryListHtml += '<td class="beneficiaryAccLabel">' + beneficiaryList[i].account + ' (' + beneficiaryList[i].weight / 100 + '%)</td>'
         beneficiaryListHtml += '<td><a class="roundedBtn beneficiaryDelBtn" id="beneficiaryDelBtn' + i + '">Remove</a></td>'

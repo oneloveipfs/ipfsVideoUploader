@@ -80,13 +80,13 @@
                 <h4>480p video: <input type="file" accept="video/mp4" name="Video480Upload" id="video480p"></h4>
                 <h4>720p video: <input type="file" accept="video/mp4" name="Video720Upload" id="video720p"></h4>
                 <h4>1080p video: <input type="file" accept="video/mp4" name="Video1080Upload" id="video1080p"></h4>
-                <h3>STEEM Article Body: <br>
+                <h3>HIVE Article Body: <br>
                 <textarea id="postBody" name="postBody"></textarea></h3>
                 <input type="file" accept="image/*" id="postImg" style="display: none">
                 <a onclick="document.getElementById('postImg').click();return true;" id="postImgBtn" class="roundedBtn">Upload an image for article body</a>
                 <h5>Maximum file size for image: 4MB</h5>
                 <h3>Beneficiaries</h3>
-                <h5>By default, 2% beneficiary is set to @dtube Steem account to support their development and curation efforts. You may add up to 7 additional accounts below as beneficiaries of your Steem post.</h5>
+                <h5>Add some Hive accounts here to automatically receive a portion of your HIVE post rewards.</h5>
                 <input type="text" id="newBeneficiaryUser" name="newBeneficiaryUser" class="meta" placeholder="New beneficiary username">
                 <input type="number" id="newBeneficiaryPercent" name="newBeneficiaryPercent" class="meta" placeholder="%" min="0.01" max="98" step="0.01">
                 <a class="styledButton" id="appendBeneficiaryBtn">+</a><br>
@@ -101,7 +101,7 @@
             </div>
         </div>
         <div id="thumbnailSwapper">
-            <div class="warningbox" id="thumbnailSwapNoAvalon">As you are not logged in with Avalon, the post on Avalon blockchain will not be updated. Therefore, only the Steem post will be updated with the new thumbnail.</div>
+            <div class="warningbox" id="thumbnailSwapNoAvalon">As you are not logged in with Avalon, the post on Avalon blockchain will not be updated. Therefore, only the Hive post will be updated with the new thumbnail.</div>
             <h3>Link to d.tube video to swap thumbnail:</h3>
             <input type="text" class="meta" placeholder="Paste d.tube link here" id="thumbnailSwapLink">
             <a class="roundedBtn" id="linkSubmitBtn">Submit Link</a>
