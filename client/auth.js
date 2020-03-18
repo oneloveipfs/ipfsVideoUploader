@@ -21,7 +21,7 @@ async function Steem() {
                     restrict()
                     resolve(null)
                 } else {
-                    document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + authResponse.data.user + ' on Steem'
+                    document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + authResponse.data.user + ' on Hive'
                     retrieveDraft()
                     resolve(authResponse.data.user)
                 }
@@ -46,7 +46,7 @@ async function Steem() {
                     alert(err)
                     return resolve(null)
                 }
-                document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + res.account.name + ' on Steem'
+                document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + res.account.name + ' on Hive'
                 axios.get('/checkuser?user=' + res.account.name).then(function(response) {
                     console.log(response)
                     if (response.data.isInWhitelist == false) {

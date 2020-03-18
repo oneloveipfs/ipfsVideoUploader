@@ -472,12 +472,12 @@ function postVideo() {
     }
 
     console.log('post video')
-    document.getElementById('progressBarFront').innerHTML = 'Submitting video to Steem blockchain...'
+    document.getElementById('progressBarFront').innerHTML = 'Submitting video to Hive blockchain...'
 
     let progressbar = document.getElementById('progressBarBack')
     let progressbarInner = document.getElementById('progressBarFront')
 
-    // Post to Steem blockchain
+    // Post to Hive blockchain
     let transaction = generatePost()
     console.log(transaction)
     if (Auth.iskeychain == 'true') {
@@ -548,8 +548,7 @@ function buildPostBody(author,permlink,postBody,videoHash,snapHash,description) 
 }
 
 function buildJsonMetadata() {
-    // TODO: Update json_metadata for dtube 0.9+ for Steem + SCOT
-    // 'dtube' tag as first tag for Steemit post
+    // 'dtube' tag as first tag for Hive post
     let SteemTags = ['dtube']
     SteemTags = SteemTags.concat(postparams.tags);
 
@@ -663,12 +662,12 @@ async function broadcastAvalon(json,tag,permlink,cb) {
         }
         let signedtx = javalon.sign(sessionStorage.getItem('OneLoveAvalonKey'),avalonAcc.name,tx)
         javalon.sendTransaction(signedtx,(err,result) => {
-            if (err) alert('Steem broadcast successful however there is an error with Avalon: ' + JSON.stringify(err))
+            if (err) alert('Hive broadcast successful however there is an error with Avalon: ' + JSON.stringify(err))
             cb()
         })
     } catch (e) {
-        // Alert any Avalon errors after successful Steem tx broadcast then proceed to watch page as usual
-        alert('Steem broadcast successful however there is an error with Avalon: ' + JSON.stringify(e))
+        // Alert any Avalon errors after successful Hive tx broadcast then proceed to watch page as usual
+        alert('Hive broadcast successful however there is an error with Avalon: ' + JSON.stringify(e))
         cb()
     }
 }
