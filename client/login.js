@@ -124,7 +124,7 @@ document.getElementById('altAuthBtn').onclick = () => {
     let hiveClient = new hivesigner.Client({
         app: 'ipfsuploader.app',
         callbackURL: 'http://localhost:3000/upload',
-        scope: ['posting']
+        scope: ['comment','comment_options']
     })
 
     hiveClient.login({},(err,token) => {

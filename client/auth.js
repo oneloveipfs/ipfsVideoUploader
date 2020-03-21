@@ -40,12 +40,12 @@ async function Hive() {
         let user = await keychainLoginPromise
         return user
     } else {
-        // SteemConnect login
-        let steemconnectLoginPromise = new Promise((resolve,reject) => {
-            let api = new steemconnect.Client({ accessToken: token })
-            api.me((err,res) => {
+        // HiveSigner login
+        let hivesignerLoginPromise = new Promise((resolve,reject) => {
+            let hiveapi = new hivesigner.Client({ accessToken: token })
+            hiveapi.me((err,res) => {
                 if (err) {
-                    alert(err)
+                    alert(JSON.stringify(err))
                     return resolve(null)
                 }
                 document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + res.account.name + ' on Hive'
@@ -68,8 +68,8 @@ async function Hive() {
             })
         })
 
-        let user = await steemconnectLoginPromise
-        return user
+        let hiveuser = await hivesignerLoginPromise
+        return hiveuser
     }
 }
 
