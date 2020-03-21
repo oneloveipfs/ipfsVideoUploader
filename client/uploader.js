@@ -474,46 +474,54 @@ function postVideo() {
     }
 
     console.log('post video')
-    document.getElementById('progressBarFront').innerHTML = 'Submitting video to Hive blockchain...'
 
     let progressbar = document.getElementById('progressBarBack')
     let progressbarInner = document.getElementById('progressBarFront')
 
-    // Post to Hive blockchain
-    let transaction = generatePost('hive')
-    let steemTx = generatePost('steem')
-    console.log('Hive tx',transaction)
-    console.log('Steem tx',steemTx)
+    progressbarInner.innerHTML = 'Submitting video to Hive blockchain...'
 
-    return
+    // Post to Hive blockchain
+    let hiveTx = generatePost('hive')
+    let steemTx = generatePost('steem')
+    console.log('Hive tx',hiveTx)
+    console.log('Steem tx',steemTx)
 
     if (Auth.iskeychain == 'true') {
         // Broadcast with Keychain
-        steem_keychain.requestBroadcast(username,transaction,'Posting',(response) => {
-            if (response.error != null) {
-                alert('Failed to post on DTube: ' + response.error + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + postparams.ipfshash + '\nThumbnail hash: ' + postparams.imghash + '\nSprite hash: ' + postparams.spritehash + '\nVideo duration: ' + postparams.duration)
-                progressbar.style.display = "none";
-                reenableFields();
-            } else if (avalonUser !== null) {
-                // Broadcast to Avalon as well if Avalon login exists
+        hive_keychain.requestBroadcast(username,hiveTx,'Posting',(hiveResponse) => {
+            if (hiveResponse.error) {
+                alert('Failed to post on DTube: ' + hiveResponse.error)
+                progressbar.style.display = "none"
+                return reenableFields()
+            }
+
+            // Avalon broadcast
+            if (avalonUser) {
+                progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
                 let avalontag = ''
                 if (postparams.tags.length !== 0)
                     avalontag = postparams.tags[0]
-                progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
-                broadcastAvalon(buildJsonMetadataAvalon(),avalontag,postparams.ipfshash,() =>  {
-                    localStorage.clear()
-                    window.location.replace('https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash)
+                broadcastAvalon(buildJsonMetadataAvalon(),avalontag,postparams.ipfshash,() => {
+                    if (steemUser) {
+                        progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
+                        steem_keychain.requestBroadcast(steemUser,steemTx,'Posting',(steemResponse) => {
+                            if (steemResponse.error) alert('Posted to Hive and Avalon blockchains successfully but failed to post to Steem: ' + steemResponse.error)
+                            broadcastCompletion(true)
+                        })
+                    } else broadcastCompletion(true)
                 })
-            } else {
-                // If Avalon login not found, redirect to d.tube watch page right away
-                localStorage.clear()
-                window.location.replace('https://d.tube/v/' + username + '/' + postparams.permlink)
-            }
+            } else if (steemUser) {
+                progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
+                steem_keychain.requestBroadcast(steemUser,steemTx,'Posting',(steemResponse) => {
+                    if (steemResponse.error) alert('Posted to Hive blockchain successfully but failed to post to Steem: ' + steemResponse.error)
+                    broadcastCompletion(false)
+                })
+            } else broadcastCompletion(false)
         })
     } else {
         // Broadcast with SteemConnect
         let api = new steemconnect.Client({ accessToken: Auth.token })
-        api.broadcast(transaction,(err) => {
+        api.broadcast(steemTx,(err) => {
             if (err != null) {
                 alert('Failed to post on DTube: ' + err + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + postparams.ipfshash + '\nThumbnail hash: ' + postparams.imghash + '\nSprite hash: ' + postparams.spritehash + '\nVideo duration: ' + postparams.duration)
                 progressbar.style.display = "none";
@@ -779,6 +787,14 @@ function updateBeneficiaries() {
             updateBeneficiaries()
         }
     }
+}
+
+function broadcastCompletion(isAvalonSuccess) {
+    localStorage.clear()
+    if (isAvalonSuccess)
+        window.location.replace('https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash)
+    else
+        window.location.replace('https://d.tube/v/' + username + '/' + postparams.permlink)
 }
 
 function beneficiarySorter (a,b) {
