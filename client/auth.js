@@ -2,8 +2,9 @@
 let url = new URL(window.location.href)
 let token = url.searchParams.get('access_token') // Access token for logged in user
 let iskeychain = url.searchParams.get('keychain')
+let steemUser = url.searchParams.get('steemuser')
 
-async function Steem() {
+async function Hive() {
     if (!token) {
         // Not logged in or no access token
         window.setTimeout(function() {
@@ -12,7 +13,7 @@ async function Steem() {
         },100)
         return null
     } else if (iskeychain == 'true') {
-        // Steem Keychain Login
+        // Hive Keychain Login
         let keychainLoginPromise = new Promise((resolve,reject) => {
             axios.get('/auth?access_token=' + token).then((authResponse) => {
                 if (authResponse.data.error != null) {
@@ -22,6 +23,7 @@ async function Steem() {
                     resolve(null)
                 } else {
                     document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + authResponse.data.user + ' on Hive'
+                    if (steemUser) document.getElementById('loggedInUser').innerHTML += ', ' + steemUser + ' on Steem'
                     retrieveDraft()
                     resolve(authResponse.data.user)
                 }
@@ -47,6 +49,7 @@ async function Steem() {
                     return resolve(null)
                 }
                 document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + res.account.name + ' on Hive'
+                
                 axios.get('/checkuser?user=' + res.account.name).then(function(response) {
                     console.log(response)
                     if (response.data.isInWhitelist == false) {
@@ -141,7 +144,7 @@ function arrContainsInt(arr,value) {
 }
 
 window.Auth = {
-    Steem,
+    Hive,
     Avalon,
     token,
     iskeychain,

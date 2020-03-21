@@ -1,9 +1,11 @@
 // Load auth details
 let username
-Auth.Steem().then((result) => {
+Auth.Hive().then((result) => {
     username = result
     Auth.Avalon()
 })
+
+steem.api.setOptions({ url: 'https://api.hive.blog' })
 
 // Setup subtitles tab
 const allLangCodes = languages.getAllLanguageCode()
@@ -22,7 +24,7 @@ if (savedSubtitles) {
     setTimeout(() => updateSubtitle(),250)
 }
 
-// Beneficiaries
+// Hive Beneficiaries
 let beneficiaryList = []
 let totalBeneficiaries = 0
 let beneficiaryAccList = []
@@ -478,8 +480,13 @@ function postVideo() {
     let progressbarInner = document.getElementById('progressBarFront')
 
     // Post to Hive blockchain
-    let transaction = generatePost()
-    console.log(transaction)
+    let transaction = generatePost('hive')
+    let steemTx = generatePost('steem')
+    console.log('Hive tx',transaction)
+    console.log('Steem tx',steemTx)
+
+    return
+
     if (Auth.iskeychain == 'true') {
         // Broadcast with Keychain
         steem_keychain.requestBroadcast(username,transaction,'Posting',(response) => {
@@ -547,7 +554,7 @@ function buildPostBody(author,permlink,postBody,videoHash,snapHash,description) 
     }
 }
 
-function buildJsonMetadata() {
+function buildJsonMetadata(network) {
     // 'dtube' tag as first tag for Hive post
     let SteemTags = ['dtube']
     SteemTags = SteemTags.concat(postparams.tags);
@@ -558,13 +565,26 @@ function buildJsonMetadata() {
         app: 'onelovedtube/0.9.3',
     }
 
-    if (avalonUser !== null)
-        jsonMeta.video.refs = ['dtc/' + avalonUser + '/' + postparams.ipfshash]
-    else
-        jsonMeta.video.refs = []
+    let ref = []
+    if (avalonUser) ref.push('dtc/' + avalonUser + '/' + postparams.ipfshash)
 
-    if (subtitleList.length > 0)
-        jsonMeta.video.content.subtitles = subtitleList
+    switch(network) {
+        case 'hive':
+            // Reference to dtc and steem
+            if (steemUser) ref.push('steem/' + steemUser + '/' + postparams.permlink)
+            break
+        case 'steem':
+            // Reference to dtc and hive
+            ref.push('hive/' + username + '/' + postparams.permlink)
+            break
+        default:
+            break
+    }
+
+    jsonMeta.video.refs = ref
+
+    // if (subtitleList.length > 0)
+    //     jsonMeta.video.content.subtitles = subtitleList
 
     return jsonMeta;
 }
@@ -608,28 +628,27 @@ function buildJsonMetadataAvalon() {
                     360: postparams.imghash,
                     spr: postparams.spritehash
                 }
-            }, // TODO: Add Skynet support
-            dur: postparams.duration,
-            title: postparams.title,
-            desc: postparams.description,
-            tag: postparams.tags[0],
-            hide: 0,
-            nsfw: 0,
-            oc: 1,
-            refs: [
-                'steem/' + username + '/' + postparams.permlink,
-                'hive/' + username + '/' + postparams.permlink
-            ]
-        }
+            } // TODO: Add Skynet support
+        },
+        dur: postparams.duration,
+        title: postparams.title,
+        desc: postparams.description,
+        tag: postparams.tags[0],
+        hide: 0,
+        nsfw: 0,
+        oc: 1,
+        refs: ['hive/' + username + '/' + postparams.permlink]
     }
 
-    if (subtitleList.length > 0)
-        jsonMeta.ipfs.subtitles = subtitleList
+    if (steemUser) jsonMeta.refs.push('steem/' + steemUser + '/' + postparams.permlink)
+
+    // if (subtitleList.length > 0)
+    //     jsonMeta.ipfs.subtitles = subtitleList
 
     return jsonMeta
 }
 
-function generatePost() {
+function generatePost(network) {
     // Power up all rewards or not
     let percentSBD = 10000
     if (postparams.powerup == true) {
@@ -650,7 +669,7 @@ function generatePost() {
                 permlink: postparams.permlink,
                 title: postparams.title,
                 body: buildPostBody(username,postparams.permlink,postparams.postBody,postparams.ipfshash,postparams.imghash,postparams.description),
-                json_metadata: JSON.stringify(buildJsonMetadata()),
+                json_metadata: JSON.stringify(buildJsonMetadata(network)),
             }
         ],
         [ "comment_options", {
