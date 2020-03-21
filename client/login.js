@@ -34,22 +34,25 @@ function dismissPopup(event,popupelement) {
 }
 
 document.getElementById('proceedAuthBtn').onclick = async function proceedLogin() {
-    if (proceedAuthBtnDisabled == true) {
-        return
-    }
-    let sclogin = false
+    if (proceedAuthBtnDisabled == true) return
+
+    let useSteem = false
     let keychainLoginBtn = document.getElementById('proceedAuthBtn')
     let username = document.getElementById('loginUsername').value.toLowerCase().replace('@','')
+    let steemUsername = document.getElementById('loginSteemUsername').value.toLowerCase().replace('@','')
     let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
     let avalonKey = document.getElementById('avalonLoginKey').value
 
-    if (!window.steem_keychain && document.getElementById('proceedAuthBtn').innerText === 'Login with Steem Keychain') {
-        alert('Steem Keychain is not installed!')
-        return
+    if (username == '') return alert('Hive username is required')
+    if (!window.hive_keychain) return alert('Hive Keychain is not installed')
+    if (!window.steem_keychain && steemUsername != '') return alert('Steem Keychain is not installed')
+
+    if (steemUsername != '') {
+        useSteem = true
+        steem_keychain.requestHandshake(() => console.log('Steem Keychain Handshake received!'))
     }
 
-    if (window.steem_keychain) steem_keychain.requestHandshake(() => console.log('Handshake received!'))
-    if (document.getElementById('proceedAuthBtn').innerText === 'Proceed to SteemConnect') sclogin = true
+    hive_keychain.requestHandshake(() => console.log('Hive Keychain Handshake received!'))
     keychainLoginBtn.innerText = "Logging In..."
     proceedAuthBtnDisabled = true
 
@@ -72,11 +75,9 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
         try {
             let avalonLoginResult = await avalonLoginPromise
             if (avalonLoginResult != true) {
-                cancelLoginBtn(sclogin)
                 return alert('Avalon key is invalid!')
             }
         } catch (e) {
-            cancelLoginBtn(sclogin)
             return alert('Avalon login error: ' + e)
         }
         
@@ -88,75 +89,71 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
         sessionStorage.clear()
     }
 
-    // Proceed to SteemConnect login page if SteemConnect login chosen
-    if (sclogin === true) {
-        return window.location.href = scconfig.steemconnectLoginURL
-    }
-
-    // Steem Keychain login
+    // Keychain login
+    // Using public posting key on Hive to initiate login
     axios.get('/login?user=' + username).then((response) => {
         if (response.data.error != null) {
             alert(response.data.error)
-            cancelLoginBtn(sclogin)
             return
         }
-        steem_keychain.requestVerifyKey(username,response.data.encrypted_memo,'Posting',(loginResponse) => {
+        hive_keychain.requestVerifyKey(username,response.data.encrypted_memo,'Posting',(loginResponse) => {
             console.log(loginResponse)
-            if (loginResponse.error != null) {
-                alert(loginResponse.message)
-                cancelLoginBtn(sclogin)
-                return
-            }
-            let encrypted_message = loginResponse.result.substr(1)   
-            let contentType = {
-                headers: {
-                    "content-type": "text/plain",
-                },
-            }
+            if (loginResponse.error != null) return alert(loginResponse.message)
 
-            axios.post('/logincb',encrypted_message,contentType).then((cbResponse) => {
-                if (cbResponse.data.error != null) {
-                    alert(cbResponse.data.error)
-                    cancelLoginBtn(sclogin)
-                } else {
-                    window.location.href = '/upload?access_token=' + cbResponse.data.access_token + '&keychain=true'
-                }
-            }).catch((err) => {
-                if (err.response.data.error) alert(err.response.data.error)
-                else alert(err)
-                cancelLoginBtn(sclogin)
-            })
+            if (steemUsername != '')
+                steem_keychain.requestSignBuffer(steemUsername,'login','Posting',(steemLoginRes) => {
+                    console.log('Steem Keychain response',steemLoginRes)
+                    if (steemLoginRes.success)
+                        keychainCb(loginResponse,steemUsername)
+                    else {
+                        alert('Steem Keychain login error: ' + steemLoginRes.error)
+                        keychainCb(loginResponse,'')
+                    }
+                })
+            else
+                keychainCb(loginResponse,'')
         })
     }).catch((err) => {
         if (err.response.data.error) alert(err.response.data.error)
         else alert(err)
-        cancelLoginBtn(sclogin)
     })
 }
 
 document.getElementById('altAuthBtn').onclick = () => {
-    if (document.getElementById('altAuthBtn').innerText === 'Login with SteemConnect') {
-        document.getElementById('loginUsername').style.display = 'none'
-        document.getElementById('sameAvalonUsername').style.display = 'none'
-        document.getElementById('proceedAuthBtn').innerText = 'Proceed to SteemConnect'
-        document.getElementById('altAuthBtn').innerText = 'Login with Steem Keychain'
-    } else {
-        document.getElementById('loginUsername').style.display = 'inline'
-        document.getElementById('sameAvalonUsername').style.display = 'block'
-        document.getElementById('proceedAuthBtn').innerText = 'Login with Steem Keychain'
-        document.getElementById('altAuthBtn').innerText = 'Login with SteemConnect'
-    }
-}
+    // HiveSigner login (plus SteemConnect dual?)
+    let hiveClient = new hivesigner.Client({
+        app: 'ipfsuploader.app',
+        callbackURL: 'http://localhost:3000/upload',
+        scope: ['posting']
+    })
 
-function cancelLoginBtn(sc) {
-    let keychainLoginBtn = document.getElementById('proceedAuthBtn')
-    if (sc === true)
-        keychainLoginBtn.innerText = "Proceed to SteemConnect"
-    else
-        keychainLoginBtn.innerText = "Login with Steem Keychain"
-    proceedAuthBtnDisabled = false
+    hiveClient.login({},(err,token) => {
+        console.log('HiveSigner',err,token)
+    })
 }
 })
+
+function keychainCb(hiveLoginRes,steemUser) {
+    let encrypted_message = hiveLoginRes.result.substr(1)   
+    let contentType = {
+        headers: {
+            "content-type": "text/plain",
+        },
+    }
+
+    axios.post('/logincb',encrypted_message,contentType).then((cbResponse) => {
+        if (cbResponse.data.error != null) {
+            alert(cbResponse.data.error)
+        } else {
+            let cbUrl = '/upload?access_token=' + cbResponse.data.access_token + '&keychain=true'
+            if (steemUser != '') cbUrl += '&steemuser=' + steemUser
+            window.location.href = cbUrl
+        }
+    }).catch((err) => {
+        if (err.response.data.error) alert(err.response.data.error)
+        else alert(err)
+    })
+}
 
 function arrContainsInt(arr,value) {
     for (var i = 0; i < arr.length; i++) {

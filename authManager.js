@@ -7,6 +7,8 @@ const fs = require('fs')
 const Keys = require('./.auth.json')
 const Config = require('./config.json')
 
+Steem.api.setOptions({ url: 'https://api.hive.blog' })
+
 // If whitelist file doesn't exist create it
 if (Config.whitelistEnabled && !fs.existsSync('whitelist.txt'))
     fs.writeFileSync('./whitelist.txt','')
