@@ -570,27 +570,57 @@ function buildJsonMetadata() {
 }
 
 function buildJsonMetadataAvalon() {
+    // let jsonMeta = {
+    //     videoId: postparams.ipfshash,
+    //     duration: postparams.duration,
+    //     title: postparams.title,
+    //     description: postparams.description,
+    //     filesize: postparams.filesize,
+    //     ipfs: {
+    //         snaphash: postparams.imghash,
+    //         spritehash: postparams.spritehash,
+    //         videohash: postparams.ipfshash,
+    //         video240hash: postparams.ipfs240hash,
+    //         video480hash: postparams.ipfs480hash,
+    //         video720hash: postparams.ipfs720hash,
+    //         video1080hash: postparams.ipfs1080hash,
+    //         gateway: config.gateway
+    //     },
+    //     thumbnailUrl: 'https://snap1.d.tube/ipfs/' + postparams.imghash,
+    //     providerName: 'IPFS',
+    //     refs: [
+    //         'steem/' + username + '/' + postparams.permlink
+    //     ]
+    // }
+
     let jsonMeta = {
-        videoId: postparams.ipfshash,
-        duration: postparams.duration,
-        title: postparams.title,
-        description: postparams.description,
-        filesize: postparams.filesize,
-        ipfs: {
-            snaphash: postparams.imghash,
-            spritehash: postparams.spritehash,
-            videohash: postparams.ipfshash,
-            video240hash: postparams.ipfs240hash,
-            video480hash: postparams.ipfs480hash,
-            video720hash: postparams.ipfs720hash,
-            video1080hash: postparams.ipfs1080hash,
-            gateway: config.gateway
-        },
-        thumbnailUrl: 'https://snap1.d.tube/ipfs/' + postparams.imghash,
-        providerName: 'IPFS',
-        refs: [
-            'steem/' + username + '/' + postparams.permlink
-        ]
+        files: {
+            ipfs: {
+                vid: {
+                    src: postparams.ipfshash,
+                    240: postparams.ipfs240hash,
+                    480: postparams.ipfs480hash,
+                    720: postparams.ipfs720hash,
+                    1080: postparams.ipfs1080hash
+                },
+                img: {
+                    118: postparams.imghash,
+                    360: postparams.imghash,
+                    spr: postparams.spritehash
+                }
+            }, // TODO: Add Skynet support
+            dur: postparams.duration,
+            title: postparams.title,
+            desc: postparams.description,
+            tag: postparams.tags[0],
+            hide: 0,
+            nsfw: 0,
+            oc: 1,
+            refs: [
+                'steem/' + username + '/' + postparams.permlink,
+                'hive/' + username + '/' + postparams.permlink
+            ]
+        }
     }
 
     if (subtitleList.length > 0)
