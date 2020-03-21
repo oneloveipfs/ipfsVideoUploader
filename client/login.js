@@ -123,7 +123,7 @@ document.getElementById('altAuthBtn').onclick = () => {
     // HiveSigner login (plus SteemConnect dual?)
     let hiveClient = new hivesigner.Client({
         app: 'ipfsuploader.app',
-        callbackURL: 'http://localhost:3000/upload',
+        callbackURL: 'https://beta.oneloved.tube/upload',
         scope: ['comment','comment_options']
     })
 
