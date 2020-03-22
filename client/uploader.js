@@ -122,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
         postparams.description = document.getElementById('description').value
         postparams.powerup = document.getElementById('powerup').checked
         postparams.permlink = generatePermlink()
+        if (document.getElementById('customPermlink').value != '') postparams.permlink = document.getElementById('customPermlink').value
 
         let sourceVideo = document.getElementById('sourcevideo').files
         let snap = document.getElementById('snapfile').files
