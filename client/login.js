@@ -57,37 +57,7 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
     proceedAuthBtnDisabled = true
 
     // Avalon login
-    if (avalonUsername !== '' && avalonKey !== '') {
-        let avalonLoginPromise = new Promise((resolve,reject) => {
-            javalon.getAccount(avalonUsername,(err,result) => {
-                if (err) return reject(err)
-                let avalonPubKey = javalon.privToPub(avalonKey)
-                if (result.pub === avalonPubKey) return resolve(true)
-
-                // Login with "Posting key" (recommended)
-                for (let i = 0; i < result.keys.length; i++) {
-                    if (arrContainsInt(result.keys[i].types,4) === true && result.keys[i].pub === avalonPubKey) return resolve(true)
-                }
-                resolve(false)
-            })
-        })
-        
-        try {
-            let avalonLoginResult = await avalonLoginPromise
-            if (avalonLoginResult != true) {
-                return alert('Avalon key is invalid!')
-            }
-        } catch (e) {
-            return alert('Avalon login error: ' + e)
-        }
-        
-        // Storing Avalon login in sessionStorage so that we can access this in the upload page to sign transactions later.
-        sessionStorage.setItem('OneLoveAvalonUser',avalonUsername)
-        sessionStorage.setItem('OneLoveAvalonKey',avalonKey)
-    } else {
-        // If Avalon username or password not provided, clear existing login (if any) from sessionStorage
-        sessionStorage.clear()
-    }
+    avalonLogin(avalonUsername,avalonKey)
 
     // Keychain login
     // Using public posting key on Hive to initiate login
@@ -121,6 +91,11 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
 
 document.getElementById('altAuthBtn').onclick = () => {
     // HiveSigner login (plus SteemConnect dual?)
+    let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
+    let avalonKey = document.getElementById('avalonLoginKey').value
+
+    avalonLogin(avalonUsername,avalonKey)
+
     let hiveClient = new hivesigner.Client({
         app: 'ipfsuploader.app',
         callbackURL: 'https://beta.oneloved.tube/upload',
@@ -153,6 +128,40 @@ function keychainCb(hiveLoginRes,steemUser) {
         if (err.response.data.error) alert(err.response.data.error)
         else alert(err)
     })
+}
+
+async function avalonLogin(avalonUsername,avalonKey) {
+    if (avalonUsername !== '' && avalonKey !== '') {
+        let avalonLoginPromise = new Promise((resolve,reject) => {
+            javalon.getAccount(avalonUsername,(err,result) => {
+                if (err) return reject(err)
+                let avalonPubKey = javalon.privToPub(avalonKey)
+                if (result.pub === avalonPubKey) return resolve(true)
+
+                // Login with "Posting key" (recommended)
+                for (let i = 0; i < result.keys.length; i++) {
+                    if (arrContainsInt(result.keys[i].types,4) === true && result.keys[i].pub === avalonPubKey) return resolve(true)
+                }
+                resolve(false)
+            })
+        })
+        
+        try {
+            let avalonLoginResult = await avalonLoginPromise
+            if (avalonLoginResult != true) {
+                return alert('Avalon key is invalid!')
+            }
+        } catch (e) {
+            return alert('Avalon login error: ' + e)
+        }
+        
+        // Storing Avalon login in sessionStorage so that we can access this in the upload page to sign transactions later.
+        sessionStorage.setItem('OneLoveAvalonUser',avalonUsername)
+        sessionStorage.setItem('OneLoveAvalonKey',avalonKey)
+    } else {
+        // If Avalon username or password not provided, clear existing login (if any) from sessionStorage
+        sessionStorage.clear()
+    }
 }
 
 function arrContainsInt(arr,value) {
