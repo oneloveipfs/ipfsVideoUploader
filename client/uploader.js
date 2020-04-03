@@ -650,6 +650,7 @@ function buildJsonMetadataAvalon() {
     }
 
     if (steemUser) jsonMeta.refs.push('steem/' + steemUser + '/' + postparams.permlink)
+    if (config.gateway) jsonMeta.files.ipfs.gw = config.gateway 
 
     // if (subtitleList.length > 0)
     //     jsonMeta.ipfs.subtitles = subtitleList
