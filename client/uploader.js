@@ -520,32 +520,10 @@ function postVideo() {
             } else broadcastCompletion(false)
         })
     } else {
-        // Broadcast with SteemConnect
-        // let api = new steemconnect.Client({ accessToken: Auth.token })
-        // api.broadcast(steemTx,(err) => {
-        //     if (err != null) {
-        //         alert('Failed to post on DTube: ' + err + '\n\nHere are the details of the upload for your reference:\nIPFS hash: ' + postparams.ipfshash + '\nThumbnail hash: ' + postparams.imghash + '\nSprite hash: ' + postparams.spritehash + '\nVideo duration: ' + postparams.duration)
-        //         progressbar.style.display = "none";
-        //         reenableFields();
-        //     } else if (avalonUser !== null) {
-        //         // Broadcast to Avalon as well if Avalon login exists
-        //         let avalontag = ''
-        //         if (postparams.tags.length !== 0)
-        //             avalontag = postparams.tags[0]
-        //         progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
-        //         broadcastAvalon(buildJsonMetadataAvalon(),avalontag,postparams.ipfshash,() =>  {
-        //             localStorage.clear()
-        //             window.location.replace('https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash)
-        //         })
-        //     } else {
-        //         localStorage.clear();
-        //         window.location.replace('https://d.tube/v/' + username + '/' + postparams.permlink)
-        //     }
-        // })
         let hiveapi = new hivesigner.Client({ 
             accessToken: Auth.token,
-            app: 'ipfsuploader.app',
-            callbackURL: 'http://localhost:3000/upload',
+            app: config.HiveSignerApp,
+            callbackURL: config.callbackURL,
             scope: ['comment','comment_options']
         })
         hiveapi.broadcast(hiveTx,(err) => {

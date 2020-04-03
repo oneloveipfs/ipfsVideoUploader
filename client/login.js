@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     axios.get('/config').then((result) => {
         config = result.data
 
-        if (!config.steemconnectEnabled) {
+        if (!config.hivesignerEnabled) {
             let tohide = document.getElementsByClassName("sclogin")
             for (let i = 0; i < tohide.length; i++) {
                 tohide[i].style.display = "none"
@@ -97,8 +97,8 @@ document.getElementById('altAuthBtn').onclick = () => {
     avalonLogin(avalonUsername,avalonKey)
 
     let hiveClient = new hivesigner.Client({
-        app: 'ipfsuploader.app',
-        callbackURL: 'https://beta.oneloved.tube/upload',
+        app: config.HiveSignerApp,
+        callbackURL: config.callbackURL,
         scope: ['comment','comment_options']
     })
 

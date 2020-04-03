@@ -1,11 +1,5 @@
 # Config file guide
 
-#### SteemConnect settings (only required for generating login links)
-* `SteemConnectApp`: Specify the app name of your SteemConnect application.
-* `callbackURL`: Specify the uploader page URL (https://yourdomain.com/upload) where the URL must be listed in SteemConnect application settings.
-
-Ignore this section if you do not wish to support SteemConnect authentication.
-
 #### General settings
 * `IPFS_API_PORT`: Specify port that IPFS daemon listens to for IPFS API calls.
 * `HTTP_PORT`: Specify port to listen to HTTP requests.
@@ -16,8 +10,9 @@ Ignore this section if you do not wish to support SteemConnect authentication.
 
 #### Client configuration
 * `gateway`: IPFS gateway domain to use as default gateway overwrite on DTube embed player.
-* `steemconnectEnabled`: Set to true to enable SteemConnect authentication.
-* `steemconnectLoginURL`: SteemConnect URL to open in web browser for authentication.
+* `hivesignerEnabled`: Set to true to enable HiveSigner authentication.
+* `HiveSignerApp`: Specify the app name of your HiveSigner application.
+* `callbackURL`: Specify the uploader page URL (https://yourdomain.com/upload) where the URL must be listed in HiveSigner application settings.
 * `tusdEndpoint`: tusd HTTP endpoint for resumable file uploads.
 
 #### tusd settings

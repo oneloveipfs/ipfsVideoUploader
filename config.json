@@ -1,7 +1,4 @@
 {
-    "SteemConnectApp": "ipfsuploader.app",
-    "callbackURL": "https://uploader.oneloved.tube/upload",
-
     "IPFS_API_PORT": 5001,
     "HTTP_PORT": 3000,
     "whitelistEnabled": true,
@@ -11,9 +8,10 @@
     "admins":["techcoderx","graylan","gray00","d00k13","vaultec","toddmck","priyanarc"],
 
     "ClientConfig": {
-        "gateway": "video.oneloveipfs.com",
-        "steemconnectEnabled": true,
-        "steemconnectLoginURL": "https://steemconnect.com/oauth2/authorize?client_id=ipfsuploader.app&redirect_uri=https%3A%2F%2Fuploader.oneloved.tube%2Fupload&scope=comment,comment_options",
+        "gateway": "https://video.oneloveipfs.com",
+        "hivesignerEnabled": true,
+        "HiveSignerApp": "ipfsuploader.app",
+        "callbackURL": "https://beta.oneloved.tube/upload",
         "tusdEndpoint": "http://localhost:1080/files"
     },
 

@@ -15,7 +15,7 @@ This is an alternative IPFS uploader to upload videos onto DTube. Includes a bas
 
 ### Additional requirements
 
-* A SteemConnect application (if SteemConnect authentication is used)
+* A HiveSigner application (if HiveSigner authentication is used)
 * A domain name for HTTPS, plus SSL certificate for that domain installed
 
 # Installation
@@ -28,13 +28,9 @@ This is an alternative IPFS uploader to upload videos onto DTube. Includes a bas
 
 4. Run `npm run keygen` to generate encryption and auth keys for Steem Keychain support. Then backup the contents of `.auth.json` file in a safe place.
 
-5. Run `npm run sc2link` to generate SteemConnect login link (if SteemConnect is used).
+5. If `whitelistEnabled` is set to `true`, add some Steem accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Steem user)
 
-6. Replace the login link with the one you obtained from step 5 in [config.json](https://github.com/techcoderx/ipfsVideoUploader/blob/master/config.json#L16) (if SteemConnect is used).
-
-7. If `whitelistEnabled` is set to `true`, add some Steem accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Steem user)
-
-8. Run the app by typing `npm start`. Your app will listen to ports you specify in `config.json` file.
+6. Run the app by typing `npm start`. Your app will listen to ports you specify in `config.json` file.
 
 All uploaded files (through non-resumable upload APIs) will be saved in the `uploaded` folder within the repo. Image files (for Steem article body) will be saved in the `imguploads` folder. As for resumable uploads, you may define the directory in `config.json` file as well as the `tusd` daemon startup arguments.
 
