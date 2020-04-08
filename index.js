@@ -4,6 +4,7 @@ const FileUploader = require('./ipfsUploadHandler')
 const db = require('./dbManager')
 const Auth = require('./authManager')
 const WC = require('./wcHelper')
+const Shawp = require('./shawp')
 const WooCommerce = require('woocommerce-api')
 const fs = require('fs')
 const async = require('async')
@@ -15,6 +16,7 @@ const app = Express()
 const http = require('http').Server(app)
 
 FileUploader.IPSync.init(http)
+Shawp.init()
 
 // Prohibit access to certain files through HTTP
 app.get('/index.js',(req,res) => {return res.status(404).redirect('/404')})
@@ -27,6 +29,7 @@ app.get('/scripts/getLoginLink.js',(req,res) => {return res.status(404).redirect
 app.get('/whitelist.txt',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/config.json',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/db/wc.json',(req,res) => {return res.status(404).redirect('/404')})
+app.get('/db/shawp/*',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package.json',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package-lock.json',(req,res) => {return res.status(404).redirect('/404')})
 
@@ -151,9 +154,6 @@ app.post('/uploadSubtitle',APILimiter,(request,response) => {
 })
 
 app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(request,response) => {
-    console.log(JSON.stringify(request.headers) + '\n')
-    console.log(JSON.stringify(request.body) + '\n\n')
-
     switch (request.headers['hook-name']) {
         case "pre-create":
             // Upload type check
@@ -265,7 +265,7 @@ app.get('/activeusers',APILimiter,(req,res) => {
 })
 
 app.post('/botusage',Parser.json(),(req,res) => {
-    if (!Config.WooCommerceEnabled) return res.status(404).end()
+    if (!Config.WooCommerceEnabled || Config.Shawp.Enabled) return res.status(404).end()
     Auth.webhookAuth(req.body.token,(err,valid) => {
         if (err || valid == false) return res.status(403).send('Failed to verify webhook.')
         res.status(200).send()
@@ -278,7 +278,7 @@ app.post('/botusage',Parser.json(),(req,res) => {
 
 // WooCommerce API calls
 app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(req,res) => {
-    if (!Config.WooCommerceEnabled) return res.status(404).end()
+    if (!Config.WooCommerceEnabled || Config.Shawp.Enabled) return res.status(404).end()
     WC.VerifyWebhook(req.rawBody,req.header('X-WC-Webhook-Signature'),(isValid) => {
         if (!isValid) return res.status(403).send('Invalid webhook')
 
@@ -315,7 +315,7 @@ app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlenco
 })
 
 app.get('/wc_user_info',APILimiter,(req,res) => {
-    if (!Config.WooCommerceEnabled) return res.status(404).end()
+    if (!Config.WooCommerceEnabled || Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,(user) => {
         WC.User(user,(err,info) => {
             if (err) res.status(400).send(err)
@@ -325,7 +325,7 @@ app.get('/wc_user_info',APILimiter,(req,res) => {
 })
 
 app.get('/wc_user_info_admin',APILimiter,(req,res) => {
-    if (!Config.WooCommerceEnabled) return res.status(404).end()
+    if (!Config.WooCommerceEnabled || Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,(user) => {
         if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
         WC.User(req.query.user,(err,info) => {

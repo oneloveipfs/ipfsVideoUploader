@@ -7,12 +7,14 @@
     "start": "node index.js",
     "sc2link": "node scripts/getLoginLink.js",
     "keygen": "node scripts/generateKeys.js",
-    "test": "mocha"
+    "test": "mocha --timeout 5000"
   },
   "author": "techcoderx",
   "license": "GPLv3",
   "dependencies": {
+    "@hiveio/hive-js": "0.0.1",
     "async": "^2.6.2",
+    "axios": "^0.19.2",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",

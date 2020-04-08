@@ -33,36 +33,20 @@
                 "name": "Trial",
                 "price": 0.00,
                 "quota": 0
-            },
-            {
-                "wcpid": 7405,
-                "name": "Starter",
-                "price": 3.00,
-                "quota": 17179869184
-            },
-            {
-                "wcpid": 206,
-                "name": "Creator",
-                "price": 10.00,
-                "quota": 68719476736
-            },
-            {
-                "wcpid": 371,
-                "name": "Enterprise",
-                "price": 35.00,
-                "quota": 274877906944
-            },
-            {
-                "wcpid": 376,
-                "name": "Ultimate",
-                "price": 60.00,
-                "quota": 549755813888
             }
         ],
         "Referral": {
-            "quotaBonus": 536870912,
-            "maxBonus": 5368709120
+            "quotaBonus": 0,
+            "maxBonus": 0
         }
+    },
+    "Shawp": {
+        "Enabled": true,
+        "DefaultUSDRate": 0.0029,
+        "HiveAPI": "https://hived.techcoderx.com",
+        "SteemAPI": "https://api.steemit.com",
+        "HiveReceiver": "randomvlogs",
+        "SteemReceiver": "randomvlogs"
     },
 
     "test": {
