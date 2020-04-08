@@ -1,5 +1,6 @@
 const Config = require('./config.json')
 const db = require('./dbManager')
+const Auth = require('./authManager')
 const hive = require('@hiveio/hive-js')
 const steem = require('steem')
 const fs = require('fs')
@@ -10,6 +11,7 @@ steem.api.setOptions({ url: Config.Shawp.SteemAPI, useAppbaseApi: true })
 
 let Customers = JSON.parse(fs.readFileSync('db/shawp/users.json'))
 let RefillHistory = JSON.parse(fs.readFileSync('db/shawp/refills.json'))
+let ConsumeHistory = JSON.parse(fs.readFileSync('db/shawp/consumes.json'))
 
 let Shawp = {
     init: () => {
@@ -22,7 +24,7 @@ let Shawp = {
                 if (tx.amount.endsWith('HIVE')) {
                     let amt = parseFloat(tx.amount.replace(' HIVE',''))
                     Shawp.ExchangeRate(Shawp.coins.Hive,amt,(e,usd) => {
-                        Shawp.Refill(tx.from,tx.from,"Hive",tx.amount,usd)
+                        Shawp.Refill(tx.from,tx.from,Shawp.methods.Hive,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
                         console.log('Refilled ' + (usd/0.0029) + ' credits successfully')
@@ -30,7 +32,10 @@ let Shawp = {
                 } else if (tx.amount.endsWith('HBD')) {
                     let amt = parseFloat(tx.amount.replace(' HBD',''))
                     Shawp.ExchangeRate(Shawp.coins.HiveDollars,amt,(e,usd) => {
-                        console.log(usd)
+                        Shawp.Refill(tx.from,tx.from,Shawp.methods.Hive,tx.amount,usd)
+                        Shawp.WriteRefillHistory()
+                        Shawp.WriteUserDB()
+                        console.log('Refilled ' + (usd/0.0029) + ' credits successfully')
                     })
                 }
             }
@@ -40,7 +45,23 @@ let Shawp = {
             let transaction = tx
             if (transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.SteemReceiver) {
                 let tx = transaction.operations[0][1]
-                
+                if (tx.amount.endsWith('STEEM')) {
+                    let amt = parseFloat(tx.amount.replace(' STEEM',''))
+                    Shawp.ExchangeRate(Shawp.coins.Steem,amt,(e,usd) => {
+                        Shawp.Refill(tx.from,tx.from,Shawp.methods.Steem,tx.amount,usd)
+                        Shawp.WriteRefillHistory()
+                        Shawp.WriteUserDB()
+                        console.log('Refilled ' + (usd/0.0029) + ' credits successfully')
+                    })
+                } else if (tx.amount.endsWith('SBD')) {
+                    let amt = parseFloat(tx.amount.replace(' SBD',''))
+                    Shawp.ExchangeRate(Shawp.coins.SteemDollars,amt,(e,usd) => {
+                        Shawp.Refill(tx.from,tx.from,Shawp.methods.Steem,tx.amount,usd)
+                        Shawp.WriteRefillHistory()
+                        Shawp.WriteUserDB()
+                        console.log('Refilled ' + (usd/0.0029) + ' credits successfully')
+                    })
+                }
             }
         })
     },
@@ -51,6 +72,8 @@ let Shawp = {
             balance: 0,
             joinedSince: new Date().getTime()
         }
+        fs.writeFile('db/shawp/usagehistory/' + username + '.json',JSON.stringify([]),() => {})
+        Auth.whitelistAdd(username,() => {})
     },
     User: (username) => {
         return Customers[username] || {}
@@ -105,8 +128,24 @@ let Shawp = {
             credits: newCredits
         })
     },
+    Consume: () => {
+        let datetoday = new Date()
+        let daynow = datetoday.getDate()
+        let monthnow = datetoday.getMonth()
+        let yearnow = datetoday.getFullYear()
+        for (user in Customers) db.getTotalUsage(user,(usage) => {
+            let gbdays = Math.round(usage / 1073741824 * 100000000) / 100000000
+            Customers[user].balance -= gbdays
+
+            if (!ConsumeHistory[user]) ConsumeHistory[user] = []
+            ConsumeHistory[user].unshift([daynow + '/' + monthnow + '/' + yearnow,gbdays])
+        })
+    },
     getRefillHistory: (username,start,count) => {
         return RefillHistory[username].slice(start,start+count)
+    },
+    getConsumeHistory: (username,start,count) => {
+        return ConsumeHistory[username].slice(start,start+count)
     },
     getDaysRemaining: (username,cb) => {
         db.getTotalUsage(username,(usage) => {
@@ -115,6 +154,10 @@ let Shawp = {
             else
                 return cb(Math.floor(Customers[username].balance / usage * 1073741824))
         })
+    },
+    setRate: (username,usdRate) => {
+        if (!Customers[username]) return
+        Customers[username].rate = usdRate
     },
     WriteUserDB: () => {
         fs.writeFile('db/shawp/users.json',JSON.stringify(Customers),(e) => {
@@ -126,12 +169,25 @@ let Shawp = {
             if (e) console.log('Error saving refill database: ' + err)
         })
     },
+    WriteConsumeHistory: () => {
+        fs.writeFile('db/shawp/consumes.json',JSON.stringify(ConsumeHistory),(e) => {
+            if (e) console.log('Error saving refill database: ' + err)
+        })
+    },
     coins: {
         DTC: 0,
         Hive: 1,
         HiveDollars: 2,
         Steem: 3,
         SteemDollars: 4
+    },
+    methods: {
+        DTC: 0,
+        Hive: 1,
+        Steem: 2,
+        Coupon: 3, // through promo/wc orders
+        Referral: 4, // not sure
+        System: 5
     }
 }
 
