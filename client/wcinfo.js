@@ -12,8 +12,9 @@ if (token == null || token == '') {
         let monthlyRate = result.data.rate * 30
         let infoToDisplay = '<h2>OneLoveIPFS account details</h2>'
         infoToDisplay += '<h3>Balance: ' + result.data.balance + ' GBdays'
-        infoToDisplay += '<br><br>Rate: $' + result.data.rate + '/day (~$' + monthlyRate + '/month)'
-        infoToDisplay += '<br><br>Joined Since: ' + moment(result.data.joinedSince).utc(result.data.joinedSince).local().format('MMMM DD YYYY h:mm:ss a') + '</h3>'
+        infoToDisplay += '<br>Current Usage: ' + humanReadableSize(result.data.usage)
+        infoToDisplay += '<br>Rate: $' + result.data.rate + '/day (~$' + monthlyRate + '/month)'
+        infoToDisplay += '<br>Joined Since: ' + moment(result.data.joinedSince).utc(result.data.joinedSince).local().format('MMMM DD YYYY h:mm:ss a') + '</h3>'
         document.getElementById('wcinfo').innerHTML = HtmlSanitizer.SanitizeHtml(infoToDisplay)
     } else {
         let totalAllocatedQuota = result.data.plan.quota + result.data.bonus + result.data.quotaOffset

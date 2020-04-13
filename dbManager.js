@@ -56,12 +56,12 @@ let db = {
     getUsage: (username,cb) => {
         cb(usageData[username])
     },
-    getTotalUsage: (username,cb) => {
+    getTotalUsage: (username) => {
         let qtotal = 0
         for (det in usageData[username]) {
             qtotal += usageData[username][det]
         }
-        cb(qtotal)
+        return qtotal
     },
     getAllUsage: (type,cb) => {
         let totalUse = 0

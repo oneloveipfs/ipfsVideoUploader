@@ -105,13 +105,11 @@ let Shawp = {
         require('./authManager').whitelistAdd(username,() => {})
     },
     User: (username) => {
-        // if (!Customers[username]) return {}
-        // db.getTotalUsage(username,(usage) => {
-        //     let res = JSON.parse(JSON.stringify(Customers[username]))
-        //     res.usage = usage
-        //     return res
-        // })
-        return Customers[username] || {}
+        if (!Customers[username]) return {}
+        let totalusage = db.getTotalUsage(username)
+        let res = JSON.parse(JSON.stringify(Customers[username]))
+        res.usage = totalusage
+        return res
     },
     UserExists: (username) => {
         if (!Customers[username]) return false
@@ -168,13 +166,14 @@ let Shawp = {
         let daynow = datetoday.getDate()
         let monthnow = datetoday.getMonth()
         let yearnow = datetoday.getFullYear()
-        for (user in Customers) db.getTotalUsage(user,(usage) => {
+        for (user in Customers) {
+            let usage = db.getTotalUsage(user)
             let gbdays = Math.round(usage / 1073741824 * 100000000) / 100000000
             Customers[user].balance -= gbdays
 
             if (!ConsumeHistory[user]) ConsumeHistory[user] = []
             ConsumeHistory[user].unshift([daynow + '/' + monthnow + '/' + yearnow,gbdays])
-        })
+        }
     },
     getRefillHistory: (username,start,count) => {
         return RefillHistory[username].slice(start,start+count)
@@ -183,19 +182,18 @@ let Shawp = {
         return ConsumeHistory[username].slice(start,start+count)
     },
     getDaysRemaining: (username,cb) => {
-        db.getTotalUsage(username,(usage) => {
-            if (usage <= 0)
-                return cb(-1)
-            else if (Customers[username].balance <= 0 && !Config.admins.includes(username))
-                return cb(0,usage/1073741824 - Customers[username].balance)
-            let days = Math.floor(Customers[username].balance / usage * 1073741824)
-            if (days == 0 && !Config.admins.includes(username))
-                return cb(days,usage/1073741824 - Customers[username].balance)
-            else if (days == 0 && Config.admins.includes(username))
-                return cb(-2)
-            else
-                return cb(days)
-        })
+        let usage = db.getTotalUsage(username)
+        if (usage <= 0)
+            return cb(-1)
+        else if (Customers[username].balance <= 0 && !Config.admins.includes(username))
+            return cb(0,usage/1073741824 - Customers[username].balance)
+        let days = Math.floor(Customers[username].balance / usage * 1073741824)
+        if (days == 0 && !Config.admins.includes(username))
+            return cb(days,usage/1073741824 - Customers[username].balance)
+        else if (days == 0 && Config.admins.includes(username))
+            return cb(-2)
+        else
+            return cb(days)
     },
     setRate: (username,usdRate) => {
         if (!Customers[username]) return

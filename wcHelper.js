@@ -82,11 +82,11 @@ let WCMethods = {
         Customers[username].botuse = use
     },
     AvailableQuota: (username,cb) => {
-        db.getTotalUsage(username,(usage) => {
-            let botusage = Customers[username].botuse
-            if (botusage == undefined) botusage = 0
-            cb(WCMethods.TotalQuota(username) - usage - botusage)
-        })
+        let usage = db.getTotalUsage(username)
+        let botusage = Customers[username].botuse
+        if (botusage == undefined) botusage = 0
+        cb(WCMethods.TotalQuota(username) - usage - botusage)
+        
     },
     WriteWCUserData: () => {
         fs.writeFile('db/wc.json',JSON.stringify(Customers),(err) => {
