@@ -13,6 +13,13 @@ if (token == null || token == '') {
 } else axios.get(geturl).then((result) => {
     if (isEmpty(result.data)) {
         return document.getElementById('wcinfo').innerHTML = '<h3>User is not a registered OneLoveIPFS customer!</h3>'
+    } else if (result.data.balance) {
+        let monthlyRate = result.data.rate * 30
+        let infoToDisplay = '<h2>OneLoveIPFS account details</h2>'
+        infoToDisplay += '<h3>Balance: ' + result.data.balance + ' GBdays'
+        infoToDisplay += '<br><br>Rate: $' + result.data.rate + '/day (~$' + monthlyRate + '/month)'
+        infoToDisplay += '<br><br>Joined Since: ' + moment(result.data.joinedSince).utc(result.data.joinedSince).local().format('MMMM DD YYYY h:mm:ss a') + '</h3>'
+        document.getElementById('wcinfo').innerHTML = HtmlSanitizer.SanitizeHtml(infoToDisplay)
     } else {
         let totalAllocatedQuota = result.data.plan.quota + result.data.bonus + result.data.quotaOffset
         let botusage = result.data.botuse

@@ -77,7 +77,7 @@ describe('Shawp',() => {
         let oldbal = Shawp.User(Config.test.user).balance
         Shawp.Consume()
         let newbal = Shawp.User(Config.test.user).balance
-        assert.isTrue(newbal < oldbal)
+        assert.isTrue(newbal <= oldbal)
         done()
     })
 

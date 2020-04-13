@@ -69,30 +69,12 @@ const rawBodySaver = (req, res, buf, encoding) => {
 app.use(Parser.text())
 
 // Setup WooCommerce
-let WooCommerceAPI
-if (Config.WooCommerceEnabled === true) {
-    WooCommerceAPI = new WooCommerce(Config.WooCommerceConfig)
-}
+let WooCommerceAPI = Config.WooCommerceEnabled ? new WooCommerce(Config.WooCommerceConfig) : null
 
-app.get('/', (request,response) => {
-    // Welcome page
-    loadWebpage('./client/welcome.html',response);
-});
-
-app.get('/reviews', (request,response) => {
-    // Review page
-    loadWebpage('./client/reviews.html',response)
-})
-
-app.get('/upload', (request,response) => {
-    // Uploader page
-    loadWebpage('./client/uploader.html',response);
-});
-
-app.get('/404', (request,response) => {
-    // 404 page
-    loadWebpage('./client/404.html',response);
-})
+app.get('/', (request,response) => loadWebpage('./client/welcome.html',response)) // Home page
+app.get('/reviews', (request,response) => loadWebpage('./client/reviews.html',response)) // Review page
+app.get('/upload', (request,response) => loadWebpage('./client/uploader.html',response)) // Upload page
+app.get('/404', (request,response) => loadWebpage('./client/404.html',response)) // 404 page
 
 app.get('/checkuser', APILimiter, (request,response) => {
     // Check if user is in whitelist
@@ -264,6 +246,53 @@ app.get('/activeusers',APILimiter,(req,res) => {
     res.send({count: FileUploader.IPSync.activeCount()})
 })
 
+/*
+app.get('shawp_user_info',APILimiter,(req,res) => {
+    if (!Config.Shawp.Enabled) return res.status(404).end()
+    Authenticate(req,res,(user) => {
+        return res.send(Shawp.User(user))
+    })
+})
+
+app.get('shawp_user_info_admin',APILimiter,(req,res) => {
+    if (!Config.Shawp.Enabled) return res.status(404).end()
+    Authenticate(req,res,(user) => {
+        if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
+        return res.send(Shawp.User(req.query.user))
+    })
+})
+*/
+
+app.get('shawp_refill_history',APILimiter,(req,res) => {
+    if (!Config.Shawp.Enabled) return res.status(404).end()
+    Authenticate(req,res,(user) => {
+        return res.send(Shawp.getRefillHistory(user,req.query.start || 0,req.query.count))
+    })
+})
+
+app.get('shawp_refill_history_admin',APILimiter,(req,res) => {
+    if (!Config.Shawp.Enabled) return res.status(404).end()
+    Authenticate(req,res,(user) => {
+        if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
+        return res.send(Shawp.getRefillHistory(req.query.user,req.query.start || 0,req.query.count))
+    })
+})
+
+app.get('shawp_consumption_history',APILimiter,(req,res) => {
+    if (!Config.Shawp.Enabled) return res.status(404).end()
+    Authenticate(req,res,(user) => {
+        return res.send(Shawp.getConsumeHistory(user,req.query.start || 0,req.query.count))
+    })
+})
+
+app.get('shawp_consumption_history_admin',APILimiter,(req,res) => {
+    if (!Config.Shawp.Enabled) return res.status(404).end()
+    Authenticate(req,res,(user) => {
+        if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
+        return res.send(Shawp.getConsumeHistory(req.query.user,req.query.start || 0,req.query.count))
+    })
+})
+
 app.post('/botusage',Parser.json(),(req,res) => {
     if (!Config.WooCommerceEnabled || Config.Shawp.Enabled) return res.status(404).end()
     Auth.webhookAuth(req.body.token,(err,valid) => {
@@ -315,9 +344,11 @@ app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlenco
 })
 
 app.get('/wc_user_info',APILimiter,(req,res) => {
-    if (!Config.WooCommerceEnabled || Config.Shawp.Enabled) return res.status(404).end()
+    if (!Config.WooCommerceEnabled && !Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,(user) => {
-        WC.User(user,(err,info) => {
+        if (Config.Shawp.Enabled) 
+            return res.send(Shawp.User(user))
+        else WC.User(user,(err,info) => {
             if (err) res.status(400).send(err)
             return res.send(info)
         })
@@ -325,10 +356,12 @@ app.get('/wc_user_info',APILimiter,(req,res) => {
 })
 
 app.get('/wc_user_info_admin',APILimiter,(req,res) => {
-    if (!Config.WooCommerceEnabled || Config.Shawp.Enabled) return res.status(404).end()
+    if (!Config.WooCommerceEnabled && !Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,(user) => {
         if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
-        WC.User(req.query.user,(err,info) => {
+        if (Config.Shawp.Enabled) 
+            return res.send(Shawp.User(req.query.user))
+        else WC.User(req.query.user,(err,info) => {
             if (err) res.status(400).send(err)
             return res.send(info)
         })
