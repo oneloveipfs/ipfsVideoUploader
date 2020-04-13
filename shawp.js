@@ -1,6 +1,5 @@
 const Config = require('./config.json')
 const db = require('./dbManager')
-const Auth = require('./authManager')
 const hive = require('@hiveio/hive-js')
 const steem = require('steem')
 const fs = require('fs')
@@ -18,48 +17,79 @@ let Shawp = {
         // Stream transactions from blockchain
         if (!Config.Shawp.Enabled) return
         if (Config.Shawp.HiveReceiver) hive.api.streamTransactions((err,tx) => {
+            if (err) return console.log('Hive tx stream error',err)
             let transaction = tx
-            if (transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.HiveReceiver) {
+            if (transaction && transaction.operations && transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.HiveReceiver) {
                 let tx = transaction.operations[0][1]
+                console.log(tx)
                 if (tx.amount.endsWith('HIVE')) {
                     let amt = parseFloat(tx.amount.replace(' HIVE',''))
                     Shawp.ExchangeRate(Shawp.coins.Hive,amt,(e,usd) => {
-                        Shawp.Refill(tx.from,tx.from,Shawp.methods.Hive,tx.amount,usd)
+                        if (e) return console.log(e)
+                        let receiver = tx.from
+                        let memo = tx.memo.toLowerCase()
+                        if (memo && memo.startsWith('to: @')) {
+                            let otheruser = memo.replace('to: @','')
+                            if (hive.utils.validateAccountName(otheruser) == null) receiver = otheruser
+                        }
+                        Shawp.Refill(tx.from,receiver,Shawp.methods.Hive,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled ' + (usd/0.0029) + ' credits successfully')
+                        console.log('Refilled ' + (usd/0.0029) + ' credits to @' + receiver + ' successfully')
                     })
                 } else if (tx.amount.endsWith('HBD')) {
                     let amt = parseFloat(tx.amount.replace(' HBD',''))
                     Shawp.ExchangeRate(Shawp.coins.HiveDollars,amt,(e,usd) => {
+                        if (e) return console.log(e)
+                        let receiver = tx.from
+                        let memo = tx.memo.toLowerCase()
+                        if (memo && memo.startsWith('to: @')) {
+                            let otheruser = memo.replace('to: @','')
+                            if (hive.utils.validateAccountName(otheruser) == null) receiver = otheruser
+                        }
                         Shawp.Refill(tx.from,tx.from,Shawp.methods.Hive,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled ' + (usd/0.0029) + ' credits successfully')
+                        console.log('Refilled ' + (usd/0.0029) + ' credits to @' + receiver + ' successfully')
                     })
                 }
             }
         })
         
         if (Config.Shawp.SteemReceiver) steem.api.streamTransactions((err,tx) => {
+            if (err) return console.log('Steem tx stream error',err)
             let transaction = tx
             if (transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.SteemReceiver) {
                 let tx = transaction.operations[0][1]
                 if (tx.amount.endsWith('STEEM')) {
                     let amt = parseFloat(tx.amount.replace(' STEEM',''))
                     Shawp.ExchangeRate(Shawp.coins.Steem,amt,(e,usd) => {
+                        if (e) return console.log(e)
+                        let receiver = tx.from
+                        let memo = tx.memo.toLowerCase()
+                        if (memo && memo.startsWith('to: @')) {
+                            let otheruser = memo.replace('to: @','')
+                            if (steem.utils.validateAccountName(otheruser) == null) receiver = otheruser
+                        }
                         Shawp.Refill(tx.from,tx.from,Shawp.methods.Steem,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled ' + (usd/0.0029) + ' credits successfully')
+                        console.log('Refilled ' + (usd/0.0029) + ' credits to @' + receiver + ' successfully')
                     })
                 } else if (tx.amount.endsWith('SBD')) {
                     let amt = parseFloat(tx.amount.replace(' SBD',''))
                     Shawp.ExchangeRate(Shawp.coins.SteemDollars,amt,(e,usd) => {
+                        if (e) return console.log(e)
+                        let receiver = tx.from
+                        let memo = tx.memo.toLowerCase()
+                        if (memo && memo.startsWith('to: @')) {
+                            let otheruser = memo.replace('to: @','')
+                            if (steem.utils.validateAccountName(otheruser) == null) receiver = otheruser
+                        }
                         Shawp.Refill(tx.from,tx.from,Shawp.methods.Steem,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled ' + (usd/0.0029) + ' credits successfully')
+                        console.log('Refilled ' + (usd/0.0029) + ' credits to @' + receiver + ' successfully')
                     })
                 }
             }
@@ -72,10 +102,15 @@ let Shawp = {
             balance: 0,
             joinedSince: new Date().getTime()
         }
-        fs.writeFile('db/shawp/usagehistory/' + username + '.json',JSON.stringify([]),() => {})
-        Auth.whitelistAdd(username,() => {})
+        require('./authManager').whitelistAdd(username,() => {})
     },
     User: (username) => {
+        // if (!Customers[username]) return {}
+        // db.getTotalUsage(username,(usage) => {
+        //     let res = JSON.parse(JSON.stringify(Customers[username]))
+        //     res.usage = usage
+        //     return res
+        // })
         return Customers[username] || {}
     },
     UserExists: (username) => {
@@ -151,8 +186,15 @@ let Shawp = {
         db.getTotalUsage(username,(usage) => {
             if (usage <= 0)
                 return cb(-1)
+            else if (Customers[username].balance <= 0 && !Config.admins.includes(username))
+                return cb(0,usage/1073741824 - Customers[username].balance)
+            let days = Math.floor(Customers[username].balance / usage * 1073741824)
+            if (days == 0 && !Config.admins.includes(username))
+                return cb(days,usage/1073741824 - Customers[username].balance)
+            else if (days == 0 && Config.admins.includes(username))
+                return cb(-2)
             else
-                return cb(Math.floor(Customers[username].balance / usage * 1073741824))
+                return cb(days)
         })
     },
     setRate: (username,usdRate) => {

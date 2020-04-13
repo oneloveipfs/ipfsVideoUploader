@@ -36,9 +36,9 @@
         <div id='content'>
             <div id="head">
                 <h1>Welcome to OneLoveDTube IPFS Uploader</h1>
-                <h3>An alternative way of uploading videos to DTube, a decentralized video platform built on Hive and Avalon blockchain.<br><br>Starting from $3/month</h3>
+                <h3>An alternative way of uploading videos to DTube, a decentralized video platform built on Hive and Avalon blockchain.<br><br>$0.087/GB/month</h3>
                 <table id="buttons"><tr>
-                    <td><a href="https://order.oneloveipfs.com" class="styledButton" target="_blank" rel="noreferrer">Sign Up</a></td>
+                    <td><a id="signupButton" class="styledButton">Sign Up</a></td>
                 </tr></table>
             </div>
             <div id="intro1">
@@ -84,6 +84,39 @@
                     <a class="roundedBtn" id="proceedAuthBtn">Login with Keychains</a>
                     <h3 class="sclogin">OR</h3>
                     <a class="roundedBtn sclogin" id="altAuthBtn">Login with HiveSigner</a>
+                </div>
+            </div>
+        </div>
+        <div id="signupPopup" class="popup">
+            <div class="popup-content">
+                <div class="popup-header">
+                    <h2>Get started</h2>
+                </div>
+                <div class="popup-body">
+                    <div id="signupstart">
+                        <h4>To begin, purchase some hosting credits (GBdays). One GBday allows you to store 1GB worth of files on our service for 24 hours. Each GBDay costs $0.0029. <br><br>Our payment system accepts HIVE, HBD, STEEM and SBD.</h4>
+                        <input type="text" placeholder="HIVE Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="receiverUsername" class="loginFields">
+                        <input type="number" placeholder="GBDays to purchase (minimum 100)" id="gbdaysInput" class="loginFields">
+                        <h4 style="margin-block-start: 0.25em; margin-block-end: 0.6em;">Payment method: 
+                        <select id="pymtMtd">
+                            <option>HIVE</option>
+                            <option>HBD</option>
+                            <option>STEEM</option>
+                            <option>SBD</option>
+                        </select></h4>
+                        <a class="roundedBtn" id="getPaymentBtns">Get payment info</a>
+                        <h5 class="redeemVoucherNavBtn"><a onclick="document.getElementById('signupstart').style.display = 'none'; document.getElementById('signupredeem').style.display = 'block';">Redeem a voucher</a></h5>
+                    </div>
+                    <!--<div id="signuppay">
+                        <a><< Back</a>
+
+                    </div>-->
+                    <div id="signupredeem" style="display: none;">
+                        <a onclick="document.getElementById('signupredeem').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>
+                        <input type="text" placeholder="HIVE Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="redeemerUsername" class="loginFields">
+                        <input type="text" placeholder="Voucher Code" autocomplete="off" autocorrent="off" autocapitalize="off" spellcheck="false" id="voucherCode" class="loginFields">
+                        <a class="roundedBtn" id="redeemVoucherBtn">Redeem</a>
+                    </div>
                 </div>
             </div>
         </div>

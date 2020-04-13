@@ -1,11 +1,6 @@
 let config
 
 document.addEventListener('DOMContentLoaded', () => {
-    let proceedAuthBtnDisabled = document.getElementById('proceedAuthBtn').disabled
-    document.getElementById('authButton').onclick = function loginBtnClicked() {
-    // Show popup window of login options
-    document.getElementById('loginPopup').style.display = "block"
-
     axios.get('/config').then((result) => {
         config = result.data
 
@@ -16,14 +11,20 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     })
-}
+    let proceedAuthBtnDisabled = document.getElementById('proceedAuthBtn').disabled
+    document.getElementById('authButton').onclick = function loginBtnClicked() {
+        // Show popup window of login options
+        document.getElementById('loginPopup').style.display = "block"
+    }
 
 window.onclick = (event) => {
     dismissPopup(event,'loginPopup')
+    dismissPopup(event,'signupPopup')
 }
 
 window.ontouchstart = (event) => {
     dismissPopup(event,'loginPopup')
+    dismissPopup(event,'signupPopup')
 }
 
 function dismissPopup(event,popupelement) {
@@ -105,6 +106,14 @@ document.getElementById('altAuthBtn').onclick = () => {
     hiveClient.login({},(err,token) => {
         console.log('HiveSigner',err,token)
     })
+}
+
+document.getElementById('signupButton').onclick = () => {
+    document.getElementById('signupPopup').style.display = "block"
+}
+
+document.getElementById('redeemVoucherBtn').onclick = () => {
+    alert('Invalid voucher code')
 }
 })
 

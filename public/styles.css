@@ -76,14 +76,18 @@ h2 {
     padding-bottom: 20px;
     text-align: center;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 35px;
 }
 
 .popup-body {
     font-family: Geneva, Verdana, sans-serif;
     margin-left: 15px;
     margin-right: 25px;
-    text-align: center;
     padding-bottom: 20px;
+}
+
+#loginPopup .popup-body {
+    text-align: center;
 }
 
 @-webkit-keyframes animatetop {
@@ -129,6 +133,15 @@ h2 {
     text-align: left;
     margin-left: 3px;
     margin-bottom: 7px;
+    font-size: 12px;
+    width: fit-content;
+}
+
+.redeemVoucherNavBtn {
+    margin-top: 5px;
+    text-align: left;
+    margin-left: 3px;
+    margin-bottom: -5px;
     font-size: 12px;
     width: fit-content;
 }
@@ -922,7 +935,7 @@ td {
     }
 
     h2 {
-        font-size: 30px;
+        font-size: 28px;
     }
 
     #linkResult {

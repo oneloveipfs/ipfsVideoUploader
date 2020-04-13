@@ -78,12 +78,17 @@ app.get('/404', (request,response) => loadWebpage('./client/404.html',response))
 
 app.get('/checkuser', APILimiter, (request,response) => {
     // Check if user is in whitelist
-    if (Config.whitelistEnabled)
-        if (!Auth.whitelist().includes(request.query.user)) 
-            return response.send({isInWhitelist: false})
-
-    response.send({isInWhitelist: true})
-});
+    if (!Config.whitelistEnabled)
+        response.send({
+            isInWhitelist: true,
+            isAdmin: Config.admins.includes(request.query.user)
+        })
+    else
+        response.send({
+            isInWhitelist: Auth.whitelist().includes(request.query.user),
+            isAdmin: Config.admins.includes(request.query.user)
+        })
+})
 
 app.get('/login',AuthAPILimiter,(request,response) => {
     // Steem Keychain Auth
@@ -117,22 +122,22 @@ app.post('/logincb',AuthAPILimiter,(request,response) => {
 
 app.get('/auth',AuthAPILimiter,(request,response) => {
     let access_token = request.query.access_token
-    Auth.verifyAuth(access_token,(err,res) => {
+    Auth.verifyAuth(access_token,false,(err,res) => {
         if (err) return response.status(401).send({error: err})
         else return response.send(res)
     })
 })
 
 app.post('/uploadVideo',VideoUploadAPILimiter,(request,response) => {
-    Authenticate(request,response,(user) => FileUploader.uploadVideo(user,request,response))
+    Authenticate(request,response,true,(user) => FileUploader.uploadVideo(user,request,response))
 })
 
 app.post('/uploadImage',ImageUploadAPILimiter,(request,response) => {
-    Authenticate(request,response,(user) => FileUploader.uploadImage(user,request,response))
+    Authenticate(request,response,true,(user) => FileUploader.uploadImage(user,request,response))
 })
 
 app.post('/uploadSubtitle',APILimiter,(request,response) => {
-    Authenticate(request,response,(user) => FileUploader.uploadSubtitles(user,request,response))
+    Authenticate(request,response,true,(user) => FileUploader.uploadSubtitles(user,request,response))
 })
 
 app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(request,response) => {
@@ -142,7 +147,7 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
             if(!db.getPossibleTypes().includes(request.body.Upload.MetaData.type)) return response.status(400).send({error: 'Invalid upload type'})
 
             // Authenticate
-            Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,(e) => {
+            Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,true,(e) => {
                 if (e) return response.status(401).send({error: e})
                 return response.status(200).send()
             })
@@ -151,7 +156,7 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
             request.socket.setTimeout(0)
 
             // Get user by access token then process upload
-            Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,(e,user) => {
+            Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,false,(e,user) => {
                 FileUploader.handleTusUpload(request.body,user,() => {
                     FileUploader.writeUploadRegister()
                     response.status(200).send()
@@ -265,14 +270,14 @@ app.get('shawp_user_info_admin',APILimiter,(req,res) => {
 
 app.get('shawp_refill_history',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
-    Authenticate(req,res,(user) => {
+    Authenticate(req,res,false,(user) => {
         return res.send(Shawp.getRefillHistory(user,req.query.start || 0,req.query.count))
     })
 })
 
 app.get('shawp_refill_history_admin',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
-    Authenticate(req,res,(user) => {
+    Authenticate(req,res,false,(user) => {
         if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
         return res.send(Shawp.getRefillHistory(req.query.user,req.query.start || 0,req.query.count))
     })
@@ -280,14 +285,14 @@ app.get('shawp_refill_history_admin',APILimiter,(req,res) => {
 
 app.get('shawp_consumption_history',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
-    Authenticate(req,res,(user) => {
+    Authenticate(req,res,false,(user) => {
         return res.send(Shawp.getConsumeHistory(user,req.query.start || 0,req.query.count))
     })
 })
 
 app.get('shawp_consumption_history_admin',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
-    Authenticate(req,res,(user) => {
+    Authenticate(req,res,false,(user) => {
         if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
         return res.send(Shawp.getConsumeHistory(req.query.user,req.query.start || 0,req.query.count))
     })
@@ -345,7 +350,7 @@ app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlenco
 
 app.get('/wc_user_info',APILimiter,(req,res) => {
     if (!Config.WooCommerceEnabled && !Config.Shawp.Enabled) return res.status(404).end()
-    Authenticate(req,res,(user) => {
+    Authenticate(req,res,false,(user) => {
         if (Config.Shawp.Enabled) 
             return res.send(Shawp.User(user))
         else WC.User(user,(err,info) => {
@@ -357,7 +362,7 @@ app.get('/wc_user_info',APILimiter,(req,res) => {
 
 app.get('/wc_user_info_admin',APILimiter,(req,res) => {
     if (!Config.WooCommerceEnabled && !Config.Shawp.Enabled) return res.status(404).end()
-    Authenticate(req,res,(user) => {
+    Authenticate(req,res,false,(user) => {
         if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
         if (Config.Shawp.Enabled) 
             return res.send(Shawp.User(req.query.user))
@@ -382,18 +387,18 @@ function loadWebpage(HTMLFile,response) {
     });
 }
 
-function Authenticate(request,response,next) {
+function Authenticate(request,response,needscredits,next) {
     let access_token = request.query.access_token
     if (Config.whitelistEnabled && !access_token) return response.status(400).send({error: 'Missing API auth credentials'})
     if (Config.whitelistEnabled && request.query.scauth === 'true') {
         // Handle SteemConnect access token
-        Auth.scAuth(access_token,(err,user) => {
+        Auth.scAuth(access_token,needscredits,(err,user) => {
             if (err) return response.status(401).send({ error: err })
             else next(user)
         })
     } else {
         // Handle access token from /logincb
-        Auth.verifyAuth(access_token,(err,result) => {
+        Auth.verifyAuth(access_token,needscredits,(err,result) => {
             if (err) return response.status(401).send({ error: err })
             else next(result.user)
         })

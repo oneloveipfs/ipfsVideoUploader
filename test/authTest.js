@@ -41,7 +41,7 @@ describe('Auth',() => {
         })
 
         it('verifyAuth should return a JWT decoded object',function (done) {
-            Auth.verifyAuth(testToken,(err,result) => {
+            Auth.verifyAuth(testToken,false,(err,result) => {
                 assert.isObject(result)
                 done()
             })

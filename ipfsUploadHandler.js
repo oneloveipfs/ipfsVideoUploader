@@ -392,7 +392,7 @@ let uploadOps = {
                     if (!db.getPossibleTypes().includes(info.type)) return socket.emit('result', { error: 'Invalid upload type requested' })
 
                     // Authenticate & get username
-                    Auth.authenticate(info.access_token,info.keychain,(e,user) => {
+                    Auth.authenticate(info.access_token,info.keychain,false,(e,user) => {
                         if (e) return socket.emit('result', { error: 'Auth error: ' + JSON.stringify(e) })
                         
                         // Upload ID not found in register, register socket

@@ -1,8 +1,3 @@
-// Raw auth info
-// let url = new URL(window.location.href)
-// let token = url.searchParams.get('access_token') // Access token for logged in user
-// let iskeychain = url.searchParams.get('keychain')
-
 let geturl = '/wc_user_info?access_token=' + token
 
 if (iskeychain !== 'true') geturl += '&scauth=true'
