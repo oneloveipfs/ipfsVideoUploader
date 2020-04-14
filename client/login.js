@@ -1,4 +1,5 @@
 let config
+let shawpconfig
 
 document.addEventListener('DOMContentLoaded', () => {
     axios.get('/config').then((result) => {
@@ -11,6 +12,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     })
+
+    axios.get('/shawp_config').then((result) => {
+        shawpconfig = result.data
+        document.getElementById('homepagePriceLbl').innerText = '$' + (shawpconfig.DefaultUSDRate * 30) + '/GB/month'
+    })
+
     let proceedAuthBtnDisabled = document.getElementById('proceedAuthBtn').disabled
     document.getElementById('authButton').onclick = function loginBtnClicked() {
         // Show popup window of login options
@@ -112,6 +119,58 @@ document.getElementById('signupButton').onclick = () => {
     document.getElementById('signupPopup').style.display = "block"
 }
 
+document.getElementById('getPaymentBtns').onclick = () => {
+    let receipient = document.getElementById('receiverUsername').value
+    let paymentMethod = document.getElementById('pymtMtd').value
+    let creditsToBuy = parseFloat(document.getElementById('gbdaysInput').value)
+    if (receipient && validateAccountName(receipient) !== null) return alert(validateAccountName(receipient))
+    if (creditsToBuy <= 0) return alert('Purchase quantity must not be less than or equals to zero.')
+    exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
+        if (e) return alert(e)
+        if (receipient) document.getElementById('receiverAccConfirm').innerText = 'Username: ' + receipient
+        document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + creditsToBuy + ' GBdays'
+        document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
+
+        switch (paymentMethod) {
+            case 'HIVE':
+            case 'HBD':
+                document.getElementById('SteemKeychainBtn').style.display = 'none'
+                document.getElementById('SteemLoginBtn').style.display = 'none'
+                document.getElementById('HiveKeychainBtn').style.display = 'block'
+                document.getElementById('HiveKeychainBtn').onclick = () => {
+                    hive_keychain.requestTransfer(receipient,shawpconfig.HiveReceiver,amt.toString(),receipient ? 'to: @' + receipient : '',paymentMethod,(e) => {
+                        if (e) return alert(e.message)
+                        document.getElementById('signuppay').style.display = 'none'
+                        document.getElementById('signupcb').style.display = 'block'
+                    })
+                }
+                document.getElementById('HiveSignerBtn').style.display = 'block'
+                document.getElementById('HiveSignerBtn').href = 'https://hivesigner.com/sign/transfer?to=' + shawpconfig.HiveReceiver + '&amount=' + amt + paymentMethod + (receipient ? '&memo=to: @' + receipient : '')
+                break
+            case 'STEEM':
+            case 'SBD':
+                document.getElementById('HiveKeychainBtn').style.display = 'none'
+                document.getElementById('HiveSignerBtn').style.display = 'none'
+                document.getElementById('SteemKeychainBtn').style.display = 'block'
+                document.getElementById('SteemKeychainBtn').onclick = () => {
+                    steem_keychain.requestTransfer(receipient,shawpconfig.SteemReceiver,amt.toString(),receipient ? 'to: @' + receipient : '',paymentMethod,(e) => {
+                        if (e) return alert(e.message)
+                        document.getElementById('signuppay').style.display = 'none'
+                        document.getElementById('signupcb').style.display = 'block'
+                    })
+                }
+                document.getElementById('SteemLoginBtn').style.display = 'block'
+                document.getElementById('SteemLoginBtn').href = 'https://steemlogin.com/sign/transfer?to=' + shawpconfig.SteemReceiver + '&amount=' + amt + paymentMethod + (receipient ? '&memo=to: @' + receipient : '')
+                break
+            default:
+                break
+        }
+        
+        document.getElementById('signupstart').style.display = 'none'
+        document.getElementById('signuppay').style.display = 'block'
+    })
+}
+
 document.getElementById('redeemVoucherBtn').onclick = () => {
     alert('Invalid voucher code')
 }
@@ -171,6 +230,75 @@ async function avalonLogin(avalonUsername,avalonKey) {
         // If Avalon username or password not provided, clear existing login (if any) from sessionStorage
         sessionStorage.clear()
     }
+}
+
+function exchageRate (coin,amount,cb) {
+    switch (coin) {
+        case 'DTC':
+            // DTC payments coming soon
+            break
+        case 'HIVE':
+            axios.get('https://api.coingecko.com/api/v3/coins/hive?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
+                cb(null,Math.ceil(amount * 0.0029 / response.data.market_data.current_price.usd * 1000) / 1000)
+            }).catch((e) => cb(e))
+            break
+        case 'HBD':
+            axios.get('https://api.coingecko.com/api/v3/coins/hive_dollar?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
+                cb(null,Math.ceil(amount * 0.0029 / response.data.market_data.current_price.usd * 1000) / 1000)
+            }).catch((e) => cb(e))
+            break
+        case 'STEEM':
+            axios.get('https://api.coingecko.com/api/v3/coins/steem?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
+                cb(null,Math.ceil(amount * 0.0029 / response.data.market_data.current_price.usd * 1000) / 1000)
+            }).catch((e) => cb(e))
+            break
+        case 'SBD':
+            axios.get('https://api.coingecko.com/api/v3/coins/steem-dollars?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
+                cb(null,Math.ceil(amount * 0.0029 / response.data.market_data.current_price.usd * 1000) / 1000)
+            }).catch((e) => cb(e))
+            break
+        default:
+            break
+    }
+}
+
+function validateAccountName(value) {
+    var i = void 0,
+        label = void 0,
+        len = void 0,
+        suffix = void 0;
+  
+    suffix = "Hive username must ";
+    if (!value) {
+        return suffix + "not be empty.";
+    }
+    var length = value.length;
+    if (length < 3 || length > 16) {
+        return suffix + "be between 3 and 16 characters.";
+    }
+    if (/\./.test(value)) {
+        suffix = "Each account segment much ";
+    }
+    var ref = value.split(".");
+    for (i = 0, len = ref.length; i < len; i++) {
+        label = ref[i];
+        if (!/^[a-z]/.test(label)) {
+            return suffix + "start with a letter.";
+        }
+        if (!/^[a-z0-9-]*$/.test(label)) {
+            return suffix + "have only letters, digits, or dashes.";
+        }
+        if (/--/.test(label)) {
+            return suffix + "have only one dash in a row.";
+        }
+        if (!/[a-z0-9]$/.test(label)) {
+            return suffix + "end with a letter or digit.";
+        }
+        if (!(label.length >= 3)) {
+            return suffix + "be longer";
+        }
+    }
+    return null;
 }
 
 function arrContainsInt(arr,value) {

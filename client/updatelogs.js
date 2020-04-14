@@ -4,7 +4,7 @@ axios.get('/updatelogs').then((response) => {
     let updatesHTML = document.getElementById('updates').innerHTML
 
     for (let i = updates.length - 1; i >= 0; i--) {
-        updatesHTML += '<div class="updatelog">Version ' + updates[i].version + '<br>Released ' + updates[i].created + '<br><br><a href="' + updates[i].steemitLink + '">' + updates[i].description + '</a><br><br>Payout: ' + updates[i].payout + '</div>'
+        updatesHTML += '<div class="updatelog">Version ' + updates[i].version + '<br>Released ' + updates[i].created + '<br><br><a href="' + updates[i].link + '">' + updates[i].description + '</a><br><br>Payout: ' + updates[i].payout + '</div>'
     }
 
     document.getElementById('updates').innerHTML = updatesHTML

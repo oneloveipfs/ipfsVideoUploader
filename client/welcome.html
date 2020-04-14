@@ -5,19 +5,19 @@
         <link rel="shortcut icon" href="public/logo.png">
         <title>OneLoveDTube Uploader</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="An alternative way of uploading videos to DTube, a decentralized video platform built on Steem blockchain.">
+        <meta name="description" content="An alternative way of uploading videos to DTube, a decentralized video platform built on Steem, Hive and Avalon blockchains.">
         <meta name="image" content="https://cloudflare-ipfs.com/ipfs/QmaMkaquzvyrwksumFZry69GV9qr3YA2t2J26LeXi4pxWp">
-        <link rel="canonical" href="https://uploader.oneloved.tube">
+        <link rel="canonical" href="https://beta.oneloved.tube">
         <!-- Twitter -->
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="OneLoveDTube Uploader">
-        <meta name="twitter:description" content="An alternative way of uploading videos to DTube, a decentralized video platform built on Steem blockchain.">
+        <meta name="twitter:description" content="An alternative way of uploading videos to DTube, a decentralized video platform built on Steem, Hive and Avalon blockchain.">
         <meta name="twitter:image:src" content="https://cloudflare-ipfs.com/ipfs/QmYc9zsrs5thDt1RjKB7MNYnMUL6MWVPMfNsTvn27is4LK">
         <!-- OpenGraph -->
         <meta name="og:title" content="OneLoveDTube Uploader">
-        <meta name="og:description" content="An alternative way of uploading videos to DTube, a decentralized video platform built on Steem blockchain.">
+        <meta name="og:description" content="An alternative way of uploading videos to DTube, a decentralized video platform built on Steem, Hive and Avalon blockchain.">
         <meta name="og:image" content="https://cloudflare-ipfs.com/ipfs/QmaMkaquzvyrwksumFZry69GV9qr3YA2t2J26LeXi4pxWp">
-        <meta name="og:url" content="https://uploader.oneloved.tube">
+        <meta name="og:url" content="https://beta.oneloved.tube">
         <meta name="og:site_name" content="OneLoveIPFS">
         <meta name="og:type" content="website">
         <!-- JavaScripts -->
@@ -36,7 +36,8 @@
         <div id='content'>
             <div id="head">
                 <h1>Welcome to OneLoveDTube IPFS Uploader</h1>
-                <h3>An alternative way of uploading videos to DTube, a decentralized video platform built on Hive and Avalon blockchain.<br><br>$0.087/GB/month</h3>
+                <h3>An alternative way of uploading videos to DTube, a decentralized video platform built on Steem, Hive and Avalon blockchain.</h3>
+                <h3 id="homepagePriceLbl">$/GB/month</h3>
                 <table id="buttons"><tr>
                     <td><a id="signupButton" class="styledButton">Sign Up</a></td>
                 </tr></table>
@@ -64,7 +65,7 @@
             </div>
             <div id="updates">
                 <h2>Release Notes</h2>
-                <h3>Our development progress are logged onto the Hive blockchain, the same blockchain where your videos are being posted. Check them out!</h3>
+                <h3>Our development progress are logged onto the Steem and Hive blockchains, the same blockchains where your videos are being posted to. Check them out!</h3>
             </div>
         </div>
         <!-- Login Pop Up Window -->
@@ -94,9 +95,9 @@
                 </div>
                 <div class="popup-body">
                     <div id="signupstart">
-                        <h4>To begin, purchase some hosting credits (GBdays). One GBday allows you to store 1GB worth of files on our service for 24 hours. Each GBDay costs $0.0029. <br><br>Our payment system accepts HIVE, HBD, STEEM and SBD.</h4>
-                        <input type="text" placeholder="HIVE Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="receiverUsername" class="loginFields">
-                        <input type="number" placeholder="GBDays to purchase (minimum 100)" id="gbdaysInput" class="loginFields">
+                        <h4>To begin, purchase some hosting credits (GBdays). One GBday allows you to store 1GB of files on our service for 24 hours. Each GBDay costs $0.0029.<br><br>Our payment system accepts HIVE, HBD, STEEM and SBD.</h4>
+                        <input type="text" placeholder="HIVE Username (if different from sender address)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="receiverUsername" class="loginFields">
+                        <input type="number" placeholder="GBdays to purchase" id="gbdaysInput" class="loginFields">
                         <h4 style="margin-block-start: 0.25em; margin-block-end: 0.6em;">Payment method: 
                         <select id="pymtMtd">
                             <option>HIVE</option>
@@ -107,19 +108,30 @@
                         <a class="roundedBtn" id="getPaymentBtns">Get payment info</a>
                         <h5 class="redeemVoucherNavBtn"><a onclick="document.getElementById('signupstart').style.display = 'none'; document.getElementById('signupredeem').style.display = 'block';">Redeem a voucher</a></h5>
                     </div>
-                    <!--<div id="signuppay">
-                        <a><< Back</a>
-
-                    </div>-->
+                    <div id="signuppay" style="display: none;">
+                        <a onclick="document.getElementById('signuppay').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>
+                        <h4 id="receiverAccConfirm"></h4>
+                        <h4 id="gbdaysconfirm">Credits: 0 GBdays</h4>
+                        <h4 id="quoteAmt">Amount: </h4><br>
+                        <a class="roundedBtn" id="HiveKeychainBtn">Pay with Hive Keychain</a>
+                        <a class="roundedBtn" id="HiveSignerBtn">Pay with HiveSigner</a>
+                        <a class="roundedBtn" id="SteemKeychainBtn">Pay with Steem Keychain</a>
+                        <a class="roundedBtn" id="SteemLoginBtn">Pay with SteemLogin</a>
+                        <h6>Disclaimer: The amount quoted above may differ than the actual price in your selected coin. Due to price fluctuations, you may receive more or less GBdays after refilling your account. Alternatively, you may refill your account from your Steem/Hive wallet by sending any amount (minimum 1 STEEM/HIVE or 0.1 SBD/HBD) to @oneloveipfs.</h6>
+                    </div>
                     <div id="signupredeem" style="display: none;">
                         <a onclick="document.getElementById('signupredeem').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>
                         <input type="text" placeholder="HIVE Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="redeemerUsername" class="loginFields">
                         <input type="text" placeholder="Voucher Code" autocomplete="off" autocorrent="off" autocapitalize="off" spellcheck="false" id="voucherCode" class="loginFields">
                         <a class="roundedBtn" id="redeemVoucherBtn">Redeem</a>
                     </div>
+                    <div id="signupcb" style="display: none;">
+                        <a onclick="document.getElementById('signupcb').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>
+                        <h4>Thank you for your purchase. Your order is currently being processed, which should take no longer than one minute. Once this is complete, you may login and begin uploading videos to our service.<br><br>If you have any issues, please contact the OneLoveIPFS team on Discord.</h4>
+                    </div>
                 </div>
             </div>
         </div>
-        <div id='footer'><h4 class="madeBy">Made by <a target="_blank" rel="noreferrer" href=https://d.tube/c/techcoderx>@techcoderx</a> - <a target="_blank" rel="noreferrer" href=https://github.com/techcoderx/ipfsVideoUploader>Source Code</a> - <a target="_blank" rel="noreferrer" href="https://discord.gg/Sc4utKr">Discord</a> - <a target="_blank" rel="noreferrer" href="https://github.com/techcoderx/ipfsVideoUploader/blob/master/docs/FAQ.md">FAQ</a></h4></div>
+        <div id='footer'><p class="madeBy">Made by <a target="_blank" rel="noreferrer" href=https://d.tube/c/techcoderx>@techcoderx</a> - <a target="_blank" rel="noreferrer" href=https://github.com/techcoderx/ipfsVideoUploader>Source Code</a> - <a target="_blank" rel="noreferrer" href="https://discord.gg/Sc4utKr">Discord</a> - <a target="_blank" rel="noreferrer" href="https://github.com/techcoderx/ipfsVideoUploader/blob/master/docs/FAQ.md">FAQ</a></p></div>
     </body>
 </html>

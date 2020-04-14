@@ -11,7 +11,7 @@
 #content {
     position: absolute;
     top:50px;
-    bottom:35px;
+    bottom:27px;
     left:0;
     width:100%;
     overflow-x: hidden;
@@ -22,10 +22,10 @@
     position: absolute;
     bottom:0;
     left:0;
-    height: 35px;
+    height: 27px;
     width:100%;
     padding:0;
-    background: aqua;
+    background: rgb(54,57,63);
     text-align: center;
 }
 
@@ -144,6 +144,16 @@ h2 {
     margin-bottom: -5px;
     font-size: 12px;
     width: fit-content;
+}
+
+#signuppay h6, #signuppay h4 {
+    margin-block-start: 0.25em;
+    margin-block-end: 0.25em;
+}
+
+#HiveKeychainBtn, #HiveSignerBtn, #SteemKeychainBtn, #SteemLoginBtn {
+    display: none;
+    margin-block-end: 0.5em;
 }
 
 #uploadForm, #thumbnailSwapper, #wcinfo, #pymtnotification {
@@ -525,9 +535,15 @@ textarea {
 }
 
 .madeBy {
-    font-family: "Comic Sans MS", Verdana, sans-serif;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 13px;
+    color: #ffffff;
     margin-block-start: 6px;
     margin-block-end: 5px;
+}
+
+.madeBy a:visited, .madeBy a {
+    color: #ffffff;
 }
 
 /* Welcome page only */
@@ -954,13 +970,13 @@ td {
     }
 }
 
-@media screen and (max-width: 450px) {
+@media screen and (max-width: 347px) {
     #footer {
-        height: 57px;
+        height: 43px;
     }
 
     #content {
-        bottom: 57px;
+        bottom: 43px;
     }
 }
 
