@@ -1,6 +1,9 @@
 const Multer = require('multer')
 const IPFS = require('ipfs-http-client')
+// const Skynet = require('@nebulous/skynet')
 const Shell = require('shelljs')
+const FormData = require('form-data')
+const axios = require('axios')
 const getDuration = require('get-video-duration')
 const fs = require('fs')
 const async = require('async')
@@ -25,19 +28,54 @@ const upload = Multer({ dest: './uploaded/' })
 const imgUpload = Multer({ dest: './imguploads/', limits: { fileSize: 7340032 } })
 const { globSource } = IPFS
 
-async function addFile(dir,trickle,callback) {
+async function addFile(dir,trickle,skynetpin,callback) {
     let ipfsAdd = ipfsAPI.add(globSource(dir, {recursive: true}), { trickle: trickle })
+    let hash
 
     for await (const file of ipfsAdd) {
-        callback(file.cid.toString())
+        hash = file.cid.toString()
         break
     }
+
+    if (skynetpin) {
+        let skylink = await skynetAdd(dir,{
+            portalUrl: Config.Skynet.portalUrl,
+            portalUploadPath: Config.Skynet.portalUploadPath,
+            portalFileFieldname: Config.Skynet.portalFileFieldname,
+            portalDirectoryFileFieldname: Config.Skynet.portalDirectoryFileFieldname,
+            customFilename: hash + '.mp4'
+        })
+        console.log('Added',hash,skylink)
+        callback(hash,skylink)
+    } else {
+        console.log('Added',hash)
+        callback(hash)
+    }
+}
+
+function skynetAdd(path,opts) {
+    let options = { filename: opts.customFilename }
+
+    let formData = new FormData();
+    formData.append(opts.portalFileFieldname, fs.createReadStream(path), options);
+
+    let url = `${trimTrailingSlash(opts.portalUrl)}${trimTrailingSlash(opts.portalUploadPath)}`
+
+    return new Promise((resolve, reject) => {
+        axios.post(url, formData, { headers: { 'User-Agent': 'Sia-Agent' } })
+            .then(resp => resolve(resp.data.skylink))
+            .catch(error => reject(error))
+    })
+}
+
+function trimTrailingSlash(str) {
+    return str.replace(/\/$/, "");
 }
 
 function processSingleVideo(id,user,cb) {
     let vpath = Config.tusdUploadDir + '/' + id
     if (!fs.existsSync(vpath)) return cb({ error: 'Could not find upload' })
-    Shell.exec('./scripts/dtube-sprite.sh ' + vpath + ' uploaded/' + id + '.jpg',() => addFile('uploaded/' + id + '.jpg',true,(hash) => fs.stat('uploaded/' + id + '.jpg',(err,stat) => {
+    Shell.exec('./scripts/dtube-sprite.sh ' + vpath + ' uploaded/' + id + '.jpg',() => addFile('uploaded/' + id + '.jpg',true,false,(hash) => fs.stat('uploaded/' + id + '.jpg',(err,stat) => {
         !err ? db.recordUsage(user,'sprites',stat['size']) 
             : console.log('Error getting sprite filesize: ' + err)
         
@@ -82,13 +120,13 @@ let uploadOps = {
             // Generate sprite from source video, and add all uploaded files to IPFS
             let ipfsops = {
                 videohash: (cb) => {
-                    addFile(videoPathName,true,(hash) => {
+                    addFile(videoPathName,true,false,(hash) => {
                         cb(null,hash)
                     })
                 },
                 spritehash: (cb) => {
                     Shell.exec('./scripts/dtube-sprite.sh ' + videoPathName + ' uploaded/' + sourceVideoFilename + '.jpg',() => {
-                        addFile('uploaded/' + sourceVideoFilename + '.jpg',true,(hash) => {
+                        addFile('uploaded/' + sourceVideoFilename + '.jpg',true,false,(hash) => {
                             cb(null,hash)
                         })
                     })
@@ -103,7 +141,7 @@ let uploadOps = {
                                       : 'uploaded/' + snapFilename
                     
                     fs.rename('uploaded/' + snapFilename,snapPathName,() => {
-                        addFile(snapPathName,false,(hash) => {
+                        addFile(snapPathName,false,false,(hash) => {
                             cb(null,hash)
                         })
                     })
@@ -115,7 +153,7 @@ let uploadOps = {
                 ipfsops.video240hash = (cb) => {
                     let video240PathName = 'uploaded/' + sourceVideoFilename + '_240.mp4'
                     fs.renameSync('uploaded/' + request.files.Video240Upload[0].filename,video240PathName)
-                    addFile(video240PathName,true,(hash) => {
+                    addFile(video240PathName,true,false,(hash) => {
                         cb(null,hash)
                     })
                 }
@@ -125,7 +163,7 @@ let uploadOps = {
                 ipfsops.video480hash = (cb) => {
                     let video480PathName = 'uploaded/' + sourceVideoFilename + '_480.mp4'
                     fs.renameSync('uploaded/' + request.files.Video480Upload[0].filename,video480PathName)
-                    addFile(video480PathName,true,(hash) => {
+                    addFile(video480PathName,true,false,(hash) => {
                         cb(null,hash)
                     })
                 }
@@ -135,7 +173,7 @@ let uploadOps = {
                 ipfsops.video720hash = (cb) => {
                     let video720PathName = 'uploaded/' + sourceVideoFilename + '_720.mp4'
                     fs.renameSync('uploaded/' + request.files.Video720Upload[0].filename,video720PathName)
-                    addFile(video720PathName,true,(hash) => {
+                    addFile(video720PathName,true,false,(hash) => {
                         cb(null,hash)
                     })
                 }
@@ -145,7 +183,7 @@ let uploadOps = {
                 ipfsops.video1080hash = (cb) => {
                     let video1080PathName = 'uploaded/' + sourceVideoFilename + '_1080.mp4'
                     fs.renameSync('uploaded/' + request.files.Video1080Upload[0].filename,video1080PathName)
-                    addFile(video1080PathName,true,(hash) => {
+                    addFile(video1080PathName,true,false,(hash) => {
                         cb(null,hash)
                     })
                 }
@@ -220,7 +258,7 @@ let uploadOps = {
             if (err) return response.status(400).send({error: err})
             if (!request.file) return response.status(400).send({error: 'No files have been uploaded.'})
             let uploadedImg = request.file.filename
-            addFile('imguploads/' + uploadedImg,trickleDagAdd,(hash) => {
+            addFile('imguploads/' + uploadedImg,trickleDagAdd,false,(hash) => {
                 if (Config.UsageLogs) {
                     // Log usage data for image uploads
                     db.recordUsage(username,imgType,request.file.size)
@@ -279,13 +317,11 @@ let uploadOps = {
             case 'videos':
                 let ipfsops = {
                     videohash: (cb) => {
-                        addFile(filepath,true,(hash) => cb(null,hash))
+                        addFile(filepath,true,Config.Skynet.enabled,(hash,skylink) => cb(null,{ipfshash: hash, skylink: skylink}))
                     },
                     spritehash: (cb) => {
                         Shell.exec('./scripts/dtube-sprite.sh ' + filepath + ' uploaded/' + json.Upload.ID + '.jpg',() => {
-                            addFile('uploaded/' + json.Upload.ID + '.jpg',true,(hash) => {
-                                cb(null,hash)
-                            })
+                            addFile('uploaded/' + json.Upload.ID + '.jpg',true,false,(hash) => cb(null,hash))
                         })
                     }
                 }
@@ -301,16 +337,22 @@ let uploadOps = {
                         db.writeUsageData()
                     })
 
-                    db.recordHash(user,'videos',results.videohash)
+                    db.recordHash(user,'videos',results.videohash.ipfshash)
                     db.recordHash(user,'sprites',results.spritehash)
                     db.writeHashesData()
+
+                    if (results.videohash.skylink) {
+                        db.recordSkylink(user,'videos',results.videohash.skylink)
+                        db.writeSkylinksData()
+                    }
 
                     getDuration(json.Upload.Storage.Path).then((videoDuration) => {
                         let result = {
                             username: user,
                             type: 'videos',
-                            ipfshash: results.videohash,
+                            ipfshash: results.videohash.ipfshash,
                             spritehash: results.spritehash,
+                            skylink: results.videohash.skylink,
                             duration: videoDuration,
                             filesize: json.Upload.Size
                         }
@@ -327,7 +369,7 @@ let uploadOps = {
             case 'video480':
             case 'video720':
             case 'video1080':
-                addFile(filepath,true,(hash) => {
+                addFile(filepath,true,Config.Skynet.enabled,(hash,skylink) => {
                     if (Config.UsageLogs) {
                         db.recordUsage(user,json.Upload.MetaData.type,json.Upload.Size)
                         db.writeUsageData()
@@ -336,10 +378,16 @@ let uploadOps = {
                     db.recordHash(user,json.Upload.MetaData.type,hash)
                     db.writeHashesData()
 
+                    if (skylink) {
+                        db.recordSkylink(user,json.Upload.MetaData.type,skylink)
+                        db.writeSkylinksData()
+                    }
+
                     let result = { 
                         username: user,
                         type: json.Upload.MetaData.type,
-                        hash: hash
+                        hash: hash,
+                        skylink: skylink
                     }
 
                     if (socketRegister[json.Upload.ID] && socketRegister[json.Upload.ID].socket) socketRegister[json.Upload.ID].socket.emit('result',result)

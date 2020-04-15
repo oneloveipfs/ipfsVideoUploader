@@ -4,6 +4,7 @@ const fs = require('fs')
 // Cache JSON data into variables
 let usageData = JSON.parse(fs.readFileSync('db/usage.json','utf8'))
 let hashes = JSON.parse(fs.readFileSync('db/hashes.json','utf8'))
+let skylinks = JSON.parse(fs.readFileSync('db/skylinks.json','utf8'))
 
 let possibleTypes = ['videos','thumbnails','sprites','images','video240','video480','video720','video1080','subtitles']
 
@@ -52,6 +53,16 @@ let db = {
         if (!hashes[username][type].includes(hash))
             hashes[username][type].push(hash)
     },
+    recordSkylink: (username,type,skylink) => {
+        if (!skylinks[username])
+            skylinks[username] = {
+                videos: []
+            }
+
+        if (!skylinks[username][type]) skylinks[username][type] = []
+        if (!skylinks[username][type].includes(skylink))
+            skylinks[username][type].push(skylink)
+    },
     // Retrieve usage and hashes data
     getUsage: (username,cb) => {
         cb(usageData[username])
@@ -92,6 +103,25 @@ let db = {
 
         cb(hashesToReturn)
     },
+    getSkylinks: (types,cb) => {
+        let skylinksToReturn = {}
+        function getAllSkylinks(linkType) {
+            let skylinkArrToReturn = []
+            for(let key in skylinks) {
+                if (skylinks.hasOwnProperty(key) && skylinks[key][linkType] != undefined) {
+                    skylinkArrToReturn = skylinkArrToReturn.concat(skylinks[key][linkType])
+                }
+            }
+            return skylinkArrToReturn
+        }
+
+        for (let i = 0; i < possibleTypes.length; i++) {
+            if (types.includes(possibleTypes[i]))
+                skylinksToReturn[possibleTypes[i]] = getAllSkylinks(possibleTypes[i])
+        }
+
+        cb(skylinksToReturn)
+    },
     getHashesByUser: (types,username,cb) => {
         let hashesToReturn = {}
 
@@ -101,6 +131,16 @@ let db = {
         }
         
         cb(hashesToReturn)
+    },
+    getSkylinksByUser: (types,username,cb) => {
+        let skylinksToReturn = {}
+
+        for (let i = 0; i < possibleTypes.length; i++) {
+            if (types.includes(possibleTypes[i]))
+                skylinksToReturn[possibleTypes[i]] = skylinks[username][possibleTypes[i]]
+        }
+        
+        cb(skylinksToReturn)
     },
     // Write data in variables to disk
     writeUsageData: () => {
@@ -113,6 +153,12 @@ let db = {
         fs.writeFile('db/hashes.json',JSON.stringify(hashes),(err) => {
             if (err)
                 console.log('Error saving hash logs: ' + err)
+        })
+    },
+    writeSkylinksData: () => {
+        fs.writeFile('db/skylinks.json',JSON.stringify(skylinks),(err) => {
+            if (err)
+                console.log('Error saving skylinks: ' + err)
         })
     }
 }

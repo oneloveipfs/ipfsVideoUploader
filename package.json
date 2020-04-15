@@ -21,6 +21,7 @@
     "crypto-js": "^3.2.1",
     "express": "^4.17.1",
     "express-rate-limit": "^3.5.3",
+    "form-data": "^3.0.0",
     "fs": "0.0.1-security",
     "get-video-duration": "^0.3.0",
     "http": "0.0.0",

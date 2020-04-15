@@ -46,15 +46,19 @@ uplStat.on('result',(r) => {
             break
         case 'video240':
             postparams.ipfs240hash = r.hash
+            if (r.skylink) postparams.skylink240 = r.skylink
             break
         case 'video480':
             postparams.ipfs480hash = r.hash
+            if (r.skylink) postparams.skylink480 = r.skylink
             break
         case 'video720':
             postparams.ipfs720hash = r.hash
+            if (r.skylink) postparams.skylink720 = r.skylink
             break
         case 'video1080':
             postparams.ipfs1080hash = r.hash
+            if (r.skylink) postparams.skylink1080 = r.skylink
             break
         default:
             return console.log('uplStat Error: missing type in repsonse')
@@ -599,29 +603,6 @@ function buildJsonMetadata(network) {
 }
 
 function buildJsonMetadataAvalon() {
-    // let jsonMeta = {
-    //     videoId: postparams.ipfshash,
-    //     duration: postparams.duration,
-    //     title: postparams.title,
-    //     description: postparams.description,
-    //     filesize: postparams.filesize,
-    //     ipfs: {
-    //         snaphash: postparams.imghash,
-    //         spritehash: postparams.spritehash,
-    //         videohash: postparams.ipfshash,
-    //         video240hash: postparams.ipfs240hash,
-    //         video480hash: postparams.ipfs480hash,
-    //         video720hash: postparams.ipfs720hash,
-    //         video1080hash: postparams.ipfs1080hash,
-    //         gateway: config.gateway
-    //     },
-    //     thumbnailUrl: 'https://snap1.d.tube/ipfs/' + postparams.imghash,
-    //     providerName: 'IPFS',
-    //     refs: [
-    //         'steem/' + username + '/' + postparams.permlink
-    //     ]
-    // }
-
     let jsonMeta = {
         files: {
             ipfs: {
@@ -648,6 +629,13 @@ function buildJsonMetadataAvalon() {
         oc: 1,
         refs: ['hive/' + username + '/' + postparams.permlink]
     }
+
+    // Add Skylinks if applicable
+    if (postparams.skylink) jsonMeta.files.sia.vid.src = postparams.skylink
+    if (postparams.skylink240) jsonMeta.files.sia.vid['240'] = postparams.skylink240
+    if (postparams.skylink480) jsonMeta.files.sia.vid['480'] = postparams.skylink480
+    if (postparams.skylink720) jsonMeta.files.sia.vid['720'] = postparams.skylink720
+    if (postparams.skylink1080) jsonMeta.files.sia.vid['1080'] = postparams.skylink1080
 
     if (steemUser) jsonMeta.refs.push('steem/' + steemUser + '/' + postparams.permlink)
     if (config.gateway) jsonMeta.files.ipfs.gw = config.gateway 
