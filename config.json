@@ -15,6 +15,14 @@
         "tusdEndpoint": "http://localhost:1080/files"
     },
 
+    "Skynet": {
+        "enabled": true,
+        "portalUrl": "http://localhost:9980",
+        "portalUploadPath": "/skynet/skyfile",
+        "portalFileFieldname": "file",
+        "portalDirectoryFileFieldname": "files[]"
+    },
+
     "tusdUploadDir": "/Users/techcoderx/tusfiles",
     "socketTimeout": 600000,
 
