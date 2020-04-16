@@ -24,10 +24,7 @@ let Shawp = {
         if (Config.Shawp.HiveReceiver && (!network || network === 'hive')) hive.api.streamTransactions((err,tx) => {
             if (err) return console.log('Hive tx stream error',err)
             let transaction = tx
-            if (transaction.transaction_num == 0) {
-                headBlockHive = transaction.block_num
-                console.log('Hive block',headBlockHive)
-            }
+            if (transaction.transaction_num == 0) headBlockHive = transaction.block_num
             if (transaction && transaction.operations && transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.HiveReceiver) {
                 let tx = transaction.operations[0][1]
                 console.log(tx)
@@ -70,10 +67,7 @@ let Shawp = {
         if (Config.Shawp.SteemReceiver && (!network || network === 'steem')) steem.api.streamTransactions((err,tx) => {
             if (err) return console.log('Steem tx stream error',err)
             let transaction = tx
-            if (transaction.transaction_num == 0) {
-                headBlockSteem = transaction.block_num
-                console.log('Steem block',headBlockSteem)
-            }
+            if (transaction.transaction_num == 0) headBlockSteem = transaction.block_num
             if (transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.SteemReceiver) {
                 let tx = transaction.operations[0][1]
                 if (tx.amount.endsWith('STEEM')) {
