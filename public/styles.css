@@ -113,7 +113,7 @@ h2 {
     font-size: 16px;
 }
 
-#pymtnotification {
+#refillnotify {
     margin-top: 15px;
     display: none;
 }
@@ -146,7 +146,7 @@ h2 {
     width: fit-content;
 }
 
-#signuppay h6, #signuppay h4 {
+#signuppay h6, #signuppay h4, #refillPopup h6, #refillPopup h4 {
     margin-block-start: 0.25em;
     margin-block-end: 0.25em;
 }
@@ -156,7 +156,7 @@ h2 {
     margin-block-end: 0.5em;
 }
 
-#uploadForm, #thumbnailSwapper, #wcinfo, #pymtnotification {
+#uploadForm, #thumbnailSwapper, #wcinfo, #refillnotify, #refiller {
     margin-left: auto;
     margin-right: auto;
     width: 700px;
@@ -525,13 +525,17 @@ textarea {
     display: none;
 }
 
-#wcinfo {
+#wcinfo, #refiller {
     display: none;
 }
 
 #wcinfo h2 {
     font-size: 30px;
     text-align: center;
+}
+
+#refiller h2 {
+    font-size: 25px;
 }
 
 .madeBy {
@@ -906,7 +910,7 @@ td {
         margin-top: 10px;
     }
 
-    #uploadForm, #thumbnailSwapper, #wcinfo, #pymtnotification {
+    #uploadForm, #thumbnailSwapper, #wcinfo, #refillnotify, #refiller {
         margin-left: 15px;
         margin-right: 25px;
         width: auto;

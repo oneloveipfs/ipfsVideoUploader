@@ -127,6 +127,7 @@ document.getElementById('getPaymentBtns').onclick = () => {
     if (creditsToBuy <= 0) return alert('Purchase quantity must not be less than or equals to zero.')
     exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
         if (e) return alert(e)
+        amt = amt.toFixed(3)
         if (receipient) document.getElementById('receiverAccConfirm').innerText = 'Username: ' + receipient
         document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + creditsToBuy + ' GBdays'
         document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
@@ -139,7 +140,7 @@ document.getElementById('getPaymentBtns').onclick = () => {
                 document.getElementById('HiveKeychainBtn').style.display = 'block'
                 document.getElementById('HiveKeychainBtn').onclick = () => {
                     hive_keychain.requestTransfer(receipient,shawpconfig.HiveReceiver,amt.toString(),receipient ? 'to: @' + receipient : '',paymentMethod,(e) => {
-                        if (e) return alert(e.message)
+                        if (e.error) return alert(e.error)
                         document.getElementById('signuppay').style.display = 'none'
                         document.getElementById('signupcb').style.display = 'block'
                     })
@@ -154,7 +155,7 @@ document.getElementById('getPaymentBtns').onclick = () => {
                 document.getElementById('SteemKeychainBtn').style.display = 'block'
                 document.getElementById('SteemKeychainBtn').onclick = () => {
                     steem_keychain.requestTransfer(receipient,shawpconfig.SteemReceiver,amt.toString(),receipient ? 'to: @' + receipient : '',paymentMethod,(e) => {
-                        if (e) return alert(e.message)
+                        if (e.error) return alert(e.error)
                         document.getElementById('signuppay').style.display = 'none'
                         document.getElementById('signupcb').style.display = 'block'
                     })
@@ -239,22 +240,22 @@ function exchageRate (coin,amount,cb) {
             break
         case 'HIVE':
             axios.get('https://api.coingecko.com/api/v3/coins/hive?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * 0.0029 / response.data.market_data.current_price.usd * 1000) / 1000)
+                cb(null,Math.ceil(amount * shawpconfig.DefaultUSDRate / response.data.market_data.current_price.usd * 1000) / 1000)
             }).catch((e) => cb(e))
             break
         case 'HBD':
             axios.get('https://api.coingecko.com/api/v3/coins/hive_dollar?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * 0.0029 / response.data.market_data.current_price.usd * 1000) / 1000)
+                cb(null,Math.ceil(amount * shawpconfig.DefaultUSDRate / response.data.market_data.current_price.usd * 1000) / 1000)
             }).catch((e) => cb(e))
             break
         case 'STEEM':
             axios.get('https://api.coingecko.com/api/v3/coins/steem?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * 0.0029 / response.data.market_data.current_price.usd * 1000) / 1000)
+                cb(null,Math.ceil(amount * shawpconfig.DefaultUSDRate / response.data.market_data.current_price.usd * 1000) / 1000)
             }).catch((e) => cb(e))
             break
         case 'SBD':
             axios.get('https://api.coingecko.com/api/v3/coins/steem-dollars?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * 0.0029 / response.data.market_data.current_price.usd * 1000) / 1000)
+                cb(null,Math.ceil(amount * shawpconfig.DefaultUSDRate / response.data.market_data.current_price.usd * 1000) / 1000)
             }).catch((e) => cb(e))
             break
         default:

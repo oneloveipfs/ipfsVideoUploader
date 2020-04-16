@@ -52,8 +52,8 @@
         "DefaultUSDRate": 0.0029,
         "HiveAPI": "https://hived.techcoderx.com",
         "SteemAPI": "https://api.steemit.com",
-        "HiveReceiver": "randomvlogs",
-        "SteemReceiver": "randomvlogs"
+        "HiveReceiver": "onelovedtube",
+        "SteemReceiver": "onelovedtube"
     },
 
     "test": {

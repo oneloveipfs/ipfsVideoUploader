@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let uploader = document.getElementById('uploadForm')
     let thumbnailSwapper = document.getElementById('thumbnailSwapper')
     let wcinfo = document.getElementById('wcinfo')
+    let refiller = document.getElementById('refiller')
 
     document.getElementById('modeBtn').onclick = () => {
         if (document.getElementById("dropdownbox").style.display === 'block')
@@ -33,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         uploader.style.display = 'block'
         thumbnailSwapper.style.display = 'none'
         wcinfo.style.display = 'none'
+        refiller.style.display = 'none'
         document.getElementById("dropdownbox").style.display = 'none'
     }
 
@@ -40,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         uploader.style.display = 'none'
         thumbnailSwapper.style.display = 'block'
         wcinfo.style.display = 'none'
+        refiller.style.display = 'none'
         document.getElementById("dropdownbox").style.display = 'none'
     }
 
@@ -47,6 +50,15 @@ document.addEventListener('DOMContentLoaded', () => {
         uploader.style.display = 'none'
         thumbnailSwapper.style.display = 'none'
         wcinfo.style.display = 'block'
+        refiller.style.display = 'none'
+        document.getElementById("dropdownbox").style.display = 'none'
+    }
+
+    document.getElementById('refillCrModeBtn').onclick = () => {
+        uploader.style.display = 'none'
+        thumbnailSwapper.style.display = 'none'
+        wcinfo.style.display = 'none'
+        refiller.style.display = 'block'
         document.getElementById("dropdownbox").style.display = 'none'
     }
 

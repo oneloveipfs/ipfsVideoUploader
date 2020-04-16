@@ -13,13 +13,21 @@ let Customers = JSON.parse(fs.readFileSync('db/shawp/users.json'))
 let RefillHistory = JSON.parse(fs.readFileSync('db/shawp/refills.json'))
 let ConsumeHistory = JSON.parse(fs.readFileSync('db/shawp/consumes.json'))
 
+let headBlockHive
+let headBlockSteem
+
 let Shawp = {
-    init: () => {
+    init: (network) => {
         // Stream transactions from blockchain
+        if (network) console.log('Keeping alive for',network)
         if (!Config.Shawp.Enabled) return
-        if (Config.Shawp.HiveReceiver) hive.api.streamTransactions((err,tx) => {
+        if (Config.Shawp.HiveReceiver && (!network || network === 'hive')) hive.api.streamTransactions((err,tx) => {
             if (err) return console.log('Hive tx stream error',err)
             let transaction = tx
+            if (transaction.transaction_num == 0) {
+                headBlockHive = transaction.block_num
+                console.log('Hive block',headBlockHive)
+            }
             if (transaction && transaction.operations && transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.HiveReceiver) {
                 let tx = transaction.operations[0][1]
                 console.log(tx)
@@ -29,6 +37,7 @@ let Shawp = {
                         if (e) return console.log(e)
                         let receiver = tx.from
                         let memo = tx.memo.toLowerCase()
+                        if (memo !== '' && !memo.startsWith('to: @')) return // Memo must be empty or begin with "to: @"
                         if (memo && memo.startsWith('to: @')) {
                             let otheruser = memo.replace('to: @','')
                             if (hive.utils.validateAccountName(otheruser) == null) receiver = otheruser
@@ -44,6 +53,7 @@ let Shawp = {
                         if (e) return console.log(e)
                         let receiver = tx.from
                         let memo = tx.memo.toLowerCase()
+                        if (memo !== '' && !memo.startsWith('to: @')) return // Memo must be empty or begin with "to: @"
                         if (memo && memo.startsWith('to: @')) {
                             let otheruser = memo.replace('to: @','')
                             if (hive.utils.validateAccountName(otheruser) == null) receiver = otheruser
@@ -57,9 +67,13 @@ let Shawp = {
             }
         })
         
-        if (Config.Shawp.SteemReceiver) steem.api.streamTransactions((err,tx) => {
+        if (Config.Shawp.SteemReceiver && (!network || network === 'steem')) steem.api.streamTransactions((err,tx) => {
             if (err) return console.log('Steem tx stream error',err)
             let transaction = tx
+            if (transaction.transaction_num == 0) {
+                headBlockSteem = transaction.block_num
+                console.log('Steem block',headBlockSteem)
+            }
             if (transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.SteemReceiver) {
                 let tx = transaction.operations[0][1]
                 if (tx.amount.endsWith('STEEM')) {
@@ -68,6 +82,7 @@ let Shawp = {
                         if (e) return console.log(e)
                         let receiver = tx.from
                         let memo = tx.memo.toLowerCase()
+                        if (memo !== '' && !memo.startsWith('to: @')) return // Memo must be empty or begin with "to: @"
                         if (memo && memo.startsWith('to: @')) {
                             let otheruser = memo.replace('to: @','')
                             if (steem.utils.validateAccountName(otheruser) == null) receiver = otheruser
@@ -83,6 +98,7 @@ let Shawp = {
                         if (e) return console.log(e)
                         let receiver = tx.from
                         let memo = tx.memo.toLowerCase()
+                        if (memo !== '' && !memo.startsWith('to: @')) return // Memo must be empty or begin with "to: @"
                         if (memo && memo.startsWith('to: @')) {
                             let otheruser = memo.replace('to: @','')
                             if (steem.utils.validateAccountName(otheruser) == null) receiver = otheruser
@@ -96,12 +112,26 @@ let Shawp = {
             }
         })
 
-        Scheduler.scheduleJob('0 0 * * *',() => {
-            Shawp.Consume()
-            Shawp.WriteConsumeHistory()
-            Shawp.WriteUserDB()
-            console.log('Daily consumption completed successfully')
-        })
+        if (!network) {
+            Scheduler.scheduleJob('0 0 * * *',() => {
+                Shawp.Consume()
+                Shawp.WriteConsumeHistory()
+                Shawp.WriteUserDB()
+                console.log('Daily consumption completed successfully')
+            })
+
+            Scheduler.scheduleJob('* * * * *',() => {
+                hive.api.getDynamicGlobalProperties((e,r) => {
+                    if (!e && Math.abs(r.head_block_number - headBlockHive) > 100) 
+                        Shawp.init('hive') // keep alive
+                })
+
+                steem.api.getDynamicGlobalProperties((e,r) => {
+                    if (!e && Math.abs(r.head_block_number - headBlockSteem) > 100) 
+                        Shawp.init('steem') // keep alive
+                })
+            })
+        }
     },
     AddUser: (username) => {
         if (Customers[username]) return

@@ -31,11 +31,12 @@
                     <a id="newUploadModeBtn">New upload</a>
                     <a id="snapSwapModeBtn">Thumbnail Swap</a>
                     <a id="subDetModeBtn">Account details</a>
+                    <a id="refillCrModeBtn">Refill credits</a>
                 </div>
             </div>
         </div>
         <div id='content' class="uploadcontent">
-        <div class="warningbox" id="pymtnotification">Your next payment date has already been reached. Please renew your subscription on oneloveipfs.com.</div>
+        <div class="warningbox" id="refillnotify">Your hosting credits are running low on balance. Please refill as soon as possible to prevent your account from being disabled for uploading.</div>
         <div id="uploadForm">
             <div id="tab">
                 <a class="tabs" id="tabBasics">Basics</a>
@@ -118,6 +119,40 @@
             </div>
         </div>
         <div id="wcinfo"><h3>Loading account data...</h3></div> <!-- User info page (e.g. WC subscription package, quota available etc.) -->
+        <div id="refiller"> <!-- Hosting credits refill page -->
+            <h2>Refill credits</h2>
+            <input type="number" class="meta" placeholder="GBdays to refill" id="gbdaysInput">
+            <h4>Payment method:
+                <select id="pymtMtd">
+                    <option>HIVE</option>
+                    <option>HBD</option>
+                    <option>STEEM</option>
+                    <option>SBD</option>
+                </select></h4>
+            </h4>
+            <input class="styledButton" type="submit" value="Refill" id="refillSubmitBtn"><br>
+            <div id="refillPopup" class="popup">
+                <div class="popup-content">
+                    <div class="popup-header">
+                        <h2>Refill</h2>
+                    </div>
+                    <div class="popup-body">
+                        <div id="refillpay">
+                            <h4 id="gbdaysconfirm">Credits: 0 GBdays</h4>
+                            <h4 id="quoteAmt">Amount: </h4><br>
+                            <a class="roundedBtn" id="HiveKeychainBtn">Pay with Hive Keychain</a>
+                            <a class="roundedBtn" id="HiveSignerBtn" target="_blank" rel="noreferrer">Pay with HiveSigner</a>
+                            <a class="roundedBtn" id="SteemKeychainBtn">Pay with Steem Keychain</a>
+                            <a class="roundedBtn" id="SteemLoginBtn" target="_blank" rel="noreferrer">Pay with SteemLogin</a>
+                            <h6>Disclaimer: The amount quoted above may differ than the actual price in your selected coin. Due to price fluctuations, you may receive more or less GBdays after refilling your account. Alternatively, you may refill your account from your Steem/Hive wallet by sending any amount to @onelovedtube (without memo if sending from same wallet as refill account, or memo if different wallet, with the format "to: @username").</h6>
+                        </div>
+                        <div id="refillcb" style="display: none;">
+                            <h4>Thank you for refilling. Your hosting credits balance should be updated in your account within a minute.<br><br>If you have any issues, please contact the OneLoveIPFS team on Discord.</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         </div>
         <div id='footer'><h4 class="madeBy">Made by <a target="_blank" rel="noreferrer" href=https://d.tube/c/techcoderx>@techcoderx</a> - <a target="_blank" rel="noreferrer" href=https://github.com/techcoderx/ipfsVideoUploader>Source Code</a> - <a target="_blank" rel="noreferrer" href="https://discord.gg/Sc4utKr">Discord</a> - <a target="_blank" rel="noreferrer" href="https://github.com/techcoderx/ipfsVideoUploader/blob/master/docs/FAQ.md">FAQ</a></h4></div>
     </body>
