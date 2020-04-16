@@ -631,6 +631,11 @@ function buildJsonMetadataAvalon() {
     }
 
     // Add Skylinks if applicable
+    if (postparams.skylink || postparams.skylink240 || postparams.skylink480 || postparams.skylink720 || postparams.skylink1080) {
+        jsonMeta.files.sia = {
+            vid: {}
+        }
+    }
     if (postparams.skylink) jsonMeta.files.sia.vid.src = postparams.skylink
     if (postparams.skylink240) jsonMeta.files.sia.vid['240'] = postparams.skylink240
     if (postparams.skylink480) jsonMeta.files.sia.vid['480'] = postparams.skylink480
