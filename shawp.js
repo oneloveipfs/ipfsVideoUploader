@@ -117,6 +117,9 @@ let Shawp = {
         let totalusage = db.getTotalUsage(username)
         let res = JSON.parse(JSON.stringify(Customers[username]))
         res.usage = totalusage
+        let daysRemaining = Shawp.getDaysRemaining(username)
+        res.daysremaining = daysRemaining.days
+        if (daysRemaining.needs) res.needs = daysRemaining.needs
         return res
     },
     UserExists: (username) => {
@@ -189,19 +192,19 @@ let Shawp = {
     getConsumeHistory: (username,start,count) => {
         return ConsumeHistory[username].slice(start,start+count)
     },
-    getDaysRemaining: (username,cb) => {
+    getDaysRemaining: (username) => {
         let usage = db.getTotalUsage(username)
         if (usage <= 0 || !Customers[username])
-            return cb(-1)
+            return { days: -1 }
         else if (Customers[username].balance <= 0 && !Config.admins.includes(username))
-            return cb(0,usage/1073741824 - Customers[username].balance)
+            return { days: 0, needs: usage/1073741824 - Customers[username].balance }
         let days = Math.floor(Customers[username].balance / usage * 1073741824)
         if (days == 0 && !Config.admins.includes(username))
-            return cb(days,usage/1073741824 - Customers[username].balance)
+            return { days: days, needs: usage/1073741824 - Customers[username].balance }
         else if (days == 0 && Config.admins.includes(username))
-            return cb(-2)
+            return { days: -2 }
         else
-            return cb(days)
+            return { days: days }
     },
     setRate: (username,usdRate) => {
         if (!Customers[username]) return

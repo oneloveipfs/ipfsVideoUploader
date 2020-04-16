@@ -55,13 +55,13 @@ let auth = {
             else if (Config.whitelistEnabled === true) {
                 if (!whitelist.includes(result.user))
                     return cb('Looks like you do not have access to the uploader!')
-                if (Config.Shawp.Enabled) Shawp.getDaysRemaining(result.user,(days,addRequired) => {
-                    if (days === 0 && needscredits)
-                        cb('Insufficient hosting credits, needs additional ' + Math.ceil(addRequired) + ' GBdays.')
+                if (Config.Shawp.Enabled) {
+                    let daysRemaining = Shawp.getDaysRemaining(result.user)
+                    if (daysRemaining.days === 0 && daysRemaining.needs)
+                        cb('Insufficient hosting credits, needs additional ' + Math.ceil(daysRemaining.needs) + ' GBdays.')
                     else
                         cb(null,result)
-                })
-                else cb(null,result)
+                } else cb(null,result)
             }
         })
     },
@@ -72,13 +72,13 @@ let auth = {
             if (err) return cb(err)
             if (!whitelist.includes(result.account.name))
                 return cb('Looks like you do not have access to the uploader!')
-            if (Config.Shawp.Enabled) Shawp.getDaysRemaining(result.user,(days,addRequired) => {
-                if (days === 0 && needscredits)
-                    cb('Insufficient hosting credits, needs additional ' + Math.ceil(addRequired) + ' GBdays.')
+            if (Config.Shawp.Enabled) {
+                let daysRemaining = Shawp.getDaysRemaining(result.user)
+                if (daysRemaining.days === 0 && daysRemaining.needs)
+                    cb('Insufficient hosting credits, needs additional ' + Math.ceil(daysRemaining.needs) + ' GBdays.')
                 else
                     cb(null,result.account.name)
-            })
-            else cb(null,result.account.name)
+            } else cb(null,result.account.name)
         })
     },
     authenticate: (access_token,keychain,needscredits,cb) => {

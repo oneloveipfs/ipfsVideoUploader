@@ -251,23 +251,6 @@ app.get('/activeusers',APILimiter,(req,res) => {
     res.send({count: FileUploader.IPSync.activeCount()})
 })
 
-/*
-app.get('shawp_user_info',APILimiter,(req,res) => {
-    if (!Config.Shawp.Enabled) return res.status(404).end()
-    Authenticate(req,res,(user) => {
-        return res.send(Shawp.User(user))
-    })
-})
-
-app.get('shawp_user_info_admin',APILimiter,(req,res) => {
-    if (!Config.Shawp.Enabled) return res.status(404).end()
-    Authenticate(req,res,(user) => {
-        if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
-        return res.send(Shawp.User(req.query.user))
-    })
-})
-*/
-
 app.get('/shawp_config',APILimiter,(req,res) => {
     res.send(Config.Shawp)
 })
