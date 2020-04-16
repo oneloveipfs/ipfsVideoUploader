@@ -93,9 +93,9 @@ describe('Shawp',() => {
     })
 
     it('Shawp.getDaysRemaining should return days remaining with sufficient credits',(done) => {
-        Shawp.getDaysRemaining(Config.test.user,(days) => {
-            assert.typeOf(days,'number')
-            done()
-        })
+        let daysLeft = Shawp.getDaysRemaining(Config.test.user)
+        assert.typeOf(daysLeft.days,'number')
+        if (daysLeft.needs) assert.typeOf(daysLeft.needs,'number')
+        done()
     })
 })
