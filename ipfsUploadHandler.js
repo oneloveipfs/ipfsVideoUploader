@@ -59,7 +59,14 @@ function skynetAdd(path,opts) {
     let url = opts.portalUrl + opts.portalUploadPath + '?filename=' + opts.customFilename + '&force=true'
 
     return new Promise((resolve, reject) => {
-        axios.post(url, formData, { headers: { 'User-Agent': 'Sia-Agent', 'content-type': formData.getHeaders()['content-type'] }})
+        axios.post(url, formData, { 
+            headers: { 
+                'User-Agent': 'Sia-Agent', 
+                'content-type': formData.getHeaders()['content-type'] 
+            },
+            maxContentLength: 99999999999,
+            maxBodyLength: 99999999999
+        })
             .then(resp => resolve(resp.data.skylink))
             .catch(error => reject(error))
     })
