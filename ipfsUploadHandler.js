@@ -42,7 +42,6 @@ async function addFile(dir,trickle,skynetpin,callback) {
             portalUrl: Config.Skynet.portalUrl,
             portalUploadPath: Config.Skynet.portalUploadPath,
             portalFileFieldname: Config.Skynet.portalFileFieldname,
-            portalDirectoryFileFieldname: Config.Skynet.portalDirectoryFileFieldname,
             customFilename: hash + '.mp4'
         })
         console.log('Added',hash,skylink)
@@ -54,22 +53,16 @@ async function addFile(dir,trickle,skynetpin,callback) {
 }
 
 function skynetAdd(path,opts) {
-    let options = { filename: opts.customFilename }
+    let formData = new FormData()
+    formData.append(opts.portalFileFieldname, fs.createReadStream(path))
 
-    let formData = new FormData();
-    formData.append(opts.portalFileFieldname, fs.createReadStream(path), options);
-
-    let url = `${trimTrailingSlash(opts.portalUrl)}${trimTrailingSlash(opts.portalUploadPath)}`
+    let url = opts.portalUrl + opts.portalUploadPath + '?filename=' + opts.customFilename + '&force=true'
 
     return new Promise((resolve, reject) => {
-        axios.post(url, formData, { headers: { 'User-Agent': 'Sia-Agent' } })
+        axios.post(url, formData, { headers: { 'User-Agent': 'Sia-Agent', 'content-type': formData.getHeaders()['content-type'] }})
             .then(resp => resolve(resp.data.skylink))
             .catch(error => reject(error))
     })
-}
-
-function trimTrailingSlash(str) {
-    return str.replace(/\/$/, "");
 }
 
 function processSingleVideo(id,user,cb) {

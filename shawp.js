@@ -183,7 +183,7 @@ let Shawp = {
     },
     getDaysRemaining: (username,cb) => {
         let usage = db.getTotalUsage(username)
-        if (usage <= 0)
+        if (usage <= 0 || !Customers[username])
             return cb(-1)
         else if (Customers[username].balance <= 0 && !Config.admins.includes(username))
             return cb(0,usage/1073741824 - Customers[username].balance)
