@@ -173,9 +173,8 @@ app.get('/usage',APILimiter, (request,response) => {
     // API to get usage info
     if (!Config.UsageLogs) return response.send('Logs are disabled therefore API is not available for usage.');
     if (request.query.user === undefined || request.query.user === '') return response.send('Steem username is not defined!');
-    db.getUsage(request.query.user,(result) => {
-        response.send(result)
-    })
+    let usage = db.getUsage(request.query.user)
+    response.send(usage)
 })
 
 app.get('/totalUsage',(request,response) => {

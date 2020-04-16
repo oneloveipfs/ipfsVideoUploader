@@ -10,11 +10,25 @@ if (token == null || token == '') {
         return document.getElementById('wcinfo').innerHTML = '<h3>User is not a registered OneLoveIPFS customer!</h3>'
     } else if (result.data.balance) {
         let monthlyRate = result.data.rate * 30
-        let infoToDisplay = '<h2>OneLoveIPFS account details</h2>'
+        let infoToDisplay = '<h2>Account summary</h2>'
         infoToDisplay += '<h3>Balance: ' + result.data.balance + ' GBdays'
         infoToDisplay += '<br>Current Usage: ' + humanReadableSize(result.data.usage)
         infoToDisplay += '<br>Rate: $' + result.data.rate + '/day (~$' + monthlyRate + '/month)'
         infoToDisplay += '<br>Joined Since: ' + moment(result.data.joinedSince).utc(result.data.joinedSince).local().format('MMMM DD YYYY h:mm:ss a') + '</h3>'
+
+        if (result.data.usagedetails) {
+            infoToDisplay += '<br><h2>Usage breakdown</h2><h3>'
+            if (result.data.usagedetails.videos) infoToDisplay += 'Source videos: ' + humanReadableSize(result.data.usagedetails.videos) + '<br>'
+            if (result.data.usagedetails.video240) infoToDisplay += '240p videos: ' + humanReadableSize(result.data.usagedetails.video240) + '<br>'
+            if (result.data.usagedetails.video480) infoToDisplay += '480p videos: ' + humanReadableSize(result.data.usagedetails.video480) + '<br>'
+            if (result.data.usagedetails.video720) infoToDisplay += '720p videos: ' + humanReadableSize(result.data.usagedetails.video720) + '<br>'
+            if (result.data.usagedetails.video1080) infoToDisplay += '1080p videos: ' + humanReadableSize(result.data.usagedetails.video1080) + '<br>'
+            if (result.data.usagedetails.thumbnails) infoToDisplay += 'Thumbnails: ' + humanReadableSize(result.data.usagedetails.thumbnails) + '<br>'
+            if (result.data.usagedetails.sprites) infoToDisplay += 'Sprites: ' + humanReadableSize(result.data.usagedetails.sprites) + '<br>'
+            if (result.data.usagedetails.subtitles) infoToDisplay += 'Subtitles: ' + humanReadableSize(result.data.usagedetails.subtitles) + '<br>'
+            infoToDisplay += '</h3>'
+        }
+
         document.getElementById('wcinfo').innerHTML = HtmlSanitizer.SanitizeHtml(infoToDisplay)
     } else {
         let totalAllocatedQuota = result.data.plan.quota + result.data.bonus + result.data.quotaOffset

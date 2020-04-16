@@ -14,14 +14,13 @@ describe('Database',() => {
     })
 
     it('getUsage should return numbers representing usage data in bytes',(done) => {
-        db.getUsage(Config.test.user,(result) => {
-            for(let key in result) {
-                if (result.hasOwnProperty(key)) {
-                    assert.typeOf(result[key],'number')
-                }
+        let usage = db.getUsage(Config.test.user)
+        for(let key in usage) {
+            if (usage.hasOwnProperty(key)) {
+                assert.typeOf(usage[key],'number')
             }
-            done()
-        })
+        }
+        done()
     })
 
     it('getAllUsage should return numbers representing total usage data for specific hash type for all users in bytes',(done) => {

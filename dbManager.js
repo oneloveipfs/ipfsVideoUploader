@@ -64,8 +64,8 @@ let db = {
             skylinks[username][type].push(skylink)
     },
     // Retrieve usage and hashes data
-    getUsage: (username,cb) => {
-        cb(usageData[username])
+    getUsage: (username) => {
+        return usageData[username] || {}
     },
     getTotalUsage: (username) => {
         let qtotal = 0

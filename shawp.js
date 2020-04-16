@@ -120,6 +120,10 @@ let Shawp = {
         let daysRemaining = Shawp.getDaysRemaining(username)
         res.daysremaining = daysRemaining.days
         if (daysRemaining.needs) res.needs = daysRemaining.needs
+
+        // Usage breakdown
+        res.usagedetails = db.getUsage(username)
+
         return res
     },
     UserExists: (username) => {
