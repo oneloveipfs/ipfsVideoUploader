@@ -4,6 +4,7 @@ const hive = require('@hiveio/hive-js')
 const steem = require('steem')
 const fs = require('fs')
 const axios = require('axios')
+const Scheduler = require('node-schedule')
   
 hive.api.setOptions({url: Config.Shawp.HiveAPI, useAppbaseApi: true })
 steem.api.setOptions({ url: Config.Shawp.SteemAPI, useAppbaseApi: true })
@@ -35,7 +36,7 @@ let Shawp = {
                         Shawp.Refill(tx.from,receiver,Shawp.methods.Hive,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled ' + (usd/0.0029) + ' credits to @' + receiver + ' successfully')
+                        console.log('Refilled $' + usd + ' to @' + receiver + ' successfully')
                     })
                 } else if (tx.amount.endsWith('HBD')) {
                     let amt = parseFloat(tx.amount.replace(' HBD',''))
@@ -50,7 +51,7 @@ let Shawp = {
                         Shawp.Refill(tx.from,tx.from,Shawp.methods.Hive,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled ' + (usd/0.0029) + ' credits to @' + receiver + ' successfully')
+                        console.log('Refilled $' + usd + ' to @' + receiver + ' successfully')
                     })
                 }
             }
@@ -74,7 +75,7 @@ let Shawp = {
                         Shawp.Refill(tx.from,tx.from,Shawp.methods.Steem,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled ' + (usd/0.0029) + ' credits to @' + receiver + ' successfully')
+                        console.log('Refilled $' + usd + ' to @' + receiver + ' successfully')
                     })
                 } else if (tx.amount.endsWith('SBD')) {
                     let amt = parseFloat(tx.amount.replace(' SBD',''))
@@ -89,10 +90,17 @@ let Shawp = {
                         Shawp.Refill(tx.from,tx.from,Shawp.methods.Steem,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled ' + (usd/0.0029) + ' credits to @' + receiver + ' successfully')
+                        console.log('Refilled $' + usd + ' to @' + receiver + ' successfully')
                     })
                 }
             }
+        })
+
+        Scheduler.scheduleJob('0 0 * * *',() => {
+            Shawp.Consume()
+            Shawp.WriteConsumeHistory()
+            Shawp.WriteUserDB()
+            console.log('Daily consumption completed successfully')
         })
     },
     AddUser: (username) => {
