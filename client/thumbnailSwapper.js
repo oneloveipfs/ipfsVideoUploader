@@ -276,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let jsonAvalon = avalonPostToModify.json
                 jsonAvalon.thumbnailUrl = 'https://snap1.d.tube/ipfs/' + newSnapHash
                 jsonAvalon.ipfs.snaphash = newSnapHash
-                jsonAvalon.app = 'onelovedtube/0.9.3'
+                jsonAvalon.app = 'onelovedtube/0.9.4'
 
                 let avalonSwapTx = {
                     type: 4,
