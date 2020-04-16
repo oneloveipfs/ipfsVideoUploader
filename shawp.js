@@ -21,7 +21,7 @@ let Shawp = {
         // Stream transactions from blockchain
         if (network) console.log('Keeping alive for',network)
         if (!Config.Shawp.Enabled) return
-        if (Config.Shawp.HiveReceiver && (!network || network === 'hive')) hive.api.streamTransactions((err,tx) => {
+        if (Config.Shawp.HiveReceiver && (!network || network === 'hive')) hive.api.streamTransactions('irreversible',(err,tx) => {
             if (err) return console.log('Hive tx stream error',err)
             let transaction = tx
             if (transaction.transaction_num == 0) headBlockHive = transaction.block_num
@@ -64,7 +64,7 @@ let Shawp = {
             }
         })
         
-        if (Config.Shawp.SteemReceiver && (!network || network === 'steem')) steem.api.streamTransactions((err,tx) => {
+        if (Config.Shawp.SteemReceiver && (!network || network === 'steem')) steem.api.streamTransactions('irreversible',(err,tx) => {
             if (err) return console.log('Steem tx stream error',err)
             let transaction = tx
             if (transaction.transaction_num == 0) headBlockSteem = transaction.block_num
