@@ -38,14 +38,20 @@ async function addFile(dir,trickle,skynetpin,callback) {
     }
 
     if (skynetpin) {
-        let skylink = await skynetAdd(dir,{
-            portalUrl: Config.Skynet.portalUrl,
-            portalUploadPath: Config.Skynet.portalUploadPath,
-            portalFileFieldname: Config.Skynet.portalFileFieldname,
-            customFilename: hash + '.mp4'
-        })
-        console.log('Added',hash,skylink)
-        callback(hash,skylink)
+        try {
+            let skylink = await skynetAdd(dir,{
+                portalUrl: Config.Skynet.portalUrl,
+                portalUploadPath: Config.Skynet.portalUploadPath,
+                portalFileFieldname: Config.Skynet.portalFileFieldname,
+                customFilename: hash + '.mp4'
+            })
+            console.log('Added',hash,skylink)
+            callback(hash,skylink)
+        } catch (e) {
+            console.log('Skynet upload error',e.response.data)
+            console.log('Added',hash)
+            callback(hash)
+        }
     } else {
         console.log('Added',hash)
         callback(hash)
