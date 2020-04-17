@@ -544,6 +544,7 @@ textarea {
     color: #ffffff;
     margin-block-start: 6px;
     margin-block-end: 5px;
+    font-weight: normal;
 }
 
 .madeBy a:visited, .madeBy a {
