@@ -18,7 +18,7 @@
     "Skynet": {
         "enabled": true,
         "portalUrl": "http://localhost:9980",
-        "portalUploadPath": "/skynet/skyfile/videos",
+        "portalUploadPath": "/skynet/skyfile",
         "portalFileFieldname": "file"
     },
 
