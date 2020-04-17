@@ -74,6 +74,8 @@ document.getElementById('refillSubmitBtn').onclick = () => {
     document.getElementById('refillpay').style.display = 'block'
     document.getElementById('refillcb').style.display = 'none'
 
+    if (document.getElementById('gbdaysInput').value == '') return alert('Please specify GBdays to refill.')
+
     let paymentMethod = document.getElementById('pymtMtd').value
     let creditsToBuy = parseFloat(document.getElementById('gbdaysInput').value)
     if (creditsToBuy <= 0) return alert('Purchase quantity must not be less than or equals to zero.')

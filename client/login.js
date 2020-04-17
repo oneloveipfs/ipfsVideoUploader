@@ -120,6 +120,7 @@ document.getElementById('signupButton').onclick = () => {
 }
 
 document.getElementById('getPaymentBtns').onclick = () => {
+    if (document.getElementById('gbdaysInput').value == '') return alert('Please specify GBdays to purchase.')
     let receipient = document.getElementById('receiverUsername').value
     let paymentMethod = document.getElementById('pymtMtd').value
     let creditsToBuy = parseFloat(document.getElementById('gbdaysInput').value)
