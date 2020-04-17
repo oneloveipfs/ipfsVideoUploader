@@ -56,7 +56,7 @@ function skynetAdd(path,opts) {
     let formData = new FormData()
     formData.append(opts.portalFileFieldname, fs.createReadStream(path))
 
-    let url = opts.portalUrl + opts.portalUploadPath + '?filename=' + opts.customFilename + '&force=true'
+    let url = trimTrailingSlash(opts.portalUrl) + trimTrailingSlash(opts.portalUploadPath) + '/' + opts.customFilename + '?filename=' + opts.customFilename + '&force=true'
 
     return new Promise((resolve, reject) => {
         axios.post(url, formData, { 
@@ -70,6 +70,10 @@ function skynetAdd(path,opts) {
             .then(resp => resolve(resp.data.skylink))
             .catch(error => reject(error))
     })
+}
+
+function trimTrailingSlash(str) {
+    return str.replace(/\/$/, "");
 }
 
 function processSingleVideo(id,user,cb) {
