@@ -34,10 +34,12 @@ if (token == null || token == '') {
 
         document.getElementById('wcinfo').innerHTML = HtmlSanitizer.SanitizeHtml(infoToDisplay)
 
-        if (accdetail.daysRemaining > 0 && accdetail.daysRemaining < 7)
+        if (accdetail.daysremaining > 0 && accdetail.daysremaining < 7)
             document.getElementById('refillnotify').style.display = 'block'
-        else if (accdetail.daysRemaining == 0) {
-            document.getElementById('needsrefillnotify').innerText = 'Uploads have been disabled for your account due to insufficient balance, needs ' + accdetail.needs + ' GBdays. Please refill your hosting credits to upload.'
+        else if (accdetail.daysremaining == 0) {
+            console.log('needs')
+            document.getElementById('needsrefillnotify').innerText = 'Uploads have been disabled for your account due to insufficient balance, needs ' + Math.ceil(accdetail.needs) + ' GBdays. Please refill your hosting credits to upload.'
+            document.getElementById('needsrefillnotify').style.display = 'block'
         }
     } else {
         let totalAllocatedQuota = result.data.plan.quota + result.data.bonus + result.data.quotaOffset

@@ -55,7 +55,7 @@ let auth = {
             else if (Config.whitelistEnabled === true) {
                 if (!whitelist.includes(result.user))
                     return cb('Looks like you do not have access to the uploader!')
-                if (Config.Shawp.Enabled) {
+                if (Config.Shawp.Enabled && needscredits) {
                     let daysRemaining = Shawp.getDaysRemaining(result.user)
                     if (daysRemaining.days === 0 && daysRemaining.needs)
                         cb('Insufficient hosting credits, needs additional ' + Math.ceil(daysRemaining.needs) + ' GBdays.')
@@ -72,7 +72,7 @@ let auth = {
             if (err) return cb(err)
             if (!whitelist.includes(result.account.name))
                 return cb('Looks like you do not have access to the uploader!')
-            if (Config.Shawp.Enabled) {
+            if (Config.Shawp.Enabled && needscredits) {
                 let daysRemaining = Shawp.getDaysRemaining(result.user)
                 if (daysRemaining.days === 0 && daysRemaining.needs)
                     cb('Insufficient hosting credits, needs additional ' + Math.ceil(daysRemaining.needs) + ' GBdays.')
