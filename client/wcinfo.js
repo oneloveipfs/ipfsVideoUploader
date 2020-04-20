@@ -36,6 +36,9 @@ if (token == null || token == '') {
 
         if (accdetail.daysRemaining > 0 && accdetail.daysRemaining < 7)
             document.getElementById('refillnotify').style.display = 'block'
+        else if (accdetail.daysRemaining == 0) {
+            document.getElementById('needsrefillnotify').innerText = 'Uploads have been disabled for your account due to insufficient balance, needs ' + accdetail.needs + ' GBdays. Please refill your hosting credits to upload.'
+        }
     } else {
         let totalAllocatedQuota = result.data.plan.quota + result.data.bonus + result.data.quotaOffset
         let botusage = result.data.botuse
