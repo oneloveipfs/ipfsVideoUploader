@@ -5,7 +5,7 @@ Auth.Hive().then((result) => {
     Auth.Avalon()
 })
 
-steem.api.setOptions({ url: 'https://api.hive.blog' })
+hivejs.api.setOptions({ url: 'https://api.hive.blog' })
 
 // Setup subtitles tab
 const allLangCodes = languages.getAllLanguageCode()
@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (percentage <= 0) return alert('Beneficiary percentage must be more than 0.')
         if (weightRemaining < 0) return alert('You can\'t set beneficiaries totalling more than 100%!')
 
-        steem.api.getAccounts([account],(err,result) => {
+        hivejs.api.getAccounts([account],(err,result) => {
             if (err) return alert('Error while validating account: ' + err)
             if (result.length === 0) return alert('Beneficiary account specified doesn\'t exist!')
 
