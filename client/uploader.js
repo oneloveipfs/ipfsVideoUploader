@@ -74,6 +74,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Hide Avalon first curated tag info if not logged in with Avalon
     if (!avalonUser || !avalonKey) {
         document.getElementById('tagInfo1').style.display = 'none'
+    } else {
+        javalon.getAccount(avalonUser,(err,acc) => {
+            if (err) return
+            document.getElementById('dtcBurnInput').placeholder = 'Available: ' + thousandSeperator(acc.balance / 100) + ' DTC'
+            window.availableForBurn = acc.balance / 100
+        })
     }
 
     // Get configuration
@@ -212,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('avalonvw').oninput = () => {
         let avalonVW = document.getElementById('avalonvw').value
         document.getElementById('avalonvwlabel').innerText = 'Avalon vote weight: ' + avalonVW + '%'
-        if (avalonVW > 10)
+        if (avalonVW > 30)
             document.getElementById('avalonhighvwalert').style.display = 'block'
         else
             document.getElementById('avalonhighvwalert').style.display = 'none'
@@ -701,6 +707,8 @@ async function broadcastAvalon(json,tag,permlink,cb) {
         })
     })
 
+    let burnAmt = document.getElementById('dtcBurnInput').value ? Math.floor(parseFloat(document.getElementById('dtcBurnInput').value) * 100) : 0
+
     try {
         let avalonAcc = await avalonGetAccPromise
         let tx = {
@@ -712,6 +720,12 @@ async function broadcastAvalon(json,tag,permlink,cb) {
                 tag: tag
             }
         }
+
+        if (burnAmt > 0) {
+            tx.type = 13
+            tx.data.burn = burnAmt
+        }
+
         let signedtx = javalon.sign(sessionStorage.getItem('OneLoveAvalonKey'),avalonAcc.name,tx)
         javalon.sendTransaction(signedtx,(err,result) => {
             if (err) alert('Hive broadcast successful however there is an error with Avalon: ' + JSON.stringify(err))
@@ -805,3 +819,9 @@ function beneficiarySorter (a,b) {
 
     return comp
 }
+
+function thousandSeperator(num) {
+    var num_parts = num.toString().split(".");
+    num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return num_parts.join(".");
+  }

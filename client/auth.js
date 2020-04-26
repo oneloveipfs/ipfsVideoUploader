@@ -77,6 +77,7 @@ async function Avalon() {
     // Verify Avalon login
     let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
     let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
+    let promoteDisabled = false
 
     if (!avalonUser || !avalonKey) return
 
@@ -88,7 +89,11 @@ async function Avalon() {
             
             // Login with "Posting key" (recommended)
             for (let i = 0; i < result.keys.length; i++) {
-                if (arrContainsInt(result.keys[i].types,4) === true && result.keys[i].pub === avalonPubKey) return resolve(true)
+                if (arrContainsInt(result.keys[i].types,4) === true && result.keys[i].pub === avalonPubKey) {
+                    if (arrContainsInt(result.keys[i].types,13) === false) promoteDisabled = true
+                    return resolve(true)
+                }
+                if (arrContainsInt(result.keys[i].types,13) === true && result.keys[i].pub === avalonPubKey) return resolve(true)
             }
             resolve(false)
         })
@@ -106,6 +111,7 @@ async function Avalon() {
     }
 
     document.getElementById('loggedInUser').innerHTML += ', and ' + avalonUser + ' on Avalon'
+    if (promoteDisabled) document.getElementById('dtcBurnSection').style.display = 'none'
     document.getElementById('avalonZone').style.display = 'block'
 }
 
