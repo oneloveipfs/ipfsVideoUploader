@@ -10,3 +10,7 @@ patch:
         patched: '2020-05-01T05:26:21.381Z'
     - steem > lodash:
         patched: '2020-05-01T05:26:21.381Z'
+    - woocommerce-api > npm-check-updates > lodash:
+        patched: '2020-05-02T09:02:35.248Z'
+    - woocommerce-api > npm-check-updates > node-alias > lodash:
+        patched: '2020-05-02T09:02:35.248Z'
