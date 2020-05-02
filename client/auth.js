@@ -23,7 +23,7 @@ async function Hive() {
                     resolve(null)
                 } else {
                     document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + authResponse.data.user + ' on Hive'
-                    if (steemUser) document.getElementById('loggedInUser').innerHTML += ', ' + steemUser + ' on Steem'
+                    if (steemUser) document.getElementById('loggedInUser').innerHTML += HtmlSanitizer.SanitizeHtml(', ' + steemUser + ' on Steem')
                     retrieveDraft()
                     resolve(authResponse.data.user)
                 }
