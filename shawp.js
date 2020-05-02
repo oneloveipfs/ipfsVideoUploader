@@ -9,6 +9,9 @@ const Scheduler = require('node-schedule')
 hive.api.setOptions({url: Config.Shawp.HiveAPI, useAppbaseApi: true })
 steem.api.setOptions({ url: Config.Shawp.SteemAPI, useAppbaseApi: true })
 
+hive.config.set('uri', Config.Shawp.HiveAPI)
+hive.config.set('alternative_api_endpoints', [])
+
 let Customers = JSON.parse(fs.readFileSync('db/shawp/users.json'))
 let RefillHistory = JSON.parse(fs.readFileSync('db/shawp/refills.json'))
 let ConsumeHistory = JSON.parse(fs.readFileSync('db/shawp/consumes.json'))
