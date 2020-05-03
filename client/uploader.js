@@ -602,9 +602,6 @@ function buildJsonMetadata(network) {
 
     jsonMeta.video.refs = ref
 
-    // if (subtitleList.length > 0)
-    //     jsonMeta.video.content.subtitles = subtitleList
-
     return jsonMeta;
 }
 
@@ -651,8 +648,12 @@ function buildJsonMetadataAvalon() {
     if (steemUser) jsonMeta.refs.push('steem/' + steemUser + '/' + postparams.permlink)
     if (config.gateway) jsonMeta.files.ipfs.gw = config.gateway 
 
-    // if (subtitleList.length > 0)
-    //     jsonMeta.ipfs.subtitles = subtitleList
+    if (subtitleList.length > 0) {
+        jsonMeta.files.ipfs.sub = {}
+        for (let i = 0; i < subtitleList.length; i++) {
+            jsonMeta.files.ipfs.sub[subtitleList[i].lang] = subtitleList[i].hash
+        }
+    }
 
     return jsonMeta
 }
