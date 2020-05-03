@@ -53,5 +53,11 @@
         "description": "Welcome Hive & resumable uploads API",
         "link": "https://esteem.app/ipfs/@techcoderx/oneloveipfs-uploader-v0-9-3-welcome-hive-blockchain-and-resumable-uploads-api",
         "payout": "$2.64"
+    }, {
+        "created": "17 April 2020",
+        "version": "0.9.4",
+        "description": "Skynet uploads & new payment system",
+        "link": "https://esteem.app/hive-134220/@techcoderx/oneloveipfs-uploader-v0-9-4-skynet-uploads-and-new-payment-system",
+        "payout": "$1.74"
     }
 ]
