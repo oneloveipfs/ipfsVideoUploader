@@ -43,7 +43,7 @@ for i in `seq 0 $((MAX - 1))` ; do
 	lz=""
 	if [ $i -lt 10 ]; then lz=0; fi
 
-	ffmpeg -hide_banner -loglevel error -accurate_seek -ss $(bc <<< $i*$STEPS) -i $1 -s 210x118 -frames:v 1 $TEMPDIR/sprite_$lz$i.bmp
+	ffmpeg -hide_banner -loglevel error -accurate_seek -ss $(bc <<< $i*$STEPS) -i $1 -s 128x72 -frames:v 1 $TEMPDIR/sprite_$lz$i.bmp
 
 	if [ "$((i%(MAX/4)))" = 0 ]; then printf "$((i/(MAX/4)*25))%% "; fi
 done
