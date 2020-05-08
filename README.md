@@ -17,22 +17,23 @@ This is an alternative IPFS uploader to upload videos onto DTube. Includes a bas
 
 * A HiveSigner application (if HiveSigner authentication is used)
 * A domain name for HTTPS, plus SSL certificate for that domain installed
+* A running `siad` node for Skynet upload support.
 
 # Installation
 
-1. Clone this repository by typing `git clone https://github.com/techcoderx/ipfsVideoUploader.git` in a terminal window.
+1. Clone this repository by typing `git clone https://github.com/oneloveipfs/ipfsVideoUploader.git` in a terminal window.
 
 2. Install all required node modules. `cd ipfsVideoUploader && npm install`
 
 3. Configure uploader by modifying `config.json` file. If you need help with the configuration, view the documentation [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/docs/ConfigDocs.md)
 
-4. Run `npm run keygen` to generate encryption and auth keys for Steem Keychain support. Then backup the contents of `.auth.json` file in a safe place.
+4. Run `npm run keygen` to generate encryption and auth keys for Hive Keychain support. Then backup the contents of `.auth.json` file in a safe place.
 
-5. If `whitelistEnabled` is set to `true`, add some Steem accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Steem user)
+5. If `whitelistEnabled` is set to `true`, add some Hive accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Hive user)
 
 6. Run the app by typing `npm start`. Your app will listen to ports you specify in `config.json` file.
 
-All uploaded files (through non-resumable upload APIs) will be saved in the `uploaded` folder within the repo. Image files (for Steem article body) will be saved in the `imguploads` folder. As for resumable uploads, you may define the directory in `config.json` file as well as the `tusd` daemon startup arguments.
+All uploaded files (through non-resumable upload APIs) will be saved in the `uploaded` folder within the repo. Image files (for Hive and Steem article body) will be saved in the `imguploads` folder. As for resumable uploads, you may define the directory in `config.json` file as well as the `tusd` daemon startup arguments.
 
 # Supported file formats
 
