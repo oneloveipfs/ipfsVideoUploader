@@ -393,6 +393,8 @@ let uploadOps = {
                         db.writeSkylinksData()
                     }
 
+                    // TODO: Record encoding cost reported by encoding servers
+
                     let result = { 
                         username: user,
                         type: json.Upload.MetaData.type,
@@ -471,7 +473,10 @@ let uploadOps = {
                         })
 
                         // Or else if "videos" type requested, generate sprites, duration etc
-                        processSingleVideo(info.id,user,(result) => {
+                        let uploadUser = user
+                        if (request.body.Upload.MetaData.encoderUser && request.body.Upload.MetaData.encodingCost)
+                            uploadUser = request.body.Upload.MetaData.encoderUser
+                        processSingleVideo(info.id,uploadUser,(result) => {
                             socket.emit('result',result)
                         })
                     })

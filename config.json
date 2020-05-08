@@ -5,7 +5,8 @@
     "UsageLogs": true,
     "tokenExpiry": 86400,
 
-    "admins":["techcoderx","graylan","gray00","d00k13","vaultec","toddmck","priyanarc"],
+    "admins":["graylan","gray00","d00k13","vaultec","toddmck","priyanarc"],
+    "encoderAccounts":[],
 
     "ClientConfig": {
         "gateway": "https://video.oneloveipfs.com",

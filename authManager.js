@@ -101,6 +101,9 @@ let auth = {
         let decrypted = Crypto.AES.decrypt(message,Keys.AESKey).toString(Crypto.enc.Utf8).split(':')
         cb(decrypted)
     },
+    invalidHiveUsername: (username) => {
+        return Hive.utils.validateAccountName(username)
+    },
     whitelist: () => {return whitelist},
     whitelistAdd: (username,cb) => {
         if (!whitelist.includes(username)) {

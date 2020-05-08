@@ -147,8 +147,16 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
             if(!db.getPossibleTypes().includes(request.body.Upload.MetaData.type)) return response.status(400).send({error: 'Invalid upload type'})
 
             // Authenticate
-            Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,true,(e) => {
+            Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,true,(e,user) => {
                 if (e) return response.status(401).send({error: e})
+                if (request.body.Upload.MetaData.encoderUser && request.body.Upload.MetaData.encodingCost) { 
+                    if (Auth.invalidHiveUsername(request.body.Upload.MetaData.encoderUser))
+                        return response.status(401).send({error: 'Invalid encoderUser Hive username'})
+                    else if (!Config.admins.includes(user) && !Config.encoderAccounts.includes(user))
+                        return response.status(401).send({error: 'Uploads from encoding servers must be an admin or encoder account.'})
+                    else if (request.body.Upload.MetaData.type == 'videos')
+                        return response.status(401).send({error: 'Uploads from encoding servers may not be source video files.'})
+                }
                 return response.status(200).send()
             })
             break
@@ -157,7 +165,10 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
 
             // Get user by access token then process upload
             Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,false,(e,user) => {
-                FileUploader.handleTusUpload(request.body,user,() => {
+                let uploadUser = user
+                if (request.body.Upload.MetaData.encoderUser && request.body.Upload.MetaData.encodingCost)
+                    uploadUser = request.body.Upload.MetaData.encoderUser
+                FileUploader.handleTusUpload(request.body,uploadUser,() => {
                     FileUploader.writeUploadRegister()
                     response.status(200).send()
                 })
