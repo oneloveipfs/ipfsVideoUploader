@@ -54,7 +54,17 @@
         "HiveAPI": "https://hived.techcoderx.com",
         "SteemAPI": "https://api.steemit.com",
         "HiveReceiver": "onelovedtube",
-        "SteemReceiver": "onelovedtube"
+        "SteemReceiver": "onelovedtube",
+        "Coinbase": {
+            "enabled": true,
+            "enabledCurrencies": ["BTC","ETH","BCH","DAI","LTC","USDC"]
+        }
+    },
+
+    "CoinbaseCommerce": {
+        "APIKey": "",
+        "RedirectURL": "",
+        "CancelURL": ""
     },
 
     "test": {

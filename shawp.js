@@ -2,6 +2,7 @@ const Config = require('./config.json')
 const db = require('./dbManager')
 const hive = require('@hiveio/hive-js')
 const steem = require('steem')
+const coinbase = require('coinbase-commerce-node')
 const fs = require('fs')
 const axios = require('axios')
 const Scheduler = require('node-schedule')
@@ -18,6 +19,9 @@ let ConsumeHistory = JSON.parse(fs.readFileSync('db/shawp/consumes.json'))
 
 let headBlockHive
 let headBlockSteem
+
+let coinbaseClient = coinbase.Client
+coinbaseClient.init(Config.CoinbaseCommerce.APIKey)
 
 let Shawp = {
     init: (network) => {
@@ -257,11 +261,20 @@ let Shawp = {
         })
     },
     coins: {
+        // Native
         DTC: 0,
         Hive: 1,
         HiveDollars: 2,
         Steem: 3,
-        SteemDollars: 4
+        SteemDollars: 4,
+
+        // Coinbase commerce
+        BTC: 5,
+        ETH: 6,
+        LTC: 7,
+        BCH: 8,
+        DAI: 9,
+        USDC: 10
     },
     methods: {
         DTC: 0,
@@ -269,7 +282,8 @@ let Shawp = {
         Steem: 2,
         Coupon: 3, // through promo/wc orders
         Referral: 4, // not sure
-        System: 5
+        System: 5,
+        Coinbase: 6
     }
 }
 
