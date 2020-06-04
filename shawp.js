@@ -21,7 +21,13 @@ let headBlockHive
 let headBlockSteem
 
 let coinbaseClient = coinbase.Client
-coinbaseClient.init(Config.CoinbaseCommerce.APIKey)
+let coinbaseCharge
+let coinbaseWebhook
+if (Config.Shawp.Coinbase.enabled) {
+    coinbaseClient.init(Config.CoinbaseCommerce.APIKey)
+    coinbaseCharge = coinbase.resources.Charge
+    coinbaseWebhook = coinbase.Webhook
+}
 
 let Shawp = {
     init: (network) => {
@@ -190,6 +196,36 @@ let Shawp = {
                 return cb({ error: 'invalid coin' })
         }
     },
+    CoinbaseCharge: (username,usdAmt,cb) => {
+        let chargeData = {
+            name: Config.CoinbaseCommerce.ProductName,
+            description: 'Account refill for @' + username,
+            metadata: {
+                customer_username: username
+            },
+            pricing_type: 'fixed_price',
+            local_price: {
+                amount: usdAmt,
+                currency: 'USD'
+            }
+        }
+
+        coinbaseCharge.create(chargeData,(e,response) => {
+            console.log(e,response)
+            if (e)
+                return cb(e)
+            else
+                return cb(null,response)
+        })
+    },
+    CoinbaseWebhookVerify: (request,cb) => {
+        try {
+            coinbaseWebhook.verifySigHeader(request.rawBody,request.headers['x-cc-webhook-signature'],Config.CoinbaseCommerce.WebhookSecret)
+            cb(true)
+        } catch {
+            cb(false)
+        }
+    },
     Refill: (from,username,method,rawAmt,usdAmt) => {
         if (!Customers[username]) Shawp.AddUser(username)
 
@@ -269,6 +305,7 @@ let Shawp = {
         SteemDollars: 4,
 
         // Coinbase commerce
+        // TODO: Add support for running own node. Not your node, not your rules.
         BTC: 5,
         ETH: 6,
         LTC: 7,

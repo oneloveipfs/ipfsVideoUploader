@@ -295,6 +295,32 @@ app.get('/shawp_consumption_history_admin',APILimiter,(req,res) => {
     })
 })
 
+app.post('/shawp_refill_coinbase',Parser.json(),(req,res) => {
+    if (!Config.Shawp.Enabled || !Config.Shawp.Coinbase.enabled) return res.status(404).send()
+    if (!req.body.username || !req.body.usdAmt) return res.status(400).send({error:'Username or amount is missing'})
+    Shawp.CoinbaseCharge(req.body.username,req.body.usdAmt,(e,r) => {
+        if (e)
+            return res.status(400).send({error:e.message})
+        else
+            return res.status(200).send(r)
+    })
+})
+
+app.post('/shawp_refill_coinbase_webhook',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(req,res) => {
+    if (!Config.Shawp.Enabled || !Config.Shawp.Coinbase.enabled) return res.status(404).send()
+    Shawp.CoinbaseWebhookVerify(req,(verified) => {
+        if (!verified) return res.status(403).send()
+        res.status(200).send()
+        console.log(req.body)
+
+        if (req.body.event.type == 'charge:confirmed') {
+            Shawp.Refill('',req.body.event.data.metadata.customer_username,Shawp.methods.Coinbase,'','')
+            Shawp.WriteUserDB()
+            Shawp.WriteRefillHistory()
+        }
+    })
+})
+
 app.post('/botusage',Parser.json(),(req,res) => {
     if (!Config.WooCommerceEnabled || Config.Shawp.Enabled) return res.status(404).end()
     Auth.webhookAuth(req.body.token,(err,valid) => {
