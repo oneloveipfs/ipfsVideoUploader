@@ -104,6 +104,7 @@
                             <option>HBD</option>
                             <option>STEEM</option>
                             <option>SBD</option>
+                            <option>Coinbase</option>
                         </select></h4>
                         <a class="roundedBtn" id="getPaymentBtns">Get payment info</a>
                         <h5 class="redeemVoucherNavBtn"><a onclick="document.getElementById('signupstart').style.display = 'none'; document.getElementById('signupredeem').style.display = 'block';">Redeem a voucher</a></h5>
@@ -117,7 +118,8 @@
                         <a class="roundedBtn" id="HiveSignerBtn" target="_blank" rel="noreferrer">Pay with HiveSigner</a>
                         <a class="roundedBtn" id="SteemKeychainBtn">Pay with Steem Keychain</a>
                         <a class="roundedBtn" id="SteemLoginBtn" target="_blank" rel="noreferrer">Pay with SteemLogin</a>
-                        <h6>Disclaimer: The amount quoted above may differ than the actual price in your selected coin. Due to price fluctuations, you may receive more or less GBdays after refilling your account. Alternatively, you may refill your account from your Steem/Hive wallet by sending any amount to @onelovedtube (without memo if sending from same wallet as refill account, or memo if different wallet, with the format "to: @username").</h6>
+                        <a class="roundedBtn" id="CoinbaseCommerceBtn" target="_blank" rel="noreferrer">Pay with Coinbase Commerce</a>
+                        <h6 id="nativeDisclaimer">Disclaimer: The amount quoted above may differ than the actual price in your selected coin. Due to price fluctuations, you may receive more or less GBdays after refilling your account. Alternatively, you may refill your account from your Steem/Hive wallet by sending any amount to @onelovedtube (without memo if sending from same wallet as refill account, or memo if different wallet, with the format "to: @username").</h6>
                     </div>
                     <div id="signupredeem" style="display: none;">
                         <a onclick="document.getElementById('signupredeem').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>

@@ -16,12 +16,36 @@ document.addEventListener('DOMContentLoaded', () => {
     axios.get('/shawp_config').then((result) => {
         shawpconfig = result.data
         document.getElementById('homepagePriceLbl').innerText = '$' + (shawpconfig.DefaultUSDRate * 30) + '/GB/month'
+
+        let paymentOptions = document.getElementById('pymtMtd').getElementsByTagName('option')
+        for (let i = 0; i < paymentOptions.length; i++) {
+            if ((paymentOptions[i].value == "HIVE" || paymentOptions[i].value == "HBD") && !shawpconfig.HiveReceiver)
+                paymentOptions[i].disabled = true
+            else if ((paymentOptions[i].value == "STEEM" || paymentOptions[i].value == "SBD") && !shawpconfig.SteemReceiver)
+                paymentOptions[i].disabled = true
+            else if (paymentOptions[i].value == "Coinbase" && !shawpconfig.Coinbase.enabled)
+                paymentOptions[i].disabled = true
+        }
+
+        if (shawpconfig.Coinbase.enabled) {
+            let signupStartText = document.getElementById('signupstart').children[0]
+            signupStartText.innerHTML += ' You can also pay with '
+
+            for (let i = 0; i < shawpconfig.Coinbase.enabledCurrencies.length; i++) {
+                signupStartText.innerHTML += shawpconfig.Coinbase.enabledCurrencies[i]
+                if (i < shawpconfig.Coinbase.enabledCurrencies.length - 2)
+                    signupStartText.innerHTML += ', '
+                else if (i < shawpconfig.Coinbase.enabledCurrencies.length - 1)
+                    signupStartText.innerHTML += ' and '
+            }
+            signupStartText.innerHTML += ' through Coinbase commerce.'
+        }
     })
 
     let proceedAuthBtnDisabled = document.getElementById('proceedAuthBtn').disabled
     document.getElementById('authButton').onclick = function loginBtnClicked() {
         // Show popup window of login options
-        document.getElementById('loginPopup').style.display = "block"
+        updateDisplayByIDs(['loginPopup'],[])
     }
 
 window.onclick = (event) => {
@@ -116,7 +140,7 @@ document.getElementById('altAuthBtn').onclick = () => {
 }
 
 document.getElementById('signupButton').onclick = () => {
-    document.getElementById('signupPopup').style.display = "block"
+    updateDisplayByIDs(['signupPopup'],[])
 }
 
 document.getElementById('getPaymentBtns').onclick = () => {
@@ -124,53 +148,60 @@ document.getElementById('getPaymentBtns').onclick = () => {
     let receipient = document.getElementById('receiverUsername').value
     let paymentMethod = document.getElementById('pymtMtd').value
     let creditsToBuy = parseFloat(document.getElementById('gbdaysInput').value)
+    let nativePymtProcessors = ['HIVE','HBD','STEEM','SBD']
     if (receipient && validateAccountName(receipient) !== null) return alert(validateAccountName(receipient))
     if (creditsToBuy <= 0) return alert('Purchase quantity must not be less than or equals to zero.')
-    exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
+    if (nativePymtProcessors.includes(paymentMethod)) exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
         if (e) return alert(e)
         amt = amt.toFixed(3)
         if (receipient) document.getElementById('receiverAccConfirm').innerText = 'Username: ' + receipient
         document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + creditsToBuy + ' GBdays'
         document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
+        updateDisplayByIDs(['nativeDisclaimer'],['CoinbaseCommerceBtn'])
 
         switch (paymentMethod) {
             case 'HIVE':
             case 'HBD':
-                document.getElementById('SteemKeychainBtn').style.display = 'none'
-                document.getElementById('SteemLoginBtn').style.display = 'none'
-                document.getElementById('HiveKeychainBtn').style.display = 'block'
+                updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn'],['SteemKeychainBtn','SteemLoginBtn'])
                 document.getElementById('HiveKeychainBtn').onclick = () => {
                     hive_keychain.requestTransfer(receipient,shawpconfig.HiveReceiver,amt.toString(),receipient ? 'to: @' + receipient : '',paymentMethod,(e) => {
                         if (e.error) return alert(e.error)
-                        document.getElementById('signuppay').style.display = 'none'
-                        document.getElementById('signupcb').style.display = 'block'
+                        updateDisplayByIDs(['signupcb'],['signuppay'])
                     })
                 }
-                document.getElementById('HiveSignerBtn').style.display = 'block'
                 document.getElementById('HiveSignerBtn').href = 'https://hivesigner.com/sign/transfer?to=' + shawpconfig.HiveReceiver + '&amount=' + amt + paymentMethod + (receipient ? '&memo=to: @' + receipient : '')
                 break
             case 'STEEM':
             case 'SBD':
-                document.getElementById('HiveKeychainBtn').style.display = 'none'
-                document.getElementById('HiveSignerBtn').style.display = 'none'
-                document.getElementById('SteemKeychainBtn').style.display = 'block'
+                updateDisplayByIDs(['SteemKeychainBtn','SteemLoginBtn'],['HiveKeychainBtn','HiveSignerBtn'])
                 document.getElementById('SteemKeychainBtn').onclick = () => {
                     steem_keychain.requestTransfer(receipient,shawpconfig.SteemReceiver,amt.toString(),receipient ? 'to: @' + receipient : '',paymentMethod,(e) => {
                         if (e.error) return alert(e.error)
-                        document.getElementById('signuppay').style.display = 'none'
-                        document.getElementById('signupcb').style.display = 'block'
+                        updateDisplayByIDs(['signupcb'],['signuppay'])
                     })
                 }
-                document.getElementById('SteemLoginBtn').style.display = 'block'
                 document.getElementById('SteemLoginBtn').href = 'https://steemlogin.com/sign/transfer?to=' + shawpconfig.SteemReceiver + '&amount=' + amt + paymentMethod + (receipient ? '&memo=to: @' + receipient : '')
                 break
             default:
                 break
         }
-        
-        document.getElementById('signupstart').style.display = 'none'
-        document.getElementById('signuppay').style.display = 'block'
+
+        updateDisplayByIDs(['signuppay'],['signupstart'])
     })
+    else if (paymentMethod == 'Coinbase') {
+        let fiatAmt = Math.floor(creditsToBuy * shawpconfig.DefaultUSDRate * 100) / 100
+        let roundedCredits = (fiatAmt / shawpconfig.DefaultUSDRate).toFixed(6)
+        document.getElementById('receiverAccConfirm').innerText = 'Username: ' + receipient
+        document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + roundedCredits + ' GBdays'
+        document.getElementById('quoteAmt').innerText = 'Amount: ' + fiatAmt + ' USD'
+
+        updateDisplayByIDs(['CoinbaseCommerceBtn','signuppay'],['signupstart','HiveKeychainBtn','HiveSignerBtn','SteemKeychainBtn','SteemLoginBtn','nativeDisclaimer'])
+        
+        document.getElementById('CoinbaseCommerceBtn').onclick = () =>
+            axios.post('/shawp_refill_coinbase',{ username: receipient, usdAmt: fiatAmt })
+                .then((response) => window.location.href = response.data.hosted_url)
+                .catch((e) => alert(JSON.stringify(e)))
+    }
 }
 
 document.getElementById('redeemVoucherBtn').onclick = () => {
@@ -307,4 +338,12 @@ function arrContainsInt(arr,value) {
     for (var i = 0; i < arr.length; i++) {
         if (arr[i] === value) return true
     }
+}
+
+function updateDisplayByIDs(toshow,tohide) {
+    for (let i = 0; i < tohide.length; i++)
+        document.getElementById(tohide[i]).style.display = 'none'
+    
+    for (let i = 0; i < toshow.length; i++)
+        document.getElementById(toshow[i]).style.display = 'block'
 }

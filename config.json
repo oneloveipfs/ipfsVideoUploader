@@ -56,14 +56,14 @@
         "HiveReceiver": "onelovedtube",
         "SteemReceiver": "onelovedtube",
         "Coinbase": {
-            "enabled": false,
+            "enabled": true,
             "enabledCurrencies": ["BTC","ETH","BCH","DAI","LTC","USDC"]
         }
     },
 
     "CoinbaseCommerce": {
-        "APIKey": "",
-        "WebhookSecret": "",
+        "APIKey": "64328273-7451-4a0f-b131-5009b847169c",
+        "WebhookSecret": "4c8f5764-3972-4356-9550-f95644ece563",
         "RedirectURL": "",
         "CancelURL": "",
         "ProductName": "OneLoveIPFS hosting credits"
