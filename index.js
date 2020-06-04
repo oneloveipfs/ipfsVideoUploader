@@ -311,7 +311,7 @@ app.post('/shawp_refill_coinbase_webhook',Parser.json({ verify: rawBodySaver }),
     Shawp.CoinbaseWebhookVerify(req,(verified) => {
         if (!verified) return res.status(403).send()
         res.status(200).send()
-        console.log(req.body)
+        console.log(JSON.stringify(req.body))
 
         if (req.body.event.type == 'charge:confirmed') {
             Shawp.Refill('',req.body.event.data.metadata.customer_username,Shawp.methods.Coinbase,'','')
