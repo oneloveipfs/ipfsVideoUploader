@@ -139,8 +139,14 @@ document.getElementById('refillSubmitBtn').onclick = () => {
 
         updateDisplayByIDs(['CoinbaseCommerceBtn','coinbaseDisclaimer','refillpay','refillPopup'],['HiveKeychainBtn','HiveSignerBtn','SteemKeychainBtn','SteemLoginBtn','nativeDisclaimer','refillcb','refillcancel'])
 
+        let cbUrl = new URL(window.location.href)
+        cbUrl.searchParams.set('callback','refillcb')
+
+        let cancelUrl = new URL(window.location.href)
+        cancelUrl.searchParams.set('callback','refillcancel')
+
         document.getElementById('CoinbaseCommerceBtn').onclick = () =>
-            axios.post('/shawp_refill_coinbase',{ username: username, usdAmt: fiatAmt, cbUrl: window.location.href + '&callback=refillcb', cancelUrl: window.location.href + '&callback=refillcancel' })
+            axios.post('/shawp_refill_coinbase',{ username: username, usdAmt: fiatAmt, cbUrl: cbUrl, cancelUrl: cancelUrl })
                 .then((response) => window.location.href = response.data.hosted_url)
                 .catch((e) => alert(JSON.stringify(e)))
     }
