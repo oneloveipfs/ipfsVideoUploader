@@ -63,8 +63,8 @@
 
     "CoinbaseCommerce": {
         "APIKey": "",
-        "RedirectURL": "",
         "WebhookSecret": "",
+        "RedirectURL": "",
         "CancelURL": "",
         "ProductName": "OneLoveIPFS hosting credits"
     },
