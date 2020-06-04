@@ -56,7 +56,7 @@
         "HiveReceiver": "onelovedtube",
         "SteemReceiver": "onelovedtube",
         "Coinbase": {
-            "enabled": true,
+            "enabled": false,
             "enabledCurrencies": ["BTC","ETH","BCH","DAI","LTC","USDC"]
         }
     },
