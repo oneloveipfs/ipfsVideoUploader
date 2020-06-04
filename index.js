@@ -303,7 +303,7 @@ app.post('/shawp_refill_coinbase',Parser.json(),(req,res) => {
             return res.status(400).send({error:e.message})
         else
             return res.status(200).send(r)
-    })
+    },req.body.cbUrl,req.body.cancelUrl)
 })
 
 app.post('/shawp_refill_coinbase_webhook',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(req,res) => {

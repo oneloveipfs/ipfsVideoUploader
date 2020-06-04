@@ -196,7 +196,7 @@ let Shawp = {
                 return cb({ error: 'invalid coin' })
         }
     },
-    CoinbaseCharge: (username,usdAmt,cb) => {
+    CoinbaseCharge: (username,usdAmt,cb,cbUrl,cancelUrl) => {
         let chargeData = {
             name: Config.CoinbaseCommerce.ProductName,
             description: 'Account refill for @' + username,
@@ -207,7 +207,9 @@ let Shawp = {
             local_price: {
                 amount: usdAmt,
                 currency: 'USD'
-            }
+            },
+            redirect_url: cbUrl || Config.CoinbaseCommerce.RedirectURL,
+            cancel_url: cancelUrl || Config.CoinbaseCommerce.CancelURL
         }
 
         coinbaseCharge.create(chargeData,(e,response) => {

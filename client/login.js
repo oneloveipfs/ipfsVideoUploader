@@ -2,6 +2,12 @@ let config
 let shawpconfig
 
 document.addEventListener('DOMContentLoaded', () => {
+    let url = new URL(window.location.href)
+    if (url.searchParams.get('callback') == 'signupcancel')
+        updateDisplayByIDs(['signupcancel','signupPopup'],['signupstart'])
+    else if (url.searchParams.get('callback') == 'signupcb')
+        updateDisplayByIDs(['signupcb','signupPopup'],['signupstart'])
+
     axios.get('/config').then((result) => {
         config = result.data
 
@@ -157,7 +163,7 @@ document.getElementById('getPaymentBtns').onclick = () => {
         if (receipient) document.getElementById('receiverAccConfirm').innerText = 'Username: ' + receipient
         document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + creditsToBuy + ' GBdays'
         document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
-        updateDisplayByIDs(['nativeDisclaimer'],['CoinbaseCommerceBtn'])
+        updateDisplayByIDs(['nativeDisclaimer'],['CoinbaseCommerceBtn','coinbaseDisclaimer'])
 
         switch (paymentMethod) {
             case 'HIVE':
@@ -189,13 +195,13 @@ document.getElementById('getPaymentBtns').onclick = () => {
         updateDisplayByIDs(['signuppay'],['signupstart'])
     })
     else if (paymentMethod == 'Coinbase') {
-        let fiatAmt = Math.floor(creditsToBuy * shawpconfig.DefaultUSDRate * 100) / 100
+        let fiatAmt = Math.round(creditsToBuy * shawpconfig.DefaultUSDRate * 100) / 100
         let roundedCredits = (fiatAmt / shawpconfig.DefaultUSDRate).toFixed(6)
         document.getElementById('receiverAccConfirm').innerText = 'Username: ' + receipient
         document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + roundedCredits + ' GBdays'
-        document.getElementById('quoteAmt').innerText = 'Amount: ' + fiatAmt + ' USD'
+        document.getElementById('quoteAmt').innerText = 'Amount: $' + fiatAmt + ' USD'
 
-        updateDisplayByIDs(['CoinbaseCommerceBtn','signuppay'],['signupstart','HiveKeychainBtn','HiveSignerBtn','SteemKeychainBtn','SteemLoginBtn','nativeDisclaimer'])
+        updateDisplayByIDs(['CoinbaseCommerceBtn','coinbaseDisclaimer','signuppay'],['signupstart','HiveKeychainBtn','HiveSignerBtn','SteemKeychainBtn','SteemLoginBtn','nativeDisclaimer'])
         
         document.getElementById('CoinbaseCommerceBtn').onclick = () =>
             axios.post('/shawp_refill_coinbase',{ username: receipient, usdAmt: fiatAmt })

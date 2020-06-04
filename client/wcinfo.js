@@ -35,11 +35,11 @@ if (token == null || token == '') {
         document.getElementById('wcinfo').innerHTML = HtmlSanitizer.SanitizeHtml(infoToDisplay)
 
         if (accdetail.daysremaining > 0 && accdetail.daysremaining < 7)
-            document.getElementById('refillnotify').style.display = 'block'
+            updateDisplayByIDs(['refillnotify'],[])
         else if (accdetail.daysremaining == 0) {
             console.log('needs')
             document.getElementById('needsrefillnotify').innerText = 'Uploads have been disabled for your account due to insufficient balance, needs ' + Math.ceil(accdetail.needs) + ' GBdays. Please refill your hosting credits to upload.'
-            document.getElementById('needsrefillnotify').style.display = 'block'
+            updateDisplayByIDs(['needsrefillnotify'],[])
         }
     } else {
         let totalAllocatedQuota = result.data.plan.quota + result.data.bonus + result.data.quotaOffset
@@ -56,7 +56,7 @@ if (token == null || token == '') {
             let DueDate = new Date(result.data.due)
             infoToDisplay += '<br>Next payment: ' + moment(DueDate).utc(DueDate).local().format('MMMM DD YYYY h:mm:ss a')
             if (DateNow > DueDate)
-                document.getElementById('refillnotify').style.display = 'block'
+                updateDisplayByIDs(['refillnotify'],[])
         }
         infoToDisplay += '<br><br>Available balance: ' + humanReadableSize(result.data.avail) + ' (' + Math.ceil(result.data.avail / totalAllocatedQuota * 10000) / 100 + '% free)'
         infoToDisplay += '<br>Total quota: ' + humanReadableSize(totalAllocatedQuota) + '</h3>'
@@ -75,9 +75,14 @@ if (token == null || token == '') {
         document.getElementById('wcinfo').innerHTML = '<h3>There is an error retrieving your OneLoveIPFS account details. Please login again. If error still persists, please contact techcoderx#7481 on Discord.</h3>'
 })
 
+if (url.searchParams.get('callback') == 'refillcb')
+    updateDisplayByIDs(['refiller','refillPopup','refillcb'],['uploadForm','refillpay'])
+else if (url.searchParams.get('callback') == 'refillcancel')
+    updateDisplayByIDs(['refiller','refillPopup','refillcancel'],['uploadForm','refillpay'])
+
+
 document.getElementById('refillSubmitBtn').onclick = () => {
-    document.getElementById('refillpay').style.display = 'block'
-    document.getElementById('refillcb').style.display = 'none'
+    updateDisplayByIDs(['refillpay'],['refillcb'])
 
     if (document.getElementById('gbdaysInput').value == '') return alert('Please specify GBdays to refill.')
 
@@ -86,50 +91,59 @@ document.getElementById('refillSubmitBtn').onclick = () => {
     if (creditsToBuy <= 0) return alert('Purchase quantity must not be less than or equals to zero.')
     document.getElementById('refillSubmitBtn').value = 'Loading...'
     document.getElementById('refillSubmitBtn').disabled = true
-    exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
+    let nativePymtProcessors = ['HIVE','HBD','STEEM','SBD']
+    if (nativePymtProcessors.includes(paymentMethod)) exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
         document.getElementById('refillSubmitBtn').value = 'Refill'
         document.getElementById('refillSubmitBtn').disabled = false
         if (e) return alert(e)
         amt = amt.toFixed(3)
         document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + creditsToBuy + ' GBdays'
         document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
+        updateDisplayByIDs(['nativeDisclaimer'],['coinbaseDisclaimer'])
 
         switch (paymentMethod) {
             case 'HIVE':
             case 'HBD':
-                document.getElementById('SteemKeychainBtn').style.display = 'none'
-                document.getElementById('SteemLoginBtn').style.display = 'none'
-                document.getElementById('HiveKeychainBtn').style.display = 'block'
+                updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn'],['SteemKeychainBtn','SteemLoginBtn'])
                 document.getElementById('HiveKeychainBtn').onclick = () => {
                     hive_keychain.requestTransfer(username,shawpconfig.HiveReceiver,amt.toString(),'to: @' + username,paymentMethod,(e) => {
                         if (e.error) return alert(e.error)
-                        document.getElementById('refillpay').style.display = 'none'
-                        document.getElementById('refillcb').style.display = 'block'
+                        updateDisplayByIDs(['refillcb'],['refillpay'])
                     })
                 }
-                document.getElementById('HiveSignerBtn').style.display = 'block'
                 document.getElementById('HiveSignerBtn').href = 'https://hivesigner.com/sign/transfer?to=' + shawpconfig.HiveReceiver + '&amount=' + amt + paymentMethod + '&memo=to: @' + username
                 break
             case 'STEEM':
             case 'SBD':
-                document.getElementById('HiveKeychainBtn').style.display = 'none'
-                document.getElementById('HiveSignerBtn').style.display = 'none'
-                document.getElementById('SteemKeychainBtn').style.display = 'block'
+                updateDisplayByIDs(['SteemKeychainBtn','SteemLoginBtn'],['HiveKeychainBtn','HiveSignerBtn'])
                 document.getElementById('SteemKeychainBtn').onclick = () => {
                     steem_keychain.requestTransfer(steemUser,shawpconfig.SteemReceiver,amt.toString(),'to: @' + username,paymentMethod,(e) => {
                         if (e.error) return alert(e.error)
-                        document.getElementById('refillpay').style.display = 'none'
-                        document.getElementById('refillcb').style.display = 'block'
+                        updateDisplayByIDs(['refillcb'],['refillpay'])
                     })
                 }
-                document.getElementById('SteemLoginBtn').style.display = 'block'
                 document.getElementById('SteemLoginBtn').href = 'https://steemlogin.com/sign/transfer?to=' + shawpconfig.SteemReceiver + '&amount=' + amt + paymentMethod + '&memo=to: @' + username
                 break
             default:
                 break
         }
-        document.getElementById('refillPopup').style.display = 'block'
+        updateDisplayByIDs(['refillPopup'],[])
     })
+    else if (paymentMethod == 'Coinbase') {
+        document.getElementById('refillSubmitBtn').value = 'Refill'
+        document.getElementById('refillSubmitBtn').disabled = false
+        let fiatAmt = Math.round(creditsToBuy * accdetail.rate * 100) / 100
+        let roundedCredits = (fiatAmt / accdetail.rate).toFixed(6)
+        document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + roundedCredits + ' GBdays'
+        document.getElementById('quoteAmt').innerText = 'Amount: $' + fiatAmt + ' USD'
+
+        updateDisplayByIDs(['CoinbaseCommerceBtn','coinbaseDisclaimer','refillpay','refillPopup'],['HiveKeychainBtn','HiveSignerBtn','SteemKeychainBtn','SteemLoginBtn','nativeDisclaimer','refillcb','refillcancel'])
+
+        document.getElementById('CoinbaseCommerceBtn').onclick = () =>
+            axios.post('/shawp_refill_coinbase',{ username: username, usdAmt: fiatAmt, cbUrl: window.location.href + '&callback=refillcb', cancelUrl: window.location.href + '&callback=cancelcb' })
+                .then((response) => window.location.href = response.data.hosted_url)
+                .catch((e) => alert(JSON.stringify(e)))
+    }
 }
 })
 
@@ -198,4 +212,12 @@ function isEmpty(obj) {
             return false;
     }
     return true;
+}
+
+function updateDisplayByIDs(toshow,tohide) {
+    for (let i = 0; i < tohide.length; i++)
+        document.getElementById(tohide[i]).style.display = 'none'
+    
+    for (let i = 0; i < toshow.length; i++)
+        document.getElementById(toshow[i]).style.display = 'block'
 }

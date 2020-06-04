@@ -120,6 +120,7 @@
                         <a class="roundedBtn" id="SteemLoginBtn" target="_blank" rel="noreferrer">Pay with SteemLogin</a>
                         <a class="roundedBtn" id="CoinbaseCommerceBtn" target="_blank" rel="noreferrer">Pay with Coinbase Commerce</a>
                         <h6 id="nativeDisclaimer">Disclaimer: The amount quoted above may differ than the actual price in your selected coin. Due to price fluctuations, you may receive more or less GBdays after refilling your account. Alternatively, you may refill your account from your Steem/Hive wallet by sending any amount to @onelovedtube (without memo if sending from same wallet as refill account, or memo if different wallet, with the format "to: @username").</h6>
+                        <h6 id="coinbaseDisclaimer">Coinbase Commerce rounds all fiat amounts to 2 decimal places, hence the GBdays above may differ from the GBdays you have entered to reflect changes as a result of the rounding. You will be redicted to commerce.coinbase.com to complete the payment.</h6>
                     </div>
                     <div id="signupredeem" style="display: none;">
                         <a onclick="document.getElementById('signupredeem').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>
@@ -130,6 +131,10 @@
                     <div id="signupcb" style="display: none;">
                         <a onclick="document.getElementById('signupcb').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>
                         <h4>Thank you for your purchase. Your order is currently being processed, which should take no longer than one minute. Once this is complete, you may login and begin uploading videos to our service.<br><br>If you have any issues, please contact the OneLoveIPFS team on Discord.</h4>
+                    </div>
+                    <div id="signupcancel" style="display: none;">
+                        <a onclick="document.getElementById('signupcancel').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>
+                        <h4>Your order has been cancelled successfully. To create a new order, you may go back and start again.</h4>
                     </div>
                 </div>
             </div>
