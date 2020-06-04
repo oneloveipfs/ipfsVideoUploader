@@ -99,7 +99,7 @@ document.getElementById('refillSubmitBtn').onclick = () => {
         amt = amt.toFixed(3)
         document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + creditsToBuy + ' GBdays'
         document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
-        updateDisplayByIDs(['nativeDisclaimer'],['coinbaseDisclaimer'])
+        updateDisplayByIDs(['nativeDisclaimer'],['coinbaseDisclaimer','CoinbaseCommerceBtn'])
 
         switch (paymentMethod) {
             case 'HIVE':
