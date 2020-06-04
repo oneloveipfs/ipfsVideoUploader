@@ -62,10 +62,10 @@
     },
 
     "CoinbaseCommerce": {
-        "APIKey": "64328273-7451-4a0f-b131-5009b847169c",
-        "WebhookSecret": "4c8f5764-3972-4356-9550-f95644ece563",
-        "RedirectURL": "",
-        "CancelURL": "",
+        "APIKey": "",
+        "WebhookSecret": "",
+        "RedirectURL": "https://beta.oneloved.tube/?callback=signupcb",
+        "CancelURL": "https://beta.oneloved.tube/?callback=signupcancel",
         "ProductName": "OneLoveIPFS hosting credits"
     },
 
