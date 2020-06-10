@@ -162,6 +162,10 @@ h2 {
     width: 700px;
 }
 
+#uploadForm, #thumbnailSwapper, #wcinfo, #refiller {
+    padding-bottom: 20px;
+}
+
 #tab {
     text-align: center;
     padding-top: 15px;
