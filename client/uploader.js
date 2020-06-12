@@ -451,7 +451,11 @@ function uploadVideo(resolution,next) {
     if (config.tusdChunkSize) videoUploadSetting.chunkSize = config.tusdChunkSize
 
     let videoUpload = new tus.Upload(videoToUpload[0], videoUploadSetting)
-    videoUpload.start()
+    videoUpload.findPreviousUploads().then((p) => {
+        if (p.length > 0)
+            videoUpload.resumeFromPreviousUpload(p[0])
+        videoUpload.start()
+    })
 }
 
 function restrictImg() {
@@ -624,7 +628,7 @@ function buildJsonMetadataAvalon() {
                     360: postparams.imghash,
                     spr: postparams.spritehash
                 }
-            } // TODO: Add Skynet support
+            }
         },
         dur: postparams.duration,
         title: postparams.title,
