@@ -3,7 +3,9 @@ let shawpconfig
 
 document.addEventListener('DOMContentLoaded', () => {
     let url = new URL(window.location.href)
-    if (url.searchParams.get('callback') == 'signupcancel')
+    if (url.searchParams.get('callback') == 'signupstart')
+        updateDisplayByIDs(['signupstart','signupPopup'],['signupcancel','signupcb'])
+    else if (url.searchParams.get('callback') == 'signupcancel')
         updateDisplayByIDs(['signupcancel','signupPopup'],['signupstart'])
     else if (url.searchParams.get('callback') == 'signupcb')
         updateDisplayByIDs(['signupcb','signupPopup'],['signupstart'])
