@@ -8,7 +8,7 @@ fi
 
 mkdir tusd && cd tusd
 echo "Downloading tusd for Ubuntu..."
-wget -q https://github.com/tus/tusd/releases/download/v1.1.0/tusd_linux_amd64.tar.gz
+wget -q https://github.com/tus/tusd/releases/download/v1.3.0/tusd_linux_amd64.tar.gz
 tar -xvf tusd_linux_amd64.tar.gz
 cd tusd_linux_amd64
 mv tusd /usr/bin
