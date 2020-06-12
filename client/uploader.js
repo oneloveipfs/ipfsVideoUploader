@@ -419,6 +419,7 @@ function uploadVideo(resolution,next) {
 
     let videoUpload = new tus.Upload(videoToUpload[0], {
         endpoint: config.tusdEndpoint,
+        chunkSize: config.tusdChunkSize,
         retryDelays: [0,3000,5000,10000,20000],
         metadata: {
             access_token: Auth.token,

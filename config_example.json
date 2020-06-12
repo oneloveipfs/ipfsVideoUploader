@@ -13,7 +13,8 @@
         "hivesignerEnabled": true,
         "HiveSignerApp": "ipfsuploader.app",
         "callbackURL": "https://beta.oneloved.tube/upload",
-        "tusdEndpoint": "http://localhost:1080/files"
+        "tusdEndpoint": "http://localhost:1080/files",
+        "tusdChunkSize": 4096
     },
 
     "Skynet": {
