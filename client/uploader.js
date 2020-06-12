@@ -417,9 +417,8 @@ function uploadVideo(resolution,next) {
     progressbar.style.display = "block"
     progressbarInner.innerHTML = "Uploading... (0%)"
 
-    let videoUpload = new tus.Upload(videoToUpload[0], {
+    let videoUploadSetting = {
         endpoint: config.tusdEndpoint,
-        chunkSize: config.tusdChunkSize,
         retryDelays: [0,3000,5000,10000,20000],
         metadata: {
             access_token: Auth.token,
@@ -447,8 +446,11 @@ function uploadVideo(resolution,next) {
             })
             uploadVideo(resolution+1,next)
         }
-    })
+    }
 
+    if (config.tusdChunkSize) videoUploadSetting.chunkSize = config.tusdChunkSize
+
+    let videoUpload = new tus.Upload(videoToUpload[0], videoUploadSetting)
     videoUpload.start()
 }
 
