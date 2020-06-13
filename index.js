@@ -141,6 +141,9 @@ app.post('/uploadSubtitle',APILimiter,(request,response) => {
 })
 
 app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(request,response) => {
+    if (!request.body.Upload.IsFinal)
+        return response.status(200).send()
+    // console.log(request.headers['hook-name'],request.body.Upload)
     switch (request.headers['hook-name']) {
         case "pre-create":
             // Upload type check
