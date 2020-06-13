@@ -100,7 +100,11 @@ let videoUpload = new tus.Upload(videoToUpload[0], {
     }
 })
 
-videoUpload.start()
+videoUpload.findPreviousUploads().then((p) => {
+    if (p.length > 0)
+        videoUpload.resumeFromPreviousUpload(p[0])
+    videoUpload.start()
+})
 ```
 
 #### Result example:

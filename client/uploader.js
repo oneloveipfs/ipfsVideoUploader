@@ -417,7 +417,7 @@ function uploadVideo(resolution,next) {
     progressbar.style.display = "block"
     progressbarInner.innerHTML = "Uploading... (0%)"
 
-    let videoUploadSetting = {
+    let videoUpload = new tus.Upload(videoToUpload[0], {
         endpoint: config.tusdEndpoint,
         retryDelays: [0,3000,5000,10000,20000],
         parallelUploads: 10,
@@ -447,11 +447,8 @@ function uploadVideo(resolution,next) {
             })
             uploadVideo(resolution+1,next)
         }
-    }
-
-    if (config.tusdChunkSize) videoUploadSetting.chunkSize = config.tusdChunkSize
-
-    let videoUpload = new tus.Upload(videoToUpload[0], videoUploadSetting)
+    })
+    
     videoUpload.findPreviousUploads().then((p) => {
         if (p.length > 0)
             videoUpload.resumeFromPreviousUpload(p[0])
