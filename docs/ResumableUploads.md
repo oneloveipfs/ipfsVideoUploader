@@ -75,6 +75,7 @@ let videoToUpload = document.getElementById('fileInput').files[0]
 let videoUpload = new tus.Upload(videoToUpload[0], {
     endpoint: 'https://tusd.oneloved.tube/files',
     retryDelays: [0,3000,5000,10000,20000],
+    parallelUploads: 10, // number of upload threads
     metadata: {
         access_token: 'your access token here',
         keychain: 'true',
