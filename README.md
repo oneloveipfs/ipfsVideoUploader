@@ -25,13 +25,15 @@ This is an alternative IPFS uploader to upload videos onto DTube. Includes a bas
 
 2. Install all required node modules. `cd ipfsVideoUploader && npm install`
 
-3. Configure uploader by modifying `config.json` file. If you need help with the configuration, view the documentation [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/docs/ConfigDocs.md)
+3. Copy the example config file. `cp config_example.json config.json`
 
-4. Run `npm run keygen` to generate encryption and auth keys for Hive Keychain support. Then backup the contents of `.auth.json` file in a safe place.
+4. Configure uploader by modifying `config.json` file. If you need help with the configuration, view the documentation [here](https://github.com/techcoderx/ipfsVideoUploader/blob/master/docs/ConfigDocs.md)
 
-5. If `whitelistEnabled` is set to `true`, add some Hive accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Hive user)
+5. Run `npm run keygen` to generate encryption and auth keys for Hive Keychain support. Then backup the contents of `.auth.json` file in a safe place.
 
-6. Run the app by typing `npm start`. Your app will listen to ports you specify in `config.json` file.
+6. If `whitelistEnabled` is set to `true`, add some Hive accounts to the whitelist by modifying [whitelist.txt](https://github.com/techcoderx/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Hive user)
+
+7. Run the app by typing `npm start`. Your app will listen to ports you specify in `config.json` file.
 
 All uploaded files (through non-resumable upload APIs) will be saved in the `uploaded` folder within the repo. Image files (for Hive and Steem article body) will be saved in the `imguploads` folder. As for resumable uploads, you may define the directory in `config.json` file as well as the `tusd` daemon startup arguments.
 
