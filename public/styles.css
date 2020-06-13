@@ -416,7 +416,6 @@ textarea {
 
 #logoBanner {
     height: 35px;
-    width: 35px;
     vertical-align: middle;
 }
 
@@ -837,9 +836,10 @@ td {
 
 /* MOBILE */
 @media screen and (max-width: 768px) {
+    /*
     #headTitleText {
         display: none;
-    }
+    }*/
 
     #head h1 {
         font-size: 30px;
