@@ -72,7 +72,6 @@ app.use(Parser.text())
 let WooCommerceAPI = Config.WooCommerceEnabled ? new WooCommerce(Config.WooCommerceConfig) : null
 
 app.get('/', (request,response) => loadWebpage('./client/welcome.html',response)) // Home page
-app.get('/reviews', (request,response) => loadWebpage('./client/reviews.html',response)) // Review page
 app.get('/upload', (request,response) => loadWebpage('./client/uploader.html',response)) // Upload page
 app.get('/404', (request,response) => loadWebpage('./client/404.html',response)) // 404 page
 
