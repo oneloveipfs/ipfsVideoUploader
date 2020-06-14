@@ -51,10 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     let proceedAuthBtnDisabled = document.getElementById('proceedAuthBtn').disabled
-    document.getElementById('authButton').onclick = function loginBtnClicked() {
-        // Show popup window of login options
-        updateDisplayByIDs(['loginPopup'],[])
-    }
+    document.getElementById('authButton').onclick = loginBtnClicked
+    document.getElementById('authButton2').onclick = loginBtnClicked
 
 window.onclick = (event) => {
     dismissPopup(event,'loginPopup')
@@ -71,6 +69,11 @@ function dismissPopup(event,popupelement) {
     if (event.target == popup) {
         popup.style.display = "none"
     }
+}
+
+function loginBtnClicked() {
+    // Show popup window of login options
+    updateDisplayByIDs(['loginPopup'],[])
 }
 
 document.getElementById('proceedAuthBtn').onclick = async function proceedLogin() {

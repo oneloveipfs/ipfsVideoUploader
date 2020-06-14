@@ -1,3 +1,14 @@
+window.addEventListener('scroll',() => {
+    if (window.scrollY > 200) {
+        document.getElementById('homepageheader').style.visibility = 'visible'
+        document.getElementById('homepageheader').style.opacity = 1
+    } else {
+        document.getElementById('homepageheader').style.visibility = 'hidden'
+        document.getElementById('homepageheader').style.opacity = 0
+    }
+})
+
+/*
 // Get update logs then display them on homepage
 axios.get('/updatelogs').then((response) => {
     let updates = response.data
@@ -20,6 +31,7 @@ axios.get('/totalUploadCount').then((counter) => {
         document.getElementById('homeStats').innerText = counter.data.count + ' unique DTube videos uploaded to date, with file sizes totaling ' + abbrevateFilesize(allUse.data.total) + '.'
     })
 })
+*/
 
 function abbrevateFilesize(size) {
     let abbrevated

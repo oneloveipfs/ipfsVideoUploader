@@ -29,43 +29,75 @@
         <script src="client/updatelogs.js"></script>
     </head>
     <body>
-        <div id='header'>
+        <div class="header" id="homepageheader">
             <h1 id="siteTitle"><a href="/" class="title"><img id="logoBanner" src="public/logo.png" alt="oneloveipfs logo">  <div id="headTitleText">Uploader</div></a></h1>
             <a id="authButton" class="headerBtn"><p>Log In</p></a>
         </div>
-        <div id='content'>
-            <div id="head">
-                <h1>Welcome to OneLoveIPFS Uploader</h1>
+        <div id="head">
+            <a id="authButton2"><p>Log In</p></a>
+            <div class="textcontainer">
+                <h1>OneLoveIPFS Uploader</h1>
                 <h3>An alternative way of uploading videos to DTube, a decentralized video platform built on Steem, Hive and Avalon blockchain.</h3>
                 <h3 id="homepagePriceLbl">$/GB/month</h3>
                 <table id="buttons"><tr>
                     <td><a id="signupButton" class="styledButton">Sign Up</a></td>
                 </tr></table>
+                <div class="scrollarrow">
+                    <a onclick="window.scroll(0,window.innerHeight - 50)">
+                    <span></span>
+                    <span></span>
+                    <span></span></a>
+                </div>
             </div>
-            <div id="intro1">
-                A new method of posting to DTube is born. Upload your cutting edge videos onto our high performance, decentralized IPFS nodes. Your videos will remain on the IPFS network indefinitely.
+        </div>
+        <div id="statsContainer">
+            <div class="grid-item" id="statUploads">
+                <img src="public/about/upload.png">
+                <h1>1,053</h1><p>videos uploaded</p>
             </div>
-            <div class="table1" id="homepageTable">
-                <table>
-                    <tr><td><img class="icons" src="public/about/queue.png" alt="encoding queues"></td></tr>
-                    <tr><td>Stuck in upload queue? You can skip it by using our upload servers instead! IPFS operations are handled asynchronously, means there's no need to wait in a queue to add your outstanding video to the network!</td></tr>
-                    <tr><td><img class="icons" src="public/about/keys.png" alt="private keys"></td></tr>
-                    <tr><td>Hate entering private keys on websites? Our uploader supports Hive Keychain and HiveConnect, so your Hive transactions are signed securely without exposing your Hive keys to anyone!</td></tr>
-                    <tr><td><img class="icons" src="public/about/servers.png" alt="servers"></td></tr>
-                    <tr><td>DTube servers down? Videos unplayable on DTube? Our uploader uploads your video straight to the public IPFS network, without involving DTube's upload servers. Your video will remain playable even during DTube's downtime, as long as it is available in the IPFS network!</td></tr>
-                </table>
+            <div class="grid-item" id="statFilesizes">
+                <img src="public/about/file.png">
+                <h1>146 GB</h1><p>total file size</p>
             </div>
-            <div id="homeStats">
-                ___ unique DTube videos uploaded to date, with file sizes totaling ___ KB.
+            <div class="grid-item" id="statUsers">
+                <img src="public/about/usergroup.png">
+                <h1>16</h1><p>total users</p>
             </div>
-            <div id="whatOurCustomersSay">
-                <h2>Reviews</h2>
-                <h3>Can't believe in what we're offering?</h3>
-                <a href="/reviews" class="styledButton" rel="noreferrer">See what our customers say</a>
+        </div>
+        <h2 class="feature-heading">Top Features</h2>
+        <div class="featureContainer">
+            <div class="feature-item">
+                <h3>Resumable Uploads</h3>
+                <p>Uploading on a slow or unreliable internet connection? Large video files? We support Tus resumable uploads for the best uploading experience. No upload progress is lost if it gets interrupted for any reason.</p>
             </div>
-            <div id="updates">
-                <h2>Release Notes</h2>
-                <h3>Our development progress are logged onto the Steem and Hive blockchains, the same blockchains where your videos are being posted to. Check them out!</h3>
+            <div class="feature-item">
+                <h3>Dual Protocol Support</h3>
+                <p>OneLoveIPFS uploader pins videos to IPFS and Skynet, which are the best decentralized file sharing protocols available. Your videos are available on multiple decentralized networks for the best file availability possible.</p>
+            </div>
+            <div class="feature-item">
+                <h3>0% Beneficiaries</h3>
+                <p>Neither OneLoveIPFS nor DTube collects any additional post beneficiaries when uploading through OneLoveIPFS uploader as your usage is billed by disk utilization. You can set your own beneficiaries if you like.</p>
+            </div>
+            <div class="feature-item">
+                <h3>Full Quality Videos</h3>
+                <p>All files uploaded to our servers get added directly to IPFS and Skynet without any additional processing. Your viewers enjoy the best quality video, which is what you originally uploaded. 4K video? Sure, we can take that.</p>
+            </div>
+            <div class="feature-item">
+                <h3>Article Body Image Uploads</h3>
+                <p>Need some images for your Steem/Hive article body of your corresponding video? You can upload them right in our interface. Unlike other frontends, uploaded images goes straight to IPFS, not centralized image servers.</p>
+            </div>
+            <div class="feature-item">
+                <h3>7 Tags Support</h3>
+                <p>Need to use more than one tag that is allowed on DTube upload page? You can use up to 7 tags in our interface, where the first tag will be the first curated tag for your Avalon post.</p>
+            </div>
+        </div>
+        <h2 class="feature-heading">Wrong thumbnail?</h2>
+        <div class="featureContainer thumbnailSwapFeatureContainer">
+            <div class="feature-item">
+                <img class="feature-preview-img" src="public/about/swap.png" alt="thumbnail swap tool">
+            </div>
+            <div class="feature-item">
+                <p>With our thumbnail swap tool, we can replace the thumbnail of your existing DTube video, regardless of where the video was uploaded from, as long as it is an IPFS, BTFS or Skynet upload. The new thumbnail will be at full quality, so people that come across your videos see the finest detail of it, just like any new uploads made on our uploader.<br><br>This tool will not work for 3rd party upload sources.</p>
             </div>
         </div>
         <!-- Login Pop Up Window -->
@@ -139,6 +171,5 @@
                 </div>
             </div>
         </div>
-        <div id='footer'><p class="madeBy">Made by <a target="_blank" rel="noreferrer" href=https://d.tube/c/techcoderx>@techcoderx</a> - <a target="_blank" rel="noreferrer" href=https://github.com/techcoderx/ipfsVideoUploader>Source Code</a> - <a target="_blank" rel="noreferrer" href="https://discord.gg/Sc4utKr">Discord</a> - <a target="_blank" rel="noreferrer" href="https://github.com/techcoderx/ipfsVideoUploader/blob/master/docs/FAQ.md">FAQ</a></p></div>
     </body>
 </html>
