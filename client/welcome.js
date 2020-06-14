@@ -22,36 +22,37 @@ axios.get('/updatelogs').then((response) => {
     console.log(error)
 })
 
-/*
-// <div class="updatelog">Version 0.8.3<br>Released 17 January 2019<br><br><a href="https://steemit.com/onelovedtube/@techcoderx/onelovedtube-ipfs-uploader-0-8-3-mobile-optimizations-multi-resolution-upload-support-and-more">Mobile optimizations, multi-resolution upload support and more!</a><br><br>Payout: $51.02</div>
-
 // Load general uploader stats
-axios.get('/totalUploadCount').then((counter) => {
-    axios.get('/totalUsage').then((allUse) => {
-        document.getElementById('homeStats').innerText = counter.data.count + ' unique DTube videos uploaded to date, with file sizes totaling ' + abbrevateFilesize(allUse.data.total) + '.'
-    })
+axios.get('/stats').then((counter) => {
+    document.getElementById('uploadCount').innerText = thousandSeperator(counter.data.count)
+    document.getElementById('usageCount').innerText = abbrevateFilesize(counter.data.usage.total)
+    document.getElementById('userCount').innerText = thousandSeperator(counter.data.usercount)
 })
-*/
 
 function abbrevateFilesize(size) {
     let abbrevated
     if (size > 1125899906842623) {
         // Petabytes
-        abbrevated = Math.round(size / 1125899906842624) + ' PB'
-        return size / 1125899906842624
+        abbrevated = thousandSeperator(Math.round(size / 1125899906842624)) + ' PB'
     } else if (size > 1099511627775) {
         // Terabytes
-        abbrevated = Math.round(size / 1099511627776) + ' TB'
+        abbrevated = thousandSeperator(Math.round(size / 1099511627776)) + ' TB'
     } else if (size > 1073741823) {
         // Gigabytes
-        abbrevated = Math.round(size / 1073741824) + ' GB'
+        abbrevated = thousandSeperator(Math.round(size / 1073741824)) + ' GB'
     } else if (size > 1048575) {
         // Megabytes
-        abbrevated = Math.round(size / 1048576) + ' MB'
+        abbrevated = thousandSeperator(Math.round(size / 1048576)) + ' MB'
     } else {
         // Less than 1 MB
-        abbrevated = Math.round(size / 1024) + ' KB'
+        abbrevated = thousandSeperator(Math.round(size / 1024)) + ' KB'
     }
 
     return abbrevated
+}
+
+function thousandSeperator(num) {
+    let num_parts = num.toString().split(".");
+    num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    return num_parts.join(".");
 }

@@ -190,7 +190,7 @@ app.get('/usage',APILimiter, (request,response) => {
     response.send(usage)
 })
 
-app.get('/totalUsage',(request,response) => {
+app.get('/stats',(request,response) => {
     let getUseOps = {}
     let possibleTypes = db.getPossibleTypes()
 
@@ -208,16 +208,12 @@ app.get('/totalUsage',(request,response) => {
         for(let i = 0; i < possibleTypes.length; i++) {
             allUse.total += result[possibleTypes[i]]
         }
-        response.send(allUse)
-    })
-})
-
-app.get('/totalUploadCount',(request,response) => {
-    // Get unique video uploads by number of source video hashes stored in db
-    db.getHashes('videos',(obtainedHashes) => {
-        response.send({
-            count: obtainedHashes.videos.length,
-            usercount: db.allUsersCount()
+        db.getHashes('videos',(obtainedHashes) => {
+            response.send({
+                count: obtainedHashes.videos.length,
+                usercount: db.allUsersCount(),
+                usage: allUse
+            })
         })
     })
 })

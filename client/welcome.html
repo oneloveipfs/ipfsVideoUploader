@@ -27,7 +27,7 @@
         <script src="https://cdn.jsdelivr.net/npm/hivesigner"></script>
         <script src="client/cdnfallback.js"></script>
         <script src="client/login.js"></script>
-        <script src="client/updatelogs.js"></script>
+        <script src="client/welcome.js"></script>
     </head>
     <body>
         <div class="header" id="homepageheader">
@@ -54,15 +54,15 @@
         <div id="statsContainer">
             <div class="grid-item" id="statUploads">
                 <img src="public/about/upload.png">
-                <h1>1,053</h1><p>videos uploaded</p>
+                <h1 id="uploadCount">0</h1><p>videos uploaded</p>
             </div>
             <div class="grid-item" id="statFilesizes">
                 <img src="public/about/file.png">
-                <h1>146 GB</h1><p>total file size</p>
+                <h1 id="usageCount">0 GB</h1><p>total file size</p>
             </div>
             <div class="grid-item" id="statUsers">
                 <img src="public/about/usergroup.png">
-                <h1>16</h1><p>total users</p>
+                <h1 id="userCount">0</h1><p>total users</p>
             </div>
         </div>
         <h2 class="feature-heading">Top Features</h2>

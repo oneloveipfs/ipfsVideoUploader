@@ -21,7 +21,7 @@ let db = {
         return possibleTypes
     },
     allUsersCount: () => {
-        return Object.keys(usageData).length
+        return Object.keys(hashes).length
     },
     // Log usage data and IPFS hashes
     recordUsage: (username,type,size) => {
