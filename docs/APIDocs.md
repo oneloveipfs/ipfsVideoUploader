@@ -12,15 +12,9 @@
 ```
 * `user` *(required)*: Steem account username
 
-#### To get total usage data for all users:
+#### To get uploader global statistics:
 ```
-/totalUsage
-```
-*(There are no arguments to be specifed in the URL for this API call)*
-
-#### To obtain number of uploads for all users:
-```
-/totalUploadCount
+/stats
 ```
 *(There are no arguments to be specifed in the URL for this API call)*
 
@@ -69,34 +63,7 @@ These API calls will only be enabled if `WooCommerceEnabled` is set to `true` in
 * Input data: The string obtained from `/login` GET API after decrypting with posting key
 
 #### To upload a video:
-```
-/uploadVideo?access_token=AUTH_TOKEN
-```
-
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or SteemConnect login access token.
-* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a SteemConnect access token.
-* Content type: multipart/form-data
-* File inputs:
-    - `VideoUpload`: Source video file
-    - `SnapUpload` *(optional)*: Thumbnail of the video
-    - `Video240Upload` *(optional)*: 240p encoded video
-    - `Video480Upload` *(optional)*: 480p encoded video
-    - `Video720Upload` *(optional)*: 720p encoded video
-    - `Video1080Upload` *(optional)*: 1080p encoded video
-* Output data example:
-```
-{
-    username: "techcoderx",
-    duration: 666.967,
-    filesize: 553986721,
-    ipfshash: "QmXEVRMFWJtGodYdcQQ5EEVJE7VTsq4rPcoBet4KLonF1r",
-    ipfs240hash: "QmUjfPkDTBz7GVrvxDH1SZeLmvR5xDTEX2ogvfGZMG6Ake",
-    ipfs480hash: "QmXpM81BhGGoBF9QUQMCU9yKJxjtKfChyEUU1AP8KzKh3B",
-    ipfs720hash: "QmSGEj3j7i1YJtYmuAEKzNaKhifDiB41fdiDHjAeGSpMGe",
-    snaphash: "QmUKHnTN3TR8zS2s2xUqvv6rzcwogh4T64Un3u4B2UBkt8",
-    spritehash: "QmTfsUT6aS2QXUoA9CSgTF9Lp4sFruRix29RjxznkQVCv1"
-}
-```
+Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/ResumableUploads.md) for details regarding Tus resumable video upload API.
 
 #### To upload an image file:
 ```
@@ -137,6 +104,8 @@ These API calls will only be enabled if `WooCommerceEnabled` is set to `true` in
 ```
 
 ## WooCommerce related POST API
+**Disabled when Shawp is used.**
+
 These API calls will only be enabled if `WooCommerceEnabled` is set to `true` in config.json.
 
 #### IPFS Bot usage webhook (currently used in [IPFS Discord pinning bot](https://github.com/techcoderx/DTube-IPFS-Bot))

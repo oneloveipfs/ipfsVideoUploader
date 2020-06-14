@@ -25,7 +25,6 @@ app.get('/authManager.js',(req,res) => {return res.status(404).redirect('/404')}
 app.get('/ipfsUploadHandler.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/wcHelper.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/scripts/generateKeys.js',(req,res) => {return res.status(404).redirect('/404')})
-app.get('/scripts/getLoginLink.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/whitelist.txt',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/config.json',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/db/wc.json',(req,res) => {return res.status(404).redirect('/404')})
@@ -41,19 +40,14 @@ const AuthAPILimiter = RateLimiter({
     skipSuccessfulRequests: true
 })
 
-const VideoUploadAPILimiter = RateLimiter({
-    max: 5,
-    windowMs: 30000 // 5 requests every 30 seconds
-})
-
 const ImageUploadAPILimiter = RateLimiter({
     max: 10,
     windowMs: 30000 // 10 requests every 30 seconds
 })
 
 const APILimiter = RateLimiter({
-    max: 3,
-    windowMs: 1000 // 3 requests per second
+    max: 5,
+    windowMs: 1000 // 5 requests per second
 })
 
 app.use(Express.static(__dirname, { dotfiles: 'deny' }));
@@ -127,8 +121,8 @@ app.get('/auth',AuthAPILimiter,(request,response) => {
     })
 })
 
-app.post('/uploadVideo',VideoUploadAPILimiter,(request,response) => {
-    Authenticate(request,response,true,(user) => FileUploader.uploadVideo(user,request,response))
+app.post('/uploadVideo',(request,response) => {
+    response.status(410).send({error: 'Non-resumable video upload API is depreciated. Please use Tus resumable video uploads. For more info, please refer to ResumableUploads.md in documentation.'})
 })
 
 app.post('/uploadImage',ImageUploadAPILimiter,(request,response) => {
@@ -190,7 +184,7 @@ app.get('/usage',APILimiter, (request,response) => {
     response.send(usage)
 })
 
-app.get('/stats',(request,response) => {
+app.get('/stats',APILimiter,(request,response) => {
     let getUseOps = {}
     let possibleTypes = db.getPossibleTypes()
 
