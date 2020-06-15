@@ -21,13 +21,10 @@ let headBlockHive
 let headBlockSteem
 
 let coinbaseClient = coinbase.Client
-let coinbaseCharge
-let coinbaseWebhook
-if (Config.Shawp.Coinbase.enabled) {
+let coinbaseCharge = coinbase.resources.Charge
+let coinbaseWebhook = coinbase.Webhook
+if (Config.Shawp.Coinbase.enabled)
     coinbaseClient.init(Config.CoinbaseCommerce.APIKey)
-    coinbaseCharge = coinbase.resources.Charge
-    coinbaseWebhook = coinbase.Webhook
-}
 
 let Shawp = {
     init: (network) => {
