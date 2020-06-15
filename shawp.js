@@ -256,7 +256,7 @@ let Shawp = {
             Customers[user].balance -= gbdays
 
             if (!ConsumeHistory[user]) ConsumeHistory[user] = []
-            ConsumeHistory[user].unshift([daynow + '/' + monthnow + '/' + yearnow,gbdays])
+            if (gbdays > 0) ConsumeHistory[user].unshift([daynow + '/' + monthnow + '/' + yearnow,gbdays])
         }
     },
     getRefillHistory: (username,start,count) => {
