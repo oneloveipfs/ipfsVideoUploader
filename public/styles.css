@@ -185,13 +185,13 @@ a {
     width: 700px;
 }
 
-#uploadForm, #thumbnailSwapper, #wcinfo, #refiller { padding-bottom: 20px; }
-#uploadForm { margin-top: 50px; }
-#thumbnailSwapper, #wcinfo, #refiller, #content404 { margin-top: 70px; }
+#content {
+    margin-top: 70px;
+    padding-bottom: 20px;
+}
 
 #tab {
     text-align: center;
-    padding-top: 15px;
 }
 
 .tabs {
@@ -449,6 +449,7 @@ textarea {
     display: inline-block;
     font-size: 28px;
     margin-left: 5px;
+    color: #ffffff;
 }
 
 .title:visited {
@@ -760,6 +761,7 @@ textarea {
     padding: 10px 70px;
 }
 
+.testimonial a { color: #ffffff; }
 .testimonial a:visited { color: #ffffff; }
 .testimonial a:hover { color: #ffffff; }
 .testimonial a:active { color: #ffffff; }
