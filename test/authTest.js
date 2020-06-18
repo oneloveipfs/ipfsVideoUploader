@@ -4,18 +4,25 @@ const Keys = require('../.auth.json')
 const user = require('../config.json').test.user
 
 describe('Auth',() => {
-    if(Keys.wifMessage && Keys.wifMessage != "")
-        it('generateEncryptedMemo should return a string that starts with a #',function (done) {
-            this.timeout(0)
-            Auth.generateEncryptedMemo(user,(err,result) => {
-                assert.typeOf(result,'string')
-                assert.equal(result.charAt(0),'#')
-                done()
-            })
+    it('generateEncryptedMemo should return a string that starts with a #',function (done) {
+        this.timeout(0)
+        Auth.generateEncryptedMemo(user,(err,result) => {
+            assert.typeOf(result,'string')
+            assert.equal(result.charAt(0),'#')
+            done()
         })
-    else console.log('generateEncryptedMemo test skipped due to missing private key in .auth.json')
+    })
 
-    
+    it('generateEncryptedMemoAvalon should return a string that has 4 \'_\'s',function(done) {
+        this.timeout(0)
+        Auth.generateEncryptedMemoAvalon(user,null,(err,result) => {
+            let splitMessage = result.split('_')
+            assert.typeOf(result,'string')
+            assert.equal(splitMessage.length,4)
+            done()
+        })
+    })
+
     it('whitelist should be an array',function (done) {
         assert.typeOf(Auth.whitelist(),'array')
         done()
@@ -29,24 +36,22 @@ describe('Auth',() => {
         })
     })
 
-    if(Keys.JWTKey && Keys.JWTKey != "") {
-        let testToken
+    let testToken
 
-        it('generateJWT should return a string',function (done) {
-            Auth.generateJWT(user,(err,result) => {
-                testToken = result
-                assert.typeOf(result,'string')
-                done()
-            })
+    it('generateJWT should return a string',function (done) {
+        Auth.generateJWT(user,(err,result) => {
+            testToken = result
+            assert.typeOf(result,'string')
+            done()
         })
+    })
 
-        it('verifyAuth should return a JWT decoded object',function (done) {
-            Auth.verifyAuth(testToken,false,(err,result) => {
-                assert.isObject(result)
-                done()
-            })
-        })  
-    } else console.log('generateJWT and verifyAuth test skipped due to missing passwords in .auth.json')
+    it('verifyAuth should return a JWT decoded object',function (done) {
+        Auth.verifyAuth(testToken,false,(err,result) => {
+            assert.isObject(result)
+            done()
+        })
+    })  
 })
 
 Auth.stopWatchingOnWhitelist()
