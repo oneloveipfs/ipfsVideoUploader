@@ -494,6 +494,17 @@ function postVideo() {
     let progressbar = document.getElementById('progressBarBack')
     let progressbarInner = document.getElementById('progressBarFront')
 
+    if (Auth.dtconly == 'true') {
+        progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
+        let avalontag = ''
+        if (postparams.tags.length !== 0)
+            avalontag = postparams.tags[0]
+        broadcastAvalon(buildJsonMetadataAvalon(),avalontag,postparams.ipfshash,() => {
+            broadcastCompletion(true)
+        })
+        return
+    }
+
     progressbarInner.innerHTML = 'Submitting video to Hive blockchain...'
 
     // Post to Hive blockchain
@@ -650,8 +661,8 @@ function buildJsonMetadataAvalon() {
     if (postparams.skylink720) jsonMeta.files.sia.vid['720'] = postparams.skylink720
     if (postparams.skylink1080) jsonMeta.files.sia.vid['1080'] = postparams.skylink1080
 
-    if (dtconly != 'true') jsonMeta.refs.push('hive/' + username + '/' + postparams.permlink)
-    if (steemUser) jsonMeta.refs.push('steem/' + steemUser + '/' + postparams.permlink)
+    if (Auth.dtconly != 'true') jsonMeta.refs.push('hive/' + username + '/' + postparams.permlink)
+    if (Auth.dtconly != 'true' && steemUser) jsonMeta.refs.push('steem/' + steemUser + '/' + postparams.permlink)
     if (config.gateway) jsonMeta.files.ipfs.gw = config.gateway 
 
     if (subtitleList.length > 0) {
@@ -735,12 +746,12 @@ async function broadcastAvalon(json,tag,permlink,cb) {
 
         let signedtx = javalon.sign(sessionStorage.getItem('OneLoveAvalonKey'),avalonAcc.name,tx)
         javalon.sendTransaction(signedtx,(err,result) => {
-            if (err) alert('Hive broadcast successful however there is an error with Avalon: ' + JSON.stringify(err))
+            if (err) alert('Avalon broadcast error: ' + JSON.stringify(err))
             cb()
         })
     } catch (e) {
         // Alert any Avalon errors after successful Hive tx broadcast then proceed to watch page as usual
-        alert('Hive broadcast successful however there is an error with Avalon: ' + JSON.stringify(e))
+        alert('Avalon broadcast error: ' + JSON.stringify(e))
         cb()
     }
 }

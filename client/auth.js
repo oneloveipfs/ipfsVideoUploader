@@ -160,5 +160,6 @@ window.Auth = {
     Avalon,
     token,
     iskeychain,
+    dtconly,
     restrict
 }
