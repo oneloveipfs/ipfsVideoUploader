@@ -6,7 +6,7 @@
         <title>OneLoveIPFS Uploader</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-        <script src="https://unpkg.com/javalon/bin/javalon.min.js"></script>
+        <script src="https://raw.githubusercontent.com/dtube/javalon/master/bin/javalon.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/async/3.1.0/async.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/hivesigner"></script>
@@ -85,7 +85,7 @@
                 <h4>480p video: <input type="file" accept="video/mp4" name="Video480Upload" id="video480p"></h4>
                 <h4>720p video: <input type="file" accept="video/mp4" name="Video720Upload" id="video720p"></h4>
                 <h4>1080p video: <input type="file" accept="video/mp4" name="Video1080Upload" id="video1080p"></h4>
-                <h3>Steem/Hive Permlink: <br><input type="text" id="customPermlink" name="customPermlink" class="meta"></h3>
+                <div class="grapheneSettings"><h3>Steem/Hive Permlink: <br><input type="text" id="customPermlink" name="customPermlink" class="meta"></h3>
                 <h3>Steem/Hive Article Body: <br>
                 <textarea id="postBody" name="postBody"></textarea></h3>
                 <input type="file" accept="image/*" id="postImg" style="display: none">
@@ -97,7 +97,7 @@
                 <input type="number" id="newBeneficiaryPercent" name="newBeneficiaryPercent" class="meta" placeholder="%" min="0.01" max="98" step="0.01">
                 <a class="styledButton" id="appendBeneficiaryBtn">+</a><br>
                 <table class="beneficiaryTableList" id="beneficiaryTableList"></table>
-                <h3 id="totalBeneficiariesLabel">Total beneficiaries: 0%</h3>
+                <h3 id="totalBeneficiariesLabel">Total beneficiaries: 0%</h3></div>
             </div>
             <input class="styledButton" type="submit" value="Upload!" id="submitbutton">
             <input class="styledButton" type="button" value="Save draft" id="draftBtn">

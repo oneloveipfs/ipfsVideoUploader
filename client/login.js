@@ -1,5 +1,4 @@
-let config
-let shawpconfig
+let config, shawpconfig
 
 document.addEventListener('DOMContentLoaded', () => {
     let url = new URL(window.location.href)
@@ -86,8 +85,8 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
     let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
     let avalonKey = document.getElementById('avalonLoginKey').value
 
-    if (username == '') return alert('Hive username is required')
-    if (!window.hive_keychain) return alert('Hive Keychain is not installed')
+    if (username == '' && avalonUsername == '') return alert('Hive or Avalon username is required')
+    if (!window.hive_keychain && username !== '') return alert('Hive Keychain is not installed')
     if (!window.steem_keychain && steemUsername != '') return alert('Steem Keychain is not installed')
 
     if (steemUsername != '') {
@@ -95,16 +94,16 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
         steem_keychain.requestHandshake(() => console.log('Steem Keychain Handshake received!'))
     }
 
-    hive_keychain.requestHandshake(() => console.log('Hive Keychain Handshake received!'))
+    if (username !== '') hive_keychain.requestHandshake(() => console.log('Hive Keychain Handshake received!'))
     keychainLoginBtn.innerText = "Logging In..."
     proceedAuthBtnDisabled = true
 
     // Avalon login
-    avalonLogin(avalonUsername,avalonKey)
+    avalonLogin(avalonUsername,avalonKey,!username)
 
     // Keychain login
     // Using public posting key on Hive to initiate login
-    axios.get('/login?user=' + username).then((response) => {
+    if (username) axios.get('/login?user=' + username).then((response) => {
         if (response.data.error != null) {
             alert(response.data.error)
             return
@@ -117,14 +116,14 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
                 steem_keychain.requestSignBuffer(steemUsername,'login','Posting',(steemLoginRes) => {
                     console.log('Steem Keychain response',steemLoginRes)
                     if (steemLoginRes.success)
-                        keychainCb(loginResponse,steemUsername)
+                        keychainCb(loginResponse.result.substr(1),steemUsername,false)
                     else {
                         alert('Steem Keychain login error: ' + steemLoginRes.error)
-                        keychainCb(loginResponse,'')
+                        keychainCb(loginResponse.result.substr(1),'',false)
                     }
                 })
             else
-                keychainCb(loginResponse,'')
+                keychainCb(loginResponse.result.substr(1),'',false)
         })
     }).catch((err) => {
         if (err.response.data.error) alert(err.response.data.error)
@@ -137,7 +136,7 @@ document.getElementById('altAuthBtn').onclick = () => {
     let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
     let avalonKey = document.getElementById('avalonLoginKey').value
 
-    avalonLogin(avalonUsername,avalonKey)
+    avalonLogin(avalonUsername,avalonKey,false)
 
     let hiveClient = new hivesigner.Client({
         app: config.HiveSignerApp,
@@ -220,8 +219,7 @@ document.getElementById('redeemVoucherBtn').onclick = () => {
 }
 })
 
-function keychainCb(hiveLoginRes,steemUser) {
-    let encrypted_message = hiveLoginRes.result.substr(1)   
+function keychainCb(encrypted_message,steemUser,dtconly) {
     let contentType = {
         headers: {
             "content-type": "text/plain",
@@ -234,6 +232,7 @@ function keychainCb(hiveLoginRes,steemUser) {
         } else {
             let cbUrl = '/upload?access_token=' + cbResponse.data.access_token + '&keychain=true'
             if (steemUser != '') cbUrl += '&steemuser=' + steemUser
+            if (dtconly) cbUrl += '&dtconly=true'
             window.location.href = cbUrl
         }
     }).catch((err) => {
@@ -242,8 +241,9 @@ function keychainCb(hiveLoginRes,steemUser) {
     })
 }
 
-async function avalonLogin(avalonUsername,avalonKey) {
+async function avalonLogin(avalonUsername,avalonKey,dtconly) {
     if (avalonUsername !== '' && avalonKey !== '') {
+        let avalonKeyId
         let avalonLoginPromise = new Promise((resolve,reject) => {
             javalon.getAccount(avalonUsername,(err,result) => {
                 if (err) return reject(err)
@@ -252,7 +252,10 @@ async function avalonLogin(avalonUsername,avalonKey) {
 
                 // Login with "Posting key" (recommended)
                 for (let i = 0; i < result.keys.length; i++) {
-                    if (arrContainsInt(result.keys[i].types,4) === true && result.keys[i].pub === avalonPubKey) return resolve(true)
+                    if (arrContainsInt(result.keys[i].types,4) === true && result.keys[i].pub === avalonPubKey) {
+                        avalonKeyId = result.keys[i].id
+                        return resolve(true)
+                    }
                 }
                 resolve(false)
             })
@@ -270,6 +273,24 @@ async function avalonLogin(avalonUsername,avalonKey) {
         // Storing Avalon login in sessionStorage so that we can access this in the upload page to sign transactions later.
         sessionStorage.setItem('OneLoveAvalonUser',avalonUsername)
         sessionStorage.setItem('OneLoveAvalonKey',avalonKey)
+
+        if (dtconly) {
+            let loginGetUrl = '/login?user=' + avalonUsername + '&dtc=true'
+            if (avalonKeyId) loginGetUrl += '&dtckeyid=' + avalonKeyId
+            axios.get(loginGetUrl).then((response) => {
+                if (response.data.error != null)
+                    return alert(response.data.error)
+                javalon.decrypt(avalonKey,response.data.encrypted_memo,(e,decryptedAES) => {
+                    if (e) {
+                        return alert('Avalon decrypt error: ' + e.error)
+                    }
+                    keychainCb(decryptedAES,'',true)
+                })
+            }).catch((e) => {
+                if (e.response.data.error) alert(e.response.data.error)
+                else alert(JSON.stringify(e))
+            })
+        }
     } else {
         // If Avalon username or password not provided, clear existing login (if any) from sessionStorage
         sessionStorage.clear()

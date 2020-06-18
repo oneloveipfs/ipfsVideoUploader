@@ -93,11 +93,16 @@ app.get('/login',AuthAPILimiter,(request,response) => {
         if (!Auth.whitelist().includes(request.query.user))
             return response.status(403).send({error: 'Looks like you do not have access to the uploader!'})
 
-    Auth.generateEncryptedMemo(request.query.user,(err,memo) => {
+    if (request.query.dtc == 'true') {
+        Auth.generateEncryptedMemoAvalon(request.query.user,request.query.dtckeyid,(e,memo) => {
+            if (e) return response.send(e)
+            response.send({encrypted_memo: memo, error: null})
+        })
+    } else Auth.generateEncryptedMemo(request.query.user,(err,memo) => {
         if (err) return response.send({error: err})
         response.send({encrypted_memo: memo, error: null})
     })
-});
+})
 
 app.post('/logincb',AuthAPILimiter,(request,response) => {
     // Keychain Auth Callback

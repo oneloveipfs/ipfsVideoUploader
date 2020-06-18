@@ -1,4 +1,5 @@
 const Hive = require('@hiveio/hive-js')
+const Avalon = require('javalon')
 const SteemConnect = require('steemconnect')
 const JWT = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
@@ -35,6 +36,36 @@ let auth = {
             let encrypted_memo = Hive.memo.encode(Keys.wifMessage,res[0].posting.key_auths[0][0],'#' + encrypted_message)
             cb(null,encrypted_memo)
         })
+    },
+    generateEncryptedMemoAvalon: async (username,keyid,cb) => {
+        if (keyid && keyid.length > 25) return cb({error: 'Invalid custom key identifier'})
+        let encrypted_message = Crypto.AES.encrypt(username + ':oneloveipfs_login',Keys.AESKey).toString()
+        let avalonGetAccPromise = new Promise((resolve,reject) => {
+            Avalon.getAccount(username,(e,acc) => {
+                if (e) return reject(e)
+                resolve(acc)
+            })
+        })
+        try {
+            let avalonAcc = await avalonGetAccPromise
+            let pubKey
+            if (keyid) {
+                // Custom key
+                for (let i = 0; i < avalonAcc.keys.length; i++) 
+                    if (avalonAcc.keys[i].id == keyid && avalonAcc.keys[i].types.includes(4))
+                        pubKey = avalonAcc.keys[i].pub
+                if (!pubKey)
+                    return cb({error: 'Custom key identifier not found'})
+            } else
+                pubKey = avalonAcc.pub // Master key
+            
+            Avalon.encrypt(pubKey,encrypted_message,Keys.wifAvalonMessage,(err,encrypted) => {
+                if (err) return cb(err)
+                cb(null,encrypted)
+            })
+        } catch (e) {
+            cb(e)
+        }
     },
     generateJWT: (user,cb) => {
         // Generate access token to be sent as response

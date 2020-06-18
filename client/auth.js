@@ -3,6 +3,7 @@ let url = new URL(window.location.href)
 let token = url.searchParams.get('access_token') // Access token for logged in user
 let iskeychain = url.searchParams.get('keychain')
 let steemUser = url.searchParams.get('steemuser')
+let dtconly = url.searchParams.get('dtconly')
 
 async function Hive() {
     if (!token) {
@@ -13,7 +14,7 @@ async function Hive() {
         },100)
         return null
     } else if (iskeychain == 'true') {
-        // Hive Keychain Login
+        // Hive Keychain / Avalon only Login
         let keychainLoginPromise = new Promise((resolve,reject) => {
             axios.get('/auth?access_token=' + token).then((authResponse) => {
                 if (authResponse.data.error != null) {
@@ -22,7 +23,13 @@ async function Hive() {
                     restrict()
                     resolve(null)
                 } else {
-                    document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + authResponse.data.user + ' on Hive'
+                    if (dtconly == 'true') {
+                        let grapheneSettings = document.getElementsByClassName('grapheneSettings')
+                        for (let i = 0; i < grapheneSettings.length; i++)
+                            grapheneSettings[i].style.display = 'none'
+                        document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + authResponse.data.user + ' on Avalon'
+                    } else
+                        document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + authResponse.data.user + ' on Hive'
                     if (steemUser) document.getElementById('loggedInUser').innerHTML += HtmlSanitizer.SanitizeHtml(', ' + steemUser + ' on Steem')
                     retrieveDraft()
                     resolve(authResponse.data.user)
@@ -89,11 +96,10 @@ async function Avalon() {
             
             // Login with "Posting key" (recommended)
             for (let i = 0; i < result.keys.length; i++) {
-                if (arrContainsInt(result.keys[i].types,4) === true && result.keys[i].pub === avalonPubKey) {
-                    if (arrContainsInt(result.keys[i].types,13) === false) promoteDisabled = true
+                if (result.keys[i].types.includes(4) && result.keys[i].pub === avalonPubKey) {
+                    if (!result.keys[i].types.includes(13)) promoteDisabled = true
                     return resolve(true)
                 }
-                if (arrContainsInt(result.keys[i].types,13) === true && result.keys[i].pub === avalonPubKey) return resolve(true)
             }
             resolve(false)
         })
@@ -110,7 +116,7 @@ async function Avalon() {
         return alert('An error occured with Avalon login. Please login again.')
     }
 
-    document.getElementById('loggedInUser').innerHTML += ', and ' + avalonUser + ' on Avalon'
+    if (dtconly != 'true') document.getElementById('loggedInUser').innerHTML += ', and ' + avalonUser + ' on Avalon'
     if (promoteDisabled) document.getElementById('dtcBurnSection').style.display = 'none'
     document.getElementById('avalonZone').style.display = 'block'
 }

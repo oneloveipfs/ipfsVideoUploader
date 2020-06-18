@@ -635,7 +635,7 @@ function buildJsonMetadataAvalon() {
         hide: 0,
         nsfw: 0,
         oc: 1,
-        refs: ['hive/' + username + '/' + postparams.permlink]
+        refs: []
     }
 
     // Add Skylinks if applicable
@@ -650,6 +650,7 @@ function buildJsonMetadataAvalon() {
     if (postparams.skylink720) jsonMeta.files.sia.vid['720'] = postparams.skylink720
     if (postparams.skylink1080) jsonMeta.files.sia.vid['1080'] = postparams.skylink1080
 
+    if (dtconly != 'true') jsonMeta.refs.push('hive/' + username + '/' + postparams.permlink)
     if (steemUser) jsonMeta.refs.push('steem/' + steemUser + '/' + postparams.permlink)
     if (config.gateway) jsonMeta.files.ipfs.gw = config.gateway 
 
