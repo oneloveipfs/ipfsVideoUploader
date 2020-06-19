@@ -30,9 +30,8 @@ describe('Auth',() => {
     })
 
     it ('whitelistAdd() should add new user to whitelist',function(done) {
-        let newUser = 'testy'
-        Auth.whitelistAdd(newUser,() => {
-            assert.equal(Auth.whitelist().includes(newUser),true)
+        Auth.whitelistAdd(user,() => {
+            assert.equal(Auth.whitelist().includes(user),true)
             done()
         })
     })
