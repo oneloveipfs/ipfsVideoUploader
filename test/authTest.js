@@ -1,7 +1,8 @@
 const assert = require('chai').assert
 const Auth = require('../authManager')
-const Keys = require('../.auth.json')
-const user = require('../config.json').test.user
+const Config = require('../config.json')
+const user = Config.test.user
+const app = Config.tokenApp
 
 describe('Auth',() => {
     it('generateEncryptedMemo should return a string that starts with a #',function (done) {
@@ -36,23 +37,18 @@ describe('Auth',() => {
         })
     })
 
-    let testToken
-
-    it('generateJWT should return a string',function (done) {
-        Auth.generateJWT(user,(err,result) => {
-            if (err) console.log(err)
-            testToken = result
-            assert.typeOf(result,'string')
-            done()
+    it('generateJWT should return a valid JWT token',function (done) {
+        Auth.generateJWT(user,(err,token) => {
+            assert.typeOf(token,'string')
+            Auth.verifyAuth(token,false,(e,result) => {
+                assert.isObject(result)
+                assert.equal(result.user,user)
+                assert.equal(result.app,app)
+                assert.isBelow(result.exp,Date.now())
+                done()
+            })
         })
-    })
-
-    it('verifyAuth should return a JWT decoded object',function (done) {
-        Auth.verifyAuth(testToken,false,(err,result) => {
-            assert.isObject(result)
-            done()
-        })
-    })  
+    }) 
 })
 
 Auth.stopWatchingOnWhitelist()

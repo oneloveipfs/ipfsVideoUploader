@@ -4,6 +4,7 @@
     "whitelistEnabled": true,
     "UsageLogs": true,
     "tokenExpiry": 86400,
+    "tokenApp": "oneloveipfs",
 
     "admins":["graylan","gray00","d00k13","vaultec","toddmck","priyanarc"],
     "encoderAccounts":[],

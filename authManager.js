@@ -72,7 +72,7 @@ let auth = {
         let timeNow = Date.now()
         JWT.sign({
             user: user,
-            app: 'oneloveipfs',
+            app: Config.tokenApp,
             iat: timeNow / 1000,
             exp: (timeNow / 1000) + Config.tokenExpiry
         },Keys.JWTKey,(err,token) => {
