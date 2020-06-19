@@ -7,14 +7,14 @@ const hashes = JSON.parse(fs.readFileSync(__dirname + '/../db/hashes.json','utf8
 
 describe('Database',() => {
     it('userExistInHashesDB should return a boolean',(done) => {
-        db.userExistInHashesDB(Config.test.user,(result) => {
+        db.userExistInHashesDB(Config.test.user,'all',(result) => {
             assert.typeOf(result,'boolean')
             done()
         })
     })
 
     it('getUsage should return numbers representing usage data in bytes',(done) => {
-        let usage = db.getUsage(Config.test.user)
+        let usage = db.getUsage(Config.test.user,'all')
         for(let key in usage) {
             if (usage.hasOwnProperty(key)) {
                 assert.typeOf(usage[key],'number')
@@ -49,15 +49,15 @@ describe('Database',() => {
         for(let i = 0; i < Config.test.hashType.length; i++) {
             // Record test hash (which are not valid ipfs hash) if no hash in hashes.json for user
             if (!hashes[Config.test.user]) {
-                db.recordHash(Config.test.user,Config.test.hashType[i],'Qmtesthash123')
+                db.recordHash(Config.test.user,'all',Config.test.hashType[i],'Qmtesthash123')
                 hashes[Config.test.user] = {[Config.test.hashType[i]]: 'Qmtesthash123'}
             } else if (!hashes[Config.test.user][Config.test.hashType[i]]) {
-                db.recordHash(Config.test.user,Config.test.hashType[i],'Qmtesthash123')
+                db.recordHash(Config.test.user,'all',Config.test.hashType[i],'Qmtesthash123')
                 hashes[Config.test.user][Config.test.hashType[i]] = 'Qmtesthash123'
             }
         }
 
-        db.getHashesByUser(Config.test.hashType,Config.test.user,(result) => {
+        db.getHashesByUser(Config.test.hashType,Config.test.user,'all',(result) => {
             for (let key in result) {
                 if (result.hasOwnProperty(key)) {
                     assert.typeOf(result[key],'array')

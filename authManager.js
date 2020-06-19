@@ -23,14 +23,15 @@ let whitelistWatcher = fs.watch('whitelist.txt',() => {
     fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
         if (err) return console.log('Error while updating whitelist: ' + err)
         whitelist = readList.split('\n')
-        console.log(whitelist)
     })
 })
 
 let auth = {
     generateEncryptedMemo: (username,cb) => {
         // Generate encrypted text to be decrypted by Keychain or posting key on client
-        let encrypted_message = Crypto.AES.encrypt(username + ':oneloveipfs_login',Keys.AESKey).toString()
+        let message = username + ':oneloveipfs_login:hive'
+        if (auth.isInWhitelist(username,null)) message = username + ':oneloveipfs_login:all'
+        let encrypted_message = Crypto.AES.encrypt(message,Keys.AESKey).toString()
         Hive.api.getAccounts([username],(err,res) => {
             if (err) return cb(err)
             let encrypted_memo = Hive.memo.encode(Keys.wifMessage,res[0].posting.key_auths[0][0],'#' + encrypted_message)
@@ -39,7 +40,9 @@ let auth = {
     },
     generateEncryptedMemoAvalon: async (username,keyid,cb) => {
         if (keyid && keyid.length > 25) return cb({error: 'Invalid custom key identifier'})
-        let encrypted_message = Crypto.AES.encrypt(username + ':oneloveipfs_login',Keys.AESKey).toString()
+        let message = username + ':oneloveipfs_login:dtc'
+        if (auth.isInWhitelist(username,null)) message = username + ':oneloveipfs_login:all'
+        let encrypted_message = Crypto.AES.encrypt(message,Keys.AESKey).toString()
         let avalonGetAccPromise = new Promise((resolve,reject) => {
             Avalon.getAccount(username,(e,acc) => {
                 if (e) return reject(e)
@@ -67,12 +70,13 @@ let auth = {
             cb(e)
         }
     },
-    generateJWT: (user,cb) => {
+    generateJWT: (user,network,cb) => {
         // Generate access token to be sent as response
         let timeNow = Date.now()
         JWT.sign({
             user: user,
             app: Config.tokenApp,
+            network: network,
             iat: timeNow / 1000,
             exp: (timeNow / 1000) + Config.tokenExpiry
         },Keys.JWTKey,(err,token) => {
@@ -89,7 +93,7 @@ let auth = {
                 if (!whitelist.includes(result.user))
                     return cb('Looks like you do not have access to the uploader!')
                 if (Config.Shawp.Enabled && needscredits) {
-                    let daysRemaining = Shawp.getDaysRemaining(result.user)
+                    let daysRemaining = Shawp.getDaysRemaining(result.user,result.network)
                     if (daysRemaining.days === 0 && daysRemaining.needs)
                         cb('Insufficient hosting credits, needs additional ' + Math.ceil(daysRemaining.needs) + ' GBdays.')
                     else
@@ -103,15 +107,21 @@ let auth = {
         let scapi = SteemConnect.Initialize({ accessToken: access_token })
         scapi.me((err,result) => {
             if (err) return cb(err)
-            if (!whitelist.includes(result.account.name))
+            if (!auth.isInWhitelist(result.user,'hive'))
                 return cb('Looks like you do not have access to the uploader!')
             if (Config.Shawp.Enabled && needscredits) {
-                let daysRemaining = Shawp.getDaysRemaining(result.user)
+                let network = 'hive'
+                if (auth.isInWhitelist(result.user,null))
+                    network = 'all'
+                let daysRemaining = Shawp.getDaysRemaining(result.user,network)
                 if (daysRemaining.days === 0 && daysRemaining.needs)
                     cb('Insufficient hosting credits, needs additional ' + Math.ceil(daysRemaining.needs) + ' GBdays.')
+                }
+                
+                if (auth.isInWhitelist(result.account.name,null))
+                    cb(null,result.account.name,'all')
                 else
-                    cb(null,result.account.name)
-            } else cb(null,result.account.name)
+                    cb(null,result.account.name,'hive')
         })
     },
     authenticate: (access_token,keychain,needscredits,cb) => {
@@ -119,12 +129,12 @@ let auth = {
         if (keychain === 'true') {
             auth.verifyAuth(access_token,needscredits,(err,result) => {
                 if (err) return cb(err)
-                else return cb(null,result.user)
+                else return cb(null,result.user,result.network)
             })
         } else {
-            auth.scAuth(access_token,needscredits,(err,user) => {
+            auth.scAuth(access_token,needscredits,(err,user,network) => {
                 if (err) return cb(err)
-                else return cb(null,user)
+                else return cb(null,user,network)
             })
         }
     },
@@ -135,10 +145,19 @@ let auth = {
     invalidHiveUsername: (username) => {
         return Hive.utils.validateAccountName(username)
     },
+    isInWhitelist: (username,network) => {
+        if (!network && whitelist.includes(username))
+            return true
+        else if (whitelist.includes(username) || whitelist.includes(username + '@' + network))
+            return true
+        else return false
+    },
     whitelist: () => {return whitelist},
-    whitelistAdd: (username,cb) => {
-        if (!whitelist.includes(username)) {
-            whitelist.push(username)
+    whitelistAdd: (username,network,cb) => {
+        let fullusername = username
+        if (network && network != 'all') fullusername += '@' + network
+        if (!auth.isInWhitelist(username,network)) {
+            whitelist.push(fullusername)
             fs.writeFile('whitelist.txt',whitelist.join('\n'),() => {
                 cb()
             })

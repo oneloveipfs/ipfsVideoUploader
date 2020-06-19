@@ -10,8 +10,10 @@ let possibleTypes = ['videos','thumbnails','sprites','images','video240','video4
 
 let db = {
     // Check if user exist in hashes db
-    userExistInHashesDB: (username,cb) => {
-        if (!hashes.hasOwnProperty(username)) {
+    userExistInHashesDB: (username,network,cb) => {
+        let fullusername = username
+        if (network && network != 'all') fullusername += '@' + network
+        if (!hashes.hasOwnProperty(fullusername)) {
             cb(false)
         } else {
             cb(true)
@@ -24,21 +26,25 @@ let db = {
         return Object.keys(hashes).length
     },
     // Log usage data and IPFS hashes
-    recordUsage: (username,type,size) => {
-        if (!usageData[username]) {
+    recordUsage: (username,network,type,size) => {
+        let fullusername = username
+        if (network && network != 'all') fullusername += '@' + network
+        if (!usageData[fullusername]) {
             // New user?
-            usageData[username] = {}
+            usageData[fullusername] = {}
         }
 
-        if (!usageData[username][type]) {
-            usageData[username][type] = size
+        if (!usageData[fullusername][type]) {
+            usageData[fullusername][type] = size
         } else {
-            usageData[username][type] = usageData[username][type] + size
+            usageData[fullusername][type] = usageData[fullusername][type] + size
         }
     },
-    recordHash: (username,type,hash) => {
-        if (!hashes[username]) {
-            hashes[username] = {
+    recordHash: (username,network,type,hash) => {
+        let fullusername = username
+        if (network && network != 'all') fullusername += '@' + network
+        if (!hashes[fullusername]) {
+            hashes[fullusername] = {
                 videos: [],
                 thumbnails: [],
                 sprites: [],
@@ -46,31 +52,37 @@ let db = {
             }
         }
 
-        if (!hashes[username][type]) {
-            hashes[username][type] = []
+        if (!hashes[fullusername][type]) {
+            hashes[fullusername][type] = []
         }
 
-        if (!hashes[username][type].includes(hash))
-            hashes[username][type].push(hash)
+        if (!hashes[fullusername][type].includes(hash))
+            hashes[fullusername][type].push(hash)
     },
-    recordSkylink: (username,type,skylink) => {
-        if (!skylinks[username])
-            skylinks[username] = {
+    recordSkylink: (username,network,type,skylink) => {
+        let fullusername = username
+        if (network && network != 'all') fullusername += '@' + network
+        if (!skylinks[fullusername])
+            skylinks[fullusername] = {
                 videos: []
             }
 
-        if (!skylinks[username][type]) skylinks[username][type] = []
-        if (!skylinks[username][type].includes(skylink))
-            skylinks[username][type].push(skylink)
+        if (!skylinks[fullusername][type]) skylinks[fullusername][type] = []
+        if (!skylinks[fullusername][type].includes(skylink))
+            skylinks[fullusername][type].push(skylink)
     },
     // Retrieve usage and hashes data
-    getUsage: (username) => {
-        return usageData[username] || {}
+    getUsage: (username,network) => {
+        let fullusername = username
+        if (network && network != 'all') fullusername += '@' + network
+        return usageData[fullusername] || {}
     },
-    getTotalUsage: (username) => {
+    getTotalUsage: (username,network) => {
+        let fullusername = username
+        if (network && network != 'all') fullusername += '@' + network
         let qtotal = 0
-        for (det in usageData[username]) {
-            qtotal += usageData[username][det]
+        for (det in usageData[fullusername]) {
+            qtotal += usageData[fullusername][det]
         }
         return qtotal
     },
@@ -122,22 +134,26 @@ let db = {
 
         cb(skylinksToReturn)
     },
-    getHashesByUser: (types,username,cb) => {
+    getHashesByUser: (types,username,network,cb) => {
+        let fullusername = username
+        if (network && network != 'all') fullusername += '@' + network
         let hashesToReturn = {}
 
         for (let i = 0; i < possibleTypes.length; i++) {
             if (types.includes(possibleTypes[i]))
-                hashesToReturn[possibleTypes[i]] = hashes[username][possibleTypes[i]]
+                hashesToReturn[possibleTypes[i]] = hashes[fullusername][possibleTypes[i]]
         }
         
         cb(hashesToReturn)
     },
-    getSkylinksByUser: (types,username,cb) => {
+    getSkylinksByUser: (types,username,network,cb) => {
+        let fullusername = username
+        if (network && network != 'all') fullusername += '@' + network
         let skylinksToReturn = {}
 
         for (let i = 0; i < possibleTypes.length; i++) {
             if (types.includes(possibleTypes[i]))
-                skylinksToReturn[possibleTypes[i]] = skylinks[username][possibleTypes[i]]
+                skylinksToReturn[possibleTypes[i]] = skylinks[fullusername][possibleTypes[i]]
         }
         
         cb(skylinksToReturn)

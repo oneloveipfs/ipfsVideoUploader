@@ -49,7 +49,7 @@ let Shawp = {
                             let otheruser = memo.replace('to: @','')
                             if (hive.utils.validateAccountName(otheruser) == null) receiver = otheruser
                         }
-                        Shawp.Refill(tx.from,receiver,Shawp.methods.Hive,tx.amount,usd)
+                        Shawp.Refill(tx.from,receiver,'all',Shawp.methods.Hive,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
                         console.log('Refilled $' + usd + ' to @' + receiver + ' successfully')
@@ -65,7 +65,7 @@ let Shawp = {
                             let otheruser = memo.replace('to: @','')
                             if (hive.utils.validateAccountName(otheruser) == null) receiver = otheruser
                         }
-                        Shawp.Refill(tx.from,tx.from,Shawp.methods.Hive,tx.amount,usd)
+                        Shawp.Refill(tx.from,receiver,'all',Shawp.methods.Hive,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
                         console.log('Refilled $' + usd + ' to @' + receiver + ' successfully')
@@ -91,7 +91,7 @@ let Shawp = {
                             let otheruser = memo.replace('to: @','')
                             if (steem.utils.validateAccountName(otheruser) == null) receiver = otheruser
                         }
-                        Shawp.Refill(tx.from,tx.from,Shawp.methods.Steem,tx.amount,usd)
+                        Shawp.Refill(tx.from,receiver,'all',Shawp.methods.Steem,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
                         console.log('Refilled $' + usd + ' to @' + receiver + ' successfully')
@@ -107,7 +107,7 @@ let Shawp = {
                             let otheruser = memo.replace('to: @','')
                             if (steem.utils.validateAccountName(otheruser) == null) receiver = otheruser
                         }
-                        Shawp.Refill(tx.from,tx.from,Shawp.methods.Steem,tx.amount,usd)
+                        Shawp.Refill(tx.from,receiver,'all',Shawp.methods.Steem,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
                         console.log('Refilled $' + usd + ' to @' + receiver + ' successfully')
@@ -137,31 +137,38 @@ let Shawp = {
             })
         }
     },
-    AddUser: (username) => {
-        if (Customers[username]) return
-        Customers[username] = {
+    AddUser: (username,network) => {
+        let fullusername = username
+        if (network && network != 'all') fullusername += '@' + network
+        if (Customers[fullusername]) return
+        Customers[fullusername] = {
             rate: Config.Shawp.DefaultUSDRate,
             balance: 0,
             joinedSince: new Date().getTime()
         }
-        require('./authManager').whitelistAdd(username,() => {})
+        require('./authManager').whitelistAdd(username,network,() => {})
     },
-    User: (username) => {
+    User: (fullusername) => {
+        let username,network
+        if (fullusername.split('@').length == 2) {
+            username = fullusername.split('@')[0]
+            network = fullusername.split('@')[1]
+        } else username = fullusername
         if (!Customers[username]) return {}
-        let totalusage = db.getTotalUsage(username)
-        let res = JSON.parse(JSON.stringify(Customers[username]))
+        let totalusage = db.getTotalUsage(username,network)
+        let res = JSON.parse(JSON.stringify(Customers[fullusername]))
         res.usage = totalusage
         let daysRemaining = Shawp.getDaysRemaining(username)
         res.daysremaining = daysRemaining.days
         if (daysRemaining.needs) res.needs = daysRemaining.needs
 
         // Usage breakdown
-        res.usagedetails = db.getUsage(username)
+        res.usagedetails = db.getUsage(username,network)
 
         return res
     },
-    UserExists: (username) => {
-        if (!Customers[username]) return false
+    UserExists: (fullusername) => {
+        if (!Customers[fullusername]) return false
         else return true
     },
     ExchangeRate: (coin,amount,cb) => {
@@ -193,12 +200,13 @@ let Shawp = {
                 return cb({ error: 'invalid coin' })
         }
     },
-    CoinbaseCharge: (username,usdAmt,cb,cbUrl,cancelUrl) => {
+    CoinbaseCharge: (username,network,usdAmt,cb,cbUrl,cancelUrl) => {
         let chargeData = {
             name: Config.CoinbaseCommerce.ProductName,
             description: 'Account refill for @' + username,
             metadata: {
-                customer_username: username
+                customer_username: username,
+                network: network
             },
             pricing_type: 'fixed_price',
             local_price: {
@@ -225,16 +233,18 @@ let Shawp = {
             cb(false)
         }
     },
-    Refill: (from,username,method,rawAmt,usdAmt) => {
-        if (!Customers[username]) Shawp.AddUser(username)
+    Refill: (from,username,network,method,rawAmt,usdAmt) => {
+        let fullusername = username
+        if (network && network != 'all') fullusername += '@' + network
+        if (!Customers[fullusername]) Shawp.AddUser(username,network)
 
-        let newCredits = Math.floor(usdAmt / Customers[username].rate * 100000000) / 100000000
-        Customers[username].balance += newCredits
+        let newCredits = Math.floor(usdAmt / Customers[fullusername].rate * 100000000) / 100000000
+        Customers[fullusername].balance += newCredits
 
-        if (!RefillHistory[username])
-            RefillHistory[username] = []
+        if (!RefillHistory[fullusername])
+            RefillHistory[fullusername] = []
         
-        RefillHistory[username].unshift({
+        RefillHistory[fullusername].unshift({
             from: from,
             method: method,
             rawAmt: rawAmt,
@@ -256,29 +266,35 @@ let Shawp = {
             if (gbdays > 0) ConsumeHistory[user].unshift([daynow + '/' + monthnow + '/' + yearnow,gbdays])
         }
     },
-    getRefillHistory: (username,start,count) => {
-        return RefillHistory[username].slice(start,start+count)
+    getRefillHistory: (username,network,start,count) => {
+        let fullusername = username
+        if (network && network != 'all') fullusername += '@' + network
+        return RefillHistory[fullusername].slice(start,start+count)
     },
-    getConsumeHistory: (username,start,count) => {
-        return ConsumeHistory[username].slice(start,start+count)
+    getConsumeHistory: (username,network,start,count) => {
+        let fullusername = username
+        if (network && network != 'all') fullusername += '@' + network
+        return ConsumeHistory[fullusername].slice(start,start+count)
     },
-    getDaysRemaining: (username) => {
-        let usage = db.getTotalUsage(username)
-        if (usage <= 0 || !Customers[username])
+    getDaysRemaining: (username,network) => {
+        let fullusername = username
+        if (network && network != 'all') fullusername += '@' + network
+        let usage = db.getTotalUsage(username,network)
+        if (usage <= 0 || !Customers[fullusername])
             return { days: -1 }
-        else if (Customers[username].balance <= 0 && !Config.admins.includes(username))
-            return { days: 0, needs: usage/1073741824 - Customers[username].balance }
-        let days = Math.floor(Customers[username].balance / usage * 1073741824)
+        else if (Customers[fullusername].balance <= 0 && !Config.admins.includes(username))
+            return { days: 0, needs: usage/1073741824 - Customers[fullusername].balance }
+        let days = Math.floor(Customers[fullusername].balance / usage * 1073741824)
         if (days == 0 && !Config.admins.includes(username))
-            return { days: days, needs: usage/1073741824 - Customers[username].balance }
+            return { days: days, needs: usage/1073741824 - Customers[fullusername].balance }
         else if (days == 0 && Config.admins.includes(username))
             return { days: -2 }
         else
             return { days: days }
     },
-    setRate: (username,usdRate) => {
-        if (!Customers[username]) return
-        Customers[username].rate = usdRate
+    setRate: (fullusername,usdRate) => {
+        if (!Customers[fullusername]) return
+        Customers[fullusername].rate = usdRate
     },
     WriteUserDB: () => {
         fs.writeFile('db/shawp/users.json',JSON.stringify(Customers),(e) => {

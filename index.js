@@ -78,7 +78,7 @@ app.get('/checkuser', APILimiter, (request,response) => {
         })
     else
         response.send({
-            isInWhitelist: Auth.whitelist().includes(request.query.user),
+            isInWhitelist: Auth.isInWhitelist(request.query.user,request.query.network),
             isAdmin: Config.admins.includes(request.query.user)
         })
 })
@@ -89,11 +89,14 @@ app.get('/login',AuthAPILimiter,(request,response) => {
         // Username not specified, throw an error
         return response.status(400).send({error: 'Username not specified!'})
 
+    let queryNetwork = request.query.network
+    if (request.query.dtc == 'true') queryNetwork = 'dtc'
+
     if (Config.whitelistEnabled)
-        if (!Auth.whitelist().includes(request.query.user))
+        if (!Auth.isInWhitelist(request.query.user,queryNetwork))
             return response.status(403).send({error: 'Looks like you do not have access to the uploader!'})
 
-    if (request.query.dtc == 'true') {
+    if (request.query.dtc == 'true' || request.query.network == 'dtc') {
         Auth.generateEncryptedMemoAvalon(request.query.user,request.query.dtckeyid,(e,memo) => {
             if (e) return response.send(e)
             response.send({encrypted_memo: memo, error: null})
@@ -111,7 +114,7 @@ app.post('/logincb',AuthAPILimiter,(request,response) => {
             if (!Auth.whitelist().includes(decoded[0]))
                 return response.status(403).send({error: 'Looks like you do not have access to the uploader!'})
 
-        Auth.generateJWT(decoded[0],(err,token) => {
+        Auth.generateJWT(decoded[0],decoded[2],(err,token) => {
             if (err) return response.send({error: err})
             response.send({access_token: token, error: null})
         })
@@ -131,11 +134,11 @@ app.post('/uploadVideo',(request,response) => {
 })
 
 app.post('/uploadImage',ImageUploadAPILimiter,(request,response) => {
-    Authenticate(request,response,true,(user) => FileUploader.uploadImage(user,request,response))
+    Authenticate(request,response,true,(user,network) => FileUploader.uploadImage(user,network,request,response))
 })
 
 app.post('/uploadSubtitle',APILimiter,(request,response) => {
-    Authenticate(request,response,true,(user) => FileUploader.uploadSubtitles(user,request,response))
+    Authenticate(request,response,true,(user,network) => FileUploader.uploadSubtitles(user,network,request,response))
 })
 
 app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(request,response) => {
@@ -165,11 +168,11 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
             request.socket.setTimeout(0)
 
             // Get user by access token then process upload
-            Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,false,(e,user) => {
+            Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,false,(e,user,network) => {
                 let uploadUser = user
                 if (request.body.Upload.MetaData.encoderUser && request.body.Upload.MetaData.encodingCost)
                     uploadUser = request.body.Upload.MetaData.encoderUser
-                FileUploader.handleTusUpload(request.body,uploadUser,() => {
+                FileUploader.handleTusUpload(request.body,uploadUser,network,() => {
                     FileUploader.writeUploadRegister()
                     response.status(200).send()
                 })
@@ -184,8 +187,8 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
 app.get('/usage',APILimiter, (request,response) => {
     // API to get usage info
     if (!Config.UsageLogs) return response.send('Logs are disabled therefore API is not available for usage.');
-    if (request.query.user === undefined || request.query.user === '') return response.send('Steem username is not defined!');
-    let usage = db.getUsage(request.query.user)
+    if (request.query.user === undefined || request.query.user === '') return response.send('Username is not defined!');
+    let usage = db.getUsage(request.query.user,request.query.network)
     response.send(usage)
 })
 
@@ -232,17 +235,20 @@ app.get('/hashes',APILimiter, (request,response) => {
         db.getHashes(typerequested,(obtainedHashes) => {
             return response.send(obtainedHashes);
         })
-    else
-        // Steem username specified does not exist in our record
-        db.userExistInHashesDB(request.query.user,(result) => {
-            if (!result) return response.send('Steem user specified doesn\'t exist in our record.')
+    else {
+        let network = request.query.network
+        if (Auth.isInWhitelist(request.query.user,null))
+            network = 'all'
+        db.userExistInHashesDB(request.query.user,network,(result) => {
+            if (!result) return response.send('User specified doesn\'t exist in our record.')
             else {
                 // BOTH valid Steem username and hash type request are specified
-                db.getHashesByUser(typerequested,request.query.user,(obtainedHashes) => {
+                db.getHashesByUser(typerequested,request.query.user,network,(obtainedHashes) => {
                     return response.send(obtainedHashes)
                 })
             }
         })
+    }
 });
 
 app.get('/updatelogs',APILimiter,(request,response) => {
@@ -264,8 +270,8 @@ app.get('/shawp_config',APILimiter,(req,res) => {
 
 app.get('/shawp_refill_history',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
-    Authenticate(req,res,false,(user) => {
-        return res.send(Shawp.getRefillHistory(user,req.query.start || 0,req.query.count))
+    Authenticate(req,res,false,(user,network) => {
+        return res.send(Shawp.getRefillHistory(user,network,req.query.start || 0,req.query.count))
     })
 })
 
@@ -273,14 +279,14 @@ app.get('/shawp_refill_history_admin',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user) => {
         if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
-        return res.send(Shawp.getRefillHistory(req.query.user,req.query.start || 0,req.query.count))
+        return res.send(Shawp.getRefillHistory(req.query.user,req.query.network || 'all',req.query.start || 0,req.query.count))
     })
 })
 
 app.get('/shawp_consumption_history',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
-    Authenticate(req,res,false,(user) => {
-        return res.send(Shawp.getConsumeHistory(user,req.query.start || 0,req.query.count))
+    Authenticate(req,res,false,(user,network) => {
+        return res.send(Shawp.getConsumeHistory(user,network,req.query.start || 0,req.query.count))
     })
 })
 
@@ -288,14 +294,14 @@ app.get('/shawp_consumption_history_admin',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user) => {
         if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
-        return res.send(Shawp.getConsumeHistory(req.query.user,req.query.start || 0,req.query.count))
+        return res.send(Shawp.getConsumeHistory(req.query.user,req.query.network || 'all',req.query.start || 0,req.query.count))
     })
 })
 
 app.post('/shawp_refill_coinbase',Parser.json(),(req,res) => {
     if (!Config.Shawp.Enabled || !Config.Shawp.Coinbase.enabled) return res.status(404).send()
     if (!req.body.username || !req.body.usdAmt) return res.status(400).send({error:'Username or amount is missing'})
-    Shawp.CoinbaseCharge(req.body.username,req.body.usdAmt,(e,r) => {
+    Shawp.CoinbaseCharge(req.body.username,req.body.network || 'all',req.body.usdAmt,(e,r) => {
         if (e)
             return res.status(400).send({error:e.message})
         else
@@ -310,7 +316,7 @@ app.post('/shawp_refill_coinbase_webhook',Parser.json({ verify: rawBodySaver }),
         res.status(200).send()
 
         if (req.body.event.data.name == Config.CoinbaseCommerce.ProductName && req.body.event.type == 'charge:confirmed') {
-            Shawp.Refill('',req.body.event.data.metadata.customer_username,Shawp.methods.Coinbase,req.body.event.data.payments[0].value.crypto.amount + ' ' + req.body.event.data.payments[0].value.crypto.currency,parseFloat(req.body.event.data.pricing.local.amount))
+            Shawp.Refill('',req.body.event.data.metadata.customer_username,req.body.event.data.metadata.network,Shawp.methods.Coinbase,req.body.event.data.payments[0].value.crypto.amount + ' ' + req.body.event.data.payments[0].value.crypto.currency,parseFloat(req.body.event.data.pricing.local.amount))
             Shawp.WriteUserDB()
             Shawp.WriteRefillHistory()
         }
@@ -330,6 +336,7 @@ app.post('/botusage',Parser.json(),(req,res) => {
 })
 
 // WooCommerce API calls
+// Depreciate non-Shawp payment system?
 app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(req,res) => {
     if (!Config.WooCommerceEnabled || Config.Shawp.Enabled) return res.status(404).end()
     WC.VerifyWebhook(req.rawBody,req.header('X-WC-Webhook-Signature'),(isValid) => {
@@ -369,9 +376,11 @@ app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlenco
 
 app.get('/wc_user_info',APILimiter,(req,res) => {
     if (!Config.WooCommerceEnabled && !Config.Shawp.Enabled) return res.status(404).end()
-    Authenticate(req,res,false,(user) => {
+    Authenticate(req,res,false,(user,network) => {
+        let fullusername = user
+        if (network && network != 'all') fullusername += '@' + network
         if (Config.Shawp.Enabled) 
-            return res.send(Shawp.User(user))
+            return res.send(Shawp.User(fullusername))
         else WC.User(user,(err,info) => {
             if (err) res.status(400).send(err)
             return res.send(info)
@@ -381,10 +390,10 @@ app.get('/wc_user_info',APILimiter,(req,res) => {
 
 app.get('/wc_user_info_admin',APILimiter,(req,res) => {
     if (!Config.WooCommerceEnabled && !Config.Shawp.Enabled) return res.status(404).end()
-    Authenticate(req,res,false,(user) => {
+    Authenticate(req,res,false,(user,network) => {
         if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
         if (Config.Shawp.Enabled) 
-            return res.send(Shawp.User(req.query.user))
+            return res.send(Shawp.User(req.query.user,req.query.network || 'all'))
         else WC.User(req.query.user,(err,info) => {
             if (err) res.status(400).send(err)
             return res.send(info)
@@ -411,15 +420,15 @@ function Authenticate(request,response,needscredits,next) {
     if (Config.whitelistEnabled && !access_token) return response.status(400).send({error: 'Missing API auth credentials'})
     if (Config.whitelistEnabled && request.query.scauth === 'true') {
         // Handle SteemConnect access token
-        Auth.scAuth(access_token,needscredits,(err,user) => {
+        Auth.scAuth(access_token,needscredits,(err,user,network) => {
             if (err) return response.status(401).send({ error: err })
-            else next(user)
+            else next(user,network)
         })
     } else {
         // Handle access token from /logincb
         Auth.verifyAuth(access_token,needscredits,(err,result) => {
             if (err) return response.status(401).send({ error: err })
-            else next(result.user)
+            else next(result.user,result.network)
         })
     }
 }

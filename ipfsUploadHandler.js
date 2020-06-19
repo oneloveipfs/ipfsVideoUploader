@@ -81,20 +81,21 @@ function trimTrailingSlash(str) {
     return str.replace(/\/$/, "");
 }
 
-function processSingleVideo(id,user,cb) {
+function processSingleVideo(id,user,network,cb) {
     let vpath = Config.tusdUploadDir + '/' + id
     if (!fs.existsSync(vpath)) return cb({ error: 'Could not find upload' })
     Shell.exec('./scripts/dtube-sprite.sh ' + vpath + ' uploaded/' + id + '.jpg',() => addFile('uploaded/' + id + '.jpg',true,false,(hash) => fs.stat('uploaded/' + id + '.jpg',(err,stat) => {
-        !err ? db.recordUsage(user,'sprites',stat['size']) 
+        !err ? db.recordUsage(user,network,'sprites',stat['size']) 
             : console.log('Error getting sprite filesize: ' + err)
         
         db.writeUsageData()
-        db.recordHash(user,hash)
+        db.recordHash(user,network,'videos',hash)
         db.writeHashesData()
 
         getDuration(vpath).then((duration) => {
             let result = {
                 username: user,
+                network: network,
                 type: 'videos',
                 ipfshash: uploadRegister[id].hash,
                 spritehash: hash,
@@ -108,7 +109,7 @@ function processSingleVideo(id,user,cb) {
 }
 
 let uploadOps = {
-    uploadImage: (username,request,response) => {
+    uploadImage: (username,network,request,response) => {
         let imgType = request.query.type
         if (!imgType) return response.status(400).send({error: 'Image upload type not specified!'})
         if (imgType != 'images' && imgType != 'thumbnails') return response.status(400).send({error: 'Invalid image upload type specified!'})
@@ -123,18 +124,19 @@ let uploadOps = {
             addFile('imguploads/' + uploadedImg,trickleDagAdd,false,(hash) => {
                 if (Config.UsageLogs) {
                     // Log usage data for image uploads
-                    db.recordUsage(username,imgType,request.file.size)
+                    db.recordUsage(username,network,imgType,request.file.size)
                     db.writeUsageData()
                 }
 
                 // Log IPFS hashes by Steem account
                 // If hash is not in database, add the hash into database
-                db.recordHash(username,imgType,hash)
+                db.recordHash(username,network,imgType,hash)
                 db.writeHashesData()
 
                 // Send image IPFS hash back to client and IPSync
                 let result = {
                     username: username,
+                    network: network,
                     imghash: hash,
                     imgtype: imgType
                 }
@@ -143,7 +145,7 @@ let uploadOps = {
             })
         })
     },
-    uploadSubtitles: async (username,request,response) => {
+    uploadSubtitles: async (username,network,request,response) => {
         try {
             WebVTT.parse(request.body)
         } catch (err) {
@@ -155,15 +157,16 @@ let uploadOps = {
         
         for await (const sub of ipfsAddSubtitleOp) {
             if (Config.UsageLogs) {
-                db.recordUsage(username,'subtitles',sub.size)
+                db.recordUsage(username,network,'subtitles',sub.size)
                 db.writeUsageData()
             }
 
-            db.recordHash(username,'subtitles',sub.cid.toString())
+            db.recordHash(username,network,'subtitles',sub.cid.toString())
             db.writeHashesData()
 
             let result = {
                 username: username,
+                network: network,
                 type: 'subtitles',
                 hash: sub.cid.toString()
             }
@@ -173,7 +176,7 @@ let uploadOps = {
             break
         }
     },
-    handleTusUpload: (json,user,callback) => {
+    handleTusUpload: (json,user,network,callback) => {
         let filepath = json.Upload.Storage.Path
         switch (json.Upload.MetaData.type) {
             case 'videos':
@@ -192,25 +195,26 @@ let uploadOps = {
                     if (errors) console.log(errors)
                     console.log(results)
                     if (Config.UsageLogs) fs.stat('uploaded/' + json.Upload.ID + '.jpg',(err,stat) => {
-                        db.recordUsage(user,'videos',json.Upload.Size)
-                        !err ? db.recordUsage(user,'sprites',stat['size']) 
+                        db.recordUsage(user,network,'videos',json.Upload.Size)
+                        !err ? db.recordUsage(user,network,'sprites',stat['size']) 
                             : console.log('Error getting sprite filesize: ' + err)
                         
                         db.writeUsageData()
                     })
 
-                    db.recordHash(user,'videos',results.videohash.ipfshash)
-                    db.recordHash(user,'sprites',results.spritehash)
+                    db.recordHash(user,network,'videos',results.videohash.ipfshash)
+                    db.recordHash(user,network,'sprites',results.spritehash)
                     db.writeHashesData()
 
                     if (results.videohash.skylink) {
-                        db.recordSkylink(user,'videos',results.videohash.skylink)
+                        db.recordSkylink(user,network,'videos',results.videohash.skylink)
                         db.writeSkylinksData()
                     }
 
                     getDuration(json.Upload.Storage.Path).then((videoDuration) => {
                         let result = {
                             username: user,
+                            network: network,
                             type: 'videos',
                             ipfshash: results.videohash.ipfshash,
                             spritehash: results.spritehash,
@@ -233,15 +237,15 @@ let uploadOps = {
             case 'video1080':
                 addFile(filepath,true,Config.Skynet.enabled,(hash,skylink) => {
                     if (Config.UsageLogs) {
-                        db.recordUsage(user,json.Upload.MetaData.type,json.Upload.Size)
+                        db.recordUsage(user,network,json.Upload.MetaData.type,json.Upload.Size)
                         db.writeUsageData()
                     }
 
-                    db.recordHash(user,json.Upload.MetaData.type,hash)
+                    db.recordHash(user,network,json.Upload.MetaData.type,hash)
                     db.writeHashesData()
 
                     if (skylink) {
-                        db.recordSkylink(user,json.Upload.MetaData.type,skylink)
+                        db.recordSkylink(user,network,json.Upload.MetaData.type,skylink)
                         db.writeSkylinksData()
                     }
 
@@ -249,6 +253,7 @@ let uploadOps = {
 
                     let result = { 
                         username: user,
+                        network: network,
                         type: json.Upload.MetaData.type,
                         hash: hash,
                         skylink: skylink
@@ -304,7 +309,7 @@ let uploadOps = {
                     if (!db.getPossibleTypes().includes(info.type)) return socket.emit('result', { error: 'Invalid upload type requested' })
 
                     // Authenticate & get username
-                    Auth.authenticate(info.access_token,info.keychain,false,(e,user) => {
+                    Auth.authenticate(info.access_token,info.keychain,false,(e,user,network) => {
                         if (e) return socket.emit('result', { error: 'Auth error: ' + JSON.stringify(e) })
                         
                         // Upload ID not found in register, register socket
@@ -328,7 +333,7 @@ let uploadOps = {
                         let uploadUser = user
                         if (request.body.Upload.MetaData.encoderUser && request.body.Upload.MetaData.encodingCost)
                             uploadUser = request.body.Upload.MetaData.encoderUser
-                        processSingleVideo(info.id,uploadUser,(result) => {
+                        processSingleVideo(info.id,uploadUser,network,(result) => {
                             socket.emit('result',result)
                         })
                     })

@@ -14,7 +14,7 @@ describe('Auth',() => {
         })
     })
 
-    it('generateEncryptedMemoAvalon should return a string that has 4 \'_\'s',function(done) {
+    it('generateEncryptedMemoAvalon should return a string containing 4 sections',function(done) {
         this.timeout(0)
         Auth.generateEncryptedMemoAvalon(user,null,(err,result) => {
             let splitMessage = result.split('_')
@@ -30,14 +30,14 @@ describe('Auth',() => {
     })
 
     it ('whitelistAdd() should add new user to whitelist',function(done) {
-        Auth.whitelistAdd(user,() => {
+        Auth.whitelistAdd(user,'all',() => {
             assert.equal(Auth.whitelist().includes(user),true)
             done()
         })
     })
 
     it('generateJWT should return a valid JWT token',function (done) {
-        Auth.generateJWT(user,(err,token) => {
+        Auth.generateJWT(user,'all',(err,token) => {
             assert.typeOf(token,'string')
             Auth.verifyAuth(token,false,(e,result) => {
                 assert.isObject(result)
