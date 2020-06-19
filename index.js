@@ -111,7 +111,7 @@ app.post('/logincb',AuthAPILimiter,(request,response) => {
     // Keychain Auth Callback
     Auth.decryptMessage(request.body,(decoded) => {
         if (Config.whitelistEnabled)
-            if (!Auth.whitelist().includes(decoded[0]))
+            if (!Auth.isInWhitelist(decoded[0],decoded[2]))
                 return response.status(403).send({error: 'Looks like you do not have access to the uploader!'})
 
         Auth.generateJWT(decoded[0],decoded[2],(err,token) => {
