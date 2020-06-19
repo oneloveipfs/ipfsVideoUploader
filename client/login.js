@@ -53,6 +53,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('authButton').onclick = loginBtnClicked
     document.getElementById('authButton2').onclick = loginBtnClicked
 
+    document.getElementById('loginUsername').onchange = () => document.getElementById('proceedAuthBtn').innerText = getKeychainLoginBtnLabel()
+    document.getElementById('loginSteemUsername').onchange = () => document.getElementById('proceedAuthBtn').innerText = getKeychainLoginBtnLabel()
+
 window.onclick = (event) => {
     dismissPopup(event,'loginPopup')
     dismissPopup(event,'signupPopup')
@@ -72,6 +75,8 @@ function dismissPopup(event,popupelement) {
 
 function loginBtnClicked() {
     // Show popup window of login options
+    // if (!window.steem_keychain) updateDisplayByIDs([],['loginSteemUsername','sameSteemUser'])
+    // if (!window.hive_keychain) updateDisplayByIDs([],['loginUsername','sameSteemUser','sameAvalonUser'])
     updateDisplayByIDs(['loginPopup'],[])
 }
 
@@ -105,12 +110,17 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
     // Using public posting key on Hive to initiate login
     if (username) axios.get('/login?user=' + username).then((response) => {
         if (response.data.error != null) {
-            alert(response.data.error)
-            return
+            keychainLoginBtn.innerText = getKeychainLoginBtnLabel()
+            proceedAuthBtnDisabled = false
+            return alert(response.data.error)
         }
         hive_keychain.requestVerifyKey(username,response.data.encrypted_memo,'Posting',(loginResponse) => {
             console.log(loginResponse)
-            if (loginResponse.error != null) return alert(loginResponse.message)
+            if (loginResponse.error != null) { 
+                keychainLoginBtn.innerText = getKeychainLoginBtnLabel()
+                proceedAuthBtnDisabled = false
+                return alert(loginResponse.message)
+            }
 
             if (steemUsername != '')
                 steem_keychain.requestSignBuffer(steemUsername,'login','Posting',(steemLoginRes) => {
@@ -126,6 +136,8 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
                 keychainCb(loginResponse.result.substr(1),'',false)
         })
     }).catch((err) => {
+        keychainLoginBtn.innerText = getKeychainLoginBtnLabel()
+        proceedAuthBtnDisabled = false
         if (err.response.data.error) alert(err.response.data.error)
         else alert(err)
     })
@@ -295,6 +307,15 @@ async function avalonLogin(avalonUsername,avalonKey,dtconly) {
         // If Avalon username or password not provided, clear existing login (if any) from sessionStorage
         sessionStorage.clear()
     }
+}
+
+function getKeychainLoginBtnLabel() {
+    let hiveUsername = document.getElementById('loginUsername').value
+    let steemUsername = document.getElementById('loginSteemUsername').value
+    if (hiveUsername || steemUsername)
+        return "Proceed with Keychains"
+    else
+        return "Proceed"
 }
 
 function exchageRate (coin,amount,cb) {

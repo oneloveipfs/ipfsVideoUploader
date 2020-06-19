@@ -12,7 +12,7 @@
         "gateway": "https://video.oneloveipfs.com",
         "hivesignerEnabled": true,
         "HiveSignerApp": "ipfsuploader.app",
-        "callbackURL": "https://beta.oneloved.tube/upload",
+        "callbackURL": "https://uploader.oneloved.tube/upload",
         "tusdEndpoint": "http://localhost:1080/files"
     },
 

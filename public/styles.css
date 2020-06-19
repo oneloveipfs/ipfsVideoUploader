@@ -109,9 +109,8 @@ a {
     padding-bottom: 20px;
 }
 
-#loginPopup .popup-body {
-    text-align: center;
-}
+#loginPopup .popup-body h3 { text-align: center; }
+#loginPopup .popup-body .logininfo { margin: 5px 0px; }
 
 @-webkit-keyframes animatetop {
     from {top:-300px; opacity:0} 
@@ -151,7 +150,7 @@ a {
     margin-bottom: 10px;
 }
 
-#sameAvalonUsername {
+.sameUsername {
     margin-top: -7px;
     text-align: left;
     margin-left: 3px;

@@ -40,6 +40,7 @@ describe('Auth',() => {
 
     it('generateJWT should return a string',function (done) {
         Auth.generateJWT(user,(err,result) => {
+            if (err) console.log(err)
             testToken = result
             assert.typeOf(result,'string')
             done()
