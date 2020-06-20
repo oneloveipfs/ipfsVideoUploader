@@ -23,7 +23,7 @@ let uploadRegister = JSON.parse(fs.readFileSync('db/register.json','utf8'))
 let socketRegister = {}
 
 const ipfsAPI = IPFS({ host: 'localhost', port: '5001', protocol: 'http' })
-const upload = Multer({ dest: './uploaded/' })
+const streamUpload = Multer({ dest: './uploaded/', limits: { fileSize: 20971520 } }) // 20MB chunks
 const imgUpload = Multer({ dest: './imguploads/', limits: { fileSize: 7340032 } })
 const { globSource } = IPFS
 
@@ -175,6 +175,29 @@ let uploadOps = {
 
             break
         }
+    },
+    uploadStreamChunk: (username,network,request,response) => {
+        // video/mp2t
+        streamUpload.single('chunk')(request,response,(err) => {
+            if (err) return response.status(400).send({error: err})
+            let chunkDir = request.file.path
+            addFile(chunkDir,true,false,(hash) => {
+                if (Config.UsageLogs) {
+                    db.recordUsage(username,network,'streams',request.file.size)
+                    db.writeUsageData()
+                }
+                db.recordHash(username,network,'streams',hash)
+                db.writeHashesData() // TODO: Write to disk every x minutes to minimize disk wear out
+
+                let result = {
+                    username: username,
+                    network: network,
+                    type: 'streams',
+                    hash: hash
+                }
+                response.status(200).send(result)
+            })
+        })
     },
     handleTusUpload: (json,user,network,callback) => {
         let filepath = json.Upload.Storage.Path
