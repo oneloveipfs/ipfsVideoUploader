@@ -199,6 +199,20 @@ let uploadOps = {
             })
         })
     },
+    uploadStreamChunkNoAuth: (request,response) => {
+        // video/mp2t
+        streamUpload.single('chunk')(request,response,(err) => {
+            if (err) return response.status(400).send({error: err})
+            let chunkDir = request.file.path
+            addFile(chunkDir,true,false,(hash) => {
+                let result = {
+                    type: 'streams',
+                    hash: hash
+                }
+                response.status(200).send(result)
+            })
+        })
+    },
     handleTusUpload: (json,user,network,callback) => {
         let filepath = json.Upload.Storage.Path
         switch (json.Upload.MetaData.type) {
