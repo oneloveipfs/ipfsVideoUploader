@@ -96,6 +96,16 @@ app.get('/login',AuthAPILimiter,(request,response) => {
         if (!Auth.isInWhitelist(request.query.user,queryNetwork))
             return response.status(403).send({error: 'Looks like you do not have access to the uploader!'})
 
+    let isInAllWhitelists = Auth.isInWhitelist(request.query.user,'all')
+    if (Config.Shawp.Enabled && needscredits == 'true') {
+        let daysRemaining = Shawp.getDaysRemaining(request.query.user,isInAllWhitelists ? 'all' : (request.query.network || 'dtc'))
+        if (daysRemaining.days === 0 && daysRemaining.needs)
+            return response.status(402).send({
+                error: 'Insufficient hosting credits, needs additional ' + Math.ceil(daysRemaining.needs) + ' GBdays.',
+                needs: Math.ceil(daysRemaining.needs)
+            })
+    }
+
     if (request.query.dtc == 'true' || request.query.network == 'dtc') {
         Auth.generateEncryptedMemoAvalon(request.query.user,request.query.dtckeyid,(e,memo) => {
             if (e) return response.send(e)
