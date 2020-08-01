@@ -97,7 +97,7 @@ app.get('/login',AuthAPILimiter,(request,response) => {
             return response.status(403).send({error: 'Looks like you do not have access to the uploader!'})
 
     let isInAllWhitelists = Auth.isInWhitelist(request.query.user,'all')
-    if (Config.Shawp.Enabled && needscredits == 'true') {
+    if (Config.Shawp.Enabled && request.query.needscredits == 'true') {
         let daysRemaining = Shawp.getDaysRemaining(request.query.user,isInAllWhitelists ? 'all' : (request.query.network || 'dtc'))
         if (daysRemaining.days === 0 && daysRemaining.needs)
             return response.status(402).send({
