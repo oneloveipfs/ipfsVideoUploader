@@ -424,7 +424,8 @@ function uploadVideo(resolution,next) {
         metadata: {
             access_token: Auth.token,
             keychain: Auth.iskeychain,
-            type: resolutionFType
+            type: resolutionFType,
+            skynet: document.getElementById('skynetupload').checked ? 'true' : 'false'
         },
         onError: (e) => {
             console.log('tus error',e)

@@ -182,7 +182,7 @@ let uploadOps = {
             case 'videos':
                 let ipfsops = {
                     videohash: (cb) => {
-                        addFile(filepath,true,Config.Skynet.enabled,(hash,skylink) => cb(null,{ipfshash: hash, skylink: skylink}))
+                        addFile(filepath,true,Config.Skynet.enabled && json.Upload.MetaData.skynet == 'true',(hash,skylink) => cb(null,{ipfshash: hash, skylink: skylink}))
                     },
                     spritehash: (cb) => {
                         Shell.exec('./scripts/dtube-sprite.sh ' + filepath + ' uploaded/' + json.Upload.ID + '.jpg',() => {
@@ -235,7 +235,7 @@ let uploadOps = {
             case 'video480':
             case 'video720':
             case 'video1080':
-                addFile(filepath,true,Config.Skynet.enabled,(hash,skylink) => {
+                addFile(filepath,true,Config.Skynet.enabled && json.Upload.MetaData.skynet == 'true',(hash,skylink) => {
                     if (Config.UsageLogs) {
                         db.recordUsage(user,network,json.Upload.MetaData.type,json.Upload.Size)
                         db.writeUsageData()
