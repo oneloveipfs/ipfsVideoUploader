@@ -28,7 +28,7 @@
     "fs": "0.0.1-security",
     "get-video-duration": "^0.3.0",
     "http": "0.0.1-security",
-    "ipfs-http-client": "^44.0.1",
+    "ipfs-http-client": "^44.3.0",
     "javalon": "^1.0.22",
     "jsonwebtoken": "^8.5.1",
     "mime-types": "^2.1.27",
