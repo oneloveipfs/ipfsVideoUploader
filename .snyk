@@ -1,5 +1,5 @@
 # Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
-version: v1.14.1
+version: v1.19.0
 ignore: {}
 # patches apply the minimum changes required to fix a vulnerability
 patch:
@@ -14,3 +14,13 @@ patch:
         patched: '2020-05-02T09:02:35.248Z'
     - woocommerce-api > npm-check-updates > node-alias > lodash:
         patched: '2020-05-02T09:02:35.248Z'
+    - '@hiveio/hive-js > lodash':
+        patched: '2020-08-23T02:59:47.478Z'
+    - coinbase-commerce-node > lodash:
+        patched: '2020-08-23T02:59:47.478Z'
+    - steem > lodash:
+        patched: '2020-08-23T02:59:47.478Z'
+    - woocommerce-api > npm-check-updates > lodash:
+        patched: '2020-08-23T02:59:47.478Z'
+    - woocommerce-api > npm-check-updates > node-alias > lodash:
+        patched: '2020-08-23T02:59:47.478Z'
