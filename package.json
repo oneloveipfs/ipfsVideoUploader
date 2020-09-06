@@ -14,7 +14,7 @@
   "author": "techcoderx",
   "license": "GPLv3",
   "dependencies": {
-    "@hiveio/hive-js": "0.8.2",
+    "@hiveio/hive-js": "0.8.4",
     "async": "^3.2.0",
     "axios": "^0.19.2",
     "bcrypt": "^5.0.0",
