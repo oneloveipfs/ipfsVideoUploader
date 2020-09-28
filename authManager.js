@@ -9,8 +9,8 @@ const Keys = require('./.auth.json')
 const Config = require('./config.json')
 const Shawp = require('./shawp')
 
-Hive.api.setOptions({ url: 'https://hived.techcoderx.com', useAppbaseApi: true })
-Hive.config.set('uri', 'https://hived.techcoderx.com')
+Hive.api.setOptions({ url: Config.Shawp.HiveAPI || 'https://hived.techcoderx.com', useAppbaseApi: true })
+Hive.config.set('uri', Config.Shawp.HiveAPI || 'https://hived.techcoderx.com')
 Hive.config.set('alternative_api_endpoints', [])
 
 // If whitelist file doesn't exist create it
