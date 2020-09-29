@@ -178,7 +178,7 @@ a {
     margin-block-end: 0.5em;
 }
 
-#uploadForm, #thumbnailSwapper, #wcinfo, #refillnotify, #refiller, #needsrefillnotify {
+#uploadForm, #thumbnailSwapper, #wcinfo, #refillnotify, #refiller, #needsrefillnotify, #disabledPage {
     margin-left: auto;
     margin-right: auto;
     width: 700px;
@@ -507,7 +507,7 @@ textarea {
 }
 
 /* Thumbnail swapper tool */
-#thumbnailSwapper {
+#thumbnailSwapper, #disabledPage {
     display: none;
 }
 
@@ -940,7 +940,7 @@ td {
         font-size: 15px;
     }
 
-    #uploadForm, #thumbnailSwapper, #wcinfo, #refillnotify, #refiller, #needsrefillnotify {
+    #uploadForm, #thumbnailSwapper, #wcinfo, #refillnotify, #refiller, #needsrefillnotify, #disabledPage {
         margin-left: 15px;
         margin-right: 25px;
         width: auto;

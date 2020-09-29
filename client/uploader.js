@@ -85,6 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Get configuration
     axios.get('/config').then((result) => {
         config = result.data
+
+        if (config.disabled) {
+            document.getElementById('disabledPage').innerText = config.disabledMessage
+            updateDisplayByIDs(['disabledPage'],['uploadForm','modeBtn'])
+        }
     })
 
     // Display warning if resumable uploads is unavailable

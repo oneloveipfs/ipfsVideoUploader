@@ -14,7 +14,9 @@
         "hivesignerEnabled": true,
         "HiveSignerApp": "ipfsuploader.app",
         "callbackURL": "https://uploader.oneloved.tube/upload",
-        "tusdEndpoint": "http://localhost:1080/files"
+        "tusdEndpoint": "http://localhost:1080/files",
+        "disabled": false,
+        "disabledMessage": ""
     },
 
     "Skynet": {
