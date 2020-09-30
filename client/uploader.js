@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         config = result.data
 
         if (config.disabled) {
-            document.getElementById('disabledPage').innerText = config.disabledMessage
+            document.getElementById('disabledText').innerText = config.disabledMessage
             updateDisplayByIDs(['disabledPage'],['uploadForm','modeBtn'])
         }
     })
