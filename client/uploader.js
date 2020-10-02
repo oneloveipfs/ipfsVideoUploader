@@ -6,6 +6,7 @@ Auth.Hive().then((result) => {
 })
 
 hivejs.api.setOptions({ url: 'https://api.hive.blog' })
+javalon.init({api: 'https://avalon.oneloved.tube'})
 
 // Setup subtitles tab
 const allLangCodes = languages.getAllLanguageCode()
