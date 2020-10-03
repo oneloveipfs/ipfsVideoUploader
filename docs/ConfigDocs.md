@@ -12,9 +12,15 @@
 #### Client configuration
 * `gateway`: IPFS gateway domain to use as default gateway overwrite on DTube embed player.
 * `hivesignerEnabled`: Set to true to enable HiveSigner authentication.
-* `HiveSignerApp`: Specify the app name of your HiveSigner application.
+* `HiveSignerApp`: Specify the app name of your HiveSigner application, this is also the Hive username for collecting posting authorities.
+* `SteemLoginApp`: Specify the Steem username for collecting posting authorities.
+* `AvalonSupportPub`: Specify an Avalon public key that users should add for resolving broadcasting issues manually if needed.
 * `callbackURL`: Specify the uploader page URL (https://yourdomain.com/upload) where the URL must be listed in HiveSigner application settings.
 * `tusdEndpoint`: tusd HTTP endpoint for resumable file uploads.
+* `enableSupport`: Set to true to enable users to authorize their ability to post to the usernames above (or Avalon public key above) in the interface.
+* `disabled`: Set to true if users should be blocked from interacting with the uploader interface. This does not affect any API calls. Useful in situations such as blockchain related issues.
+* `disabledMessage`: A text that will be displayed when users are blocked from interacting with the uploader interface.
+* `disabledMeme`: A meme to be displayed underneath the text above when the users are blocked from interacting with the uploader interface.
 
 #### Skynet
 * `enabled`: When set to true, Skynet upload support is enabled.

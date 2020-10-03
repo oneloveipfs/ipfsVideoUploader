@@ -1,6 +1,7 @@
 let authorizing = false
 
 function loadAvalonAuthorityStatus(account) {
+    if (!config.enableSupport) return
     updateDisplayByIDs(['avalonAuthorizeBtn'],[])
     if (!hasAuthority(account,'avalon')) {
         document.getElementById('avalonAuthorizeBtn').innerText = 'Authorize Avalon'
@@ -55,6 +56,7 @@ function loadAvalonAuthorityStatus(account) {
 }
 
 function loadGrapheneAuthorityStatus(account,network) {
+    if (!config.enableSupport) return
     updateDisplayByIDs([network + 'AuthorizeBtn'],[])
     let capNetwork = capitalizeFirstLetter(network) // for button label
     if (!hasAuthority(account,network)) {
