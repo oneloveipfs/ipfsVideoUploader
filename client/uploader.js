@@ -5,7 +5,17 @@ Auth.Hive().then((result) => {
     Auth.Avalon()
 })
 
-hivejs.api.setOptions({ url: 'https://api.hive.blog' })
+let hiveOptions = {
+    url: 'https://api.hive.blog',
+    useAppbaseApi: true,
+    rebranded_api: true,
+}
+
+hive.utils.autoDetectApiVersion().then((r) => {
+    hiveOptions.rebranded_api = r.rebranded_api
+    hive.api.setOptions(hiveOptions)
+    hive.broadcast.updateOperations()
+})
 
 // Setup subtitles tab
 const allLangCodes = languages.getAllLanguageCode()
@@ -349,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (percentage <= 0) return alert('Beneficiary percentage must be more than 0.')
         if (weightRemaining < 0) return alert('You can\'t set beneficiaries totalling more than 100%!')
 
-        hivejs.api.getAccounts([account],(err,result) => {
+        hive.api.getAccounts([account],(err,result) => {
             if (err) return alert('Error while validating account: ' + err)
             if (result.length === 0) return alert('Beneficiary account specified doesn\'t exist!')
 
@@ -604,7 +614,7 @@ function buildJsonMetadata(network) {
     let jsonMeta = {
         video: buildJsonMetadataAvalon(),
         tags: SteemTags,
-        app: 'onelovedtube/1.0',
+        app: 'onelovedtube/1.0.1',
     }
 
     let ref = []
@@ -721,6 +731,14 @@ function generatePost(network) {
         operations[1][1].extensions.push([0, {
             beneficiaries: sortedBeneficiary
         }])
+
+    // Hive HF24 "eclipse"
+    if (network == 'hive' && hive.config.rebranded_api) {
+        operations[1][1].percent_hbd = percent_steem_dollars
+        delete operations[1][1].percent_steem_dollars
+        operations[1][1].max_accepted_payout = '1000000.000 HBD'
+    }
+
     return operations
 }
 

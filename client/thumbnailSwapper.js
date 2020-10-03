@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             },
             hive: (cb) => {
-                hivejs.api.getContent(split[0],split[1],(err,res) => {
+                hive.api.getContent(split[0],split[1],(err,res) => {
                     if (err) return cb(err)
                     cb(null,res)
                 })
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     avalonPostToModify = post
                                 }
                             })
-                            else if (ref[0] === 'hive' && !isHive) hivejs.api.getContent(ref[1],ref[2],(err,post) => {
+                            else if (ref[0] === 'hive' && !isHive) hive.api.getContent(ref[1],ref[2],(err,post) => {
                                 if (err) return alert('Error while getting associated Hive post: ' + JSON.stringify(err))
                                 if (post.author !== username) {
                                     alert('Looks like you\'re logged in with a Hive account that doesn\'nt correspond with the author of the associated Hive post.')
@@ -203,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         steemPostToModify = post
                         console.log(steemPostToModify)
                     })
-                    else if (ref[0] === 'hive') hivejs.api.getContent(ref[1],ref[2],(err,post) => {
+                    else if (ref[0] === 'hive') hive.api.getContent(ref[1],ref[2],(err,post) => {
                         if (err) return alert('Error while getting associated Hive post: ' + JSON.stringify(err))
                         hivePostToModify = post
                     })
@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     jsonmeta.video.files.ipfs.img[118] = newSnapHash
                     jsonmeta.video.files.ipfs.img[360] = newSnapHash
                 }
-                jsonmeta.app = 'onelovedtube/1.0'
+                jsonmeta.app = 'onelovedtube/1.0.1'
 
                 // Edit Steem article body
                 let oldSnapLink = steemPostToModify.body.match(/\bhttps?:\/\/\S+/gi)[1].replace('\'></a></center><hr>','')
@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     jsonmeta.video.files.ipfs.img[118] = newSnapHash
                     jsonmeta.video.files.ipfs.img[360] = newSnapHash
                 }
-                jsonmeta.app = 'onelovedtube/1.0'
+                jsonmeta.app = 'onelovedtube/1.0.1'
 
                 // Edit Steem article body
                 let oldSnapLink = steemPostToModify.body.match(/\bhttps?:\/\/\S+/gi)[1].replace('\'></a></center><hr>','')
@@ -390,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     jsonAvalon.files.ipfs.img[118] = newSnapHash
                     jsonAvalon.files.ipfs.img[360] = newSnapHash
                 }
-                jsonAvalon.app = 'onelovedtube/1.0'
+                jsonAvalon.app = 'onelovedtube/1.0.1'
 
                 let avalonSwapTx = {
                     type: 4,
