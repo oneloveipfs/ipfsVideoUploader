@@ -16,7 +16,8 @@
         "callbackURL": "https://uploader.oneloved.tube/upload",
         "tusdEndpoint": "http://localhost:1080/files",
         "disabled": false,
-        "disabledMessage": ""
+        "disabledMessage": "",
+        "disabledMeme": "brbmeme.jpg"
     },
 
     "Skynet": {

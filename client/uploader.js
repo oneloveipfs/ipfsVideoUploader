@@ -6,7 +6,6 @@ Auth.Hive().then((result) => {
 })
 
 hivejs.api.setOptions({ url: 'https://api.hive.blog' })
-javalon.init({api: 'https://avalon.oneloved.tube'})
 
 // Setup subtitles tab
 const allLangCodes = languages.getAllLanguageCode()
@@ -89,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (config.disabled) {
             document.getElementById('disabledText').innerText = config.disabledMessage
+            document.getElementById('disabledImg').src = 'public/memes/' + config.disabledMeme
             updateDisplayByIDs(['disabledPage'],['uploadForm','modeBtn'])
         }
     })
