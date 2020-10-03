@@ -9,11 +9,6 @@ let selectedAuthor
 let selectedPermlink
 
 document.addEventListener('DOMContentLoaded', () => {
-    let uploader = document.getElementById('uploadForm')
-    let thumbnailSwapper = document.getElementById('thumbnailSwapper')
-    let wcinfo = document.getElementById('wcinfo')
-    let refiller = document.getElementById('refiller')
-
     document.getElementById('modeBtn').onclick = () => {
         if (document.getElementById("dropdownbox").style.display === 'block')
             document.getElementById("dropdownbox").style.display = 'none'
@@ -31,37 +26,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('dropdownArrow').style.borderWidth = '0 3px 3px 0'
     }
 
-    document.getElementById('newUploadModeBtn').onclick = () => {
-        uploader.style.display = 'block'
-        thumbnailSwapper.style.display = 'none'
-        wcinfo.style.display = 'none'
-        refiller.style.display = 'none'
-        document.getElementById("dropdownbox").style.display = 'none'
-    }
-
-    document.getElementById('snapSwapModeBtn').onclick = () => {
-        uploader.style.display = 'none'
-        thumbnailSwapper.style.display = 'block'
-        wcinfo.style.display = 'none'
-        refiller.style.display = 'none'
-        document.getElementById("dropdownbox").style.display = 'none'
-    }
-
-    document.getElementById('subDetModeBtn').onclick = () => {
-        uploader.style.display = 'none'
-        thumbnailSwapper.style.display = 'none'
-        wcinfo.style.display = 'block'
-        refiller.style.display = 'none'
-        document.getElementById("dropdownbox").style.display = 'none'
-    }
-
-    document.getElementById('refillCrModeBtn').onclick = () => {
-        uploader.style.display = 'none'
-        thumbnailSwapper.style.display = 'none'
-        wcinfo.style.display = 'none'
-        refiller.style.display = 'block'
-        document.getElementById("dropdownbox").style.display = 'none'
-    }
+    // Menu selection
+    document.getElementById('newUploadModeBtn').onclick = () => updateDisplayByIDs(['uploadForm'],['thumbnailSwapper','wcinfo','refiller','getHelp','dropdownbox'])
+    document.getElementById('snapSwapModeBtn').onclick = () => updateDisplayByIDs(['thumbnailSwapper'],['uploadForm','wcinfo','refiller','getHelp','dropdownbox'])
+    document.getElementById('subDetModeBtn').onclick = () => updateDisplayByIDs(['wcinfo'],['uploadForm','thumbnailSwapper','refiller','getHelp','dropdownbox'])
+    document.getElementById('refillCrModeBtn').onclick = () => updateDisplayByIDs(['refiller'],['uploadForm','thumbnailSwapper','wcinfo','getHelp','dropdownbox'])
+    document.getElementById('getHelpModeBtn').onclick = () => updateDisplayByIDs(['getHelp'],['uploadForm','thumbnailSwapper','wcinfo','refiller','dropdownbox'])
 
     document.getElementById('linkSubmitBtn').onclick = () => {
         let linkInput = document.getElementById('thumbnailSwapLink')

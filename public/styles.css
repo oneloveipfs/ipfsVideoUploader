@@ -178,7 +178,7 @@ a {
     margin-block-end: 0.5em;
 }
 
-#uploadForm, #thumbnailSwapper, #wcinfo, #refillnotify, #refiller, #needsrefillnotify, #disabledPage {
+#uploadForm, #thumbnailSwapper, #wcinfo, #refillnotify, #refiller, #getHelp, #needsrefillnotify, #disabledPage {
     margin-left: auto;
     margin-right: auto;
     width: 700px;
@@ -539,15 +539,7 @@ textarea {
     width: 220px;
 }
 
-#newSnapField {
-    display: none;
-}
-
-#swapSubmitBtn {
-    display: none;
-}
-
-#wcinfo, #refiller {
+#newSnapField, #swapSubmitBtn, #wcinfo, #refiller, #getHelp {
     display: none;
 }
 
@@ -556,8 +548,24 @@ textarea {
     text-align: center;
 }
 
-#refiller h2 {
+#refiller h2, #getHelp h2 {
     font-size: 25px;
+}
+
+/* Get help page */
+#getHelp h4 a { color: #000000; }
+#getHelp h4 a:visited { color: #000000; }
+#getHelp h4 a:hover { color: #000000; }
+#getHelp h4 a:active { color: #000000; }
+
+.authorizeBtn {
+    margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+}
+
+#avalonAuthorizeBtn, #hiveAuthorizeBtn, #steemAuthorizeBtn {
+    display: none;
 }
 
 /* Welcome page only */
@@ -940,7 +948,7 @@ td {
         font-size: 15px;
     }
 
-    #uploadForm, #thumbnailSwapper, #wcinfo, #refillnotify, #refiller, #needsrefillnotify, #disabledPage {
+    #uploadForm, #thumbnailSwapper, #wcinfo, #refillnotify, #refiller, #getHelp, #needsrefillnotify, #disabledPage {
         margin-left: 15px;
         margin-right: 25px;
         width: auto;

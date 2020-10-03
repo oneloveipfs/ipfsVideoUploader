@@ -6,7 +6,7 @@ Auth.Hive().then((result) => {
 })
 
 let hiveOptions = {
-    url: 'https://api.hive.blog',
+    url: 'https://hived.techcoderx.com',
     useAppbaseApi: true,
     rebranded_api: true,
 }
@@ -81,18 +81,7 @@ uplStat.on('result',(r) => {
 let config;
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Hide Avalon first curated tag info if not logged in with Avalon
-    if (!avalonUser || !avalonKey) {
-        document.getElementById('tagInfo1').style.display = 'none'
-    } else {
-        javalon.getAccount(avalonUser,(err,acc) => {
-            if (err) return
-            document.getElementById('dtcBurnInput').placeholder = 'Available: ' + thousandSeperator(acc.balance / 100) + ' DTC'
-            window.availableForBurn = acc.balance / 100
-        })
-    }
-
-    // Get configuration
+    // Get configuration, then load accounts and authorities
     axios.get('/config').then((result) => {
         config = result.data
 
@@ -101,9 +90,32 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('disabledImg').src = 'public/memes/' + config.disabledMeme
             updateDisplayByIDs(['disabledPage'],['uploadForm','modeBtn'])
         }
+
+        // Hide Avalon first curated tag info if not logged in with Avalon
+        if (!avalonUser || !avalonKey) {
+            document.getElementById('tagInfo1').style.display = 'none'
+        } else {
+            javalon.getAccount(avalonUser,(err,acc) => {
+                if (err) return
+                document.getElementById('dtcBurnInput').placeholder = 'Available: ' + thousandSeperator(acc.balance / 100) + ' DTC'
+                window.availableForBurn = acc.balance / 100
+                loadAvalonAuthorityStatus(acc)
+            })
+        }
+
+        if (steemUser) steem.api.getAccounts([steemUser],(e,acc) => {
+            if (e) return
+            loadGrapheneAuthorityStatus(acc[0],'steem')
+        })
+
+        hive.api.setOptions(hiveOptions)
+        if (!dtconly) hive.api.getAccounts([username],(e,acc) => {
+            if (e) return
+            loadGrapheneAuthorityStatus(acc[0],'hive')
+        })
     })
 
-    // Display warning if resumable uploads is unavailable
+    // TODO: Display warning if resumable uploads is unavailable
     if (tus.isSupported) {
         console.log('tus is supported')
     } else {
