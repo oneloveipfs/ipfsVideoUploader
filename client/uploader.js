@@ -546,7 +546,7 @@ function postVideo() {
         // Broadcast with Keychain
         hive_keychain.requestBroadcast(username,hiveTx,'Posting',(hiveResponse) => {
             if (hiveResponse.error) {
-                alert('Failed to post on DTube: ' + hiveResponse.error)
+                alert('Hive Keychain error: ' + hiveResponse.message)
                 progressbar.style.display = "none"
                 return reenableFields()
             }
@@ -561,7 +561,7 @@ function postVideo() {
                     if (steemUser) {
                         progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
                         steem_keychain.requestBroadcast(steemUser,steemTx,'Posting',(steemResponse) => {
-                            if (steemResponse.error) alert('Posted to Hive and Avalon blockchains successfully but failed to post to Steem: ' + steemResponse.error)
+                            if (steemResponse.error) alert('Posted to Hive and Avalon blockchains successfully but failed to post to Steem: ' + steemResponse.message)
                             broadcastCompletion(true)
                         })
                     } else broadcastCompletion(true)
@@ -569,7 +569,7 @@ function postVideo() {
             } else if (steemUser) {
                 progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
                 steem_keychain.requestBroadcast(steemUser,steemTx,'Posting',(steemResponse) => {
-                    if (steemResponse.error) alert('Posted to Hive blockchain successfully but failed to post to Steem: ' + steemResponse.error)
+                    if (steemResponse.error) alert('Posted to Hive blockchain successfully but failed to post to Steem: ' + steemResponse.message)
                     broadcastCompletion(false)
                 })
             } else broadcastCompletion(false)
@@ -583,7 +583,7 @@ function postVideo() {
         })
         hiveapi.broadcast(hiveTx,(err) => {
             if (err) {
-                alert('Failed to post on DTube: ' + JSON.stringify(err))
+                alert('HiveSigner error: ' + JSON.stringify(err))
                 progressbar.style.display = "none"
                 reenableFields()
             } else if (avalonUser) {
