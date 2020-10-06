@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (err) return
                 document.getElementById('dtcBurnInput').placeholder = 'Available: ' + thousandSeperator(acc.balance / 100) + ' DTC'
                 window.availableForBurn = acc.balance / 100
+                window.availableAvalonBw = acc.bw
                 loadAvalonAuthorityStatus(acc)
             })
         }
@@ -190,6 +191,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (tag.length == 0)
             return alert('Please enter some tags (up to 7) for your video!')
         postparams.tags = tags
+
+        // Avalon bandwidth check
+        if (avalonUser && avalonKey && needsBandwidth())
+            return alert('You need about ' + needsBandwidth() + ' additional bytes in your Avalon account to post this video.')
 
         // Auth.restrict()
 
@@ -859,6 +864,66 @@ function broadcastCompletion(isAvalonSuccess) {
         window.location.replace('https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash)
     else
         window.location.replace('https://d.tube/v/' + username + '/' + postparams.permlink)
+}
+
+function estimatedBandwidth() {
+    let bytes = 710 // base tx size including signatures
+
+    // skynet uploads require more bytes for additional skylinks
+    let skylinkBytes = 0
+    if (document.getElementById('skynetupload').checked)
+        skylinkBytes = 70
+
+    // additional encoded versions require +55 bytes/res
+    let encodedVidInputs = ['video240p','video480p','video720p','video1080p']
+    for (let i = 0; i < encodedVidInputs.length; i++) {
+        if (document.getElementById(encodedVidInputs[i]).files.length != 0) {
+            bytes += 55
+            if (skylinkBytes > 0) skylinkBytes += 55
+        }
+    }
+
+    bytes += skylinkBytes
+
+    // see which networks we are broadcasting to, assuming we are logged in with Avalon to be relevent
+    let hasHive = dtconly != 'true'
+    let hasSteem = steemUser ? true : false
+
+    bytes += avalonUser.length // base + username length
+
+    // tags
+    let tag = document.getElementById('tags').value.split(' ')
+    bytes += 2 * (tag[0].length)
+
+    // refs
+    if (hasHive)
+        bytes += 16 + username.length
+    if (hasSteem)
+        bytes += 17 + steemUser.length
+    if (hasHive && hasSteem)
+        bytes += 1
+
+    // other video metadata (e.g. duration, title, description)
+    bytes += 11 // duration
+    bytes += document.getElementById('title').value.length
+    bytes += document.getElementById('description').value.length
+
+    // vp and burn
+    bytes += 10 // estimated 10 digit VP to be safe
+
+    let burnAmt = document.getElementById('dtcBurnInput').value ? Math.floor(parseFloat(document.getElementById('dtcBurnInput').value) * 100) : 0
+    if (burnAmt != 0)
+        bytes += burnAmt.toString().length + 8
+
+    return bytes
+}
+
+function needsBandwidth() {
+    let currentBw = javalon.bandwidth({ bw: window.availableAvalonBw, balance: availableForBurn * 100 })
+    if (currentBw > estimatedBandwidth())
+        return false
+    else
+        return estimatedBandwidth() - currentBw
 }
 
 function beneficiarySorter (a,b) {
