@@ -192,9 +192,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return alert('Please enter some tags (up to 7) for your video!')
         postparams.tags = tags
 
-        // Avalon bandwidth check
-        if (avalonUser && avalonKey && needsBandwidth())
-            return alert('You need about ' + needsBandwidth() + ' additional bytes in your Avalon account to post this video.')
+        // Avalon bandwidth check (untested)
+        // if (avalonUser && avalonKey && needsBandwidth())
+        //     return alert('You need approximately ' + needsBandwidth() + ' additional bytes in your Avalon account to post this video.')
 
         // Auth.restrict()
 
