@@ -736,8 +736,8 @@ function generatePost(network) {
         [ "comment_options", {
             author: username,
             permlink: postparams.permlink,
-            max_accepted_payout: '1000000.000 SBD',
-            percent_steem_dollars: percentSBD,
+            max_accepted_payout: '1000000.000 HBD',
+            percent_hbd: percentSBD,
             allow_votes: true,
             allow_curation_rewards: true,
             extensions: []
@@ -748,13 +748,6 @@ function generatePost(network) {
         operations[1][1].extensions.push([0, {
             beneficiaries: sortedBeneficiary
         }])
-
-    // Hive HF24 "eclipse"
-    if (network == 'hive' && hive.config.rebranded_api) {
-        operations[1][1].percent_hbd = percent_steem_dollars
-        delete operations[1][1].percent_steem_dollars
-        operations[1][1].max_accepted_payout = '1000000.000 HBD'
-    }
 
     return operations
 }
