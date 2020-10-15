@@ -749,6 +749,12 @@ function generatePost(network) {
             beneficiaries: sortedBeneficiary
         }])
 
+    if (network == 'steem') {
+        operations[1][1].max_accepted_payout = '1000000.000 SBD'
+        operations[1][1].percent_steem_dollars = percentSBD
+        delete operations[1][1].percent_hbd
+    }
+
     return operations
 }
 
