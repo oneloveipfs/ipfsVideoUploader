@@ -11,11 +11,7 @@ let hiveOptions = {
     rebranded_api: true,
 }
 
-hive.utils.autoDetectApiVersion().then((r) => {
-    hiveOptions.rebranded_api = r.rebranded_api
-    hive.api.setOptions(hiveOptions)
-    hive.broadcast.updateOperations()
-})
+hive.api.setOptions(hiveOptions)
 
 // Setup subtitles tab
 const allLangCodes = languages.getAllLanguageCode()
