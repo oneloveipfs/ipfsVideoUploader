@@ -144,7 +144,7 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
 }
 
 document.getElementById('altAuthBtn').onclick = () => {
-    // HiveSigner login (plus SteemConnect dual?)
+    // HiveSigner login (plus SteemLogin dual?)
     let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
     let avalonKey = document.getElementById('avalonLoginKey').value
 

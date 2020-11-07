@@ -49,8 +49,8 @@ These API calls will only be enabled if `WooCommerceEnabled` is set to `true` in
 /wc_user_info?access_token=AUTH_TOKEN
 ```
 
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or SteemConnect login access token.
-* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a SteemConnect access token.
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 
 # POST API
 
@@ -73,8 +73,8 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 * `UPLOAD_TYPE` *(required)*: Kind of image to upload. Valid values:
     - `images` -> Treats the image file as a photo that is part of Steem article body.
     - `thumbnails` -> Treats the image file as the thumbnail of a video.
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or SteemConnect login access token.
-* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a SteemConnect access token.
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 * Content type: multipart/form-data
 * File input: `image`
 * Output data example:
@@ -91,8 +91,8 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 /uploadSubtitle?access_token=AUTH_TOKEN
 ```
 
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or SteemConnect login access token.
-* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a SteemConnect access token.
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 * Content type: text/plain
 * Text input must be a valid WebVTT subtitles or else it will return an error.
 * Output data example:

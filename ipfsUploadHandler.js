@@ -79,12 +79,10 @@ function trimTrailingSlash(str) {
 function processSingleVideo(id,user,network,cb) {
     let vpath = Config.tusdUploadDir + '/' + id
     if (!fs.existsSync(vpath)) return cb({ error: 'Could not find upload' })
-    Shell.exec('./scripts/dtube-sprite.sh ' + vpath + ' uploaded/' + id + '.jpg',() => addFile('uploaded/' + id + '.jpg',true,false,(hash) => fs.stat('uploaded/' + id + '.jpg',(err,stat) => {
-        !err ? db.recordUsage(user,network,'sprites',stat['size']) 
-            : console.log('Error getting sprite filesize: ' + err)
-        
-        db.writeUsageData()
+    Shell.exec('./scripts/dtube-sprite.sh ' + vpath + ' uploaded/' + id + '.jpg',() => addFile('uploaded/' + id + '.jpg',true,false,(size,hash) => {
+        db.recordUsage(user,network,'sprites',size)
         db.recordHash(user,network,'videos',hash)
+        db.writeUsageData()
         db.writeHashesData()
 
         getDuration(vpath).then((duration) => {
@@ -100,7 +98,7 @@ function processSingleVideo(id,user,network,cb) {
             uploadRegister[id] = result
             cb(result)
         })
-    })))
+    }))
 }
 
 let uploadOps = {
