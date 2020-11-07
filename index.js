@@ -334,15 +334,7 @@ app.post('/shawp_refill_coinbase_webhook',Parser.json({ verify: rawBodySaver }),
 })
 
 app.post('/botusage',Parser.json(),(req,res) => {
-    if (!Config.WooCommerceEnabled || Config.Shawp.Enabled) return res.status(404).end()
-    Auth.webhookAuth(req.body.token,(err,valid) => {
-        if (err || valid == false) return res.status(403).send('Failed to verify webhook.')
-        res.status(200).send()
-        if (WC.UserExists(req.body.username)) {
-            WC.UpdateBotUsage(req.body.username,req.body.size)
-            WC.WriteWCUserData()
-        }
-    })
+    return res.status(500).send({error: 'WIP'})
 })
 
 // WooCommerce API calls

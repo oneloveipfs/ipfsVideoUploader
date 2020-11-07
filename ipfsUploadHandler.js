@@ -23,18 +23,13 @@ let uploadRegister = JSON.parse(fs.readFileSync('db/register.json','utf8'))
 let socketRegister = {}
 
 const ipfsAPI = IPFS({ host: 'localhost', port: '5001', protocol: 'http' })
-const upload = Multer({ dest: './uploaded/' })
 const imgUpload = Multer({ dest: './imguploads/', limits: { fileSize: 7340032 } })
 const { globSource } = IPFS
 
 async function addFile(dir,trickle,skynetpin,callback) {
-    let ipfsAdd = ipfsAPI.add(globSource(dir, {recursive: true}), { trickle: trickle })
-    let hash
-
-    for await (const file of ipfsAdd) {
-        hash = file.cid.toString()
-        break
-    }
+    let ipfsAdd = await ipfsAPI.add(globSource(dir, {recursive: true}), { trickle: trickle })
+    let hash = ipfsAdd.cid.toString()
+    let size = ipfsAdd.size
 
     if (skynetpin) {
         try {
@@ -44,16 +39,16 @@ async function addFile(dir,trickle,skynetpin,callback) {
                 portalFileFieldname: Config.Skynet.portalFileFieldname,
                 customFilename: hash + '.mp4'
             })
-            console.log('Added',hash,skylink)
-            callback(hash,skylink)
+            console.log('Added',size,hash,skylink)
+            callback(size,hash,skylink)
         } catch (e) {
             console.log('Skynet upload error',e.response.data)
-            console.log('Added',hash)
-            callback(hash)
+            console.log('Added',size,hash)
+            callback(size,hash)
         }
     } else {
-        console.log('Added',hash)
-        callback(hash)
+        console.log('Added',size,hash)
+        callback(size,hash)
     }
 }
 
@@ -121,7 +116,7 @@ let uploadOps = {
             if (err) return response.status(400).send({error: err})
             if (!request.file) return response.status(400).send({error: 'No files have been uploaded.'})
             let uploadedImg = request.file.filename
-            addFile('imguploads/' + uploadedImg,trickleDagAdd,false,(hash) => {
+            addFile('imguploads/' + uploadedImg,trickleDagAdd,false,(size,hash) => {
                 if (Config.UsageLogs) {
                     // Log usage data for image uploads
                     db.recordUsage(username,network,imgType,request.file.size)
@@ -182,11 +177,11 @@ let uploadOps = {
             case 'videos':
                 let ipfsops = {
                     videohash: (cb) => {
-                        addFile(filepath,true,Config.Skynet.enabled && json.Upload.MetaData.skynet == 'true',(hash,skylink) => cb(null,{ipfshash: hash, skylink: skylink}))
+                        addFile(filepath,true,Config.Skynet.enabled && json.Upload.MetaData.skynet == 'true',(size,hash,skylink) => cb(null,{ipfshash: hash, skylink: skylink, size: size}))
                     },
                     spritehash: (cb) => {
                         Shell.exec('./scripts/dtube-sprite.sh ' + filepath + ' uploaded/' + json.Upload.ID + '.jpg',() => {
-                            addFile('uploaded/' + json.Upload.ID + '.jpg',true,false,(hash) => cb(null,hash))
+                            addFile('uploaded/' + json.Upload.ID + '.jpg',true,false,(size,hash) => cb(null,{size: size, hash: hash}))
                         })
                     }
                 }
@@ -194,16 +189,14 @@ let uploadOps = {
                 async.parallel(ipfsops,(errors,results) => {
                     if (errors) console.log(errors)
                     console.log(results)
-                    if (Config.UsageLogs) fs.stat('uploaded/' + json.Upload.ID + '.jpg',(err,stat) => {
+                    if (Config.UsageLogs) {
                         db.recordUsage(user,network,'videos',json.Upload.Size)
-                        !err ? db.recordUsage(user,network,'sprites',stat['size']) 
-                            : console.log('Error getting sprite filesize: ' + err)
-                        
+                        db.recordUsage(user,network,'sprites',results.spritehash.size) 
                         db.writeUsageData()
-                    })
+                    }
 
                     db.recordHash(user,network,'videos',results.videohash.ipfshash)
-                    db.recordHash(user,network,'sprites',results.spritehash)
+                    db.recordHash(user,network,'sprites',results.spritehash.hash)
                     db.writeHashesData()
 
                     if (results.videohash.skylink) {
@@ -217,7 +210,7 @@ let uploadOps = {
                             network: network,
                             type: 'videos',
                             ipfshash: results.videohash.ipfshash,
-                            spritehash: results.spritehash,
+                            spritehash: results.spritehash.hash,
                             skylink: results.videohash.skylink,
                             duration: videoDuration,
                             filesize: json.Upload.Size
@@ -235,7 +228,7 @@ let uploadOps = {
             case 'video480':
             case 'video720':
             case 'video1080':
-                addFile(filepath,true,Config.Skynet.enabled && json.Upload.MetaData.skynet == 'true',(hash,skylink) => {
+                addFile(filepath,true,Config.Skynet.enabled && json.Upload.MetaData.skynet == 'true',(size,hash,skylink) => {
                     if (Config.UsageLogs) {
                         db.recordUsage(user,network,json.Upload.MetaData.type,json.Upload.Size)
                         db.writeUsageData()

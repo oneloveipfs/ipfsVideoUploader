@@ -137,7 +137,7 @@ let Shawp = {
             })
         }
     },
-    AddUser: (username,network) => {
+    AddUser: (username,network,nowrite) => {
         let fullusername = db.toFullUsername(username,network)
         if (Customers[fullusername]) return
         Customers[fullusername] = {
@@ -145,7 +145,7 @@ let Shawp = {
             balance: 0,
             joinedSince: new Date().getTime()
         }
-        require('./authManager').whitelistAdd(username,network,() => {},true)
+        require('./authManager').whitelistAdd(username,network,() => {},nowrite)
     },
     User: (fullusername) => {
         let username,network

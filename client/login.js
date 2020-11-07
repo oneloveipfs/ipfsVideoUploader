@@ -255,7 +255,7 @@ function keychainCb(encrypted_message,steemUser,dtconly) {
 
 async function avalonLogin(avalonUsername,avalonKey,dtconly) {
     if (avalonUsername !== '' && avalonKey !== '') {
-        let avalonKeyId = ''
+        let avalonKeyId
         let avalonLoginPromise = new Promise((resolve,reject) => {
             javalon.getAccount(avalonUsername,(err,result) => {
                 if (err) return reject(err)

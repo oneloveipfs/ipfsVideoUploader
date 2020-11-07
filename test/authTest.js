@@ -33,7 +33,7 @@ describe('Auth',() => {
         Auth.whitelistAdd(user,'all',() => {
             assert.equal(Auth.isInWhitelist(user,'all'),true)
             done()
-        })
+        },true)
     })
 
     it('generateJWT should return a valid JWT token',function (done) {
@@ -43,11 +43,12 @@ describe('Auth',() => {
                 assert.isObject(result)
                 assert.equal(result.user,user)
                 assert.equal(result.app,app)
+                assert.equal(result.network,'all')
                 assert.isBelow(result.exp,Date.now())
                 done()
             })
         })
-    }) 
+    })
 })
 
 Auth.stopWatchingOnWhitelist()

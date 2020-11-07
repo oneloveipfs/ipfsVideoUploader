@@ -14,10 +14,9 @@
   "author": "techcoderx",
   "license": "GPLv3",
   "dependencies": {
-    "@hiveio/hive-js": "0.8.4",
+    "@hiveio/hive-js": "0.8.10",
     "async": "^3.2.0",
     "axios": "^0.19.2",
-    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "coinbase-commerce-node": "^1.0.4",
     "cors": "^2.8.5",
@@ -27,8 +26,9 @@
     "form-data": "^3.0.0",
     "fs": "0.0.1-security",
     "get-video-duration": "^0.3.0",
+    "hivesigner": "^3.2.1",
     "http": "0.0.1-security",
-    "ipfs-http-client": "^44.0.1",
+    "ipfs-http-client": "^47.0.0",
     "javalon": "^1.0.24",
     "jsonwebtoken": "^8.5.1",
     "mime-types": "^2.1.27",
@@ -39,7 +39,6 @@
     "snyk": "^1.381.1",
     "socket.io": "^2.3.0",
     "steem": "^0.7.11",
-    "steemconnect": "^2.0.1",
     "woocommerce-api": "^1.5.0"
   },
   "devDependencies": {

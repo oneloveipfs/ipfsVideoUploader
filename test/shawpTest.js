@@ -42,7 +42,7 @@ describe('Shawp',() => {
     })
 
     it('Shawp.AddUser should register a new customer',(done) => {
-        Shawp.AddUser(Config.test.user,'all')
+        Shawp.AddUser(Config.test.user,'all',true)
         assert.equal(Shawp.UserExists(Config.test.user),true)
 
         let currentUser = Shawp.User(Config.test.user)

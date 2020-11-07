@@ -1,8 +1,7 @@
 const Hive = require('@hiveio/hive-js')
 const Avalon = require('javalon')
-const SteemConnect = require('steemconnect')
+const HiveSigner = require('hivesigner')
 const JWT = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
 const Crypto = require('crypto-js')
 const fs = require('fs')
 const Keys = require('./.auth.json')
@@ -68,7 +67,7 @@ let auth = {
             } else
                 pubKey = avalonAcc.pub // Master key
             
-            Avalon.encrypt(pubKey,encrypted_message,Keys.wifAvalonMessage,(err,encrypted) => {
+            Avalon.encrypt(pubKey,encrypted_message,Keys.avalonKeypair.priv,(err,encrypted) => {
                 if (err) return cb(err)
                 cb(null,encrypted)
             })
@@ -110,7 +109,7 @@ let auth = {
     },
     scAuth: (access_token,needscredits,cb) => {
         if (!access_token) return cb('Missing access token')
-        let scapi = SteemConnect.Initialize({ accessToken: access_token })
+        let scapi = new HiveSigner.Client({ accessToken: access_token })
         scapi.me((err,result) => {
             if (err) return cb(err)
             if (!auth.isInWhitelist(result.user,'hive'))
@@ -177,11 +176,7 @@ let auth = {
             }
     },
     webhookAuth: (token,cb) => {
-        // For custom webhooks
-        bcrypt.compare(token,Keys.customwebhooktoken,(err,result) => {
-            if (err) cb(err)
-            else cb(null,result)
-        })
+        // TODO: Update for new bot webhook system
     },
     stopWatchingOnWhitelist: () => {
         // For unit testing only
