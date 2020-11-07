@@ -95,7 +95,7 @@ let auth = {
             if (err != null)
                 cb('Login error: ' + err)
             else if (Config.whitelistEnabled === true) {
-                if (!whitelist.includes(result.user))
+                if (!auth.isInWhitelist(result.user,result.network))
                     return cb('Looks like you do not have access to the uploader!')
                 if (Config.Shawp.Enabled && needscredits) {
                     let daysRemaining = Shawp.getDaysRemaining(result.user,result.network)

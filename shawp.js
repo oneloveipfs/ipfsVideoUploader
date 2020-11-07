@@ -166,7 +166,8 @@ let Shawp = {
 
         return res
     },
-    UserExists: (fullusername) => {
+    UserExists: (username,network) => {
+        let fullusername = db.toFullUsername(username,network)
         if (!Customers[fullusername]) return false
         else return true
     },

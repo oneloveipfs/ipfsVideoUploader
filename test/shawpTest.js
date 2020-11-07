@@ -2,7 +2,7 @@ const assert = require('chai').assert
 const Shawp = require('../shawp')
 const Config = require('../config.json')
 
-let userAlreadyExist = Shawp.UserExists(Config.test.user)
+let userAlreadyExist = Shawp.UserExists(Config.test.user,'all')
 
 describe('Shawp',() => {
     it('Shawp.ExchangeRate should return USD price of HIVE',(done) => {
@@ -49,6 +49,20 @@ describe('Shawp',() => {
         if (!userAlreadyExist) assert.equal(currentUser.rate,Config.Shawp.DefaultUSDRate)
         if (!userAlreadyExist) assert.equal(currentUser.balance,0)
         assert.typeOf(currentUser.joinedSince,'number')
+        done()
+    })
+
+    it('Shawp.AddUser with network should only add user to network specific whitelist',(done) => {
+        Shawp.AddUser(Config.test.dtcUser+'2','dtc',true)
+        assert.isTrue(Shawp.UserExists(Config.test.dtcUser+'2','dtc'))
+        assert.isFalse(Shawp.UserExists(Config.test.dtcUser+'2','hive'))
+        assert.isFalse(Shawp.UserExists(Config.test.dtcUser+'2'))
+
+        Shawp.AddUser(Config.test.hiveUser+'2','hive',true)
+        assert.isTrue(Shawp.UserExists(Config.test.hiveUser+'2','hive'))
+        assert.isFalse(Shawp.UserExists(Config.test.hiveUser+'2','dtc'))
+        assert.isFalse(Shawp.UserExists(Config.test.hiveUser+'2'))
+
         done()
     })
 

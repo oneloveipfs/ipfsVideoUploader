@@ -26,8 +26,10 @@ const ipfsAPI = IPFS({ host: 'localhost', port: '5001', protocol: 'http' })
 const imgUpload = Multer({ dest: './imguploads/', limits: { fileSize: 7340032 } })
 const { globSource } = IPFS
 
-async function addFile(dir,trickle,skynetpin,callback) {
-    let ipfsAdd = await ipfsAPI.add(globSource(dir, {recursive: true}), { trickle: trickle })
+async function addFile(dir,trickle,skynetpin,callback,onlyHash) {
+    let opts = { trickle: trickle, cidVersion: 0 }
+    if (onlyHash) opts.onlyHash = true
+    let ipfsAdd = await ipfsAPI.add(globSource(dir, {recursive: true}), opts)
     let hash = ipfsAdd.cid.toString()
     let size = ipfsAdd.size
 
@@ -342,7 +344,9 @@ let uploadOps = {
         activeCount: () => {
             return usercount
         }
-    }
+    },
+    // For unit tests
+    addFile
 }
 
 module.exports = uploadOps

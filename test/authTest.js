@@ -29,7 +29,7 @@ describe('Auth',() => {
         done()
     })
 
-    it ('whitelistAdd() should add new user to whitelist',function(done) {
+    it('whitelistAdd should add new user to whitelist',function(done) {
         Auth.whitelistAdd(user,'all',() => {
             assert.equal(Auth.isInWhitelist(user,'all'),true)
             done()
@@ -48,6 +48,78 @@ describe('Auth',() => {
                 done()
             })
         })
+    })
+
+    it('Adding user to Avalon specific whitelist should not whitelist user for other networks',function (done) {
+        Auth.whitelistAdd(Config.test.dtcUser,'dtc',() => {
+            assert.isTrue(Auth.isInWhitelist(Config.test.dtcUser,'dtc'))
+            assert.isFalse(Auth.isInWhitelist(Config.test.dtcUser,'hive'))
+            assert.isFalse(Auth.isInWhitelist(Config.test.dtcUser,null))
+            done()
+        })
+    })
+
+    it('Adding user to Hive specific whitelist should not whitelist user for other networks',function (done) {
+        Auth.whitelistAdd(Config.test.hiveUser,'hive',() => {
+            assert.isTrue(Auth.isInWhitelist(Config.test.hiveUser,'hive'))
+            assert.isFalse(Auth.isInWhitelist(Config.test.hiveUser,'dtc'))
+            assert.isFalse(Auth.isInWhitelist(Config.test.hiveUser,null))
+            done()
+        })
+    })
+
+    it('Avalon only user should only be authenticatable with the correct network',function (done) {
+        Auth.generateJWT(Config.test.dtcUser,'dtc',(e,token) => Auth.verifyAuth(token,false,(verifyError,result) => {
+            assert.notExists(verifyError)
+            assert.equal(result.network,'dtc')
+
+            // Other networks should fail
+            let completed = [false,false]
+            function testResults() {
+                if (completed[0] !== false && completed[1] !== false) {
+                    assert.exists(completed[0])
+                    assert.exists(completed[1])
+                    done()
+                }
+            }
+
+            Auth.generateJWT(Config.test.dtcUser,'hive',(e,hiveToken) => Auth.verifyAuth(hiveToken,false,(hiveVerifyError) => {
+                completed[0] = hiveVerifyError
+                testResults()
+            }))
+
+            Auth.generateJWT(Config.test.dtcUser,'all',(e,allToken) => Auth.verifyAuth(allToken,false,(allVerifyError) => {
+                completed[1] = allVerifyError
+                testResults()
+            }))
+        }))
+    })
+
+    it('Hive only user should only be authenticatable with the correct network',function (done) {
+        Auth.generateJWT(Config.test.hiveUser,'hive',(e,token) => Auth.verifyAuth(token,false,(verifyError,result) => {
+            assert.notExists(verifyError)
+            assert.equal(result.network,'hive')
+
+            // Other networks should fail
+            let completed = [false,false]
+            function testResults() {
+                if (completed[0] !== false && completed[1] !== false) {
+                    assert.exists(completed[0])
+                    assert.exists(completed[1])
+                    done()
+                }
+            }
+
+            Auth.generateJWT(Config.test.hiveUser,'dtc',(e,dtcToken) => Auth.verifyAuth(dtcToken,false,(dtcVerifyError) => {
+                completed[0] = dtcVerifyError
+                testResults()
+            }))
+
+            Auth.generateJWT(Config.test.hiveUser,'all',(e,allToken) => Auth.verifyAuth(allToken,false,(allVerifyError) => {
+                completed[1] = allVerifyError
+                testResults()
+            }))
+        }))
     })
 })
 
