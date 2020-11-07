@@ -11,8 +11,7 @@ let possibleTypes = ['videos','thumbnails','sprites','images','video240','video4
 let db = {
     // Check if user exist in hashes db
     userExistInHashesDB: (username,network,cb) => {
-        let fullusername = username
-        if (network && network != 'all') fullusername += '@' + network
+        let fullusername = db.toFullUsername(username,network)
         if (!hashes.hasOwnProperty(fullusername)) {
             cb(false)
         } else {
@@ -27,8 +26,7 @@ let db = {
     },
     // Log usage data and IPFS hashes
     recordUsage: (username,network,type,size) => {
-        let fullusername = username
-        if (network && network != 'all') fullusername += '@' + network
+        let fullusername = db.toFullUsername(username,network)
         if (!usageData[fullusername]) {
             // New user?
             usageData[fullusername] = {}
@@ -41,8 +39,7 @@ let db = {
         }
     },
     recordHash: (username,network,type,hash) => {
-        let fullusername = username
-        if (network && network != 'all') fullusername += '@' + network
+        let fullusername = db.toFullUsername(username,network)
         if (!hashes[fullusername]) {
             hashes[fullusername] = {
                 videos: [],
@@ -60,8 +57,7 @@ let db = {
             hashes[fullusername][type].push(hash)
     },
     recordSkylink: (username,network,type,skylink) => {
-        let fullusername = username
-        if (network && network != 'all') fullusername += '@' + network
+        let fullusername = db.toFullUsername(username,network)
         if (!skylinks[fullusername])
             skylinks[fullusername] = {
                 videos: []
@@ -73,13 +69,10 @@ let db = {
     },
     // Retrieve usage and hashes data
     getUsage: (username,network) => {
-        let fullusername = username
-        if (network && network != 'all') fullusername += '@' + network
-        return usageData[fullusername] || {}
+        return usageData[db.toFullUsername(username,network)] || {}
     },
     getTotalUsage: (username,network) => {
-        let fullusername = username
-        if (network && network != 'all') fullusername += '@' + network
+        let fullusername = db.toFullUsername(username,network)
         let qtotal = 0
         for (det in usageData[fullusername]) {
             qtotal += usageData[fullusername][det]
@@ -135,8 +128,7 @@ let db = {
         cb(skylinksToReturn)
     },
     getHashesByUser: (types,username,network,cb) => {
-        let fullusername = username
-        if (network && network != 'all') fullusername += '@' + network
+        let fullusername = db.toFullUsername(username,network)
         let hashesToReturn = {}
 
         for (let i = 0; i < possibleTypes.length; i++) {
@@ -147,8 +139,7 @@ let db = {
         cb(hashesToReturn)
     },
     getSkylinksByUser: (types,username,network,cb) => {
-        let fullusername = username
-        if (network && network != 'all') fullusername += '@' + network
+        let fullusername = db.toFullUsername(username,network)
         let skylinksToReturn = {}
 
         for (let i = 0; i < possibleTypes.length; i++) {
@@ -176,6 +167,11 @@ let db = {
             if (err)
                 console.log('Error saving skylinks: ' + err)
         })
+    },
+    toFullUsername: (username,network) => {
+        let result = username
+        if (network && network != 'all') result += '@' + network
+        return result
     }
 }
 

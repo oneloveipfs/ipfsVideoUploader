@@ -255,7 +255,7 @@ function keychainCb(encrypted_message,steemUser,dtconly) {
 
 async function avalonLogin(avalonUsername,avalonKey,dtconly) {
     if (avalonUsername !== '' && avalonKey !== '') {
-        let avalonKeyId
+        let avalonKeyId = ''
         let avalonLoginPromise = new Promise((resolve,reject) => {
             javalon.getAccount(avalonUsername,(err,result) => {
                 if (err) return reject(err)
@@ -288,7 +288,7 @@ async function avalonLogin(avalonUsername,avalonKey,dtconly) {
 
         if (dtconly) {
             let loginGetUrl = '/login?user=' + avalonUsername + '&dtc=true'
-            if (avalonKeyId) loginGetUrl += '&dtckeyid=' + avalonKeyId
+            if (avalonKeyId || avalonKeyId === '') loginGetUrl += '&dtckeyid=' + avalonKeyId
             axios.get(loginGetUrl).then((response) => {
                 if (response.data.error != null)
                     return alert(response.data.error)

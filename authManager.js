@@ -19,10 +19,13 @@ if (Config.whitelistEnabled && !fs.existsSync('whitelist.txt'))
 
 // Cache whitelist in a variable, and update variable when fs detects a file change
 let whitelist = fs.readFileSync('whitelist.txt','utf8').split('\n')
+
+// Watch for external whitelist.txt changes
 let whitelistWatcher = fs.watch('whitelist.txt',() => {
     fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
         if (err) return console.log('Error while updating whitelist: ' + err)
         whitelist = readList.split('\n')
+        auth.whitelistTrim()
     })
 })
 
@@ -30,7 +33,10 @@ let auth = {
     generateEncryptedMemo: (username,cb) => {
         // Generate encrypted text to be decrypted by Keychain or posting key on client
         let message = username + ':oneloveipfs_login:hive'
-        if (auth.isInWhitelist(username,null)) message = username + ':oneloveipfs_login:all'
+        if (auth.isInWhitelist(username,null))
+            message = username + ':oneloveipfs_login:all'
+        else if (auth.isInWhitelist(username,'dtc'))
+            message = username + ':oneloveipfs_login:dtc'
         let encrypted_message = Crypto.AES.encrypt(message,Keys.AESKey).toString()
         Hive.api.getAccounts([username],(err,res) => {
             if (err) return cb(err)
@@ -52,7 +58,7 @@ let auth = {
         try {
             let avalonAcc = await avalonGetAccPromise
             let pubKey
-            if (keyid) {
+            if (keyid || keyid === '') {
                 // Custom key
                 for (let i = 0; i < avalonAcc.keys.length; i++) 
                     if (avalonAcc.keys[i].id == keyid && avalonAcc.keys[i].types.includes(4))
@@ -153,15 +159,22 @@ let auth = {
         else return false
     },
     whitelist: () => {return whitelist},
-    whitelistAdd: (username,network,cb) => {
+    whitelistAdd: (username,network,cb,nowrite) => {
         let fullusername = username
         if (network && network != 'all') fullusername += '@' + network
         if (!auth.isInWhitelist(username,network)) {
             whitelist.push(fullusername)
-            fs.writeFile('whitelist.txt',whitelist.join('\n'),() => {
-                cb()
-            })
-        } else cb()
+            if (!nowrite) fs.writeFile('whitelist.txt',whitelist.join('\n'),() => {})
+        }
+        cb()
+    },
+    whitelistTrim: () => {
+        // Trim whitelist
+        for (let i = 0; i < whitelist.length; i++)
+            if (whitelist[i] == '') {
+                whitelist.splice(i,1)
+                i--
+            }
     },
     webhookAuth: (token,cb) => {
         // For custom webhooks
@@ -176,4 +189,5 @@ let auth = {
     }
 }
 
+auth.whitelistTrim()
 module.exports = auth

@@ -138,15 +138,14 @@ let Shawp = {
         }
     },
     AddUser: (username,network) => {
-        let fullusername = username
-        if (network && network != 'all') fullusername += '@' + network
+        let fullusername = db.toFullUsername(username,network)
         if (Customers[fullusername]) return
         Customers[fullusername] = {
             rate: Config.Shawp.DefaultUSDRate,
             balance: 0,
             joinedSince: new Date().getTime()
         }
-        require('./authManager').whitelistAdd(username,network,() => {})
+        require('./authManager').whitelistAdd(username,network,() => {},true)
     },
     User: (fullusername) => {
         let username,network
@@ -234,8 +233,7 @@ let Shawp = {
         }
     },
     Refill: (from,username,network,method,rawAmt,usdAmt) => {
-        let fullusername = username
-        if (network && network != 'all') fullusername += '@' + network
+        let fullusername = db.toFullUsername(username,network)
         if (!Customers[fullusername]) Shawp.AddUser(username,network)
 
         let newCredits = Math.floor(usdAmt / Customers[fullusername].rate * 100000000) / 100000000
@@ -267,18 +265,15 @@ let Shawp = {
         }
     },
     getRefillHistory: (username,network,start,count) => {
-        let fullusername = username
-        if (network && network != 'all') fullusername += '@' + network
+        let fullusername = db.toFullUsername(username,network)
         return RefillHistory[fullusername].slice(start,start+count)
     },
     getConsumeHistory: (username,network,start,count) => {
-        let fullusername = username
-        if (network && network != 'all') fullusername += '@' + network
+        let fullusername = db.toFullUsername(username,network)
         return ConsumeHistory[fullusername].slice(start,start+count)
     },
     getDaysRemaining: (username,network) => {
-        let fullusername = username
-        if (network && network != 'all') fullusername += '@' + network
+        let fullusername = db.toFullUsername(username,network)
         let usage = db.getTotalUsage(username,network)
         if (usage <= 0 || !Customers[fullusername])
             return { days: -1 }
@@ -292,7 +287,8 @@ let Shawp = {
         else
             return { days: days }
     },
-    setRate: (fullusername,usdRate) => {
+    setRate: (username,network,usdRate) => {
+        let fullusername = db.toFullUsername(username,network)
         if (!Customers[fullusername]) return
         Customers[fullusername].rate = usdRate
     },
