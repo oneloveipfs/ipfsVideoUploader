@@ -56,7 +56,7 @@ describe('Auth',() => {
             assert.isFalse(Auth.isInWhitelist(Config.test.dtcUser,'hive'))
             assert.isFalse(Auth.isInWhitelist(Config.test.dtcUser,null))
             done()
-        })
+        },true)
     })
 
     it('Adding user to Hive specific whitelist should not whitelist user for other networks',function (done) {
@@ -65,7 +65,7 @@ describe('Auth',() => {
             assert.isFalse(Auth.isInWhitelist(Config.test.hiveUser,'dtc'))
             assert.isFalse(Auth.isInWhitelist(Config.test.hiveUser,null))
             done()
-        })
+        },true)
     })
 
     it('Avalon only user should only be authenticatable with the correct network',function (done) {
