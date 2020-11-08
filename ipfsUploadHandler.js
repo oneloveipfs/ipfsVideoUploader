@@ -117,11 +117,9 @@ let uploadOps = {
             if (!request.file) return response.status(400).send({error: 'No files have been uploaded.'})
             let uploadedImg = request.file.filename
             addFile('imguploads/' + uploadedImg,trickleDagAdd,false,(size,hash) => {
-                if (Config.UsageLogs) {
-                    // Log usage data for image uploads
-                    db.recordUsage(username,network,imgType,request.file.size)
-                    db.writeUsageData()
-                }
+                // Log usage data for image uploads
+                db.recordUsage(username,network,imgType,request.file.size)
+                db.writeUsageData()
 
                 // Log IPFS hashes by Steem account
                 // If hash is not in database, add the hash into database
@@ -151,10 +149,8 @@ let uploadOps = {
         let ipfsAddSubtitleOp = ipfsAPI.add(subtitleBuffer)
         
         for await (const sub of ipfsAddSubtitleOp) {
-            if (Config.UsageLogs) {
-                db.recordUsage(username,network,'subtitles',sub.size)
-                db.writeUsageData()
-            }
+            db.recordUsage(username,network,'subtitles',sub.size)
+            db.writeUsageData()
 
             db.recordHash(username,network,'subtitles',sub.cid.toString())
             db.writeHashesData()
@@ -189,11 +185,9 @@ let uploadOps = {
                 async.parallel(ipfsops,(errors,results) => {
                     if (errors) console.log(errors)
                     console.log(results)
-                    if (Config.UsageLogs) {
-                        db.recordUsage(user,network,'videos',json.Upload.Size)
-                        db.recordUsage(user,network,'sprites',results.spritehash.size) 
-                        db.writeUsageData()
-                    }
+                    db.recordUsage(user,network,'videos',json.Upload.Size)
+                    db.recordUsage(user,network,'sprites',results.spritehash.size) 
+                    db.writeUsageData()
 
                     db.recordHash(user,network,'videos',results.videohash.ipfshash)
                     db.recordHash(user,network,'sprites',results.spritehash.hash)
@@ -229,10 +223,8 @@ let uploadOps = {
             case 'video720':
             case 'video1080':
                 addFile(filepath,true,Config.Skynet.enabled && json.Upload.MetaData.skynet == 'true',(size,hash,skylink) => {
-                    if (Config.UsageLogs) {
-                        db.recordUsage(user,network,json.Upload.MetaData.type,json.Upload.Size)
-                        db.writeUsageData()
-                    }
+                    db.recordUsage(user,network,json.Upload.MetaData.type,json.Upload.Size)
+                    db.writeUsageData()
 
                     db.recordHash(user,network,json.Upload.MetaData.type,hash)
                     db.writeHashesData()

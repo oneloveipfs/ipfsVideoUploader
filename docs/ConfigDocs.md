@@ -4,7 +4,6 @@
 * `IPFS_API_PORT`: Specify port that IPFS daemon listens to for IPFS API calls.
 * `HTTP_PORT`: Specify port to listen to HTTP requests.
 * `whitelistEnabled`: When set to false, whitelist checks will be ignored.
-* `UsageLogs`: When set to true, disk usage data by Steem accounts will be logged.
 * `tokenExpiry`: Speficy time in ms of access token expiry from time of issuance.
 * `admins`: Array of Hive accounts which have access to administrator APIs. May also act as `encoderAccounts` but with admin privileges.
 * `encoderAccounts`: Array of Hive accounts that may be used by encoding servers. These accounts do not have admin privileges.

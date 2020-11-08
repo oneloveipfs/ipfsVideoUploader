@@ -2,7 +2,6 @@
     "IPFS_API_PORT": 5001,
     "HTTP_PORT": 3000,
     "whitelistEnabled": true,
-    "UsageLogs": true,
     "tokenExpiry": 86400,
     "tokenApp": "oneloveipfs",
 
@@ -80,6 +79,7 @@
         "hashType": ["videos","thumbnails","sprites","images","video240","video480","video720","video1080","subtitles"],
         "user": "techcoderx",
         "dtcUser": "alice",
-        "hiveUser": "bob"
+        "hiveUser": "bob",
+        "aliasedUser": "john"
     }
 }

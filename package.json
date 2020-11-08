@@ -5,7 +5,6 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "sc2link": "node scripts/getLoginLink.js",
     "keygen": "node scripts/generateKeys.js",
     "test": "mocha --timeout 5000",
     "snyk-protect": "snyk protect",

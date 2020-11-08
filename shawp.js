@@ -45,7 +45,7 @@ let Shawp = {
                         let receiver = tx.from
                         let memo = tx.memo.toLowerCase()
                         if (memo !== '' && !memo.startsWith('to: @')) return // Memo must be empty or begin with "to: @"
-                        if (memo && memo.startsWith('to: @')) {
+                        if (memo && memo.startsWith('to: @')) { // TODO: Memo for network specific accounts
                             let otheruser = memo.replace('to: @','')
                             if (hive.utils.validateAccountName(otheruser) == null) receiver = otheruser
                         }
@@ -138,7 +138,7 @@ let Shawp = {
         }
     },
     AddUser: (username,network,nowrite) => {
-        let fullusername = db.toFullUsername(username,network)
+        let fullusername = db.toFullUsername(username,network,true)
         if (Customers[fullusername]) return
         Customers[fullusername] = {
             rate: Config.Shawp.DefaultUSDRate,
@@ -147,17 +147,13 @@ let Shawp = {
         }
         require('./authManager').whitelistAdd(username,network,() => {},nowrite)
     },
-    User: (fullusername) => {
-        let username,network
-        if (fullusername.split('@').length == 2) {
-            username = fullusername.split('@')[0]
-            network = fullusername.split('@')[1]
-        } else username = fullusername
-        if (!Customers[username]) return {}
+    User: (username,network) => {
+        let fullusername = db.toFullUsername(username,network,true)
+        if (!Customers[fullusername]) return {}
         let totalusage = db.getTotalUsage(username,network)
         let res = JSON.parse(JSON.stringify(Customers[fullusername]))
         res.usage = totalusage
-        let daysRemaining = Shawp.getDaysRemaining(username)
+        let daysRemaining = Shawp.getDaysRemaining(username,network)
         res.daysremaining = daysRemaining.days
         if (daysRemaining.needs) res.needs = daysRemaining.needs
 
@@ -167,7 +163,7 @@ let Shawp = {
         return res
     },
     UserExists: (username,network) => {
-        let fullusername = db.toFullUsername(username,network)
+        let fullusername = db.toFullUsername(username,network,true)
         if (!Customers[fullusername]) return false
         else return true
     },
@@ -234,7 +230,7 @@ let Shawp = {
         }
     },
     Refill: (from,username,network,method,rawAmt,usdAmt) => {
-        let fullusername = db.toFullUsername(username,network)
+        let fullusername = db.toFullUsername(username,network,true)
         if (!Customers[fullusername]) Shawp.AddUser(username,network)
 
         let newCredits = Math.floor(usdAmt / Customers[fullusername].rate * 100000000) / 100000000
@@ -266,15 +262,15 @@ let Shawp = {
         }
     },
     getRefillHistory: (username,network,start,count) => {
-        let fullusername = db.toFullUsername(username,network)
+        let fullusername = db.toFullUsername(username,network,true)
         return RefillHistory[fullusername].slice(start,start+count)
     },
     getConsumeHistory: (username,network,start,count) => {
-        let fullusername = db.toFullUsername(username,network)
+        let fullusername = db.toFullUsername(username,network,true)
         return ConsumeHistory[fullusername].slice(start,start+count)
     },
     getDaysRemaining: (username,network) => {
-        let fullusername = db.toFullUsername(username,network)
+        let fullusername = db.toFullUsername(username,network,true)
         let usage = db.getTotalUsage(username,network)
         if (usage <= 0 || !Customers[fullusername])
             return { days: -1 }
@@ -289,7 +285,7 @@ let Shawp = {
             return { days: days }
     },
     setRate: (username,network,usdRate) => {
-        let fullusername = db.toFullUsername(username,network)
+        let fullusername = db.toFullUsername(username,network,true)
         if (!Customers[fullusername]) return
         Customers[fullusername].rate = usdRate
     },

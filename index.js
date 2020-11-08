@@ -196,7 +196,6 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
 
 app.get('/usage',APILimiter, (request,response) => {
     // API to get usage info
-    if (!Config.UsageLogs) return response.send('Logs are disabled therefore API is not available for usage.');
     if (request.query.user === undefined || request.query.user === '') return response.send('Username is not defined!');
     let usage = db.getUsage(request.query.user,request.query.network)
     response.send(usage)

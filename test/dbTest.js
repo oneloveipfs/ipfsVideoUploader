@@ -77,4 +77,23 @@ describe('Database',() => {
         }
         done()
     })
+
+    it('setUserAlias should add a user as alias to another main account',(done) => {
+        db.setUserAlias(Config.test.hiveUser,'hive',Config.test.aliasedUser,'dtc')
+        assert.isNotNull(db.getAliasOf(Config.test.aliasedUser,'dtc'))
+        assert.equal(db.toFullUsername(Config.test.aliasedUser,'dtc',true),Config.test.hiveUser+'@hive')
+        done()
+    })
+
+    it('setUserAlias should throw when adding another aliased user as an alias',(done) => {
+        assert.throws(()=>{db.setUserAlias(Config.test.aliasedUser,'dtc','smith','all')})
+        done()
+    })
+
+    it('unsetUserAlias should remove associations with main account',(done) => {
+        db.unsetUserAlias(Config.test.aliasedUser,'dtc')
+        assert.isNull(db.getAliasOf(Config.test.aliasedUser,'dtc'))
+        assert.equal(db.toFullUsername(Config.test.aliasedUser,'dtc',true),Config.test.aliasedUser+'@dtc')
+        done()
+    })
 })
