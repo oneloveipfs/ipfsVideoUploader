@@ -2,6 +2,7 @@
     "IPFS_API_PORT": 5001,
     "HTTP_PORT": 3000,
     "whitelistEnabled": true,
+    "spritesEnabled": true,
     "tokenExpiry": 86400,
     "tokenApp": "oneloveipfs",
 

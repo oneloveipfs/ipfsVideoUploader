@@ -27,7 +27,7 @@ const streamUpload = Multer({ dest: './uploaded/', limits: { fileSize: 52428800 
 const imgUpload = Multer({ dest: './imguploads/', limits: { fileSize: 7340032 } })
 const { globSource } = IPFS
 
-async function addFile(dir,trickle,skynetpin,callback,onlyHash) {
+const addFile = async (dir,trickle,skynetpin,callback,onlyHash) => {
     let opts = { trickle: trickle, cidVersion: 0 }
     if (onlyHash) opts.onlyHash = true
     let ipfsAdd = await ipfsAPI.add(globSource(dir, {recursive: true}), opts)
@@ -55,7 +55,7 @@ async function addFile(dir,trickle,skynetpin,callback,onlyHash) {
     }
 }
 
-function skynetAdd(path,opts) {
+const skynetAdd = (path,opts) => {
     let formData = new FormData()
     formData.append(opts.portalFileFieldname, fs.createReadStream(path))
 
@@ -75,32 +75,39 @@ function skynetAdd(path,opts) {
     })
 }
 
-function trimTrailingSlash(str) {
+const addSprite = async (filepath,id) => {
+    return new Promise((rs,rj) => {
+        if (!Config.spritesEnabled) return rs({})
+        Shell.exec('./scripts/dtube-sprite.sh ' + filepath + ' uploaded/' + id + '.jpg',() => {
+            addFile('uploaded/' + id + '.jpg',true,false,(size,hash) => rs({size: size, hash: hash}))
+        })
+    })
+}
+
+const trimTrailingSlash = (str) => {
     return str.replace(/\/$/, "");
 }
 
-function processSingleVideo(id,user,network,cb) {
+const processSingleVideo = async (id,user,network,cb) => {
     let vpath = Config.tusdUploadDir + '/' + id
     if (!fs.existsSync(vpath)) return cb({ error: 'Could not find upload' })
-    Shell.exec('./scripts/dtube-sprite.sh ' + vpath + ' uploaded/' + id + '.jpg',() => addFile('uploaded/' + id + '.jpg',true,false,(size,hash) => {
-        // Video hash and usage should already been handled previously
-        db.recordHash(user,network,'sprites',hash,size)
-        db.writeHashesData()
+    let spriteGen = await addSprite(vpath,id)
+    // Video hash and usage should already been handled previously
+    db.recordHash(user,network,'sprites',spriteGen.hash,spriteGen.size)
+    db.writeHashesData()
 
-        getDuration(vpath).then((duration) => {
-            let result = {
-                username: user,
-                network: network,
-                type: 'videos',
-                ipfshash: uploadRegister[id].hash,
-                spritehash: hash,
-                duration: duration
-            }
+    let duration = await getDuration(vpath)
+    let result = {
+        username: user,
+        network: network,
+        type: 'videos',
+        ipfshash: uploadRegister[id].hash,
+        spritehash: spriteGen.hash,
+        duration: duration
+    }
 
-            uploadRegister[id] = result
-            cb(result)
-        })
-    }))
+    uploadRegister[id] = result
+    cb(result)
 }
 
 let uploadOps = {
@@ -188,13 +195,11 @@ let uploadOps = {
                         addFile(filepath,true,Config.Skynet.enabled && json.Upload.MetaData.skynet == 'true',(size,hash,skylink) => cb(null,{ipfshash: hash, skylink: skylink, size: size}))
                     },
                     spritehash: (cb) => {
-                        Shell.exec('./scripts/dtube-sprite.sh ' + filepath + ' uploaded/' + json.Upload.ID + '.jpg',() => {
-                            addFile('uploaded/' + json.Upload.ID + '.jpg',true,false,(size,hash) => cb(null,{size: size, hash: hash}))
-                        })
+                        addSprite(filepath,json.Upload.ID).then(r=>cb(null,r))
                     }
                 }
 
-                async.parallel(ipfsops,(errors,results) => {
+                async.parallel(ipfsops, async (errors,results) => {
                     if (errors) console.log(errors)
                     console.log(results)
                     db.recordHash(user,network,'videos',results.videohash.ipfshash,json.Upload.Size)
@@ -206,24 +211,23 @@ let uploadOps = {
                         db.writeSkylinksData()
                     }
 
-                    getDuration(json.Upload.Storage.Path).then((videoDuration) => {
-                        let result = {
-                            username: user,
-                            network: network,
-                            type: 'videos',
-                            ipfshash: results.videohash.ipfshash,
-                            spritehash: results.spritehash.hash,
-                            skylink: results.videohash.skylink,
-                            duration: videoDuration,
-                            filesize: json.Upload.Size
-                        }
+                    let videoDuration = await getDuration(json.Upload.Storage.Path)
+                    let result = {
+                        username: user,
+                        network: network,
+                        type: 'videos',
+                        ipfshash: results.videohash.ipfshash,
+                        spritehash: results.spritehash.hash,
+                        skylink: results.videohash.skylink,
+                        duration: videoDuration,
+                        filesize: json.Upload.Size
+                    }
 
-                        if (socketRegister[json.Upload.ID] && socketRegister[json.Upload.ID].socket) socketRegister[json.Upload.ID].socket.emit('result',result)
-                        delete socketRegister[json.Upload.ID]
-                        uploadRegister[json.Upload.ID] = result
-                        ipsync.emit('upload',result)
-                        callback()
-                    })
+                    if (socketRegister[json.Upload.ID] && socketRegister[json.Upload.ID].socket) socketRegister[json.Upload.ID].socket.emit('result',result)
+                    delete socketRegister[json.Upload.ID]
+                    uploadRegister[json.Upload.ID] = result
+                    ipsync.emit('upload',result)
+                    callback()
                 })
                 break
             case 'video240':

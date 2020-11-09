@@ -507,7 +507,7 @@ function reenableSubtitleFields() {
 }
 
 function postVideo() {
-    let requiredFields = ['ipfshash','imghash','spritehash','duration']
+    let requiredFields = ['ipfshash','imghash','duration']
     let encodedVidInputs = ['video240p','video480p','video720p','video1080p']
     let respectiveField = ['ipfs240hash','ipfs480hash','ipfs720hash','ipfs1080hash']
 

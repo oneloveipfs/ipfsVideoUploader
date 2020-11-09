@@ -217,11 +217,8 @@ app.get('/hashes',APILimiter, (request,response) => {
     // API to get IPFS hashes of uploaded files
     let typerequested = request.query.hashtype;
     if (typerequested === '' || typerequested === undefined) {
-        // What are you looking for???
-        return response.send('hashtype not specified in GET. What are you looking for?');
-    }
-
-    typerequested.split(',');
+        typerequested = db.getPossibleTypes()
+    } else typerequested.split(',');
 
     if (request.query.user === undefined || request.query.user === '')
         // Username not specified, return all hashes (either all videos, snaps or sprites, or all three)

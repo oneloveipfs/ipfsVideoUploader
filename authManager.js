@@ -4,6 +4,7 @@ const HiveSigner = require('hivesigner')
 const JWT = require('jsonwebtoken')
 const Crypto = require('crypto-js')
 const fs = require('fs')
+const { EOL } = require('os')
 const Keys = require('./.auth.json')
 const Config = require('./config.json')
 const Shawp = require('./shawp')
@@ -17,13 +18,13 @@ if (Config.whitelistEnabled && !fs.existsSync('whitelist.txt'))
     fs.writeFileSync('./whitelist.txt','')
 
 // Cache whitelist in a variable, and update variable when fs detects a file change
-let whitelist = fs.readFileSync('whitelist.txt','utf8').split('\n')
+let whitelist = fs.readFileSync('whitelist.txt','utf8').split(EOL)
 
 // Watch for external whitelist.txt changes
 let whitelistWatcher = fs.watch('whitelist.txt',() => {
     fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
         if (err) return console.log('Error while updating whitelist: ' + err)
-        whitelist = readList.split('\n')
+        whitelist = readList.split(EOL)
         auth.whitelistTrim()
     })
 })
@@ -179,7 +180,7 @@ let auth = {
         // TODO: Update for new bot webhook system
     },
     writeWhitelistToDisk: () => {
-        fs.writeFile('whitelist.txt',whitelist.join('\n'),(e) => {
+        fs.writeFile('whitelist.txt',whitelist.join(EOL),(e) => {
             if (e) console.log('Error saving whitelist to disk: ' + e)
         })
     },
