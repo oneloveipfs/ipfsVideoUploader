@@ -3,11 +3,8 @@ const UpdateLogs = require('./db/updatelogs.json')
 const FileUploader = require('./ipfsUploadHandler')
 const db = require('./dbManager')
 const Auth = require('./authManager')
-const WC = require('./wcHelper')
 const Shawp = require('./shawp')
-const WooCommerce = require('woocommerce-api')
 const fs = require('fs')
-const async = require('async')
 const Express = require('express')
 const RateLimiter = require('express-rate-limit')
 const Parser = require('body-parser')
@@ -27,7 +24,6 @@ app.get('/wcHelper.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/scripts/generateKeys.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/whitelist.txt',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/config.json',(req,res) => {return res.status(404).redirect('/404')})
-app.get('/db/wc.json',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/db/shawp/*',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package.json',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package-lock.json',(req,res) => {return res.status(404).redirect('/404')})
@@ -61,9 +57,6 @@ const rawBodySaver = (req, res, buf, encoding) => {
 }
 
 app.use(Parser.text())
-
-// Setup WooCommerce
-let WooCommerceAPI = Config.WooCommerceEnabled ? new WooCommerce(Config.WooCommerceConfig) : null
 
 app.get('/', (request,response) => loadWebpage('./client/welcome.html',response)) // Home page
 app.get('/upload', (request,response) => loadWebpage('./client/uploader.html',response)) // Upload page
@@ -311,69 +304,20 @@ app.post('/botusage',Parser.json(),(req,res) => {
     return res.status(500).send({error: 'WIP'})
 })
 
-// WooCommerce API calls
-// Depreciate non-Shawp payment system?
-app.post('/wc_order_update',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(req,res) => {
-    if (!Config.WooCommerceEnabled || Config.Shawp.Enabled) return res.status(404).end()
-    WC.VerifyWebhook(req.rawBody,req.header('X-WC-Webhook-Signature'),(isValid) => {
-        if (!isValid) return res.status(403).send('Invalid webhook')
-
-        // Send a 200 response code if webhook is legitimate
-        res.status(200).send('works')
-
-        // Check if user has paid, then process order
-        // When WooCommerce detects a payment, order status updates to processing
-        if (req.body.status === 'processing') {
-            let getUsername = req.body.meta_data.find(user => user.key === '_billing_steem_account_name')
-            let getTier = Config.WooCommerceSettings.Tiers.findIndex(tier => tier.wcpid === req.body.line_items[0].product_id)
-            if (getUsername !== undefined || getUsername !== '' || getTier !== -1) {
-                Auth.whitelistAdd(getUsername.value,() => {})
-
-                // Complete order
-                WooCommerceAPI.put('orders/' + req.body.id,{ status: 'completed' },() => {
-                    console.log('Order ID ' + req.body.id + ' has been processed successfully!')
-                })
-
-                if (!WC.UserExists(getUsername.value)) {
-                    WC.AddUser(getUsername.value,req.body.customer_id,getTier,0)
-
-                    // Referrals
-                    let getReferral = req.body.meta_data.find(refUser => refUser.key === '_billing_referral_username')
-                    if (getReferral !== undefined || getReferral !== '') {
-                        WC.AddReferral(getUsername.value,getReferral.value)
-                    }
-
-                    WC.WriteWCUserData()
-                }
-            }
-        }
-    })
-})
-
 app.get('/wc_user_info',APILimiter,(req,res) => {
-    if (!Config.WooCommerceEnabled && !Config.Shawp.Enabled) return res.status(404).end()
+    if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user,network) => {
-        let fullusername = user
-        if (network && network != 'all') fullusername += '@' + network
-        if (Config.Shawp.Enabled) 
-            return res.send(Shawp.User(fullusername))
-        else WC.User(user,(err,info) => {
-            if (err) res.status(400).send(err)
-            return res.send(info)
-        })
+        res.send(Shawp.User(user,network))
     })
 })
 
 app.get('/wc_user_info_admin',APILimiter,(req,res) => {
-    if (!Config.WooCommerceEnabled && !Config.Shawp.Enabled) return res.status(404).end()
+    if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user,network) => {
-        if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
-        if (Config.Shawp.Enabled) 
+        if (!Config.admins.includes(db.toFullUsername(user,network)))
+            return res.status(403).send({error:'Not an admin'})
+        else
             return res.send(Shawp.User(req.query.user,req.query.network || 'all'))
-        else WC.User(req.query.user,(err,info) => {
-            if (err) res.status(400).send(err)
-            return res.send(info)
-        })
     })
 })
 

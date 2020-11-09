@@ -42,20 +42,7 @@
         "wpAPI": true,
         "version": "wc/v1"
     },
-    "WooCommerceSettings": {
-        "Tiers": [
-            {
-                "wcpid": -1,
-                "name": "Trial",
-                "price": 0.00,
-                "quota": 0
-            }
-        ],
-        "Referral": {
-            "quotaBonus": 0,
-            "maxBonus": 0
-        }
-    },
+    "WooCommerceSettings": {},
     "Shawp": {
         "Enabled": true,
         "DefaultUSDRate": 0.0029,

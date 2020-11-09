@@ -38,8 +38,7 @@
     "shelljs": "^0.8.4",
     "snyk": "^1.424.4",
     "socket.io": "^2.3.0",
-    "steem": "^0.7.11",
-    "woocommerce-api": "^1.5.0"
+    "steem": "^0.7.11"
   },
   "devDependencies": {
     "chai": "^4.2.0",
