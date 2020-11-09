@@ -7,7 +7,7 @@ let hashSizes = JSON.parse(fs.readFileSync('db/hashsizes.json','utf8'))
 let hashes = JSON.parse(fs.readFileSync('db/hashes.json','utf8'))
 let skylinks = JSON.parse(fs.readFileSync('db/skylinks.json','utf8'))
 
-let possibleTypes = ['videos','thumbnails','sprites','images','video240','video480','video720','video1080','subtitles']
+let possibleTypes = ['videos','thumbnails','sprites','images','video240','video480','video720','video1080','subtitles','streams']
 
 let db = {
     // Check if user exist in hashes db

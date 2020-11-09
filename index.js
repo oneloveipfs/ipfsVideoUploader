@@ -151,6 +151,10 @@ app.post('/uploadSubtitle',APILimiter,(request,response) => {
     Authenticate(request,response,true,(user,network) => FileUploader.uploadSubtitles(user,network,request,response))
 })
 
+app.post('/uploadStream',(request,response) => {
+    Authenticate(request,response,true,(user,network) => FileUploader.uploadStreamChunk(user,network,request,response))
+})
+
 app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(request,response) => {
     if (!request.body.Upload.IsFinal)
         return response.status(200).send()
