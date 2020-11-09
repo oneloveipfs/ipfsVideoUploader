@@ -82,9 +82,8 @@ function processSingleVideo(id,user,network,cb) {
     let vpath = Config.tusdUploadDir + '/' + id
     if (!fs.existsSync(vpath)) return cb({ error: 'Could not find upload' })
     Shell.exec('./scripts/dtube-sprite.sh ' + vpath + ' uploaded/' + id + '.jpg',() => addFile('uploaded/' + id + '.jpg',true,false,(size,hash) => {
-        db.recordUsage(user,network,'sprites',size)
-        db.recordHash(user,network,'videos',hash)
-        db.writeUsageData()
+        // Video hash and usage should already been handled previously
+        db.recordHash(user,network,'sprites',hash,size)
         db.writeHashesData()
 
         getDuration(vpath).then((duration) => {
@@ -117,13 +116,9 @@ let uploadOps = {
             if (!request.file) return response.status(400).send({error: 'No files have been uploaded.'})
             let uploadedImg = request.file.filename
             addFile('imguploads/' + uploadedImg,trickleDagAdd,false,(size,hash) => {
-                // Log usage data for image uploads
-                db.recordUsage(username,network,imgType,request.file.size)
-                db.writeUsageData()
-
                 // Log IPFS hashes by Steem account
                 // If hash is not in database, add the hash into database
-                db.recordHash(username,network,imgType,hash)
+                db.recordHash(username,network,imgType,hash,request.file.size)
                 db.writeHashesData()
 
                 // Send image IPFS hash back to client and IPSync
@@ -149,10 +144,7 @@ let uploadOps = {
         let ipfsAddSubtitleOp = ipfsAPI.add(subtitleBuffer)
         
         for await (const sub of ipfsAddSubtitleOp) {
-            db.recordUsage(username,network,'subtitles',sub.size)
-            db.writeUsageData()
-
-            db.recordHash(username,network,'subtitles',sub.cid.toString())
+            db.recordHash(username,network,'subtitles',sub.cid.toString(),sub.size)
             db.writeHashesData()
 
             let result = {
@@ -185,12 +177,8 @@ let uploadOps = {
                 async.parallel(ipfsops,(errors,results) => {
                     if (errors) console.log(errors)
                     console.log(results)
-                    db.recordUsage(user,network,'videos',json.Upload.Size)
-                    db.recordUsage(user,network,'sprites',results.spritehash.size) 
-                    db.writeUsageData()
-
-                    db.recordHash(user,network,'videos',results.videohash.ipfshash)
-                    db.recordHash(user,network,'sprites',results.spritehash.hash)
+                    db.recordHash(user,network,'videos',results.videohash.ipfshash,json.Upload.Size)
+                    db.recordHash(user,network,'sprites',results.spritehash.hash,results.spritehash.size)
                     db.writeHashesData()
 
                     if (results.videohash.skylink) {
@@ -223,10 +211,7 @@ let uploadOps = {
             case 'video720':
             case 'video1080':
                 addFile(filepath,true,Config.Skynet.enabled && json.Upload.MetaData.skynet == 'true',(size,hash,skylink) => {
-                    db.recordUsage(user,network,json.Upload.MetaData.type,json.Upload.Size)
-                    db.writeUsageData()
-
-                    db.recordHash(user,network,json.Upload.MetaData.type,hash)
+                    db.recordHash(user,network,json.Upload.MetaData.type,hash,json.Upload.Size)
                     db.writeHashesData()
 
                     if (skylink) {
@@ -336,9 +321,7 @@ let uploadOps = {
         activeCount: () => {
             return usercount
         }
-    },
-    // For unit tests
-    addFile
+    }
 }
 
 module.exports = uploadOps

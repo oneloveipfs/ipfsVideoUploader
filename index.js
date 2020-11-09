@@ -202,30 +202,10 @@ app.get('/usage',APILimiter, (request,response) => {
 })
 
 app.get('/stats',APILimiter,(request,response) => {
-    let getUseOps = {}
-    let possibleTypes = db.getPossibleTypes()
-
-    for(let i = 0; i < possibleTypes.length; i++) {
-        getUseOps[possibleTypes[i]] = (cb) => {
-            db.getAllUsage(possibleTypes[i],(total) => {
-                cb(null,total)
-            })
-        }
-    }
-
-    async.parallel(getUseOps,(err,result) => {
-        let allUse = result
-        allUse.total = 0
-        for(let i = 0; i < possibleTypes.length; i++) {
-            allUse.total += result[possibleTypes[i]]
-        }
-        db.getHashes('videos',(obtainedHashes) => {
-            response.send({
-                count: obtainedHashes.videos.length,
-                usercount: db.allUsersCount(),
-                usage: allUse
-            })
-        })
+    response.send({
+        count: db.getHashes('videos').videos.length,
+        usercount: db.allUsersCount(),
+        usage: db.getAllUsage()
     })
 })
 
@@ -240,23 +220,17 @@ app.get('/hashes',APILimiter, (request,response) => {
     typerequested.split(',');
 
     if (request.query.user === undefined || request.query.user === '')
-        // Steem user not specified, return all hashes (either all videos, snaps or sprites, or all three)
-        db.getHashes(typerequested,(obtainedHashes) => {
-            return response.send(obtainedHashes);
-        })
+        // Username not specified, return all hashes (either all videos, snaps or sprites, or all three)
+        return response.send(db.getHashes(typerequested))
     else {
         let network = request.query.network
         if (Auth.isInWhitelist(request.query.user,null))
             network = 'all'
-        db.userExistInHashesDB(request.query.user,network,(result) => {
-            if (!result) return response.send('User specified doesn\'t exist in our record.')
-            else {
-                // BOTH valid Steem username and hash type request are specified
-                db.getHashesByUser(typerequested,request.query.user,network,(obtainedHashes) => {
-                    return response.send(obtainedHashes)
-                })
-            }
-        })
+        let userExists = db.userExistInHashesDB(request.query.user,network)
+        if (!userExists) return response.send({error: 'User specified doesn\'t exist in our record.'})
+        else
+            // BOTH valid username and hash type request are specified
+            return response.send(db.getHashesByUser(typerequested,request.query.user,network))
     }
 });
 

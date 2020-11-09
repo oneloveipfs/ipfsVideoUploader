@@ -3,7 +3,7 @@ const fs = require('fs')
 
 // Cache JSON data into variables
 let userInfo = JSON.parse(fs.readFileSync('db/userinfo.json','utf8'))
-let usageData = JSON.parse(fs.readFileSync('db/usage.json','utf8'))
+let hashSizes = JSON.parse(fs.readFileSync('db/hashsizes.json','utf8'))
 let hashes = JSON.parse(fs.readFileSync('db/hashes.json','utf8'))
 let skylinks = JSON.parse(fs.readFileSync('db/skylinks.json','utf8'))
 
@@ -11,13 +11,12 @@ let possibleTypes = ['videos','thumbnails','sprites','images','video240','video4
 
 let db = {
     // Check if user exist in hashes db
-    userExistInHashesDB: (username,network,cb) => {
+    userExistInHashesDB: (username,network) => {
         let fullusername = db.toFullUsername(username,network)
-        if (!hashes.hasOwnProperty(fullusername)) {
-            cb(false)
-        } else {
-            cb(true)
-        }
+        if (!hashes.hasOwnProperty(fullusername))
+            return false
+        else
+            return true
     },
     getPossibleTypes: () => {
         return possibleTypes
@@ -46,21 +45,7 @@ let db = {
         else
             return userInfo[fullusername].aliasOf
     },
-    // Log usage data and IPFS hashes
-    recordUsage: (username,network,type,size) => {
-        let fullusername = db.toFullUsername(username,network)
-        if (!usageData[fullusername]) {
-            // New user?
-            usageData[fullusername] = {}
-        }
-
-        if (!usageData[fullusername][type]) {
-            usageData[fullusername][type] = size
-        } else {
-            usageData[fullusername][type] = usageData[fullusername][type] + size
-        }
-    },
-    recordHash: (username,network,type,hash) => {
+    recordHash: (username,network,type,hash,size) => {
         let fullusername = db.toFullUsername(username,network)
         if (!hashes[fullusername]) {
             hashes[fullusername] = {
@@ -77,6 +62,9 @@ let db = {
 
         if (!hashes[fullusername][type].includes(hash))
             hashes[fullusername][type].push(hash)
+        
+        // Record size of file
+        hashSizes[hash] = size
     },
     recordSkylink: (username,network,type,skylink) => {
         let fullusername = db.toFullUsername(username,network)
@@ -91,32 +79,37 @@ let db = {
     },
     // Retrieve usage and hashes data
     getUsage: (username,network) => {
-        return usageData[db.toFullUsername(username,network)] || {}
+        let result = {}
+        let userHashes = db.getHashesByUser(possibleTypes,username,network)
+        for (hashtype in userHashes) {
+            result[hashtype] = 0
+            for (h in userHashes[hashtype]) {
+                if (typeof hashSizes[userHashes[hashtype][h]] == 'number')
+                    result[hashtype] += hashSizes[userHashes[hashtype][h]]
+            }
+        }
+        return result
     },
     getTotalUsage: (username,network) => {
-        let fullusername = db.toFullUsername(username,network)
+        let usageDet = db.getUsage(username,network)
         let qtotal = 0
-        for (det in usageData[fullusername]) {
-            qtotal += usageData[fullusername][det]
+        for (det in usageDet) {
+            qtotal += usageDet[det]
         }
         return qtotal
     },
-    getAllUsage: (type,cb) => {
+    getAllUsage: () => {
         let totalUse = 0
-        for (let key in usageData) {
-            if(usageData.hasOwnProperty(key)) {
-                let use = usageData[key][type]
-                if (!isNaN(use)) totalUse += use
-            }
-        }
-        cb(totalUse)
+        for (let fulluser in hashes)
+            totalUse += db.getTotalUsage(db.toUsername(fulluser),db.toNetwork(fulluser))
+        return totalUse
     },
-    getHashes: (types,cb) => {
+    getHashes: (types) => {
         let hashesToReturn = {}
         function getAllHashes(hashType) {
             let hashArrToReturn = []
             for(let key in hashes) {
-                if (hashes.hasOwnProperty(key) && hashes[key][hashType] != undefined) {
+                if (hashes[key][hashType]) {
                     hashArrToReturn = hashArrToReturn.concat(hashes[key][hashType])
                 }
             }
@@ -128,7 +121,7 @@ let db = {
                 hashesToReturn[possibleTypes[i]] = getAllHashes(possibleTypes[i])
         }
 
-        cb(hashesToReturn)
+        return hashesToReturn
     },
     getSkylinks: (types,cb) => {
         let skylinksToReturn = {}
@@ -149,20 +142,24 @@ let db = {
 
         cb(skylinksToReturn)
     },
-    getHashesByUser: (types,username,network,cb) => {
+    getHashesByUser: (types,username,network) => {
         let fullusername = db.toFullUsername(username,network)
         let hashesToReturn = {}
+
+        if (!hashes[fullusername]) return {}
 
         for (let i = 0; i < possibleTypes.length; i++) {
             if (types.includes(possibleTypes[i]))
                 hashesToReturn[possibleTypes[i]] = hashes[fullusername][possibleTypes[i]]
         }
         
-        cb(hashesToReturn)
+        return hashesToReturn
     },
     getSkylinksByUser: (types,username,network,cb) => {
         let fullusername = db.toFullUsername(username,network)
         let skylinksToReturn = {}
+
+        if (!skylinks[fullusername]) return {}
 
         for (let i = 0; i < possibleTypes.length; i++) {
             if (types.includes(possibleTypes[i]))
@@ -178,16 +175,16 @@ let db = {
                 console.log('Error saving user info: ' + err)
         })
     },
-    writeUsageData: () => {
-        fs.writeFile('db/usage.json',JSON.stringify(usageData),(err) => {
-            if (err)
-                console.log('Error saving usage logs: ' + err)
-        })
-    },
     writeHashesData: () => {
         fs.writeFile('db/hashes.json',JSON.stringify(hashes),(err) => {
             if (err)
                 console.log('Error saving hash logs: ' + err)
+        })
+    },
+    writeHashSizesData: () => {
+        fs.writeFile('db/hashsizes.json',JSON.stringify(hashSizes),(err) => {
+            if (err)
+                console.log('Error saving hash sizes: ' + err)
         })
     },
     writeSkylinksData: () => {
@@ -203,6 +200,16 @@ let db = {
         if (aliasOf && db.getAliasOf(username,network))
             result = db.getAliasOf(username,network)
         return result
+    },
+    toUsername: (fullusername) => {
+        return fullusername.split('@')[0]
+    },
+    toNetwork: (fullusername) => {
+        let parts = fullusername.split('@')
+        if (parts.length > 1)
+            return parts[1]
+        else
+            return 'all'
     },
     isValidAvalonUsername: (username) => {
         let allowedUsernameChars = 'abcdefghijklmnopqrstuvwxyz0123456789'
