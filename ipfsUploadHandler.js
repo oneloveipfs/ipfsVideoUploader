@@ -166,11 +166,7 @@ let uploadOps = {
             if (err) return response.status(400).send({error: err})
             let chunkDir = request.file.path
             addFile(chunkDir,true,false,(hash) => {
-                if (Config.UsageLogs) {
-                    db.recordUsage(username,network,'streams',request.file.size)
-                    db.writeUsageData()
-                }
-                db.recordHash(username,network,'streams',hash)
+                db.recordHash(username,network,'streams',hash,request.file.size)
                 db.writeHashesData() // TODO: Write to disk every x minutes to minimize disk wear out
 
                 let result = {
