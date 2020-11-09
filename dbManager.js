@@ -196,12 +196,28 @@ let db = {
                 console.log('Error saving skylinks: ' + err)
         })
     },
+    // Username helpers
     toFullUsername: (username,network,aliasOf) => {
         let result = username
         if (network && network != 'all') result += '@' + network
         if (aliasOf && db.getAliasOf(username,network))
             result = db.getAliasOf(username,network)
         return result
+    },
+    isValidAvalonUsername: (username) => {
+        let allowedUsernameChars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+        let allowedUsernameCharsOnlyMiddle = '-.'
+        username = username.toLowerCase()
+        for (let i = 0; i < username.length; i++) {
+            const c = username[i]
+            // allowed username chars
+            if (allowedUsernameChars.indexOf(c) === -1) 
+                if (allowedUsernameCharsOnlyMiddle.indexOf(c) === -1)
+                    return 'invalid character ' + c
+                else if (i === 0 || i === username.length-1)
+                    return 'character ' + c + ' can only be in the middle'
+        }
+        return null
     }
 }
 

@@ -32,7 +32,7 @@ let Shawp = {
         if (network) console.log('Keeping alive for',network)
         if (!Config.Shawp.Enabled) return
         if (Config.Shawp.HiveReceiver && (!network || network === 'hive')) hive.api.streamTransactions('irreversible',(err,tx) => {
-            if (err) return console.log('Hive tx stream error',err)
+            if (err) return
             let transaction = tx
             if (transaction.transaction_num == 0) headBlockHive = transaction.block_num
             if (transaction && transaction.operations && transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.HiveReceiver) {
@@ -44,15 +44,24 @@ let Shawp = {
                         if (e) return console.log(e)
                         let receiver = tx.from
                         let memo = tx.memo.toLowerCase()
-                        if (memo !== '' && !memo.startsWith('to: @')) return // Memo must be empty or begin with "to: @"
-                        if (memo && memo.startsWith('to: @')) { // TODO: Memo for network specific accounts
+                        let network = 'all'
+                        if (memo !== '' && !memo.startsWith('to: @') && !memo.startsWith('to: hive@') && !memo.startsWith('to: dtc@')) return // Memo must be empty or begin with "to: @" or "to: network@"
+                        if (memo && memo.startsWith('to: @')) {
                             let otheruser = memo.replace('to: @','')
+                            if (hive.utils.validateAccountName(otheruser) == null && db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
+                        } else if (memo && memo.startsWith('to: hive@')) {
+                            let otheruser = memo.replace('to: hive@','')
                             if (hive.utils.validateAccountName(otheruser) == null) receiver = otheruser
+                            network = 'hive'
+                        } else if (memo && memo.startsWith('to: dtc@')) {
+                            let otheruser = memo.replace('to: dtc@','')
+                            if (db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
+                            network = 'dtc'
                         }
-                        Shawp.Refill(tx.from,receiver,'all',Shawp.methods.Hive,tx.amount,usd)
+                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Hive,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled $' + usd + ' to @' + receiver + ' successfully')
+                        console.log('Refilled $' + usd + ' to ' + (network != 'all' ? network : '') + '@' + receiver + ' successfully')
                     })
                 } else if (tx.amount.endsWith('HBD')) {
                     let amt = parseFloat(tx.amount.replace(' HBD',''))
@@ -60,22 +69,31 @@ let Shawp = {
                         if (e) return console.log(e)
                         let receiver = tx.from
                         let memo = tx.memo.toLowerCase()
-                        if (memo !== '' && !memo.startsWith('to: @')) return // Memo must be empty or begin with "to: @"
+                        let network = 'all'
+                        if (memo !== '' && !memo.startsWith('to: @') && !memo.startsWith('to: hive@') && !memo.startsWith('to: dtc@')) return // Memo must be empty or begin with "to: @" or "to: network@"
                         if (memo && memo.startsWith('to: @')) {
                             let otheruser = memo.replace('to: @','')
+                            if (hive.utils.validateAccountName(otheruser) == null && db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
+                        } else if (memo && memo.startsWith('to: hive@')) {
+                            let otheruser = memo.replace('to: hive@','')
                             if (hive.utils.validateAccountName(otheruser) == null) receiver = otheruser
+                            network = 'hive'
+                        } else if (memo && memo.startsWith('to: dtc@')) {
+                            let otheruser = memo.replace('to: dtc@','')
+                            if (db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
+                            network = 'dtc'
                         }
-                        Shawp.Refill(tx.from,receiver,'all',Shawp.methods.Hive,tx.amount,usd)
+                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Hive,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled $' + usd + ' to @' + receiver + ' successfully')
+                        console.log('Refilled $' + usd + ' to ' + (network != 'all' ? network : '') + '@' + receiver + ' successfully')
                     })
                 }
             }
         })
         
         if (Config.Shawp.SteemReceiver && (!network || network === 'steem')) steem.api.streamTransactions('irreversible',(err,tx) => {
-            if (err) return console.log('Steem tx stream error',err)
+            if (err) return
             let transaction = tx
             if (transaction.transaction_num == 0) headBlockSteem = transaction.block_num
             if (transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.SteemReceiver) {
@@ -86,15 +104,24 @@ let Shawp = {
                         if (e) return console.log(e)
                         let receiver = tx.from
                         let memo = tx.memo.toLowerCase()
-                        if (memo !== '' && !memo.startsWith('to: @')) return // Memo must be empty or begin with "to: @"
+                        let network = 'all'
+                        if (memo !== '' && !memo.startsWith('to: @') && !memo.startsWith('to: hive@') && !memo.startsWith('to: dtc@')) return // Memo must be empty or begin with "to: @" or "to: network@"
                         if (memo && memo.startsWith('to: @')) {
                             let otheruser = memo.replace('to: @','')
+                            if (steem.utils.validateAccountName(otheruser) == null && db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
+                        } else if (memo && memo.startsWith('to: hive@')) {
+                            let otheruser = memo.replace('to: hive@','')
                             if (steem.utils.validateAccountName(otheruser) == null) receiver = otheruser
+                            network = 'hive'
+                        } else if (memo && memo.startsWith('to: dtc@')) {
+                            let otheruser = memo.replace('to: dtc@','')
+                            if (db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
+                            network = 'dtc'
                         }
-                        Shawp.Refill(tx.from,receiver,'all',Shawp.methods.Steem,tx.amount,usd)
+                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Steem,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled $' + usd + ' to @' + receiver + ' successfully')
+                        console.log('Refilled $' + usd + ' to ' + (network != 'all' ? network : '') + '@' + receiver + ' successfully')
                     })
                 } else if (tx.amount.endsWith('SBD')) {
                     let amt = parseFloat(tx.amount.replace(' SBD',''))
@@ -102,15 +129,24 @@ let Shawp = {
                         if (e) return console.log(e)
                         let receiver = tx.from
                         let memo = tx.memo.toLowerCase()
-                        if (memo !== '' && !memo.startsWith('to: @')) return // Memo must be empty or begin with "to: @"
+                        let network = 'all'
+                        if (memo !== '' && !memo.startsWith('to: @') && !memo.startsWith('to: hive@') && !memo.startsWith('to: dtc@')) return // Memo must be empty or begin with "to: @" or "to: network@"
                         if (memo && memo.startsWith('to: @')) {
                             let otheruser = memo.replace('to: @','')
+                            if (steem.utils.validateAccountName(otheruser) == null && db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
+                        } else if (memo && memo.startsWith('to: hive@')) {
+                            let otheruser = memo.replace('to: hive@','')
                             if (steem.utils.validateAccountName(otheruser) == null) receiver = otheruser
+                            network = 'hive'
+                        } else if (memo && memo.startsWith('to: dtc@')) {
+                            let otheruser = memo.replace('to: dtc@','')
+                            if (db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
+                            network = 'dtc'
                         }
-                        Shawp.Refill(tx.from,receiver,'all',Shawp.methods.Steem,tx.amount,usd)
+                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Steem,tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled $' + usd + ' to @' + receiver + ' successfully')
+                        console.log('Refilled $' + usd + ' to ' + (network != 'all' ? network : '') + '@' + receiver + ' successfully')
                     })
                 }
             }
@@ -126,12 +162,12 @@ let Shawp = {
 
             Scheduler.scheduleJob('* * * * *',() => {
                 hive.api.getDynamicGlobalProperties((e,r) => {
-                    if (!e && Math.abs(r.head_block_number - headBlockHive) > 100) 
+                    if (!e && Math.abs(r.head_block_number - headBlockHive) > 25) 
                         Shawp.init('hive') // keep alive
                 })
 
                 steem.api.getDynamicGlobalProperties((e,r) => {
-                    if (!e && Math.abs(r.head_block_number - headBlockSteem) > 100) 
+                    if (!e && Math.abs(r.head_block_number - headBlockSteem) > 25) 
                         Shawp.init('steem') // keep alive
                 })
             })

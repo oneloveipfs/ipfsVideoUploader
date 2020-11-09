@@ -163,7 +163,7 @@ let auth = {
         if (network && network != 'all') fullusername += '@' + network
         if (!auth.isInWhitelist(username,network)) {
             whitelist.push(fullusername)
-            if (!nowrite) fs.writeFile('whitelist.txt',whitelist.join('\n'),() => {})
+            if (!nowrite) auth.writeWhitelistToDisk()
         }
         cb()
     },
@@ -177,6 +177,11 @@ let auth = {
     },
     webhookAuth: (token,cb) => {
         // TODO: Update for new bot webhook system
+    },
+    writeWhitelistToDisk: () => {
+        fs.writeFile('whitelist.txt',whitelist.join('\n'),(e) => {
+            if (e) console.log('Error saving whitelist to disk: ' + e)
+        })
     },
     stopWatchingOnWhitelist: () => {
         // For unit testing only
