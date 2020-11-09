@@ -3,6 +3,7 @@
     "HTTP_PORT": 3000,
     "whitelistEnabled": true,
     "spritesEnabled": true,
+    "deleteUploadsAfterAdd": true,
     "tokenExpiry": 86400,
     "tokenApp": "oneloveipfs",
 

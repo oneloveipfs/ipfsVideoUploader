@@ -138,6 +138,7 @@ let uploadOps = {
                 }
                 response.send(result)
                 ipsync.emit('upload',result)
+                if (Config.deleteUploadsAfterAdd) fs.unlink('imguploads/'+uploadedImg,()=>{})
             })
         })
     },
@@ -173,8 +174,12 @@ let uploadOps = {
             if (err) return response.status(400).send({error: err})
             let chunkDir = request.file.path
             addFile(chunkDir,true,false,(hash) => {
-                db.recordHash(username,network,'streams',hash,request.file.size)
-                db.writeHashesData() // TODO: Write to disk every x minutes to minimize disk wear out
+                // We will finalize total stream size after livestream ends,
+                // for now it does not count towards disk usage. Alive streams
+                // record as network/streamer/link so that the full list of
+                // hashes can be retrieved from the blockchain later.
+                // TODO: Verify that network/streamer/link exists
+                db.recordHash(username,network,'streams',request.body.streamId,0)
 
                 let result = {
                     username: username,
@@ -183,6 +188,7 @@ let uploadOps = {
                     hash: hash
                 }
                 response.status(200).send(result)
+                if (Config.deleteUploadsAfterAdd) fs.unlink(chunkDir,()=>{})
             })
         })
     },

@@ -65,7 +65,8 @@ let db = {
             hashes[fullusername][type].push(hash)
         
         // Record size of file
-        hashSizes[hash] = size
+        if (size > 0)
+            hashSizes[hash] = size
     },
     recordSkylink: (username,network,type,skylink) => {
         let fullusername = db.toFullUsername(username,network)
