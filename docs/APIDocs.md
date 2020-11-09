@@ -1,16 +1,18 @@
 # GET API
 
-#### To check if Steem user is in the whitelist:
+#### To check if user is in the whitelist:
 ```
-/checkuser?user=STEEM_USERNAME
+/checkuser?user=USERNAME
 ```
-* `user` *(required)*: Steem account username
+* `user` *(required)*: Avalon/Hive account username
+* `network` *(optional)*: Specify username network. Valid values: `hive`, `dtc` and `all`. Default: `all`.
 
-#### To get usage info for specific Steem user:
+#### To get usage info for specific user:
 ```
-/usage?user=STEEM_USERNAME
+/usage?user=USERNAME
 ```
-* `user` *(required)*: Steem account username
+* `user` *(required)*: Avalon/Hive account username
+* `network` *(optional)*: Specify username network. Valid values: `hive`, `dtc` and `all`. Default: `all`.
 
 #### To get uploader global statistics:
 ```
@@ -20,11 +22,12 @@
 
 #### To get list of hashes of uploaded files:
 ```
-/hashes?user=STEEM_USERNAME&hashtype=videos,thumbnails,sprites
+/hashes?user=USERNAME&hashtype=videos,thumbnails,sprites
 ```
 
-* `user` *(optional)*: Steem account username
-* `hashtype` *(required)*: Type of hash to obtain. Valid values: `videos`, `thumbnails`, `sprites`, `images`, `video240`, `video480`, `video720`, `video1080`.
+* `user` *(optional)*: Avalon/Hive account username
+* `network` *(optional)*: Specify username network. Valid values: `hive`, `dtc` and `all`. Default: `all`.
+* `hashtype` *(optional)*: Type of hash to obtain, comma seperated. Valid values: `videos`, `thumbnails`, `sprites`, `images`, `video240`, `video480`, `video720`, `video1080`, `subtitles` and `streams` Default: All.
 
 #### To get update logs:
 ```
@@ -34,23 +37,15 @@
 
 #### To initiate a login:
 ```
-/login?user=STEEM_USERNAME
+/login?user=USERNAME
 ```
 
-* `user` *(required)*: Steem account username
+* `user` *(required)*: Avalon/Hive account username
+* `network` *(optional)*: Specify username network. Valid values: `hive`, `dtc` and `all`. Default: `all`.
+* `dtckeyid` *(optional)*: Specify Avalon custom key ID for decryption
+* `needscredits` *(optional)*: Enable check for sufficient hosting credits
 
-The client decrypts the returned string of `encrypted_memo` using the posting key of `STEEM_USERNAME`, then sends the decrypted string back to the server with `/logincb` POST API call to obtain the access token.
-
-## WooCommerce related GET API
-These API calls will only be enabled if `WooCommerceEnabled` is set to `true` in config.json.
-
-#### To get WooCommerce customer info
-```
-/wc_user_info?access_token=AUTH_TOKEN
-```
-
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
-* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
+The client decrypts the returned string of `encrypted_memo` using the posting key of `USERNAME`, then sends the decrypted string back to the server with `/logincb` POST API call to obtain the access token.
 
 # POST API
 
@@ -81,6 +76,7 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 ```
 {
     username: "techcoderx",
+    network: "all",
     imgtype: "images",
     imghash: "QmUKHnTN3TR8zS2s2xUqvv6rzcwogh4T64Un3u4B2UBkt8"
 }
@@ -99,38 +95,33 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 ```
 {
     username: "techcoderx",
+    network: "all",
     hash: "QmUgU4GRZKA5EbhyxeUXWg7K5yc5CghfAuDEQFN9BNxPHR"
 }
 ```
 
-## WooCommerce related POST API
-**Disabled when Shawp is used.**
-
-These API calls will only be enabled if `WooCommerceEnabled` is set to `true` in config.json.
-
-#### IPFS Bot usage webhook (currently used in [IPFS Discord pinning bot](https://github.com/techcoderx/DTube-IPFS-Bot))
-This webhook syncs the bot usage data with the uploader so that the correct available quota balance is shown on the account details page.
+#### To upload a HLS stream chunk:
 ```
-/botusage
+/uploadStream?access_token=AUTH_TOKEN
 ```
-
-* Content type: application/json
-* JSON data specs:
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
+* Content type: multipart/form-data
+* File input: `chunk`
+* Additional field:
+    - `streamId`: ID of on-chain Alive stream in the format of `network/streamer/link`.
+* Output data example:
 ```
 {
-    token: "CustomWebhookPasswordFromKeygenOutput", // Webhook password from keygen output
-    username: "techcoderx", // steem username to be updated
-    size: 293892389 // new usage count in bytes
+    username: "techcoderx",
+    network: "all",
+    type: "streams",
+    hash: "QmedMWg9BAicneQQax7LouQpUsMGGiBJkke6bPACnVFB95"
 }
 ```
 
-#### Order update webhook
-This webhook automatically adds new customers to `whitelist.txt` and `wc.json` database once it detects a payment so that customers can authenticate immediately once they have paid. In addition, any referrals will be updated and new bonus quota allocation will be issued.
-```
-/wc_order_update
-```
-
-This webhook API method should be added to WooCommerce webhooks settings, with topic set to `Order updated`. Then, place the generated webhook secret in `.auth.json` file (under `WCWebhookSecret`).
+#### IPFS Bot usage webhook (currently used in [IPFS Discord pinning bot](https://github.com/techcoderx/DTube-IPFS-Bot))
+This webhook syncs the bot usage data with the uploader so that the correct available quota balance is shown on the account details page. **This is currently WIP**
 
 # IPSync
 

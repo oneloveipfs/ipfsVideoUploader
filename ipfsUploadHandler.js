@@ -172,8 +172,9 @@ let uploadOps = {
         // video/mp2t
         streamUpload.single('chunk')(request,response,(err) => {
             if (err) return response.status(400).send({error: err})
+            if (!request.body.streamId) return response.status(400).send({error: 'Missing streamId'})
             let chunkDir = request.file.path
-            addFile(chunkDir,true,false,(hash) => {
+            addFile(chunkDir,true,false,(size,hash) => {
                 // We will finalize total stream size after livestream ends,
                 // for now it does not count towards disk usage. Alive streams
                 // record as network/streamer/link so that the full list of

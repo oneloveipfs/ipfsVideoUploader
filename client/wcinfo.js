@@ -1,4 +1,4 @@
-let geturl = '/wc_user_info?access_token=' + token
+let geturl = '/shawp_user_info?access_token=' + token
 
 if (iskeychain !== 'true') geturl += '&scauth=true'
 

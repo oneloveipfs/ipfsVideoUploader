@@ -78,7 +78,7 @@ app.get('/checkuser', APILimiter, (request,response) => {
 
 app.get('/login',AuthAPILimiter,(request,response) => {
     // Steem Keychain Auth
-    if ((request.query.user === undefined) || request.query.user === '')
+    if (!request.query.user || request.query.user === '')
         // Username not specified, throw an error
         return response.status(400).send({error: 'Username not specified!'})
 
@@ -193,7 +193,7 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
 
 app.get('/usage',APILimiter, (request,response) => {
     // API to get usage info
-    if (request.query.user === undefined || request.query.user === '') return response.send('Username is not defined!');
+    if (!request.query.user || request.query.user === '') return response.send('Username is not defined!');
     let usage = db.getUsage(request.query.user,request.query.network)
     response.send(usage)
 })
@@ -208,12 +208,12 @@ app.get('/stats',APILimiter,(request,response) => {
 
 app.get('/hashes',APILimiter, (request,response) => {
     // API to get IPFS hashes of uploaded files
-    let typerequested = request.query.hashtype;
-    if (typerequested === '' || typerequested === undefined) {
+    let typerequested = request.query.hashtype
+    if (typerequested === '' || !typerequested) {
         typerequested = db.getPossibleTypes()
     } else typerequested.split(',');
 
-    if (request.query.user === undefined || request.query.user === '')
+    if (!request.query.user || request.query.user === '')
         // Username not specified, return all hashes (either all videos, snaps or sprites, or all three)
         return response.send(db.getHashes(typerequested))
     else {
@@ -304,14 +304,14 @@ app.post('/botusage',Parser.json(),(req,res) => {
     return res.status(500).send({error: 'WIP'})
 })
 
-app.get('/wc_user_info',APILimiter,(req,res) => {
+app.get('/shawp_user_info',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user,network) => {
         res.send(Shawp.User(user,network))
     })
 })
 
-app.get('/wc_user_info_admin',APILimiter,(req,res) => {
+app.get('/shawp_user_info_admin',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user,network) => {
         if (!Config.admins.includes(db.toFullUsername(user,network)))

@@ -14,6 +14,14 @@ Shawp offers a set of APIs when enabled in `config.json`. APIs listed below are 
 ```
 *(There are no arguments to be specifed in the URL for this API call)*
 
+#### Shawp customer info
+```
+/shawp_user_info?access_token=AUTH_TOKEN
+```
+
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
+
 #### Refill history
 ```
 /shawp_refill_history?start=0&count=5&access_token=AUTH_TOKEN

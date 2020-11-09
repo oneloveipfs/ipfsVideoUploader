@@ -4,6 +4,8 @@
 * `IPFS_API_PORT`: Specify port that IPFS daemon listens to for IPFS API calls.
 * `HTTP_PORT`: Specify port to listen to HTTP requests.
 * `whitelistEnabled`: When set to false, whitelist checks will be ignored.
+* `spritesEnabled`: Enable video sprites generation. Not supported on Windows.
+* `deleteUploadsAfterAdd`: Deletes uploaded files (non-resumable) from filesystem that are already added to IPFS.
 * `tokenExpiry`: Speficy time in ms of access token expiry from time of issuance.
 * `admins`: Array of Hive accounts which have access to administrator APIs. May also act as `encoderAccounts` but with admin privileges.
 * `encoderAccounts`: Array of Hive accounts that may be used by encoding servers. These accounts do not have admin privileges.
@@ -30,21 +32,6 @@
 #### tusd settings
 * `tusdUploadDir`: Directory where `tusd` uploads are saved to.
 * `socketTimeout`: Timeout (in ms) where sockets will be cleared from register if upload ID is not being processed.
-
-#### WooCommerce settings
-* `WooCommerceEnabled`: When set to true, WooCommerce API will be used to enable additional functionalities (e.g. disk usage quota, bot sync through webhook etc.)
-* `WooCommerceConfig`: Configuration for WooCommerce REST API. Full documentation on API configuration can be viewed [here](https://www.npmjs.com/package/woocommerce-api#setup). Note: It is recommended to use `wc/v1` as other versions may not work with subscriptions.
-* `WooCommerceSettings`: Configuration for subscription tiers and referrals. Only applicable for tiered subscription model.
-
-###### Subscription tiers
-* `wcpid`: Product ID on WooCommerce product website for subscription tier.
-* `name`: Subscription plan name, which will be shown in user's account details page.
-* `price`: Subscription cost per month.
-* `quota`: Total allocated quota for subscription tier.
-
-###### Referrals
-* `quotaBonus`: Bonus quota allocated for each customer referred.
-* `maxBonus`: Maximum possible bonus allocation for referrals per referrer.
 
 #### Shawp
 * `Enabled`: When set to true, pay-per-use pricing model is used instead.
