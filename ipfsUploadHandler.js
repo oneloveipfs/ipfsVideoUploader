@@ -95,6 +95,7 @@ const processSingleVideo = async (id,user,network,cb) => {
     // Video hash and usage should already been handled previously
     db.recordHash(user,network,'sprites',spriteGen.hash,spriteGen.size)
     db.writeHashesData()
+    db.writeHashSizesData()
 
     let duration = await getDuration(vpath)
     let result = {
@@ -128,6 +129,7 @@ let uploadOps = {
                 // If hash is not in database, add the hash into database
                 db.recordHash(username,network,imgType,hash,request.file.size)
                 db.writeHashesData()
+                db.writeHashSizesData()
 
                 // Send image IPFS hash back to client and IPSync
                 let result = {
@@ -155,6 +157,7 @@ let uploadOps = {
         for await (const sub of ipfsAddSubtitleOp) {
             db.recordHash(username,network,'subtitles',sub.cid.toString(),sub.size)
             db.writeHashesData()
+            db.writeHashSizesData()
 
             let result = {
                 username: username,
@@ -181,6 +184,7 @@ let uploadOps = {
                 // hashes can be retrieved from the blockchain later.
                 // TODO: Verify that network/streamer/link exists
                 db.recordHash(username,network,'streams',request.body.streamId,0)
+                db.writeHashesData()
 
                 let result = {
                     username: username,
@@ -212,6 +216,7 @@ let uploadOps = {
                     db.recordHash(user,network,'videos',results.videohash.ipfshash,json.Upload.Size)
                     db.recordHash(user,network,'sprites',results.spritehash.hash,results.spritehash.size)
                     db.writeHashesData()
+                    db.writeHashSizesData()
 
                     if (results.videohash.skylink) {
                         db.recordSkylink(user,network,'videos',results.videohash.skylink)
@@ -244,6 +249,7 @@ let uploadOps = {
                 addFile(filepath,true,Config.Skynet.enabled && json.Upload.MetaData.skynet == 'true',(size,hash,skylink) => {
                     db.recordHash(user,network,json.Upload.MetaData.type,hash,json.Upload.Size)
                     db.writeHashesData()
+                    db.writeHashSizesData()
 
                     if (skylink) {
                         db.recordSkylink(user,network,json.Upload.MetaData.type,skylink)

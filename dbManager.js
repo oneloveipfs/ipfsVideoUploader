@@ -46,7 +46,7 @@ let db = {
             return userInfo[fullusername].aliasOf
     },
     recordHash: (username,network,type,hash,size) => {
-        if (!hash || !size) return
+        if (!hash && !size) return
         let fullusername = db.toFullUsername(username,network)
         if (!hashes[fullusername]) {
             hashes[fullusername] = {

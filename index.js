@@ -201,6 +201,7 @@ app.get('/usage',APILimiter, (request,response) => {
 app.get('/stats',APILimiter,(request,response) => {
     response.send({
         count: db.getHashes('videos').videos.length,
+        streams: db.getHashes('streams').streams.length,
         usercount: db.allUsersCount(),
         usage: db.getAllUsage()
     })
