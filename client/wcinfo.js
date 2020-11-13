@@ -16,6 +16,10 @@ if (token == null || token == '') {
         let infoToDisplay = '<h2>Account summary</h2>'
         infoToDisplay += '<h3>Balance: ' + result.data.balance + ' GBdays'
         infoToDisplay += '<br>Current Usage: ' + humanReadableSize(result.data.usage)
+
+        if (result.data.daysremaining && result.data.daysremaining > 0)
+            infoToDisplay += '<br>Days remaining (based on balance and usage): ' + result.data.daysremaining
+
         infoToDisplay += '<br>Rate: $' + result.data.rate + '/day (~$' + monthlyRate + '/month)'
         infoToDisplay += '<br>Joined Since: ' + moment(result.data.joinedSince).utc(result.data.joinedSince).local().format('MMMM DD YYYY h:mm:ss a') + '</h3>'
 

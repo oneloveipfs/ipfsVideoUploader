@@ -24,7 +24,7 @@ app.get('/wcHelper.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/scripts/generateKeys.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/whitelist.txt',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/config.json',(req,res) => {return res.status(404).redirect('/404')})
-app.get('/db/shawp/*',(req,res) => {return res.status(404).redirect('/404')})
+app.get('/db/*',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package.json',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package-lock.json',(req,res) => {return res.status(404).redirect('/404')})
 
