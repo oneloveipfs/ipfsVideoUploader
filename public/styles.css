@@ -552,6 +552,17 @@ textarea {
     font-size: 25px;
 }
 
+#gbdaysautobtns {
+    display: grid;
+    text-align: center;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+#gbdaysautobtns .grid-item a {
+    padding: 6px 40px;
+    font-size: 18px;
+}
+
 /* Get help page */
 #getHelp h4 a { color: #000000; }
 #getHelp h4 a:visited { color: #000000; }
@@ -1000,6 +1011,15 @@ td {
         display: table-row;
         width: 100%;
         word-break: break-all;
+    }
+
+    #gbdaysautobtns {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    #gbdaysautobtns .grid-item a {
+        font-size: 14px;
+        padding: 6px 30px;
     }
 
     /* Display td on top of each other on mobile */
