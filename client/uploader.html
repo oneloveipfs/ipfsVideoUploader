@@ -20,6 +20,7 @@
         <script src="client/languages.js"></script>
         <script src="client/uploader.js"></script>
         <script src="client/thumbnailSwapper.js"></script>
+        <script src="client/yourfiles.js"></script>
         <script src="client/wcinfo.js"></script>
         <script src="client/getHelp.js"></script>
     </head>
@@ -31,6 +32,7 @@
                 <div id="dropdownbox" class="dropdown-content">
                     <a id="newUploadModeBtn">New upload</a>
                     <a id="snapSwapModeBtn">Thumbnail Swap</a>
+                    <a id="yourFilesModeBtn">Your files</a>
                     <a id="subDetModeBtn">Account details</a>
                     <a id="refillCrModeBtn">Refill credits</a>
                     <a id="getHelpModeBtn">Get Help</a>
@@ -130,6 +132,25 @@
                 <h3 id="newSnapField">Upload new thumbnail to replace (4MB max): <input type="file" accept="image/jpeg,image/png" id="newSnap"></h3>
                 <input class="styledButton" type="submit" value="Submit!" id="swapSubmitBtn"><br>
             </div>
+        </div>
+        <div id="yourFiles">
+            <h2>Your files</h2>
+            <h4>Here you may find the list of files pinned on our service and its file sizes. Click on each hash to preview them.</h4>
+            <h4>Filter by type: <select id="yourFilesSelection" onchange="handleTypeSelection(this)">
+                <option>Source video</option>
+                <option>240p video</option>
+                <option>480p video</option>
+                <option>720p video</option>
+                <option>1080p video</option>
+                <option>Thumbnails</option>
+                <option>Sprites</option>
+                <option>Subtitles</option>
+                <option>Images</option>
+            </select></h4>
+            <table style="width: 100%;" id="hashesTbl">
+                <thead><tr><td>Hash</td><td>File Size</td></tr></thead>
+                <tbody id="hashesTbody"></tbody>
+            </table>
         </div>
         <div id="wcinfo"><h3>Loading account data...</h3></div> <!-- User info page (e.g. WC subscription package, quota available etc.) -->
         <div id="refiller"> <!-- Hosting credits refill page -->

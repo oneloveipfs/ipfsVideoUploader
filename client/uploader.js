@@ -3,6 +3,7 @@ let username
 Auth.Hive().then((result) => {
     username = result
     Auth.Avalon()
+    loadPins('videos')
 })
 
 let hiveOptions = {

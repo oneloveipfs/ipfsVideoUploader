@@ -227,7 +227,34 @@ app.get('/hashes',APILimiter, (request,response) => {
             // BOTH valid username and hash type request are specified
             return response.send(db.getHashesByUser(typerequested,request.query.user,network))
     }
-});
+})
+
+app.get('/pinsByType',APILimiter, (request,response) => {
+    // API to get details of pins by tyle
+    let typerequested = request.query.hashtype
+    if (typerequested === '' || !typerequested)
+        return response.status(400).send({error: 'Hash type not specified'})
+
+    if (!request.query.user || request.query.user === '')
+        // Username not specified, return all hashes (either all videos, snaps or sprites, or all three)
+        return response.status(400).send({error: 'Username not specified'})
+    let network = request.query.network
+    if (Auth.isInWhitelist(request.query.user,null))
+        network = 'all'
+    let userExists = db.userExistInHashesDB(request.query.user,network)
+    if (!userExists) return response.send({error: 'User specified doesn\'t exist in our record.'})
+
+    // BOTH valid username and hash type request are specified
+    let result = []
+    let hashes = db.getHashesByUser(typerequested,request.query.user,network)
+    for (let i = 0; i < hashes[typerequested].length; i++) {
+        result.push({
+            cid: hashes[typerequested][i],
+            size: db.getSizeByHash(hashes[typerequested][i])
+        })
+    }
+    response.send(result)
+})
 
 app.get('/updatelogs',APILimiter,(request,response) => {
     // Send all update logs to client to be displayed on homepage

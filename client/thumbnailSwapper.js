@@ -1,7 +1,3 @@
-// Load Avalon login
-// let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
-// let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
-
 let steemPostToModify
 let avalonPostToModify
 let hivePostToModify
@@ -27,11 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Menu selection
-    document.getElementById('newUploadModeBtn').onclick = () => updateDisplayByIDs(['uploadForm'],['thumbnailSwapper','wcinfo','refiller','getHelp','dropdownbox'])
-    document.getElementById('snapSwapModeBtn').onclick = () => updateDisplayByIDs(['thumbnailSwapper'],['uploadForm','wcinfo','refiller','getHelp','dropdownbox'])
-    document.getElementById('subDetModeBtn').onclick = () => updateDisplayByIDs(['wcinfo'],['uploadForm','thumbnailSwapper','refiller','getHelp','dropdownbox'])
-    document.getElementById('refillCrModeBtn').onclick = () => updateDisplayByIDs(['refiller'],['uploadForm','thumbnailSwapper','wcinfo','getHelp','dropdownbox'])
-    document.getElementById('getHelpModeBtn').onclick = () => updateDisplayByIDs(['getHelp'],['uploadForm','thumbnailSwapper','wcinfo','refiller','dropdownbox'])
+    let pages = ['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox']
+    document.getElementById('newUploadModeBtn').onclick = () => updateDisplayByIDs(['uploadForm'],pages)
+    document.getElementById('snapSwapModeBtn').onclick = () => updateDisplayByIDs(['thumbnailSwapper'],pages)
+    document.getElementById('yourFilesModeBtn').onclick = () => updateDisplayByIDs(['yourFiles'],pages)
+    document.getElementById('subDetModeBtn').onclick = () => updateDisplayByIDs(['wcinfo'],pages)
+    document.getElementById('refillCrModeBtn').onclick = () => updateDisplayByIDs(['refiller'],pages)
+    document.getElementById('getHelpModeBtn').onclick = () => updateDisplayByIDs(['getHelp'],pages)
 
     document.getElementById('linkSubmitBtn').onclick = () => {
         let linkInput = document.getElementById('thumbnailSwapLink')

@@ -170,6 +170,9 @@ let db = {
         
         cb(skylinksToReturn)
     },
+    getSizeByHash: (hash) => {
+        return hashSizes[hash] || null
+    },
     // Write data in variables to disk
     writeUserInfoData: () => {
         fs.writeFile('db/userinfo.json',JSON.stringify(userInfo),(err) => {
