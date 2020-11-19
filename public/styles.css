@@ -544,13 +544,18 @@ textarea {
 }
 
 #yourFiles table tr td:nth-child(1) { text-align: left; }
-#yourFiles table tr td:nth-child(2) { text-align: right; }
-#yourFiles table thead tr td { font-size: 23px; }
-#yourFiles table tbody tr td { font-size: 16px; }
+#yourFiles table tr td:nth-child(2),
+#refillHistoryTbl tbody tr td:nth-child(1),
+#refillHistoryTbl tbody tr td:nth-child(2) { text-align: right; }
+#yourFiles table thead tr td, #refillHistoryTbl thead tr td { font-size: 23px; }
+#yourFiles table tbody tr td, #refillHistoryTbl tbody tr td { font-size: 16px; }
 #yourFiles a { color: #000000; }
 #yourFiles a:visited { color: #000000; }
 #yourFiles a:hover { color: #000000; }
 #yourFiles a:active { color: #000000; }
+#refillHistoryTbl, #yourFiles table { border-collapse: collapse; }
+#refillHistoryTbl, #refillHistoryTbl tr, #refillHistoryTbl td,
+#yourFiles table, #yourFiles table tr, #yourFiles table td { border: 1px solid black; }
 
 #wcinfo h2 {
     font-size: 30px;

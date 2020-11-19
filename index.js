@@ -276,7 +276,7 @@ app.get('/shawp_config',APILimiter,(req,res) => {
 app.get('/shawp_refill_history',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user,network) => {
-        return res.send(Shawp.getRefillHistory(user,network,req.query.start || 0,req.query.count))
+        return res.send(Shawp.getRefillHistory(user,network,req.query.start || 0,req.query.count || 100))
     })
 })
 
@@ -284,14 +284,14 @@ app.get('/shawp_refill_history_admin',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user) => {
         if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
-        return res.send(Shawp.getRefillHistory(req.query.user,req.query.network || 'all',req.query.start || 0,req.query.count))
+        return res.send(Shawp.getRefillHistory(req.query.user,req.query.network || 'all',req.query.start || 0,req.query.count || 100))
     })
 })
 
 app.get('/shawp_consumption_history',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user,network) => {
-        return res.send(Shawp.getConsumeHistory(user,network,req.query.start || 0,req.query.count))
+        return res.send(Shawp.getConsumeHistory(user,network,req.query.start || 0,req.query.count || 100))
     })
 })
 
@@ -299,7 +299,7 @@ app.get('/shawp_consumption_history_admin',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user) => {
         if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
-        return res.send(Shawp.getConsumeHistory(req.query.user,req.query.network || 'all',req.query.start || 0,req.query.count))
+        return res.send(Shawp.getConsumeHistory(req.query.user,req.query.network || 'all',req.query.start || 0,req.query.count || 100))
     })
 })
 

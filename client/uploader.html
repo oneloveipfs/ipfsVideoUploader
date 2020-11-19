@@ -181,7 +181,12 @@
                     <option>Coinbase</option>
                 </select></h4>
             </h4>
-            <input class="styledButton" type="submit" value="Refill" id="refillSubmitBtn"><br>
+            <input class="styledButton" type="submit" value="Refill" id="refillSubmitBtn"><br><br>
+            <h2>Refill history</h2>
+            <table style="width: 100%;" id="refillHistoryTbl">
+                <thead><tr><td>Amount (USD)</td><td>Credits</td><td>Date/Time</td></tr></thead>
+                <tbody id="refillHistoryTbody"></tbody>
+            </table>
             <div id="refillPopup" class="popup">
                 <div class="popup-content">
                     <div class="popup-header">
