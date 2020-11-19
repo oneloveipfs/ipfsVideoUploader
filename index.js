@@ -321,7 +321,7 @@ app.post('/shawp_refill_coinbase_webhook',Parser.json({ verify: rawBodySaver }),
         res.status(200).send()
 
         if (req.body.event.data.name == Config.CoinbaseCommerce.ProductName && req.body.event.type == 'charge:confirmed') {
-            Shawp.Refill('',req.body.event.data.metadata.customer_username,req.body.event.data.metadata.network,Shawp.methods.Coinbase,req.body.event.data.payments[0].value.crypto.amount + ' ' + req.body.event.data.payments[0].value.crypto.currency,parseFloat(req.body.event.data.pricing.local.amount))
+            Shawp.Refill('',req.body.event.data.metadata.customer_username,req.body.event.data.metadata.network,Shawp.methods.Coinbase,req.body.event.data.code,new Date(req.body.event.data.created_at).getTime(),req.body.event.data.payments[0].value.crypto.amount + ' ' + req.body.event.data.payments[0].value.crypto.currency,parseFloat(req.body.event.data.pricing.local.amount))
             Shawp.WriteUserDB()
             Shawp.WriteRefillHistory()
         }

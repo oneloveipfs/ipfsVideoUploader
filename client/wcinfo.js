@@ -60,7 +60,7 @@ else if (url.searchParams.get('callback') == 'refillcancel')
 
 
 document.getElementById('refillSubmitBtn').onclick = () => {
-    updateDisplayByIDs(['refillpay'],['refillcb'])
+    updateDisplayByIDs(['refillpay'],['refillcb','refillcancel'])
 
     if (document.getElementById('gbdaysInput').value == '') return alert('Please specify GBdays to refill.')
 

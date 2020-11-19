@@ -66,8 +66,9 @@ describe('Shawp',() => {
         done()
     })
 
+    let refillTs = new Date().getTime()
     it('Shawp.Refill should top up hosting credits',(done) => {
-        Shawp.Refill("Tester",Config.test.user,'all',Shawp.methods.System,"",1)
+        Shawp.Refill("Tester",Config.test.user,'all',Shawp.methods.System,"",refillTs,"",1)
         let newCredits = Math.floor(1 / Config.Shawp.DefaultUSDRate * 100000000)/100000000
         if (!userAlreadyExist) assert.equal(Shawp.User(Config.test.user).balance,newCredits)
         done()
@@ -82,7 +83,9 @@ describe('Shawp',() => {
             method: 5,
             rawAmt: "",
             usdAmt: 1,
-            credits: Math.floor(1 / Config.Shawp.DefaultUSDRate * 100000000)/100000000
+            credits: Math.floor(1 / Config.Shawp.DefaultUSDRate * 100000000)/100000000,
+            ts: refillTs,
+            txid: ""
         }))
         done()
     })

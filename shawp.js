@@ -37,7 +37,7 @@ let Shawp = {
             if (transaction.transaction_num == 0) headBlockHive = transaction.block_num
             if (transaction && transaction.operations && transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.HiveReceiver) {
                 let tx = transaction.operations[0][1]
-                console.log(tx)
+                console.log(tx,transaction.transaction_id)
                 if (tx.amount.endsWith('HIVE')) {
                     let amt = parseFloat(tx.amount.replace(' HIVE',''))
                     Shawp.ExchangeRate(Shawp.coins.Hive,amt,(e,usd) => {
@@ -58,7 +58,7 @@ let Shawp = {
                             if (db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
                             network = 'dtc'
                         }
-                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Hive,tx.amount,usd)
+                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Hive,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
                         console.log('Refilled $' + usd + ' to ' + (network != 'all' ? network : '') + '@' + receiver + ' successfully')
@@ -83,7 +83,7 @@ let Shawp = {
                             if (db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
                             network = 'dtc'
                         }
-                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Hive,tx.amount,usd)
+                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Hive,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
                         console.log('Refilled $' + usd + ' to ' + (network != 'all' ? network : '') + '@' + receiver + ' successfully')
@@ -98,6 +98,7 @@ let Shawp = {
             if (transaction.transaction_num == 0) headBlockSteem = transaction.block_num
             if (transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.SteemReceiver) {
                 let tx = transaction.operations[0][1]
+                console.log(tx,transaction.transaction_id)
                 if (tx.amount.endsWith('STEEM')) {
                     let amt = parseFloat(tx.amount.replace(' STEEM',''))
                     Shawp.ExchangeRate(Shawp.coins.Steem,amt,(e,usd) => {
@@ -118,7 +119,7 @@ let Shawp = {
                             if (db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
                             network = 'dtc'
                         }
-                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Steem,tx.amount,usd)
+                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Steem,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
                         console.log('Refilled $' + usd + ' to ' + (network != 'all' ? network : '') + '@' + receiver + ' successfully')
@@ -143,7 +144,7 @@ let Shawp = {
                             if (db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
                             network = 'dtc'
                         }
-                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Steem,tx.amount,usd)
+                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Steem,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
                         console.log('Refilled $' + usd + ' to ' + (network != 'all' ? network : '') + '@' + receiver + ' successfully')
@@ -265,7 +266,7 @@ let Shawp = {
             cb(false)
         }
     },
-    Refill: (from,username,network,method,rawAmt,usdAmt) => {
+    Refill: (from,username,network,method,txid,ts,rawAmt,usdAmt) => {
         let fullusername = db.toFullUsername(username,network,true)
         if (!Customers[fullusername]) Shawp.AddUser(username,network)
 
@@ -280,7 +281,9 @@ let Shawp = {
             method: method,
             rawAmt: rawAmt,
             usdAmt: usdAmt,
-            credits: newCredits
+            credits: newCredits,
+            ts: ts,
+            txid: txid
         })
     },
     Consume: () => {
