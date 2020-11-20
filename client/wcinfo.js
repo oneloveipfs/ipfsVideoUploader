@@ -54,10 +54,8 @@ document.addEventListener('DOMContentLoaded', () => {
         })
 
         axios.get('/shawp_refill_history'+geturl).then(rfh => {
-            let refillHistoryHtml = ''
-            for (let i = 0; i < rfh.data.length; i++)
-                refillHistoryHtml += '<tr><td>' + rfh.data[i].usdAmt + '</td><td>' + rfh.data[i].credits + '</td><td>' + new Date(rfh.data[i].ts).toLocaleString() + '</td></tr>'
-            document.getElementById('refillHistoryTbody').innerHTML = refillHistoryHtml
+            window.rfh = rfh.data
+            populateRefillHistory(window.rfh,0)
         })
     }
 
@@ -152,6 +150,18 @@ function dismissPopup(event,popupelement) {
     if (event.target == popup) {
         popup.style.display = "none"
     }
+}
+
+function populateRefillHistory(rfh,view) {
+    let refillHistoryHtml = ''
+    for (let i = 0; i < rfh.length; i++)
+        refillHistoryHtml += '<tr><td>' + (view == 0 ? rfh[i].usdAmt : rfh[i].rawAmt) + '</td><td>' + rfh[i].credits + '</td><td>' + new Date(rfh[i].ts).toLocaleString() + '</td></tr>'
+    document.getElementById('refillHistoryHAmt').innerText = view == 0 ? 'Amount (USD)' : 'Amount (Crypto)'
+    document.getElementById('refillHistoryTbody').innerHTML = refillHistoryHtml
+}
+
+function handleAmtViewChange(selected) {
+    populateRefillHistory(window.rfh,selected.selectedIndex)
 }
 
 function exchageRate (coin,amount,cb) {
