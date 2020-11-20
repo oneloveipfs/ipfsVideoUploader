@@ -542,7 +542,7 @@ function postVideo() {
     let steemTx = generatePost('steem')
     console.log('Hive tx',hiveTx)
     console.log('Steem tx',steemTx)
-    return
+    
     if (Auth.iskeychain == 'true') {
         // Broadcast with Keychain
         hive_keychain.requestBroadcast(username,hiveTx,'Posting',(hiveResponse) => {
