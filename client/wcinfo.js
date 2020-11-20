@@ -14,27 +14,26 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 let monthlyRate = result.data.rate * 30
                 let infoToDisplay = '<h2>Account summary</h2>'
-                infoToDisplay += '<h3>Balance: ' + result.data.balance + ' GBdays'
-                infoToDisplay += '<br>Current Usage: ' + humanReadableSize(result.data.usage)
+                infoToDisplay += '<h4>Balance: ' + result.data.balance + ' GBdays</h4>'
+                infoToDisplay += '<h4>Current Usage: ' + humanReadableSize(result.data.usage) + '</h4>'
 
                 if (result.data.daysremaining && result.data.daysremaining > 0)
-                    infoToDisplay += '<br>Days remaining (based on balance and usage): ' + result.data.daysremaining
+                    infoToDisplay += '<h4>Days remaining (based on balance and usage): ' + result.data.daysremaining + '</h4>'
 
-                infoToDisplay += '<br>Rate: $' + result.data.rate + '/day (~$' + monthlyRate + '/month)'
-                infoToDisplay += '<br>Joined Since: ' + moment(result.data.joinedSince).utc(result.data.joinedSince).local().format('MMMM DD YYYY h:mm:ss a') + '</h3>'
+                infoToDisplay += '<h4>Rate: $' + result.data.rate + '/day (~$' + monthlyRate + '/month)</h4>'
+                infoToDisplay += '<h4>Joined Since: ' + moment(result.data.joinedSince).utc(result.data.joinedSince).local().format('MMMM DD YYYY h:mm:ss a') + '</h4>'
 
                 if (result.data.usagedetails && result.data.usage > 0) {
-                    infoToDisplay += '<br><h2>Usage breakdown</h2><h3>'
-                    if (result.data.usagedetails.videos) infoToDisplay += 'Source videos: ' + humanReadableSize(result.data.usagedetails.videos) + '<br>'
-                    if (result.data.usagedetails.video240) infoToDisplay += '240p videos: ' + humanReadableSize(result.data.usagedetails.video240) + '<br>'
-                    if (result.data.usagedetails.video480) infoToDisplay += '480p videos: ' + humanReadableSize(result.data.usagedetails.video480) + '<br>'
-                    if (result.data.usagedetails.video720) infoToDisplay += '720p videos: ' + humanReadableSize(result.data.usagedetails.video720) + '<br>'
-                    if (result.data.usagedetails.video1080) infoToDisplay += '1080p videos: ' + humanReadableSize(result.data.usagedetails.video1080) + '<br>'
-                    if (result.data.usagedetails.thumbnails) infoToDisplay += 'Thumbnails: ' + humanReadableSize(result.data.usagedetails.thumbnails) + '<br>'
-                    if (result.data.usagedetails.sprites) infoToDisplay += 'Sprites: ' + humanReadableSize(result.data.usagedetails.sprites) + '<br>'
-                    if (result.data.usagedetails.subtitles) infoToDisplay += 'Subtitles: ' + humanReadableSize(result.data.usagedetails.subtitles) + '<br>'
-                    if (result.data.usagedetails.streams) infoToDisplay += 'Streams: ' + humanReadableSize(result.data.usagedetails.streams) + '<br>'
-                    infoToDisplay += '</h3>'
+                    infoToDisplay += '<br><h2>Usage breakdown</h2>'
+                    if (result.data.usagedetails.videos) infoToDisplay += '<h4>Source videos: ' + humanReadableSize(result.data.usagedetails.videos) + '</h4>'
+                    if (result.data.usagedetails.video240) infoToDisplay += '<h4>240p videos: ' + humanReadableSize(result.data.usagedetails.video240) + '</h4>'
+                    if (result.data.usagedetails.video480) infoToDisplay += '<h4>480p videos: ' + humanReadableSize(result.data.usagedetails.video480) + '</h4>'
+                    if (result.data.usagedetails.video720) infoToDisplay += '<h4>720p videos: ' + humanReadableSize(result.data.usagedetails.video720) + '</h4>'
+                    if (result.data.usagedetails.video1080) infoToDisplay += '<h4>1080p videos: ' + humanReadableSize(result.data.usagedetails.video1080) + '</h4>'
+                    if (result.data.usagedetails.thumbnails) infoToDisplay += '<h4>Thumbnails: ' + humanReadableSize(result.data.usagedetails.thumbnails) + '</h4>'
+                    if (result.data.usagedetails.sprites) infoToDisplay += '<h4>Sprites: ' + humanReadableSize(result.data.usagedetails.sprites) + '</h4>'
+                    if (result.data.usagedetails.subtitles) infoToDisplay += '<h4>Subtitles: ' + humanReadableSize(result.data.usagedetails.subtitles) + '</h4>'
+                    if (result.data.usagedetails.streams) infoToDisplay += '<h4>Streams: ' + humanReadableSize(result.data.usagedetails.streams) + '</h4>'
                 }
 
                 document.getElementById('wcinfo').innerHTML = HtmlSanitizer.SanitizeHtml(infoToDisplay)
