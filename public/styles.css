@@ -506,13 +506,8 @@ textarea {
     text-align: center;
 }
 
-#beneficiaryTableList {
-    width: 100%;
-}
-
-#beneficiaryTableList tr td {
-    font-size: 15px;
-}
+.beneficiaryTableList { width: 100%; }
+.beneficiaryTableList tr td { font-size: 16px; }
 
 .beneficiaryAccLabel {
     text-align: left;
@@ -523,8 +518,8 @@ textarea {
     width: 90px;
 }
 
-#totalBeneficiariesLabel {
-    font-size: 15px;
+.totalBeneficiariesLabel {
+    font-size: 16px;
     margin-block-start: 0.25em;
     font-weight: normal;
 }
@@ -641,7 +636,7 @@ textarea {
 }
 
 #head h3 {
-    font-size: 32px;
+    font-size: 30px;
     margin-left: 50px;
     margin-right: 50px;
     font-weight: normal;

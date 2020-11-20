@@ -25,7 +25,7 @@ axios.get('/updatelogs').then((response) => {
 // Load general uploader stats
 axios.get('/stats').then((counter) => {
     document.getElementById('uploadCount').innerText = thousandSeperator(counter.data.count)
-    document.getElementById('usageCount').innerText = abbrevateFilesize(counter.data.usage.total)
+    document.getElementById('usageCount').innerText = abbrevateFilesize(counter.data.usage)
     document.getElementById('userCount').innerText = thousandSeperator(counter.data.usercount)
 })
 

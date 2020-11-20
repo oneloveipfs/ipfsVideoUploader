@@ -31,10 +31,9 @@ if (savedSubtitles) {
     setTimeout(() => updateSubtitle(),250)
 }
 
-// Hive Beneficiaries
-let beneficiaryList = []
-let totalBeneficiaries = 0
-let beneficiaryAccList = []
+// Beneficiaries
+let hiveBeneficiaries = new Beneficiaries('Hive')
+let steemBeneficiaries = new Beneficiaries('Steem')
 
 // Load Avalon login
 let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
@@ -105,6 +104,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e) return
             loadGrapheneAuthorityStatus(acc[0],'steem')
         })
+        else
+            updateDisplayByIDs([],['beneficiaryHeadingSteem','beneficiaryTableListSteem','totalBeneficiariesLabelSteem'])
 
         hive.api.setOptions(hiveOptions)
         if (!dtconly) hive.api.getAccounts([username],(e,acc) => {
@@ -365,31 +366,29 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('appendBeneficiaryBtn').onclick = () => {
         let account = document.getElementById('newBeneficiaryUser').value
         let percentage = Math.floor(document.getElementById('newBeneficiaryPercent').value * 100)
-        let weightRemaining = 10000 - totalBeneficiaries - percentage
+        let network = document.getElementById('newBeneficiaryNetwork').value
 
-        if (beneficiaryList.length === 8) return alert('Maximum number of beneficiary accounts is 8.')
-        if (account === username) return alert('You can\'t set a beneficiary to your own account!')
-        if (beneficiaryAccList.includes(account)) return alert('Account specified already added as beneficiaries.')
-        if (percentage <= 0) return alert('Beneficiary percentage must be more than 0.')
-        if (weightRemaining < 0) return alert('You can\'t set beneficiaries totalling more than 100%!')
-
-        hive.api.getAccounts([account],(err,result) => {
-            if (err) return alert('Error while validating account: ' + err)
-            if (result.length === 0) return alert('Beneficiary account specified doesn\'t exist!')
-
-            totalBeneficiaries += percentage
-            beneficiaryAccList.push(result[0].name)
+        if (network == 'All' || network == 'Hive') hive.api.getAccounts([account],(err,result) => {
+            if (err) return alert('Error while validating Hive account: ' + err)
+            if (result.length === 0) return alert('Beneficiary account specified doesn\'t exist on Hive!')
 
             // If account name and percentage valid, add account to beneficiaries list and update table
-            beneficiaryList.push({
-                account: result[0].name,
-                weight: percentage
-            })
-            updateBeneficiaries()
-            
-            // Reset new beneficiary text fields
-            document.getElementById('newBeneficiaryUser').value = ''
-            document.getElementById('newBeneficiaryPercent').value = ''
+            try {
+                hiveBeneficiaries.addAccount(account,percentage)
+            } catch (e) {
+                return alert(e)
+            }
+        })
+
+        if (network == 'All' || network == 'Steem') steem.api.getAccounts([account],(err,result) => {
+            if (err) return alert('Error while validating Steem account: ' + err)
+            if (result.length === 0) return alert('Beneficiary account specified doesn\'t exist on Steem!')
+
+            try {
+                steemBeneficiaries.addAccount(account,percentage)
+            } catch (e) {
+                return alert(e)
+            }
         })
     }
 
@@ -543,7 +542,7 @@ function postVideo() {
     let steemTx = generatePost('steem')
     console.log('Hive tx',hiveTx)
     console.log('Steem tx',steemTx)
-
+    return
     if (Auth.iskeychain == 'true') {
         // Broadcast with Keychain
         hive_keychain.requestBroadcast(username,hiveTx,'Posting',(hiveResponse) => {
@@ -714,8 +713,11 @@ function generatePost(network) {
     }
 
     // Sort beneficiary list in ascending order
-    let sortedBeneficiary = JSON.parse(JSON.stringify(beneficiaryList))
-    sortedBeneficiary.sort(beneficiarySorter)
+    let sortedBeneficiary = []
+    if (network == 'hive')
+        sortedBeneficiary = hiveBeneficiaries.sort()
+    else if (network == 'steem')
+        sortedBeneficiary = steemBeneficiaries.sort()
 
     // Create transaction to post on Steem blockchain
     let operations = [
@@ -830,30 +832,6 @@ function updateSubtitle() {
     }
 }
 
-function updateBeneficiaries() {
-    let beneficiaryTableList = document.getElementById('beneficiaryTableList')
-    let beneficiaryListHtml = ''
-    for (let i = 0; i < beneficiaryList.length; i++) {
-        beneficiaryListHtml += '<tr>'
-        beneficiaryListHtml += '<td class="beneficiaryAccLabel">' + beneficiaryList[i].account + ' (' + beneficiaryList[i].weight / 100 + '%)</td>'
-        beneficiaryListHtml += '<td><a class="roundedBtn beneficiaryDelBtn" id="beneficiaryDelBtn' + i + '">Remove</a></td>'
-        beneficiaryListHtml += '</tr>'
-    }
-    beneficiaryTableList.innerHTML = beneficiaryListHtml
-    document.getElementById('totalBeneficiariesLabel').innerText = 'Total beneficiaries: ' + totalBeneficiaries / 100 + '%'
-
-    let allBeneficiaryDelBtnElems = document.querySelectorAll('a.beneficiaryDelBtn')
-
-    for (let i = 0; i < allBeneficiaryDelBtnElems.length; i++) {
-        document.getElementById(allBeneficiaryDelBtnElems[i].id).onclick = () => {
-            beneficiaryAccList.splice(i,1)
-            totalBeneficiaries -= beneficiaryList[i].weight
-            beneficiaryList.splice(i,1)
-            updateBeneficiaries()
-        }
-    }
-}
-
 function broadcastCompletion(isAvalonSuccess) {
     localStorage.clear()
     if (isAvalonSuccess)
@@ -920,20 +898,6 @@ function needsBandwidth() {
         return false
     else
         return estimatedBandwidth() - currentBw
-}
-
-function beneficiarySorter (a,b) {
-    let accA = a.account.toUpperCase()
-    let accB = b.account.toUpperCase()
-
-    let comp = 0
-    if (accA > accB) {
-        comp = 1
-    } else if (accA < accB) {
-        comp = -1
-    }
-
-    return comp
 }
 
 function thousandSeperator(num) {
