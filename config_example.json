@@ -21,7 +21,9 @@
         "enableSupport": true,
         "disabled": false,
         "disabledMessage": "",
-        "disabledMeme": "brbmeme.jpg"
+        "disabledMeme": "brbmeme.jpg",
+        "uploadFromFs": false,
+        "noBroadcast": false
     },
 
     "Skynet": {

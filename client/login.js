@@ -49,7 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
 
-    let proceedAuthBtnDisabled = document.getElementById('proceedAuthBtn').disabled
+    window.keychainLoginBtn = document.getElementById('proceedAuthBtn')
+    window.proceedAuthBtnDisabled = document.getElementById('proceedAuthBtn').disabled
     document.getElementById('authButton').onclick = loginBtnClicked
     document.getElementById('authButton2').onclick = loginBtnClicked
 
@@ -81,10 +82,9 @@ function loginBtnClicked() {
 }
 
 document.getElementById('proceedAuthBtn').onclick = async function proceedLogin() {
-    if (proceedAuthBtnDisabled == true) return
+    if (window.proceedAuthBtnDisabled == true) return
 
     let useSteem = false
-    let keychainLoginBtn = document.getElementById('proceedAuthBtn')
     let username = document.getElementById('loginUsername').value.toLowerCase().replace('@','')
     let steemUsername = document.getElementById('loginSteemUsername').value.toLowerCase().replace('@','')
     let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
@@ -276,9 +276,13 @@ async function avalonLogin(avalonUsername,avalonKey,dtconly) {
         try {
             let avalonLoginResult = await avalonLoginPromise
             if (avalonLoginResult != true) {
+                keychainLoginBtn.innerText = getKeychainLoginBtnLabel()
+                proceedAuthBtnDisabled = false
                 return alert('Avalon key is invalid!')
             }
         } catch (e) {
+            keychainLoginBtn.innerText = getKeychainLoginBtnLabel()
+            proceedAuthBtnDisabled = false
             return alert('Avalon login error: ' + e)
         }
         
@@ -294,6 +298,8 @@ async function avalonLogin(avalonUsername,avalonKey,dtconly) {
                     return alert(response.data.error)
                 javalon.decrypt(avalonKey,response.data.encrypted_memo,(e,decryptedAES) => {
                     if (e) {
+                        keychainLoginBtn.innerText = getKeychainLoginBtnLabel()
+                        proceedAuthBtnDisabled = false
                         return alert('Avalon decrypt error: ' + e.error)
                     }
                     keychainCb(decryptedAES,'',true)

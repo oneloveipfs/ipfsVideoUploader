@@ -9,7 +9,8 @@
     "v2migration": "node scripts/v2Migration.js",
     "test": "mocha --timeout 5000",
     "snyk-protect": "snyk protect",
-    "prepare": "npm run snyk-protect"
+    "prepare": "npm run snyk-protect",
+    "devapp": "electron electron.js"
   },
   "author": "techcoderx",
   "license": "GPLv3",
@@ -42,6 +43,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
+    "electron": "^11.0.2",
     "mocha": "^7.1.2"
   },
   "snyk": true

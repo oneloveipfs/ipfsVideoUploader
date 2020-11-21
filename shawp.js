@@ -302,10 +302,12 @@ let Shawp = {
     },
     getRefillHistory: (username,network,start,count) => {
         let fullusername = db.toFullUsername(username,network,true)
+        if (!RefillHistory[fullusername]) return []
         return RefillHistory[fullusername].slice(start,start+count)
     },
     getConsumeHistory: (username,network,start,count) => {
         let fullusername = db.toFullUsername(username,network,true)
+        if (!ConsumeHistory[fullusername]) return []
         return ConsumeHistory[fullusername].slice(start,start+count)
     },
     getDaysRemaining: (username,network) => {

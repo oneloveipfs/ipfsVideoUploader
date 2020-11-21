@@ -88,7 +88,7 @@ function isElectron() {
         return true
 
     // Main process
-    if (typeof process.versions === 'object' && !!process.versions.electron)
+    if (window.process && typeof process.versions === 'object' && !!process.versions.electron)
         return true
 
     // Detect the user agent when the `nodeIntegration` option is set to true

@@ -275,8 +275,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 "content-type": "multipart/form-data"
             },
             onUploadProgress: function (progressEvent) {
-                console.log(progressEvent);
-
                 let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
                 updateProgressBar(progressPercent);
             }
@@ -441,8 +439,29 @@ function uploadVideo(resolution,next) {
 
     let progressbar = document.getElementById('progressBarBack')
     let progressbarInner = document.getElementById('progressBarFront')
-    progressbar.style.display = "block"
-    progressbarInner.innerHTML = "Uploading... (0%)"
+    progressbar.style.display = 'block'
+
+    if (config.uploadFromFs && isElectron()) {
+        progressbarInner.innerText = 'Submitting upload...'
+        return axios.post('/uploadVideoFs'+geturl,{
+            type: resolutionFType,
+            skynet: document.getElementById('skynetupload').checked ? 'true' : 'false',
+            filepath: videoToUpload[0].path
+        }).then(result => {
+            progressbarInner.innerHTML = "Processing video..."
+            uplStat.emit('registerid',{
+                id: result.data.id,
+                type: resolutionFType,
+                access_token: Auth.token,
+                keychain: Auth.iskeychain
+            })
+            uploadVideo(resolution+1,next)
+        }).catch(e => {
+            console.log(e)
+            alert('Error occured while submitting file')
+        })
+    }
+    progressbarInner.innerHTML = 'Uploading... (0%)'
 
     let videoUpload = new tus.Upload(videoToUpload[0], {
         endpoint: config.tusdEndpoint,
@@ -527,6 +546,7 @@ function postVideo() {
         let avalontag = ''
         if (postparams.tags.length !== 0)
             avalontag = postparams.tags[0]
+        if (config.noBroadcast) return
         broadcastAvalon(buildJsonMetadataAvalon(),avalontag,postparams.ipfshash,() => {
             broadcastCompletion(true)
         })
@@ -540,6 +560,7 @@ function postVideo() {
     let steemTx = generatePost('steem')
     console.log('Hive tx',hiveTx)
     console.log('Steem tx',steemTx)
+    if (config.noBroadcast) return
     
     if (Auth.iskeychain == 'true') {
         // Broadcast with Keychain

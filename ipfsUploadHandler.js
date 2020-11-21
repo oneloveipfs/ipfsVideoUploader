@@ -279,6 +279,20 @@ let uploadOps = {
                 break
         }
     },
+    uploadFromFs: (type,filepath,id,user,network,skynet,cb) => {
+        let tusTypes = ['videos','video240','video480','video720','video1080']
+        fs.stat(filepath,(e,s) => {
+            if (e) return console.log(e)
+            if (tusTypes.includes(type)) uploadOps.handleTusUpload({
+                Upload: {
+                    ID: id,
+                    Size: s.size,
+                    Storage: { Path: filepath },
+                    MetaData: { type: type, skynet: skynet }
+                }
+            },user,network,cb)
+        })
+    },
     writeUploadRegister: () => {
         fs.writeFile('db/register.json',JSON.stringify(uploadRegister),() => {})
     },
@@ -358,6 +372,13 @@ let uploadOps = {
         },
         activeCount: () => {
             return usercount
+        },
+        randomID: () => {
+            let permlink = ""
+            let possible = "abcdefghijklmnopqrstuvwxyz0123456789"
+            for (let i = 0; i < 15; i++)
+                permlink += possible.charAt(Math.floor(Math.random() * possible.length))
+            return permlink
         }
     }
 }
