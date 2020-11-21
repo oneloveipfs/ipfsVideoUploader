@@ -20,7 +20,9 @@ let ipsync
 let uplstatusio
 let usercount = 0
 
-let uploadRegister = JSON.parse(fs.readFileSync('db/register.json','utf8'))
+db.setupDb('register')
+
+let uploadRegister = JSON.parse(fs.readFileSync(defaultDir+'/db/register.json','utf8'))
 let socketRegister = {}
 
 const ipfsAPI = IPFS({ host: 'localhost', port: '5001', protocol: 'http' })
@@ -294,7 +296,7 @@ let uploadOps = {
         })
     },
     writeUploadRegister: () => {
-        fs.writeFile('db/register.json',JSON.stringify(uploadRegister),() => {})
+        fs.writeFile(defaultDir+'/db/register.json',JSON.stringify(uploadRegister),() => {})
     },
     IPSync: {
         init: (server) => {

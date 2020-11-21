@@ -1,11 +1,31 @@
 // Flat file JSON database manager
 const fs = require('fs')
+const dir = require('os').homedir() + '/.oneloveipfs'
+const dbDir = dir+'/db'
+
+// Create files if not exist already
+const setupDb = (db) => {
+    if (!fs.existsSync(dbDir)) {
+        if (!fs.existsSync(dir))
+            fs.mkdirSync(dir)
+        fs.mkdirSync(dbDir)
+    } 
+    try {
+        fs.openSync(dbDir+'/'+db+'.json','r')
+    } catch (error) {
+        fs.writeFileSync(dbDir+'/'+db+'.json','{}')
+    }
+}
+setupDb('userinfo')
+setupDb('hashsizes')
+setupDb('hashes')
+setupDb('skylinks')
 
 // Cache JSON data into variables
-let userInfo = JSON.parse(fs.readFileSync('db/userinfo.json','utf8'))
-let hashSizes = JSON.parse(fs.readFileSync('db/hashsizes.json','utf8'))
-let hashes = JSON.parse(fs.readFileSync('db/hashes.json','utf8'))
-let skylinks = JSON.parse(fs.readFileSync('db/skylinks.json','utf8'))
+let userInfo = JSON.parse(fs.readFileSync(dbDir+'/userinfo.json','utf8'))
+let hashSizes = JSON.parse(fs.readFileSync(dbDir+'/hashsizes.json','utf8'))
+let hashes = JSON.parse(fs.readFileSync(dbDir+'/hashes.json','utf8'))
+let skylinks = JSON.parse(fs.readFileSync(dbDir+'/skylinks.json','utf8'))
 
 let possibleTypes = ['videos','thumbnails','sprites','images','video240','video480','video720','video1080','subtitles','streams']
 
@@ -173,27 +193,28 @@ let db = {
     getSizeByHash: (hash) => {
         return hashSizes[hash] || null
     },
+    setupDb,
     // Write data in variables to disk
     writeUserInfoData: () => {
-        fs.writeFile('db/userinfo.json',JSON.stringify(userInfo),(err) => {
+        fs.writeFile(dbDir+'/userinfo.json',JSON.stringify(userInfo),(err) => {
             if (err)
                 console.log('Error saving user info: ' + err)
         })
     },
     writeHashesData: () => {
-        fs.writeFile('db/hashes.json',JSON.stringify(hashes),(err) => {
+        fs.writeFile(dbDir+'/hashes.json',JSON.stringify(hashes),(err) => {
             if (err)
                 console.log('Error saving hash logs: ' + err)
         })
     },
     writeHashSizesData: () => {
-        fs.writeFile('db/hashsizes.json',JSON.stringify(hashSizes),(err) => {
+        fs.writeFile(dbDir+'/hashsizes.json',JSON.stringify(hashSizes),(err) => {
             if (err)
                 console.log('Error saving hash sizes: ' + err)
         })
     },
     writeSkylinksData: () => {
-        fs.writeFile('db/skylinks.json',JSON.stringify(skylinks),(err) => {
+        fs.writeFile(dbDir+'/skylinks.json',JSON.stringify(skylinks),(err) => {
             if (err)
                 console.log('Error saving skylinks: ' + err)
         })

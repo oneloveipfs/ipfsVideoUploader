@@ -1,5 +1,4 @@
 const Config = require('./config.json')
-const UpdateLogs = require('./db/updatelogs.json')
 const FileUploader = require('./ipfsUploadHandler')
 const db = require('./dbManager')
 const Auth = require('./authManager')
@@ -24,7 +23,6 @@ app.get('/wcHelper.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/scripts/generateKeys.js',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/whitelist.txt',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/config.json',(req,res) => {return res.status(404).redirect('/404')})
-app.get('/db/*',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package.json',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package-lock.json',(req,res) => {return res.status(404).redirect('/404')})
 
@@ -265,11 +263,6 @@ app.get('/pinsByType',APILimiter, (request,response) => {
         })
     }
     response.send(result)
-})
-
-app.get('/updatelogs',APILimiter,(request,response) => {
-    // Send all update logs to client to be displayed on homepage
-    response.send(UpdateLogs);
 })
 
 app.get('/config',APILimiter,(req,res) => {

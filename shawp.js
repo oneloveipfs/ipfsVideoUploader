@@ -6,6 +6,7 @@ const coinbase = require('coinbase-commerce-node')
 const fs = require('fs')
 const axios = require('axios')
 const Scheduler = require('node-schedule')
+const dbDir = require('os').homedir() + '/.oneloveipfs/db'
   
 hive.api.setOptions({url: Config.Shawp.HiveAPI, useAppbaseApi: true })
 steem.api.setOptions({ url: Config.Shawp.SteemAPI, useAppbaseApi: true })
@@ -13,9 +14,13 @@ steem.api.setOptions({ url: Config.Shawp.SteemAPI, useAppbaseApi: true })
 hive.config.set('uri', Config.Shawp.HiveAPI)
 hive.config.set('alternative_api_endpoints', [])
 
-let Customers = JSON.parse(fs.readFileSync('db/shawp/users.json'))
-let RefillHistory = JSON.parse(fs.readFileSync('db/shawp/refills.json'))
-let ConsumeHistory = JSON.parse(fs.readFileSync('db/shawp/consumes.json'))
+db.setupDb('shawpUsers')
+db.setupDb('shawpRefills')
+db.setupDb('shawpConsumes')
+
+let Customers = JSON.parse(fs.readFileSync(dbDir+'/shawpUsers.json'))
+let RefillHistory = JSON.parse(fs.readFileSync(dbDir+'/shawpRefills.json'))
+let ConsumeHistory = JSON.parse(fs.readFileSync(dbDir+'/shawpConsumes.json'))
 
 let headBlockHive
 let headBlockSteem
@@ -331,17 +336,17 @@ let Shawp = {
         Customers[fullusername].rate = usdRate
     },
     WriteUserDB: () => {
-        fs.writeFile('db/shawp/users.json',JSON.stringify(Customers),(e) => {
+        fs.writeFile(dbDir+'/shawpUsers.json',JSON.stringify(Customers),(e) => {
             if (e) console.log('Error saving user database: ' + err)
         })
     },
     WriteRefillHistory: () => {
-        fs.writeFile('db/shawp/refills.json',JSON.stringify(RefillHistory),(e) => {
+        fs.writeFile(dbDir+'/shawpRefills.json',JSON.stringify(RefillHistory),(e) => {
             if (e) console.log('Error saving refill database: ' + err)
         })
     },
     WriteConsumeHistory: () => {
-        fs.writeFile('db/shawp/consumes.json',JSON.stringify(ConsumeHistory),(e) => {
+        fs.writeFile(dbDir+'/shawpConsumes.json',JSON.stringify(ConsumeHistory),(e) => {
             if (e) console.log('Error saving refill database: ' + err)
         })
     },
