@@ -318,36 +318,6 @@ function getKeychainLoginBtnLabel() {
         return "Proceed"
 }
 
-function exchageRate (coin,amount,cb) {
-    switch (coin) {
-        case 'DTC':
-            // DTC payments coming soon
-            break
-        case 'HIVE':
-            axios.get('https://api.coingecko.com/api/v3/coins/hive?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * shawpconfig.DefaultUSDRate / response.data.market_data.current_price.usd * 1000) / 1000)
-            }).catch((e) => cb(e))
-            break
-        case 'HBD':
-            axios.get('https://api.coingecko.com/api/v3/coins/hive_dollar?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * shawpconfig.DefaultUSDRate / response.data.market_data.current_price.usd * 1000) / 1000)
-            }).catch((e) => cb(e))
-            break
-        case 'STEEM':
-            axios.get('https://api.coingecko.com/api/v3/coins/steem?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * shawpconfig.DefaultUSDRate / response.data.market_data.current_price.usd * 1000) / 1000)
-            }).catch((e) => cb(e))
-            break
-        case 'SBD':
-            axios.get('https://api.coingecko.com/api/v3/coins/steem-dollars?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * shawpconfig.DefaultUSDRate / response.data.market_data.current_price.usd * 1000) / 1000)
-            }).catch((e) => cb(e))
-            break
-        default:
-            break
-    }
-}
-
 function validateAccountName(value) {
     var i = void 0,
         label = void 0,
@@ -385,18 +355,4 @@ function validateAccountName(value) {
         }
     }
     return null;
-}
-
-function arrContainsInt(arr,value) {
-    for (var i = 0; i < arr.length; i++) {
-        if (arr[i] === value) return true
-    }
-}
-
-function updateDisplayByIDs(toshow,tohide) {
-    for (let i = 0; i < tohide.length; i++)
-        document.getElementById(tohide[i]).style.display = 'none'
-    
-    for (let i = 0; i < toshow.length; i++)
-        document.getElementById(toshow[i]).style.display = 'block'
 }

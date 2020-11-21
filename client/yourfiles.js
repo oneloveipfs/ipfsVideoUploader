@@ -8,7 +8,7 @@ function loadPins(type) {
     axios.get(call).then(res => {
         let htmlResult = ''
         for (let i = 0; i < res.data.length; i++)
-            htmlResult += '<tr><td><a target="_blank" rel="noreferrer" href="https://video.oneloveipfs.com/ipfs/' + res.data[i].cid + '">' + res.data[i].cid + '</a></td><td>' + humanReadableSize(res.data[i].size) + '</td></tr>'
+            htmlResult += '<tr><td><a target="_blank" rel="noreferrer" href="https://video.oneloveipfs.com/ipfs/' + res.data[i].cid + '">' + res.data[i].cid + '</a></td><td>' + abbrevateFilesize(res.data[i].size) + '</td></tr>'
         document.getElementById('hashesTbody').innerHTML = htmlResult
     }).catch(e => console.log(e))
 }

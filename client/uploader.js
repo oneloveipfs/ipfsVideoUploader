@@ -233,10 +233,8 @@ document.addEventListener('DOMContentLoaded', () => {
             postparams = Object.assign(postparams,uploaderResponse)
 
             // Upload all videos
-            uploadVideo(0,() => {
-                console.log('all videos uploaded successfully')
-            })
-        }).catch(function(err) {
+            uploadVideo(0,() => console.log('all videos uploaded successfully'))
+        }).catch((err) => {
             if (err.response.data.error)
                 alert('Upload error: ' + JSON.stringify(err.response.data.error))
             else
@@ -899,9 +897,3 @@ function needsBandwidth() {
     else
         return estimatedBandwidth() - currentBw
 }
-
-function thousandSeperator(num) {
-    var num_parts = num.toString().split(".");
-    num_parts[0] = num_parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return num_parts.join(".");
-  }

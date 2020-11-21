@@ -146,7 +146,3 @@ function getAvalonKeyID(account) {
             return account.keys[i].id
     return null
 }
-
-function capitalizeFirstLetter(string) {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-}

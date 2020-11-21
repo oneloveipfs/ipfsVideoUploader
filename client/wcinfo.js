@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let monthlyRate = result.data.rate * 30
                 let infoToDisplay = '<h2>Account summary</h2>'
                 infoToDisplay += '<h4>Balance: ' + result.data.balance + ' GBdays</h4>'
-                infoToDisplay += '<h4>Current Usage: ' + humanReadableSize(result.data.usage) + '</h4>'
+                infoToDisplay += '<h4>Current Usage: ' + abbrevateFilesize(result.data.usage) + '</h4>'
 
                 if (result.data.daysremaining && result.data.daysremaining > 0)
                     infoToDisplay += '<h4>Days remaining (based on balance and usage): ' + result.data.daysremaining + '</h4>'
@@ -25,15 +25,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (result.data.usagedetails && result.data.usage > 0) {
                     infoToDisplay += '<br><h2>Usage breakdown</h2>'
-                    if (result.data.usagedetails.videos) infoToDisplay += '<h4>Source videos: ' + humanReadableSize(result.data.usagedetails.videos) + '</h4>'
-                    if (result.data.usagedetails.video240) infoToDisplay += '<h4>240p videos: ' + humanReadableSize(result.data.usagedetails.video240) + '</h4>'
-                    if (result.data.usagedetails.video480) infoToDisplay += '<h4>480p videos: ' + humanReadableSize(result.data.usagedetails.video480) + '</h4>'
-                    if (result.data.usagedetails.video720) infoToDisplay += '<h4>720p videos: ' + humanReadableSize(result.data.usagedetails.video720) + '</h4>'
-                    if (result.data.usagedetails.video1080) infoToDisplay += '<h4>1080p videos: ' + humanReadableSize(result.data.usagedetails.video1080) + '</h4>'
-                    if (result.data.usagedetails.thumbnails) infoToDisplay += '<h4>Thumbnails: ' + humanReadableSize(result.data.usagedetails.thumbnails) + '</h4>'
-                    if (result.data.usagedetails.sprites) infoToDisplay += '<h4>Sprites: ' + humanReadableSize(result.data.usagedetails.sprites) + '</h4>'
-                    if (result.data.usagedetails.subtitles) infoToDisplay += '<h4>Subtitles: ' + humanReadableSize(result.data.usagedetails.subtitles) + '</h4>'
-                    if (result.data.usagedetails.streams) infoToDisplay += '<h4>Streams: ' + humanReadableSize(result.data.usagedetails.streams) + '</h4>'
+                    if (result.data.usagedetails.videos) infoToDisplay += '<h4>Source videos: ' + abbrevateFilesize(result.data.usagedetails.videos) + '</h4>'
+                    if (result.data.usagedetails.video240) infoToDisplay += '<h4>240p videos: ' + abbrevateFilesize(result.data.usagedetails.video240) + '</h4>'
+                    if (result.data.usagedetails.video480) infoToDisplay += '<h4>480p videos: ' + abbrevateFilesize(result.data.usagedetails.video480) + '</h4>'
+                    if (result.data.usagedetails.video720) infoToDisplay += '<h4>720p videos: ' + abbrevateFilesize(result.data.usagedetails.video720) + '</h4>'
+                    if (result.data.usagedetails.video1080) infoToDisplay += '<h4>1080p videos: ' + abbrevateFilesize(result.data.usagedetails.video1080) + '</h4>'
+                    if (result.data.usagedetails.thumbnails) infoToDisplay += '<h4>Thumbnails: ' + abbrevateFilesize(result.data.usagedetails.thumbnails) + '</h4>'
+                    if (result.data.usagedetails.sprites) infoToDisplay += '<h4>Sprites: ' + abbrevateFilesize(result.data.usagedetails.sprites) + '</h4>'
+                    if (result.data.usagedetails.subtitles) infoToDisplay += '<h4>Subtitles: ' + abbrevateFilesize(result.data.usagedetails.subtitles) + '</h4>'
+                    if (result.data.usagedetails.streams) infoToDisplay += '<h4>Streams: ' + abbrevateFilesize(result.data.usagedetails.streams) + '</h4>'
                 }
 
                 document.getElementById('wcinfo').innerHTML = HtmlSanitizer.SanitizeHtml(infoToDisplay)
@@ -161,64 +161,4 @@ function populateRefillHistory(rfh,view) {
 
 function handleAmtViewChange(selected) {
     populateRefillHistory(window.rfh,selected.selectedIndex)
-}
-
-function exchageRate (coin,amount,cb) {
-    switch (coin) {
-        case 'DTC':
-            // DTC payments coming soon
-            break
-        case 'HIVE':
-            axios.get('https://api.coingecko.com/api/v3/coins/hive?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * accdetail.rate / response.data.market_data.current_price.usd * 1000) / 1000)
-            }).catch((e) => cb(e))
-            break
-        case 'HBD':
-            axios.get('https://api.coingecko.com/api/v3/coins/hive_dollar?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * accdetail.rate / response.data.market_data.current_price.usd * 1000) / 1000)
-            }).catch((e) => cb(e))
-            break
-        case 'STEEM':
-            axios.get('https://api.coingecko.com/api/v3/coins/steem?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * accdetail.rate / response.data.market_data.current_price.usd * 1000) / 1000)
-            }).catch((e) => cb(e))
-            break
-        case 'SBD':
-            axios.get('https://api.coingecko.com/api/v3/coins/steem-dollars?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * accdetail.rate / response.data.market_data.current_price.usd * 1000) / 1000)
-            }).catch((e) => cb(e))
-            break
-        default:
-            break
-    }
-}
-
-function humanReadableSize(size) {
-    let readable
-    if (size > 1000000000)
-        readable = Math.floor(size / 10737418.24) / 100 + ' GB'
-    else if (size > 1000000)
-        readable = Math.floor(size / 10485.76) / 100 + ' MB'
-    else if (size == undefined || size == 0)
-        readable = '0 KB'
-    else
-        readable = Math.floor(size / 10.24) / 100 + ' KB'
-
-    return readable
-}
-
-function isEmpty(obj) {
-    for(var key in obj) {
-        if(obj.hasOwnProperty(key))
-            return false;
-    }
-    return true;
-}
-
-function updateDisplayByIDs(toshow,tohide) {
-    for (let i = 0; i < tohide.length; i++)
-        document.getElementById(tohide[i]).style.display = 'none'
-    
-    for (let i = 0; i < toshow.length; i++)
-        document.getElementById(toshow[i]).style.display = 'block'
 }
