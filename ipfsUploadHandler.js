@@ -13,6 +13,7 @@ const Socket = require('socket.io')
 const Config = require('./config.json')
 const db = require('./dbManager')
 const Auth = require('./authManager')
+const defaultDir = require('os').homedir() + '/.oneloveipfs'
 
 let SocketIO
 let ipsync
@@ -23,8 +24,8 @@ let uploadRegister = JSON.parse(fs.readFileSync('db/register.json','utf8'))
 let socketRegister = {}
 
 const ipfsAPI = IPFS({ host: 'localhost', port: '5001', protocol: 'http' })
-const streamUpload = Multer({ dest: './uploaded/', limits: { fileSize: 52428800 } }) // 50MB chunks
-const imgUpload = Multer({ dest: './imguploads/', limits: { fileSize: 7340032 } })
+const streamUpload = Multer({ dest: defaultDir, limits: { fileSize: 52428800 } }) // 50MB chunks
+const imgUpload = Multer({ dest: defaultDir, limits: { fileSize: 7340032 } })
 const { globSource } = IPFS
 
 const addFile = async (dir,trickle,skynetpin,callback,onlyHash) => {
@@ -78,8 +79,8 @@ const skynetAdd = (path,opts) => {
 const addSprite = async (filepath,id) => {
     return new Promise((rs,rj) => {
         if (!Config.spritesEnabled) return rs({})
-        Shell.exec('./scripts/dtube-sprite.sh ' + filepath + ' uploaded/' + id + '.jpg',() => {
-            addFile('uploaded/' + id + '.jpg',true,false,(size,hash) => rs({size: size, hash: hash}))
+        Shell.exec('./scripts/dtube-sprite.sh ' + filepath + ' ' + defaultDir + '/' + id + '.jpg',() => {
+            addFile(defaultDir+'/'+id + '.jpg',true,false,(size,hash) => rs({size: size, hash: hash}))
         })
     })
 }
@@ -124,7 +125,7 @@ let uploadOps = {
             if (err) return response.status(400).send({error: err})
             if (!request.file) return response.status(400).send({error: 'No files have been uploaded.'})
             let uploadedImg = request.file.filename
-            addFile('imguploads/' + uploadedImg,trickleDagAdd,false,(size,hash) => {
+            addFile(defaultDir+'/'+uploadedImg,trickleDagAdd,false,(size,hash) => {
                 // Log IPFS hashes by Steem account
                 // If hash is not in database, add the hash into database
                 db.recordHash(username,network,imgType,hash,request.file.size)
@@ -140,7 +141,7 @@ let uploadOps = {
                 }
                 response.send(result)
                 ipsync.emit('upload',result)
-                if (Config.deleteUploadsAfterAdd) fs.unlink('imguploads/'+uploadedImg,()=>{})
+                if (Config.deleteUploadsAfterAdd) fs.unlink(defaultDir+'/'+uploadedImg,()=>{})
             })
         })
     },
