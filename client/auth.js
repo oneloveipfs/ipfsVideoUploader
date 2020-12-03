@@ -82,8 +82,8 @@ async function Hive() {
 
 async function Avalon() {
     // Verify Avalon login
-    let avalonUser = sessionStorage.getItem('OneLoveAvalonUser')
-    let avalonKey = sessionStorage.getItem('OneLoveAvalonKey')
+    let avalonUser = sessionStorage.getItem('dtcUser')
+    let avalonKey = sessionStorage.getItem('dtcKey')
     let promoteDisabled = false
 
     if (!avalonUser || !avalonKey) return

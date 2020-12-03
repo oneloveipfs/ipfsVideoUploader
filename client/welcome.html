@@ -24,7 +24,9 @@
         <!-- JavaScripts -->
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script src="https://unpkg.com/javalon/bin/javalon.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/steem/dist/steem.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/hivesigner"></script>
+        <script src="lib/hivecrypt.min.js"></script>
         <script src="client/cdnfallback.js"></script>
         <script src="client/commons.js"></script>
         <script src="client/login.js"></script>
@@ -132,17 +134,30 @@
                     <h2>Login</h2>
                 </div>
                 <div class="popup-body">
-                    <h5 class="logininfo" style="margin-bottom: 10px;">Hive or Avalon (DTube chain) authentication is required. Steem login requires Hive authentication using Keychain extensions.</h5>
-                    <input type="text" placeholder="HIVE Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginUsername" class="loginFields">
-                    <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginSteemUsername" class="loginFields">
-                    <h5 class="sameUsername" id="sameSteemUser"><a onclick="document.getElementById('loginSteemUsername').value = document.getElementById('loginUsername').value">Same as Hive username</a></h5>
-                    <input type="text" placeholder="AVALON Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginUsername" class="loginFields">
-                    <h5 class="sameUsername" id="sameAvalonUser"><a onclick="document.getElementById('avalonLoginUsername').value = document.getElementById('loginUsername').value">Same as Hive username</a></h5>
-                    <input type="password" placeholder="AVALON Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginKey" class="loginFields"><br>
-                    <a class="roundedBtn" id="proceedAuthBtn">Proceed</a>
-                    <h3 class="sclogin">OR</h3>
-                    <a class="roundedBtn sclogin" id="altAuthBtn">Proceed with HiveSigner</a>
-                    <h5 class="logininfo">Steem login is not supported with HiveSigner authentication.</h5>
+                    <div id="loginform">
+                        <h5 class="logininfo" style="margin-bottom: 10px;">Hive or Avalon (DTube chain) authentication is required. Steem login requires Hive authentication using Keychain extensions.</h5>
+                        <input type="text" placeholder="HIVE Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginUsername" class="loginFields">
+                        <input type="password" placeholder="HIVE Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginHiveKey" class="loginFields">
+                        <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginSteemUsername" class="loginFields">
+                        <h5 class="sameUsername" id="sameSteemUser"><a onclick="document.getElementById('loginSteemUsername').value = document.getElementById('loginUsername').value">Same as Hive username</a></h5>
+                        <input type="password" placeholder="STEEM Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginSteemKey" class="loginFields">
+                        <input type="text" placeholder="AVALON Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginUsername" class="loginFields">
+                        <h5 class="sameUsername" id="sameAvalonUser"><a onclick="document.getElementById('avalonLoginUsername').value = document.getElementById('loginUsername').value">Same as Hive username</a></h5>
+                        <input type="password" placeholder="AVALON Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginKey" class="loginFields"><br>
+                        <div class="rememberme"><label class="switch">
+                            <input type="checkbox" name="rememberme" id="rememberme" checked>
+                            <span class="slider round"></span>
+                        </label><h4 class="remembermelabel"> Remember Me</h4><br><br></div>
+                        <a class="roundedBtn" id="proceedAuthBtn">Proceed</a>
+                        <h3 class="sclogin">OR</h3>
+                        <a class="roundedBtn sclogin" id="altAuthBtn">Proceed with HiveSigner</a>
+                        <h5 class="logininfo sclogin">Steem login is not supported with HiveSigner authentication.</h5>
+                    </div>
+                    <div id="persistentform">
+                        <h4 id="persistentLoginText"></h4>
+                        <a class="roundedBtn" id="clearPersistAuthBtn">Clear login</a><br><br>
+                        <a class="roundedBtn" id="proceedPersistAuthBtn">Proceed</a>
+                    </div>
                 </div>
             </div>
         </div>

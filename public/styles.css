@@ -128,6 +128,7 @@ hr {
 
 #loginPopup .popup-body h3 { text-align: center; }
 #loginPopup .popup-body .logininfo { margin: 5px 0px; }
+#persistentform { display: none; }
 
 @-webkit-keyframes animatetop {
     from {top:-300px; opacity:0} 
@@ -751,6 +752,8 @@ textarea {
     width: 60vw;
 }
 
+#homepagePriceLbl, #signupButton { display: none; }
+
 /* Homepage content */
 #statsContainer {
     display: grid;
@@ -944,7 +947,7 @@ td {
     border-radius: 50%;
   }
 
-.poweruptext {
+.poweruptext, .remembermelabel {
     display: inline;
     position: absolute;
     transform: translate(10px, -70%);

@@ -105,7 +105,7 @@ app.get('/login',AuthAPILimiter,(request,response) => {
     } else Auth.generateEncryptedMemo(request.query.user,(err,memo) => {
         if (err) return response.send({error: err})
         response.send({encrypted_memo: memo, error: null})
-    })
+    },request.query.hivecrypt)
 })
 
 app.post('/logincb',AuthAPILimiter,(request,response) => {

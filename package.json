@@ -27,6 +27,7 @@
     "form-data": "^3.0.0",
     "fs": "0.0.1-security",
     "get-video-duration": "^0.3.0",
+    "hivecrypt": "^1.0.0",
     "hivesigner": "^3.2.1",
     "http": "0.0.1-security",
     "ipfs-http-client": "^47.0.0",

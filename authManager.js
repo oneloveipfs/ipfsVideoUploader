@@ -1,4 +1,5 @@
 const Hive = require('@hiveio/hive-js')
+const Hivecrypt = require('hivecrypt')
 const Avalon = require('javalon')
 const HiveSigner = require('hivesigner')
 const JWT = require('jsonwebtoken')
@@ -30,7 +31,7 @@ let whitelistWatcher = fs.watch('whitelist.txt',() => {
 })
 
 let auth = {
-    generateEncryptedMemo: (username,cb) => {
+    generateEncryptedMemo: (username,cb,hc) => {
         // Generate encrypted text to be decrypted by Keychain or posting key on client
         let message = username + ':oneloveipfs_login:hive'
         if (auth.isInWhitelist(username,null))
@@ -40,7 +41,13 @@ let auth = {
         let encrypted_message = Crypto.AES.encrypt(message,Keys.AESKey).toString()
         Hive.api.getAccounts([username],(err,res) => {
             if (err) return cb(err)
-            let encrypted_memo = Hive.memo.encode(Keys.wifMessage,res[0].posting.key_auths[0][0],'#' + encrypted_message)
+            let pack = hc == '1' ? Hivecrypt : Hive.memo
+            let encrypted_memo
+            try {
+                encrypted_memo = pack.encode(Keys.wifMessage,res[0].posting.key_auths[0][0],'#' + encrypted_message)
+            } catch {
+                return cb('Failed to generate memo to decode')
+            }
             cb(null,encrypted_memo)
         })
     },
