@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
         axios.get('/shawp_refill_history'+geturl).then(rfh => {
             window.rfh = rfh.data
             populateRefillHistory(window.rfh,0)
-        })
+        }).catch(() => {})
     }
 
     if (url.searchParams.get('callback') == 'refillcb')

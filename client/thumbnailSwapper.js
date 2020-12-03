@@ -273,13 +273,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     ]
                 ]
 
+                let steemBCMethod = isElectron() ? steem.broadcast.send : steem_keychain.requestBroadcast
+                let steemBCParams = isElectron() ? [{ extensions: [], operations: tx },[sessionStorage.getItem('steemKey')]] : [steemUser,tx,'Posting']
+
                 if (steemUser) {
                     // Broadcast with Steem Keychain
-                    steem_keychain.requestBroadcast(steemUser,tx,'Posting',(response) => {
-                        if (response.error) {
-                            cb(response.error)
+                    steemBCMethod(...steemBCParams,(e) => {
+                        if (!isElectron() && e) {
+                            cb(e.error)
+                        } else if (isElectron() && e) {
+                            cb(e.toString())
                         } else {
-                            cb(null,response)
+                            cb(null,true)
                         }
                     })
                 } // Add SteemLogin support?
@@ -321,13 +326,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     ]
                 ]
 
+                let hiveBCMethod = isElectron() ? hive.broadcast.send : hive_keychain.requestBroadcast
+                let hiveBCParams = isElectron() ? [{ extensions: [], operations: tx },[sessionStorage.getItem('hiveKey')]] : [username,tx,'Posting']
+
                 if (Auth.iskeychain === 'true') {
                     // Broadcast with Hive Keychain
-                    hive_keychain.requestBroadcast(username,tx,'Posting',(response) => {
-                        if (response.error) {
-                            cb(response.error)
+                    hiveBCMethod(...hiveBCParams,(e) => {
+                        if (!isElectron() && e) {
+                            cb(e.error)
+                        } else if (isElectron() && e) {
+                            cb(e.toString())
                         } else {
-                            cb(null,response)
+                            cb(null,true)
                         }
                     })
                 } else {
@@ -340,7 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                     hiveapi2.broadcast(tx,(error) => {
                         if (error) {
-                            cb('HiveSigner error: ' + error)
+                            cb('HiveSigner error: ' + error.error_description)
                         } else {
                             cb(null,'HiveSigner broadcast success!')
                         }
