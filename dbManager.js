@@ -1,6 +1,7 @@
 // Flat file JSON database manager
+const Config = require('./config.json')
 const fs = require('fs')
-const dir = require('os').homedir() + '/.oneloveipfs'
+const dir = Config.dataDir || require('os').homedir() + '/.oneloveipfs'
 const dbDir = dir+'/db'
 
 // Create files if not exist already

@@ -13,7 +13,7 @@ const Socket = require('socket.io')
 const Config = require('./config.json')
 const db = require('./dbManager')
 const Auth = require('./authManager')
-const defaultDir = require('os').homedir() + '/.oneloveipfs'
+const defaultDir = Config.dataDir || require('os').homedir() + '/.oneloveipfs'
 
 let SocketIO
 let ipsync

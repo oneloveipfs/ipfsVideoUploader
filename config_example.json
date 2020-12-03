@@ -6,6 +6,7 @@
     "deleteUploadsAfterAdd": true,
     "tokenExpiry": 86400,
     "tokenApp": "oneloveipfs",
+    "dataDir": "",
 
     "admins":["graylan","gray00","d00k13","vaultec","toddmck","priyanarc"],
     "encoderAccounts":[],

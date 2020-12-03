@@ -6,7 +6,7 @@ const coinbase = require('coinbase-commerce-node')
 const fs = require('fs')
 const axios = require('axios')
 const Scheduler = require('node-schedule')
-const dbDir = require('os').homedir() + '/.oneloveipfs/db'
+const dbDir = (Config.dataDir || require('os').homedir() + '/.oneloveipfs') + '/db'
   
 hive.api.setOptions({url: Config.Shawp.HiveAPI, useAppbaseApi: true })
 steem.api.setOptions({ url: Config.Shawp.SteemAPI, useAppbaseApi: true })
