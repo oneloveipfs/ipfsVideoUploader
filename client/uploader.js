@@ -536,24 +536,17 @@ function postVideo() {
         if (!postparams[requiredFields[j]]) return console.log('missing hash, not proceeding with broadcast')
     }
 
-    console.log('post video')
-
-    let progressbar = document.getElementById('progressBarBack')
     let progressbarInner = document.getElementById('progressBarFront')
 
     if (Auth.dtconly == 'true') {
-        progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
-        let avalontag = ''
-        if (postparams.tags.length !== 0)
-            avalontag = postparams.tags[0]
         if (config.noBroadcast) return
-        broadcastAvalon(buildJsonMetadataAvalon(),avalontag,postparams.ipfshash,() => {
+        broadcastAvalon(buildJsonMetadataAvalon(),postparams.ipfshash,() => {
             broadcastCompletion(true)
         })
         return
     }
 
-    progressbarInner.innerHTML = 'Submitting video to Hive blockchain...'
+    progressbarInner.innerHTML = 'Submitting video to Hive...'
 
     // Post to Hive blockchain
     let hiveTx = generatePost('hive')
@@ -561,38 +554,26 @@ function postVideo() {
     console.log('Hive tx',hiveTx)
     console.log('Steem tx',steemTx)
     if (config.noBroadcast) return
-    
+
+    let hiveBCMethod = isElectron() ? hive.broadcast.send : hive_keychain.requestBroadcast
+    let hiveBCParams = isElectron() ? [{ extensions: [], operations: hiveTx },[sessionStorage.getItem('hiveKey')]] : [username,hiveTx,'Posting']
+
+    let steemBCMethod = isElectron() ? steem.broadcast.send : steem_keychain.requestBroadcast
+    let steemBCParams = isElectron() ? [{ extensions: [], operations: steemTx },[sessionStorage.getItem('steemKey')]] : [steemUser,steemTx,'Posting']
+
     if (Auth.iskeychain == 'true') {
         // Broadcast with Keychain
-        hive_keychain.requestBroadcast(username,hiveTx,'Posting',(hiveResponse) => {
-            if (hiveResponse.error) {
-                alert('Hive Keychain error: ' + hiveResponse.message)
-                progressbar.style.display = "none"
-                return reenableFields()
-            }
+        hiveBCMethod(...hiveBCParams,(hiveResponse) => {
+            if (!isElectron() && hiveResponse.error)
+                return broadcastErrorHandler('Hive Keychain',hiveResponse.message)
+            else if (isElectron() && hiveResponse)
+                return broadcastErrorHandler('Hive broadcast',hiveResponse.toString())
 
             // Avalon broadcast
-            if (avalonUser) {
-                progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
-                let avalontag = ''
-                if (postparams.tags.length !== 0)
-                    avalontag = postparams.tags[0]
-                broadcastAvalon(buildJsonMetadataAvalon(),avalontag,postparams.ipfshash,() => {
-                    if (steemUser) {
-                        progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
-                        steem_keychain.requestBroadcast(steemUser,steemTx,'Posting',(steemResponse) => {
-                            if (steemResponse.error) alert('Posted to Hive and Avalon blockchains successfully but failed to post to Steem: ' + steemResponse.message)
-                            broadcastCompletion(true)
-                        })
-                    } else broadcastCompletion(true)
-                })
-            } else if (steemUser) {
-                progressbarInner.innerHTML = 'Submitting video to Steem blockchain...'
-                steem_keychain.requestBroadcast(steemUser,steemTx,'Posting',(steemResponse) => {
-                    if (steemResponse.error) alert('Posted to Hive blockchain successfully but failed to post to Steem: ' + steemResponse.message)
-                    broadcastCompletion(false)
-                })
-            } else broadcastCompletion(false)
+            if (avalonUser)
+                broadcastAvalon(buildJsonMetadataAvalon(),postparams.ipfshash,() => steemBroadcaster(true,steemBCMethod,steemBCParams))
+            else 
+                steemBroadcaster(false,steemBCMethod,steemBCParams)
         })
     } else {
         let hiveapi = new hivesigner.Client({ 
@@ -603,21 +584,32 @@ function postVideo() {
         })
         hiveapi.broadcast(hiveTx,(err) => {
             if (err) {
-                alert('HiveSigner error: ' + JSON.stringify(err))
-                progressbar.style.display = "none"
-                reenableFields()
+                return broadcastErrorHandler('HiveSigner',err.error_description)
             } else if (avalonUser) {
                 // Broadcast to Avalon as well if Avalon login exists
-                let avalontag = ''
-                if (postparams.tags.length !== 0)
-                    avalontag = postparams.tags[0]
-                progressbarInner.innerHTML = 'Submitting video to Avalon blockchain...'
-                broadcastAvalon(buildJsonMetadataAvalon(),avalontag,postparams.ipfshash,() =>  {
+                broadcastAvalon(buildJsonMetadataAvalon(),postparams.ipfshash,() => {
                     broadcastCompletion(true)
                 })
             } else broadcastCompletion(false)
         })
     }
+}
+
+function steemBroadcaster(isAvalon,method,params) {
+    if (steemUser) {
+        document.getElementById('progressBarFront').innerHTML = 'Submitting video to Steem blockchain...'
+        method(...params,(steemResponse) => {
+            if (!isElectron() && steemResponse.error) alert('Steem error: ' + steemResponse.message)
+            else if (isElectron() && steemResponse) alert('Steem error: ' + steemResponse.toString())
+            broadcastCompletion(isAvalon)
+        })
+    } else broadcastCompletion(isAvalon)
+}
+
+function broadcastErrorHandler(tool,e) {
+    alert(tool+' error: '+e)
+    document.getElementById('progressBarBack').style.display = "none"
+    reenableFields()
 }
 
 function generatePermlink() {
@@ -776,7 +768,12 @@ function generatePost(network) {
     return operations
 }
 
-async function broadcastAvalon(json,tag,permlink,cb) {
+async function broadcastAvalon(json,permlink,cb) {
+    document.getElementById('progressBarFront').innerHTML = 'Submitting video to Avalon...'
+    let tag = ''
+    if (postparams.tags.length !== 0)
+        tag = postparams.tags[0]
+    
     let avalonGetAccPromise = new Promise((resolve,reject) => {
         javalon.getAccount(avalonUser,(err,user) => {
             if (err) return reject(err)
@@ -852,11 +849,19 @@ function updateSubtitle() {
 }
 
 function broadcastCompletion(isAvalonSuccess) {
-    localStorage.clear()
+    clearDraft()
     if (isAvalonSuccess)
         window.location.replace('https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash)
     else
         window.location.replace('https://d.tube/v/' + username + '/' + postparams.permlink)
+}
+
+function clearDraft() {
+    localStorage.setItem('OneLoveTitle',null)
+    localStorage.setItem('OneLoveDescription',null)
+    localStorage.setItem('OneLoveTags',null)
+    localStorage.setItem('OneLovePostBody',null)
+    localStorage.setItem('OneLoveSubtitles',null)
 }
 
 function estimatedBandwidth() {

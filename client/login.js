@@ -389,7 +389,7 @@ async function handleElectronLogins(memo,steemUsername,steemKey,hiveUsername,hiv
 
     if (document.getElementById('rememberme').checked && !fromPersistence)
         localStorage.setItem('persistentLogin',JSON.stringify({
-            hiveUser: username,
+            hiveUser: hiveUsername,
             hiveKey: hiveKey,
             steemUser: steemUsername,
             steemKey: steemKey,
