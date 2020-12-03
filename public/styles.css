@@ -525,6 +525,14 @@ textarea {
     font-weight: normal;
 }
 
+#hiveCommunity h3,
+#hiveCommunity h5,
+#steemCommunity h3,
+#steemCommunity h5 {
+    margin-block-start: 0.25em;
+    margin-block-end: 0.5em;
+}
+
 /* Thumbnail swapper tool */
 #thumbnailSwapper, #disabledPage {
     display: none;

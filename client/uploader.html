@@ -99,28 +99,40 @@
                     <input type="checkbox" name="skynetupload" id="skynetupload">
                     <span class="slider round"></span>
                 </label><h3 class="poweruptext"> Upload to Skynet (experimental)</h3><br>
-                <div class="grapheneSettings"><h3>Steem/Hive Permlink: <br><input type="text" id="customPermlink" name="customPermlink" class="meta"></h3>
-                <h3>Steem/Hive Article Body: <br>
-                <textarea id="postBody" name="postBody"></textarea></h3>
-                <input type="file" accept="image/*" id="postImg" style="display: none">
-                <a onclick="document.getElementById('postImg').click();return true;" id="postImgBtn" class="roundedBtn">Upload an image for article body</a>
-                <h5>Maximum file size for image: 4MB</h5>
-                <h3>Beneficiaries</h3>
-                <h5>Add some Hive and Steem accounts here to automatically receive a portion of your HIVE and/or STEEM post rewards. Avalon beneficiaries are set in blockchain config such that @dtube receives 10% of DTUBE curation rewards.</h5>
-                <input type="text" id="newBeneficiaryUser" name="newBeneficiaryUser" class="meta" placeholder="New beneficiary username">
-                <input type="number" id="newBeneficiaryPercent" name="newBeneficiaryPercent" class="meta" placeholder="%" min="0.01" max="98" step="0.01">
-                <select id="newBeneficiaryNetwork">
-                    <option>All</option>
-                    <option>Hive</option>
-                    <option>Steem</option>
-                </select>
-                <a class="styledButton" id="appendBeneficiaryBtn">+</a><br>
-                <h3 style="margin-block-end: 0.25em;">Hive beneficiaries</h3>
-                <table class="beneficiaryTableList" id="beneficiaryTableListHive"></table>
-                <h4 class="totalBeneficiariesLabel" id="totalBeneficiariesLabelHive">Total Hive beneficiaries: 0%</h4>
-                <h3 style="margin-block-end: 0.25em;" id="beneficiaryHeadingSteem">Steem beneficiaries</h3>
-                <table class="beneficiaryTableList" id="beneficiaryTableListSteem"></table>
-                <h4 class="totalBeneficiariesLabel" id="totalBeneficiariesLabelSteem">Total Steem beneficiaries: 0%</h4></div>
+                <div class="grapheneSettings">
+                    <h3>Steem/Hive Permlink: <br><input type="text" id="customPermlink" name="customPermlink" class="meta"></h3>
+                    <h3>Steem/Hive Article Body: <br>
+                    <textarea id="postBody" name="postBody"></textarea></h3>
+                    <input type="file" accept="image/*" id="postImg" style="display: none">
+                    <a onclick="document.getElementById('postImg').click();return true;" id="postImgBtn" class="roundedBtn">Upload an image for article body</a>
+                    <h5>Maximum file size for image: 4MB</h5>
+                    <h3>Beneficiaries</h3>
+                    <h5>Add some Hive and Steem accounts here to automatically receive a portion of your HIVE and/or STEEM post rewards. Avalon beneficiaries are set in blockchain config such that @dtube receives 10% of DTUBE curation rewards.</h5>
+                    <input type="text" id="newBeneficiaryUser" name="newBeneficiaryUser" class="meta" placeholder="New beneficiary username">
+                    <input type="number" id="newBeneficiaryPercent" name="newBeneficiaryPercent" class="meta" placeholder="%" min="0.01" max="98" step="0.01">
+                    <select id="newBeneficiaryNetwork">
+                        <option>All</option>
+                        <option>Hive</option>
+                        <option>Steem</option>
+                    </select>
+                    <a class="styledButton" id="appendBeneficiaryBtn">+</a><br>
+                    <h3 style="margin-block-end: 0.25em;">Hive beneficiaries</h3>
+                    <table class="beneficiaryTableList" id="beneficiaryTableListHive"></table>
+                    <h4 class="totalBeneficiariesLabel" id="totalBeneficiariesLabelHive">Total Hive beneficiaries: 0%</h4>
+                    <h3 style="margin-block-end: 0.25em;" id="beneficiaryHeadingSteem">Steem beneficiaries</h3>
+                    <table class="beneficiaryTableList" id="beneficiaryTableListSteem"></table>
+                    <h4 class="totalBeneficiariesLabel" id="totalBeneficiariesLabelSteem">Total Steem beneficiaries: 0%</h4>
+                    <div id="hiveCommunity">
+                        <h3>Hive Community</h3>
+                        <h5>Pick a Hivemind powered community on Hive to post your video to. The default is DTube (hive-196037).</h5>
+                        <select id="hiveCommunitySelect"><option value="hive-196037">DTube (hive-196037)</option></select>
+                    </div><br>
+                    <div id="steemCommunity">
+                        <h3>Steem Community</h3>
+                        <h5>Pick a Hivemind powered community on Steem to post your video to. The default is DTube (hive-196037).</h5>
+                        <select id="steemCommunitySelect"><option value="hive-196037">DTube (hive-196037)</option></select>
+                    </div><br>
+                </div>
             </div>
             <input class="styledButton" type="submit" value="Upload!" id="submitbutton">
             <input class="styledButton" type="button" value="Save draft" id="draftBtn">

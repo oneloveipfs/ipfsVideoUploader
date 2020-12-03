@@ -103,14 +103,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (steemUser) steem.api.getAccounts([steemUser],(e,acc) => {
             if (e) return
             loadGrapheneAuthorityStatus(acc[0],'steem')
+            getCommunitySubs(acc[0].name,'steem')
         })
         else
-            updateDisplayByIDs([],['beneficiaryHeadingSteem','beneficiaryTableListSteem','totalBeneficiariesLabelSteem'])
+            updateDisplayByIDs([],['beneficiaryHeadingSteem','beneficiaryTableListSteem','totalBeneficiariesLabelSteem','steemCommunity'])
 
         hive.api.setOptions(hiveOptions)
         if (!dtconly) hive.api.getAccounts([username],(e,acc) => {
             if (e) return
             loadGrapheneAuthorityStatus(acc[0],'hive')
+            getCommunitySubs(acc[0].name,'hive')
         })
     })
 
@@ -734,8 +736,8 @@ function generatePost(network) {
     let operations = [
         [ 'comment', {
                 parent_author: '',
-                parent_permlink: 'hive-196037',
-                category: 'hive-196037',
+                parent_permlink: document.getElementById(network+'CommunitySelect').value,
+                category: document.getElementById(network+'CommunitySelect').value,
                 author: username,
                 permlink: postparams.permlink,
                 title: postparams.title,
@@ -922,4 +924,24 @@ function needsBandwidth() {
         return false
     else
         return estimatedBandwidth() - currentBw
+}
+
+async function getCommunitySubs(acc,network) {
+    let communities
+    try {
+        // TODO: use techcoderx.com api once ready
+        communities = await axios.post(network === 'hive' ? 'https://api.hive.blog' : 'https://api.steemit.com',{
+            jsonrpc: '2.0',
+            method: 'bridge.list_all_subscriptions',
+            params: { account: acc },
+            id: 1
+        })
+    } catch { return }
+    let selection = document.getElementById(network+'CommunitySelect')
+    for (let i = 0; i < communities.data.result.length; i++) if (communities.data.result[i][0] !== 'hive-196037') {
+        let newoption = document.createElement('option')
+        newoption.text = communities.data.result[i][1] + ' (' + communities.data.result[i][0] + ')'
+        newoption.value = communities.data.result[i][0]
+        selection.appendChild(newoption)
+    }
 }
