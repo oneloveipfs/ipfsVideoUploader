@@ -187,6 +187,11 @@ document.getElementById('proceedPersistAuthBtn').onclick = async () => {
     })
 }
 
+document.getElementById('clearPersistAuthBtn').onclick = () => {
+    localStorage.setItem('persistentLogin',null)
+    updateDisplayByIDs(['loginform'],['persistentform'])
+}
+
 document.getElementById('signupButton').onclick = () => {
     updateDisplayByIDs(['signupPopup'],[])
 }
