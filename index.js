@@ -40,7 +40,7 @@ const ImageUploadAPILimiter = RateLimiter({
 })
 
 const APILimiter = RateLimiter({
-    max: 5,
+    max: 10,
     windowMs: 1000 // 5 requests per second
 })
 
@@ -350,6 +350,29 @@ app.get('/shawp_user_info_admin',APILimiter,(req,res) => {
             return res.status(403).send({error:'Not an admin'})
         else
             return res.send(Shawp.User(req.query.user,req.query.network || 'all'))
+    })
+})
+
+app.get('/user_info',APILimiter,(req,res) => {
+    Authenticate(req,res,false,(user,network) => res.send(db.getUserInfo(user,network)))
+})
+
+app.put('/update_settings',APILimiter,Parser.json(),(req,res) => {
+    Authenticate(req,res,false,(user,network) => {
+        // Validators
+        for (i in req.body) {
+            if (!db.settingsValidator[i])
+                return res.status(400).send({error: 'invalid key ' + i})
+            let validator = db.settingsValidator[i](req.body[i])
+            if (validator !== null)
+                return res.status(400).send({error: validator})
+        }
+        // Updators
+        for (i in req.body) {
+            db.settingsUpdate(user,network,i,req.body[i])
+            db.writeUserInfoData()
+        }
+        res.send({})
     })
 })
 

@@ -86,8 +86,6 @@ function dismissPopup(event,popupelement) {
 
 function loginBtnClicked() {
     // Show popup window of login options
-    if (!isElectron() && !window.steem_keychain) updateDisplayByIDs([],['loginSteemUsername','sameSteemUser'])
-    if (!isElectron() && !window.hive_keychain) updateDisplayByIDs([],['loginUsername','sameSteemUser','sameAvalonUser'])
     if (isElectron() && localStorage.getItem('persistentLogin') !== null) {
         let storedLogin
         try {

@@ -194,6 +194,45 @@ let db = {
     getSizeByHash: (hash) => {
         return hashSizes[hash] || null
     },
+    settingsValidator: {
+        uplThreads: (value) => {
+            let int = parseInt(value)
+            if (isNaN(int))
+                return 'Upload thread count must be a number'
+            if (int < 1 || int > 50)
+                return 'Upload thread count must be between 1 and 50'
+            return null
+        },
+        descTemplate: (value) => {
+            if (typeof value !== 'string')
+                return 'Description template must be a string'
+            if (value.length > 1000)
+                return 'Description template must be less than or equal to 1,000 characters long'
+            return null
+        }
+    },
+    settingsTranslator: {
+        uplThreads: (value) => parseInt(value),
+        descTemplate: (value) => {
+            if (value === '')
+                return undefined
+            else
+                return value
+        }
+    },
+    settingsUpdate: (username,network,key,value) => {
+        let fullusername = db.toFullUsername(username,network)
+        if (!userInfo[fullusername])
+            userInfo[fullusername] = { settings: {} }
+        if (!userInfo[fullusername].settings)
+            userInfo[fullusername].settings = {}
+        userInfo[fullusername].settings[key] = db.settingsTranslator[key](value)
+    },
+    getUserInfo: (username,network) => {
+        let fullusername = db.toFullUsername(username,network)
+        if (!userInfo[fullusername]) return {}
+        return userInfo[fullusername]
+    },
     setupDb,
     // Write data in variables to disk
     writeUserInfoData: () => {

@@ -25,6 +25,7 @@
         <script src="client/yourfiles.js"></script>
         <script src="client/wcinfo.js"></script>
         <script src="client/getHelp.js"></script>
+        <script src="client/usersettings.js"></script>
     </head>
     <body>
         <div class='header'>
@@ -38,6 +39,7 @@
                     <a id="subDetModeBtn">Account details</a>
                     <a id="refillCrModeBtn">Refill credits</a>
                     <a id="getHelpModeBtn">Get Help</a>
+                    <a id="settingsModeBtn">Settings</a>
                 </div>
             </div>
         </div>
@@ -59,7 +61,7 @@
                 <h3>Upload a thumbnail (4MB maximum): <input type="file" accept="image/jpeg,image/png" name="SnapUpload" id="snapfile"></h3>
                 <h3>Title: <br><input type="text" id="title" name="title" class="meta"></h3>
                 <h3>Description: <br>
-                <textarea id="description" name="description"></textarea></h3>
+                <textarea id="description" name="description"></textarea><a style="font-size: 15px;" onclick="fillDescription()">Insert from template</a></h3>
                 <h3>Tags (seperated by space): <br><input type="text" id="tags" name="tags" class="meta"></h3>
                 <h5 id="tagInfo1">The first tag (out of 7 tags) that you have chosen will be the first curated tag on your Avalon post.</h5>
                 <div class="grapheneSettings"><label class="switch">
@@ -250,6 +252,16 @@
             <div class="authorizeBtn"><a class="styledButton" id="avalonAuthorizeBtn">Authorize Avalon</a></div><br>
             <div class="authorizeBtn"><a class="styledButton" id="hiveAuthorizeBtn">Authorize Hive</a></div><br>
             <div class="authorizeBtn"><a class="styledButton" id="steemAuthorizeBtn">Authorize Steem</a></div>
+        </div>
+        <div id="settings">
+            <h2>User Settings</h2>
+            <h3 style="margin-block-end: 0.25em;">Upload thread count (max 50): <br>
+            <input type="number" id="settingsUplThreads" name="settingsUplThreads" class="meta" placeholder="Default: 10" min="1" max="40" step="1"></h3>
+            <h5 style="margin-block-start: 0.25em;">Best if set in multiples of 4 Mbit/second upload bandwidth</h5>
+            <h3>Description Template: <br>
+            <textarea name="descTemplate" id="descTemplate"></textarea></h3>
+            <input type="button" class="styledButton" id="settingSaveBtn" value="Save" onclick="saveSettings()">
+            <input type="button" class="styledButton" id="settingResetBtn" value="Reset" onclick="fillSettings()">
         </div>
         </div>
     </body>

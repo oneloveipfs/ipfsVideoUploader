@@ -1,7 +1,10 @@
 let geturl = '?access_token=' + token
 if (iskeychain !== 'true') geturl += '&scauth=true'
 
-axios.get('/shawp_config').then((result) => window.shawpconfig = result.data)
+axios.get('/shawp_config').then((result) => {
+    window.shawpconfig = result.data
+    if (!window.shawpconfig.Enabled) updateDisplayByIDs([],['refillCrModeBtn'])
+})
 
 document.addEventListener('DOMContentLoaded', () => {
     if (token == null || token == '') {

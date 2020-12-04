@@ -111,8 +111,9 @@ document.addEventListener('DOMContentLoaded', () => {
         hive.api.setOptions(hiveOptions)
         if (!dtconly) hive.api.getAccounts([username],(e,acc) => {
             if (e) return
-            loadGrapheneAuthorityStatus(acc[0],'hive')
-            getCommunitySubs(acc[0].name,'hive')
+            if (acc.length > 0)
+                loadGrapheneAuthorityStatus(acc[0],'hive')
+            getCommunitySubs(username,'hive')
         })
     })
 
