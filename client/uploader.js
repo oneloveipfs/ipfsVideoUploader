@@ -469,7 +469,7 @@ function uploadVideo(resolution,next) {
     let videoUpload = new tus.Upload(videoToUpload[0], {
         endpoint: config.tusdEndpoint,
         retryDelays: [0,3000,5000,10000,20000],
-        parallelUploads: 10,
+        parallelUploads: parseInt(usersettings.uplThreads) || 10,
         metadata: {
             access_token: Auth.token,
             keychain: Auth.iskeychain,
