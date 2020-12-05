@@ -74,8 +74,14 @@ describe('Database',() => {
         done()
     })
 
+    it('getAliasedUsers should list all users aliased to a particular username',(done) => {
+        assert.strictEqual(JSON.stringify(db.getAliasedUsers(Config.test.hiveUser,'hive')),JSON.stringify([{username:Config.test.aliasedUser,network:'dtc'}]))
+        done()
+    })
+
     it('unsetUserAlias should remove associations with main account',(done) => {
-        db.unsetUserAlias(Config.test.aliasedUser,'dtc')
+        assert.doesNotThrow(()=>db.unsetUserAlias(Config.test.hiveUser,'hive',Config.test.aliasedUser,'dtc'))
+        assert.throws(()=>db.unsetUserAlias(Config.test.hiveUser,'hive',Config.test.aliasedUser,'dtc'))
         assert.isNull(db.getAliasOf(Config.test.aliasedUser,'dtc'))
         assert.equal(db.toFullUsername(Config.test.aliasedUser,'dtc',true),Config.test.aliasedUser+'@dtc')
         done()

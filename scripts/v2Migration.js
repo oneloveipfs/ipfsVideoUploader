@@ -1,3 +1,10 @@
+/* 
+ * IMPORTANT - DO THIS FIRST TO PREVENT DATA LOSS:
+ *
+ * cp db db2
+ * git pull
+ * mv db2 db
+*/
 const hashes = require('../db/hashes.json')
 const axios = require('axios')
 const fs = require('fs')
@@ -18,4 +25,10 @@ const migrate = async (cb) => {
 
 migrate(() => {
     fs.writeFileSync('db/hashsizes.json',JSON.stringify(hashSizes))
+    fs.mkdirSync(require('os').homedir()+'/.oneloveipfs')
+    fs.renameSync('db',require('os').homedir()+'/.oneloveipfs/db')
+    // THEN RENAME SHAWP DB FILES AS FOLLOWS:
+    // db/shawp/consumes.json -> db/shawpConsumes.json
+    // db/shawp/refills.json -> db/shawpRefills.json
+    // db/shawp/users.json -> db/shawpUsers.json
 })

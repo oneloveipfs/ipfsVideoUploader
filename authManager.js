@@ -112,7 +112,7 @@ let auth = {
                     else
                         cb(null,result)
                 } else cb(null,result)
-            }
+            } else cb(null,result)
         })
     },
     scAuth: (access_token,needscredits,cb) => {
@@ -152,8 +152,15 @@ let auth = {
         }
     },
     decryptMessage: (message,cb) => {
-        let decrypted = Crypto.AES.decrypt(message,Keys.AESKey).toString(Crypto.enc.Utf8).split(':')
-        cb(decrypted)
+        let decrypted
+        try {
+            decrypted = Crypto.AES.decrypt(message,Keys.AESKey).toString(Crypto.enc.Utf8).split(':')
+        } catch {
+            cb(false)
+        }
+        if (decrypted.length !== 3 || decrypted[1] !== 'oneloveipfs_login')
+            cb(false)
+        else cb(decrypted)
     },
     invalidHiveUsername: (username) => {
         return Hive.utils.validateAccountName(username)
@@ -174,6 +181,16 @@ let auth = {
             if (!nowrite) auth.writeWhitelistToDisk()
         }
         cb()
+    },
+    whitelistRm: (username,network,nowrite) => {
+        let fullusername = require('./dbManager').toFullUsername(username,network)
+        for (let i in whitelist) {
+            if (whitelist[i] === fullusername) {
+                whitelist.splice(i,1)
+                if (!nowrite) auth.writeWhitelistToDisk()
+                break
+            }
+        }
     },
     whitelistTrim: () => {
         // Trim whitelist

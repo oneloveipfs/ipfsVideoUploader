@@ -50,6 +50,13 @@ describe('Auth',() => {
         })
     })
 
+    it('Deciphering unknown messages should return false',function (done) {
+        Auth.decryptMessage('a',(decoded) => {
+            assert.isFalse(decoded)
+            done()
+        })
+    })
+
     it('Adding user to Avalon specific whitelist should not whitelist user for other networks',function (done) {
         Auth.whitelistAdd(Config.test.dtcUser,'dtc',() => {
             assert.isTrue(Auth.isInWhitelist(Config.test.dtcUser,'dtc'))

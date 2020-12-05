@@ -11,12 +11,7 @@ function saveSettings() {
     axios.put('/update_settings'+geturl,newSettings).then(() => {
         window.usersettings = newSettings
         alert('Settings saved successfully')
-    }).catch((e) => {
-        if (e.response && e.response.data && e.response.data.error)
-            alert(e.response.data.error)
-        else
-            alert(e.toString())
-    })
+    }).catch(axiosErrorHandler)
 }
 
 function fillSettings() {

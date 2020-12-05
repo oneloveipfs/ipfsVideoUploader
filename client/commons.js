@@ -8,12 +8,32 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function toReadableNetwork(network) {
+    switch (network) {
+        case 'hive':
+            return 'Hive'
+        case 'dtc':
+            return 'Avalon'
+        case 'all':
+            return 'All'
+        default:
+            return ''
+    }
+}
+
 function updateDisplayByIDs(toshow,tohide) {
     for (let i = 0; i < tohide.length; i++)
         document.getElementById(tohide[i]).style.display = 'none'
     
     for (let i = 0; i < toshow.length; i++)
         document.getElementById(toshow[i]).style.display = 'block'
+}
+
+function axiosErrorHandler(e) {
+    if (e.response && e.response.data && e.response.data.error)
+        alert(e.response.data.error)
+    else
+        alert(e.toString())
 }
 
 function thousandSeperator(num) {
@@ -79,6 +99,20 @@ function exchageRate (coin,amount,cb) {
         default:
             break
     }
+}
+
+function getAvalonKeyId(avalonUsername,avalonKey) {
+    return new Promise((resolve,reject) => javalon.getAccount(avalonUsername,(err,result) => {
+        if (err) return reject(err)
+        let avalonPubKey = javalon.privToPub(avalonKey)
+        if (result.pub === avalonPubKey) return resolve(true)
+
+        // Custom key login (recommended)
+        for (let i = 0; i < result.keys.length; i++)
+            if (arrContainsInt(result.keys[i].types,4) === true && result.keys[i].pub === avalonPubKey)
+                return resolve(result.keys[i].id)
+        resolve(false)
+    }))
 }
 
 // https://github.com/electron/electron/issues/2288

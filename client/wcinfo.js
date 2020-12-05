@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 let monthlyRate = result.data.rate * 30
                 let infoToDisplay = '<h2>Account summary</h2>'
+                if (result.data.aliasUser && result.data.aliasNetwork)
+                    infoToDisplay += '<h4>This is an alias account of ' + result.data.aliasUser + ' on ' + (result.data.aliasNetwork == 'all' ? 'Hive and Avalon networks.' : (toReadableNetwork(result.data.aliasNetwork) + ' network.')) + '</h4>'
                 infoToDisplay += '<h4>Balance: ' + result.data.balance + ' GBdays</h4>'
                 infoToDisplay += '<h4>Current Usage: ' + abbrevateFilesize(result.data.usage) + '</h4>'
 
@@ -39,7 +41,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (result.data.usagedetails.streams) infoToDisplay += '<h4>Streams: ' + abbrevateFilesize(result.data.usagedetails.streams) + '</h4>'
                 }
 
-                document.getElementById('wcinfo').innerHTML = HtmlSanitizer.SanitizeHtml(infoToDisplay)
+                if (!result.data.aliasUser && !result.data.aliasNetwork) {
+                    infoToDisplay += '<br><hr><h2>Aliased Users</h2>'
+                    infoToDisplay += '<h4>You may add another account on the same or different network as an alias so that you can upload using those accounts while having your upload usage billed to this account. You may need to enter the private key of the alias account if not using Keychain extensions. The private key entered will only be used for verification purposes and will not leave your browser, nor stored anywhere.</h4><br>'
+                    infoToDisplay += '<table id="newAlias">'
+                    infoToDisplay += '<td><select id="newAliasNet" style="height:34px; line-height:34px;" onchange="aliasNetworkSelect()"><option value="hive">Hive</option><option value="dtc">Avalon</option></select></td>'
+                    infoToDisplay += '<td><input type="text" placeholder="New alias username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="newAliasUser" class="meta"></td>'
+                    infoToDisplay += '<td><input type="password" placeholder="Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="newAliasKey" class="meta"></td>'
+                    infoToDisplay += '<td><a class="styledButton" id="newAliasAdd" onclick="addAliasBtn()">+</a></td>'
+                    infoToDisplay +='</table><br><table style="width: 100%;" id="aliasList"><thead><tr><td>Username</td><td>Network</td><td>Remove</td></tr></thead><tbody id="aliasedUsrsTBdy"></tbody></table>'
+                }
+
+                document.getElementById('wcinfo').innerHTML = infoToDisplay
+                refreshAliasAccs()
+                aliasNetworkSelect()
 
                 if (accdetail.daysremaining > 0 && accdetail.daysremaining < 7)
                     updateDisplayByIDs(['refillnotify'],[])
@@ -65,7 +80,6 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplayByIDs(['refiller','refillPopup','refillcb'],['uploadForm','refillpay'])
     else if (url.searchParams.get('callback') == 'refillcancel')
         updateDisplayByIDs(['refiller','refillPopup','refillcancel'],['uploadForm','refillpay'])
-
 
     document.getElementById('refillSubmitBtn').onclick = () => {
         updateDisplayByIDs(['refillpay'],['refillcb','refillcancel'])
@@ -164,4 +178,112 @@ function populateRefillHistory(rfh,view) {
 
 function handleAmtViewChange(selected) {
     populateRefillHistory(window.rfh,selected.selectedIndex)
+}
+
+function aliasNetworkSelect() {
+    if (window.accdetail.aliasUser && window.accdetail.aliasNetwork) return
+    let selected = document.getElementById('newAliasNet').value
+    switch (selected) {
+        case 'hive':
+            if (!isElectron() || window.hive_keychain)
+                updateDisplayByIDs([],['newAliasKey'])
+            else {
+                document.getElementById('newAliasKey').placeholder = 'Hive Key'
+                updateDisplayByIDs(['newAliasKey'],[])
+            }
+            break
+        case 'dtc':
+            document.getElementById('newAliasKey').placeholder = 'Avalon Key'
+            updateDisplayByIDs(['newAliasKey'],[])
+            break
+    }
+}
+
+function addAliasBtn() {
+    addAlias(document.getElementById('newAliasUser').value,document.getElementById('newAliasKey').value,document.getElementById('newAliasNet').value)
+}
+
+function getAUTHtml(data) {
+    let result = ''
+    for (let i in data) {
+        result += '<tr><td>' + data[i].username + '</td><td>' + toReadableNetwork(data[i].network) + '</td><td><a onclick="removeAlias(\'' + data[i].username + '\',\'' + data[i].network + '\')">Remove</a></tr>'
+    }
+    return result
+}
+
+function addAlias(user,key,network) {
+    let loginMtd
+    if (network == 'dtc')
+        loginMtd = avalonAliasAuth
+    else if (network == 'hive')
+        loginMtd = hiveAliasAuth
+    loginMtd(user,key,(token) => {
+        axios.put('/update_alias'+geturl,{ operation: 'set', aliasKey: token })
+            .then(() => refreshAliasAccs())
+            .catch(axiosErrorHandler)
+    })
+}
+
+function removeAlias(username,network) {
+    axios.put('/update_alias'+geturl,{ operation: 'unset', targetUser: username, targetNetwork: network })
+        .then(() => refreshAliasAccs())
+        .catch(axiosErrorHandler)
+}
+
+function refreshAliasAccs() {
+    if (window.accdetail.aliasUser && window.accdetail.aliasNetwork) return
+    axios.get('/get_alias'+geturl)
+        .then((r) => {
+            document.getElementById('aliasedUsrsTBdy').innerHTML = getAUTHtml(r.data)
+            document.getElementById('newAliasUser').value = ''
+            document.getElementById('newAliasKey').value = ''
+        })
+        .catch(() => alert('Deletion success but something went wrong while updating alias list'))
+}
+
+async function avalonAliasAuth(avalonUsername,avalonKey,cb) {
+    let avalonKeyId
+    try {
+        avalonKeyId = await getAvalonKeyId(avalonUsername,avalonKey)
+        if (avalonKeyId === false)
+            return alert('Avalon key is invalid')
+    } catch (e) {
+        return alert('Avalon login error: ' + e)
+    }
+    
+    let loginGetUrl = '/login?noauth=1&user=' + avalonUsername + '&dtc=true'
+    if (avalonKeyId && avalonKeyId !== true) loginGetUrl += '&dtckeyid=' + avalonKeyId
+    axios.get(loginGetUrl).then((response) => {
+        if (response.data.error != null)
+            return alert(response.data.error)
+        javalon.decrypt(avalonKey,response.data.encrypted_memo,(e,decryptedAES) => {
+            if (e)
+                return alert('Avalon decrypt error: ' + e.error)
+            cb(decryptedAES)
+        })
+    }).catch(axiosErrorHandler)
+}
+
+async function hiveAliasAuth(hiveUsername,hiveKey,cb) {
+    let usehivecrypt = false
+    let loginUrl = '/login?noauth=1&user='+hiveUsername
+    if (isElectron() || !window.hive_keychain) {
+        loginUrl += '&hivecrypt=1'
+        usehivecrypt = true
+    }
+    axios.get(loginUrl).then((r) => {
+        if (usehivecrypt) {
+            let token
+            try {
+                token = hivecrypt.decode(hiveKey,r.data.encrypted_memo).substr(1)
+            } catch {
+                return handleLoginError('Unable to decode access token with Hive posting key')
+            }
+            cb(token)
+        } else hive_keychain.requestVerifyKey(hiveUsername,r.data.encrypted_memo,'Posting',(kr) => {
+            if (kr.data.error != null)
+                return alert(response.data.error)
+            cb(kr.result.substr(1))
+        })
+    }).catch(axiosErrorHandler)
 }

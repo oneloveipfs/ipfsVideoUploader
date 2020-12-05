@@ -83,7 +83,7 @@ app.get('/login',AuthAPILimiter,(request,response) => {
     let queryNetwork = request.query.network
     if (request.query.dtc == 'true') queryNetwork = 'dtc'
 
-    if (Config.whitelistEnabled)
+    if (Config.whitelistEnabled && !request.query.noauth)
         if (!Auth.isInWhitelist(request.query.user,queryNetwork))
             return response.status(403).send({error: 'Looks like you do not have access to the uploader!'})
 
@@ -111,6 +111,8 @@ app.get('/login',AuthAPILimiter,(request,response) => {
 app.post('/logincb',AuthAPILimiter,(request,response) => {
     // Keychain Auth Callback
     Auth.decryptMessage(request.body,(decoded) => {
+        if (decoded === false)
+            return response.status(400).send({error: 'Could not decipher message'})
         if (Config.whitelistEnabled)
             if (!Auth.isInWhitelist(decoded[0],decoded[2]))
                 return response.status(403).send({error: 'Looks like you do not have access to the uploader!'})
@@ -339,7 +341,13 @@ app.post('/botusage',Parser.json(),(req,res) => {
 app.get('/shawp_user_info',APILimiter,(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user,network) => {
-        res.send(Shawp.User(user,network))
+        let shawpuserdetail = Shawp.User(user,network)
+        let aliasOf = db.getAliasOf(user,network)
+        if (aliasOf) {
+            shawpuserdetail.aliasUser = db.toUsername(aliasOf)
+            shawpuserdetail.aliasNetwork = db.toNetwork(aliasOf)
+        } else shawpuserdetail.aliasedUsers = db.getAliasedUsers(user,network)
+        res.send(shawpuserdetail)
     })
 })
 
@@ -368,11 +376,56 @@ app.put('/update_settings',APILimiter,Parser.json(),(req,res) => {
                 return res.status(400).send({error: validator})
         }
         // Updators
-        for (i in req.body) {
+        for (let i in req.body)
             db.settingsUpdate(user,network,i,req.body[i])
-            db.writeUserInfoData()
-        }
+        db.writeUserInfoData()
         res.send({})
+    })
+})
+
+app.get('/get_alias',APILimiter,(req,res) => {
+    Authenticate(req,res,false,(mainUser,mainNetwork) => res.send(db.getAliasedUsers(mainUser,mainNetwork)))
+})
+
+app.put('/update_alias',APILimiter,Parser.json(),(req,res) => {
+    // Access token should belong to the main account
+    Authenticate(req,res,false,(mainUser,mainNetwork) => {
+        if (!req.body.operation)
+            return res.status(400).send({error: 'Missing operation'})
+        if (req.body.operation !== 'set' && req.body.operation !== 'unset')
+            return res.status(400).send({error: 'Invalid operation'})
+        if (req.body.operation === 'set' && !req.body.aliasKey)
+            return res.status(400).send({error: 'Missing alias account auth key'})
+        if (req.body.operation === 'unset' && (!req.body.targetUser || !req.body.targetNetwork))
+            return res.status(400).send({error: 'Missing target user or network'})
+        else if (req.body.operation === 'unset') {
+            try {
+                if (db.toFullUsername(mainUser,mainNetwork) === db.toFullUsername(req.body.targetUser,req.body.targetNetwork))
+                    throw `Cannot ${req.body.operation} user alias to itself`
+                db.unsetUserAlias(mainUser,mainNetwork,req.body.targetUser,req.body.targetNetwork)
+                Auth.whitelistRm(req.body.targetUser,req.body.targetNetwork)
+                db.writeUserInfoData()
+            } catch (e) {
+                return res.status(400).send({error: e})
+            }
+            return res.send({})
+        } else Auth.decryptMessage(req.body.aliasKey,(decoded) => {
+            if (decoded === false)
+                return res.status(400).send({error: 'Could not decipher alias key'})
+            else if (decoded[2] === 'all')
+                // all network type is disabled due to a security issue where only hive keys are verified
+                return res.status(400).send({error: 'network type "all" is disabled'})
+            try {
+                if (db.toFullUsername(mainUser,mainNetwork) === db.toFullUsername(decoded[0],decoded[2]))
+                    throw `Cannot ${req.body.operation} user alias to itself`
+                db.setUserAlias(mainUser,mainNetwork,decoded[0],decoded[2])
+                Auth.whitelistAdd(decoded[0],decoded[2],()=>{})
+                db.writeUserInfoData()
+            } catch (e) {
+                return res.status(400).send({error: e})
+            }
+            res.send({})
+        })
     })
 })
 

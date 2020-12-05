@@ -284,27 +284,10 @@ function keychainCb(encrypted_message,steemUser,dtconly) {
 
 async function avalonLogin(avalonUsername,avalonKey,dtconly) {
     if (avalonUsername !== '' && avalonKey !== '') {
-        let avalonKeyId
-        let avalonLoginPromise = new Promise((resolve,reject) => {
-            javalon.getAccount(avalonUsername,(err,result) => {
-                if (err) return reject(err)
-                let avalonPubKey = javalon.privToPub(avalonKey)
-                if (result.pub === avalonPubKey) return resolve(true)
-
-                // Login with "Posting key" (recommended)
-                for (let i = 0; i < result.keys.length; i++) {
-                    if (arrContainsInt(result.keys[i].types,4) === true && result.keys[i].pub === avalonPubKey) {
-                        avalonKeyId = result.keys[i].id
-                        return resolve(true)
-                    }
-                }
-                resolve(false)
-            })
-        })
-        
+        let avalonKeyId = false
         try {
-            let avalonLoginResult = await avalonLoginPromise
-            if (avalonLoginResult != true) {
+            avalonKeyId = await getAvalonKeyId(avalonUsername,avalonKey)
+            if (avalonKeyId === false) {
                 keychainLoginBtn.innerText = getKeychainLoginBtnLabel()
                 proceedAuthBtnDisabled = false
                 return alert('Avalon key is invalid!')
@@ -321,7 +304,7 @@ async function avalonLogin(avalonUsername,avalonKey,dtconly) {
 
         if (dtconly) {
             let loginGetUrl = '/login?user=' + avalonUsername + '&dtc=true'
-            if (avalonKeyId || avalonKeyId === '') loginGetUrl += '&dtckeyid=' + avalonKeyId
+            if (avalonKeyId && avalonKeyId !== true) loginGetUrl += '&dtckeyid=' + avalonKeyId
             axios.get(loginGetUrl).then((response) => {
                 if (response.data.error != null)
                     return alert(response.data.error)
@@ -333,10 +316,7 @@ async function avalonLogin(avalonUsername,avalonKey,dtconly) {
                     }
                     keychainCb(decryptedAES,'',true)
                 })
-            }).catch((e) => {
-                if (e.response.data.error) alert(e.response.data.error)
-                else alert(JSON.stringify(e))
-            })
+            }).catch(axiosErrorHandler)
         }
     } else {
         // If Avalon username or password not provided, clear existing login (if any) from sessionStorage

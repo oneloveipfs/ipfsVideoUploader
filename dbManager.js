@@ -33,7 +33,7 @@ let possibleTypes = ['videos','thumbnails','sprites','images','video240','video4
 let db = {
     // Check if user exist in hashes db
     userExistInHashesDB: (username,network) => {
-        let fullusername = db.toFullUsername(username,network)
+        let fullusername = db.toFullUsername(username,network,true)
         if (!hashes.hasOwnProperty(fullusername))
             return false
         else
@@ -50,14 +50,20 @@ let db = {
         let fullMain = db.toFullUsername(mainUser,mainNetwork)
         let fullAlias = db.toFullUsername(aliasUser,aliasNetwork)
         if (userInfo[fullMain] && userInfo[fullMain].aliasOf)
-            throw 'Cannot set user alias to another aliased user'
+            throw 'Cannot set user alias to a main account that is aliased to another user'
         if (!userInfo[fullAlias]) userInfo[fullAlias] = {}
         userInfo[fullAlias].aliasOf = fullMain
     },
-    unsetUserAlias: (aliasUser,aliasNetwork) => {
+    unsetUserAlias: (mainUser,mainNetwork,aliasUser,aliasNetwork) => {
+        let fullMain = db.toFullUsername(mainUser,mainNetwork)
         let fullAlias = db.toFullUsername(aliasUser,aliasNetwork)
-        if (userInfo[fullAlias] && userInfo[fullAlias].aliasOf)
-            delete userInfo[fullAlias].aliasOf
+        if (userInfo[fullAlias] && userInfo[fullAlias].aliasOf) {
+            if (userInfo[fullAlias].aliasOf === fullMain)
+                delete userInfo[fullAlias].aliasOf
+            else
+                throw 'Cannot unset user alias of another main account'
+        } else
+            throw 'Aliased user to delete does not exist'
     },
     getAliasOf: (username,network) => {
         let fullusername = db.toFullUsername(username,network)
@@ -66,9 +72,19 @@ let db = {
         else
             return userInfo[fullusername].aliasOf
     },
+    getAliasedUsers: (mainUser,mainNetwork) => {
+        let fullusername = db.toFullUsername(mainUser,mainNetwork)
+        let result = []
+        if (userInfo[fullusername] && userInfo[fullusername].aliasOf)
+            return result
+        for (let i in userInfo)
+            if (userInfo[i].aliasOf === fullusername)
+                result.push({username: db.toUsername(i), network: db.toNetwork(i)})
+        return result
+    },
     recordHash: (username,network,type,hash,size) => {
         if (!hash && !size) return
-        let fullusername = db.toFullUsername(username,network)
+        let fullusername = db.toFullUsername(username,network,true)
         if (!hashes[fullusername]) {
             hashes[fullusername] = {
                 videos: [],
@@ -90,7 +106,7 @@ let db = {
             hashSizes[hash] = size
     },
     recordSkylink: (username,network,type,skylink) => {
-        let fullusername = db.toFullUsername(username,network)
+        let fullusername = db.toFullUsername(username,network,true)
         if (!skylinks[fullusername])
             skylinks[fullusername] = {
                 videos: []
@@ -166,7 +182,7 @@ let db = {
         cb(skylinksToReturn)
     },
     getHashesByUser: (types,username,network) => {
-        let fullusername = db.toFullUsername(username,network)
+        let fullusername = db.toFullUsername(username,network,true)
         let hashesToReturn = {}
 
         if (!hashes[fullusername]) return {}
@@ -179,7 +195,7 @@ let db = {
         return hashesToReturn
     },
     getSkylinksByUser: (types,username,network,cb) => {
-        let fullusername = db.toFullUsername(username,network)
+        let fullusername = db.toFullUsername(username,network,true)
         let skylinksToReturn = {}
 
         if (!skylinks[fullusername]) return {}
