@@ -15,8 +15,10 @@ function saveSettings() {
 }
 
 function fillSettings() {
-    document.getElementById('settingsUplThreads').value = usersettings.uplThreads ? usersettings.uplThreads : ''
-    document.getElementById('descTemplate').value = usersettings.descTemplate ? usersettings.descTemplate : ''
+    if (usersettings) {
+        document.getElementById('settingsUplThreads').value = usersettings.uplThreads ? usersettings.uplThreads : ''
+        document.getElementById('descTemplate').value = usersettings.descTemplate ? usersettings.descTemplate : ''
+    }
 }
 
 function fillDescription() {

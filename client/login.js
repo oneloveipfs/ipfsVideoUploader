@@ -127,7 +127,7 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
 
     // Keychain login
     // Using public posting key on Hive to initiate login
-    let loginUrl = '/login?user='+username
+    let loginUrl = '/login?network=hive&user='+username
     if (isElectron() && !window.hive_keychain) loginUrl += '&hivecrypt=1'
     if (username) axios.get(loginUrl).then((response) => {
         if (response.data.error != null)
@@ -178,7 +178,7 @@ document.getElementById('proceedPersistAuthBtn').onclick = async () => {
     document.getElementById('proceedPersistAuthBtn').innerText = 'Logging In...'
     let storedDetails = JSON.parse(localStorage.getItem('persistentLogin'))
     await avalonLogin(storedDetails.dtcUser,storedDetails.dtcKey,!storedDetails.hiveUser && !storedDetails.steemUser)
-    axios.get('/login?hivecrypt=1&user='+storedDetails.hiveUser).then((r) => {
+    axios.get('/login?network=hive&hivecrypt=1&user='+storedDetails.hiveUser).then((r) => {
         if (r.data.error != null)
             return handleLoginError(r.data.error)
         handleElectronLogins(r.data.encrypted_memo,storedDetails.steemUser,storedDetails.steemKey,storedDetails.hiveUser,storedDetails.hiveKey,storedDetails.dtcUser,storedDetails.dtcKey,true)

@@ -106,23 +106,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 case 'HBD':
                     updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn'],['SteemKeychainBtn','SteemLoginBtn'])
                     document.getElementById('HiveKeychainBtn').onclick = () => {
-                        hive_keychain.requestTransfer(username,shawpconfig.HiveReceiver,amt.toString(),'to: @' + username,paymentMethod,(e) => {
+                        hive_keychain.requestTransfer(username,shawpconfig.HiveReceiver,amt.toString(),(currentnetwork === 'all' ? 'to: @' : ('to: '+currentnetwork+'@')) + username,paymentMethod,(e) => {
                             if (e.error) return alert(e.error)
                             updateDisplayByIDs(['refillcb'],['refillpay'])
                         })
                     }
-                    document.getElementById('HiveSignerBtn').href = 'https://hivesigner.com/sign/transfer?to=' + shawpconfig.HiveReceiver + '&amount=' + amt + paymentMethod + '&memo=to: @' + username
+                    document.getElementById('HiveSignerBtn').href = 'https://hivesigner.com/sign/transfer?to=' + shawpconfig.HiveReceiver + '&amount=' + amt + paymentMethod + '&memo=' + (currentnetwork === 'all' ? 'to: @' : ('to: '+currentnetwork+'@')) + username
                     break
                 case 'STEEM':
                 case 'SBD':
                     updateDisplayByIDs(['SteemKeychainBtn','SteemLoginBtn'],['HiveKeychainBtn','HiveSignerBtn'])
                     document.getElementById('SteemKeychainBtn').onclick = () => {
-                        steem_keychain.requestTransfer(steemUser,shawpconfig.SteemReceiver,amt.toString(),'to: @' + username,paymentMethod,(e) => {
+                        steem_keychain.requestTransfer(steemUser,shawpconfig.SteemReceiver,amt.toString(),(currentnetwork === 'all' ? 'to: @' : ('to: '+currentnetwork+'@')) + username,paymentMethod,(e) => {
                             if (e.error) return alert(e.error)
                             updateDisplayByIDs(['refillcb'],['refillpay'])
                         })
                     }
-                    document.getElementById('SteemLoginBtn').href = 'https://steemlogin.com/sign/transfer?to=' + shawpconfig.SteemReceiver + '&amount=' + amt + paymentMethod + '&memo=to: @' + username
+                    document.getElementById('SteemLoginBtn').href = 'https://steemlogin.com/sign/transfer?to=' + shawpconfig.SteemReceiver + '&amount=' + amt + paymentMethod + '&memo=' + (currentnetwork === 'all' ? 'to: @' : ('to: '+currentnetwork+'@')) + username
                     break
                 default:
                     break
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
             cancelUrl.searchParams.set('callback','refillcancel')
 
             document.getElementById('CoinbaseCommerceBtn').onclick = () =>
-                axios.post('/shawp_refill_coinbase',{ username: username, usdAmt: fiatAmt, cbUrl: cbUrl, cancelUrl: cancelUrl })
+                axios.post('/shawp_refill_coinbase',{ username: username, network: currentnetwork, usdAmt: fiatAmt, cbUrl: cbUrl, cancelUrl: cancelUrl })
                     .then((response) => window.location.href = response.data.hosted_url)
                     .catch((e) => alert(JSON.stringify(e)))
         }
@@ -266,7 +266,7 @@ async function avalonAliasAuth(avalonUsername,avalonKey,cb) {
 
 async function hiveAliasAuth(hiveUsername,hiveKey,cb) {
     let usehivecrypt = false
-    let loginUrl = '/login?noauth=1&user='+hiveUsername
+    let loginUrl = '/login?noauth=1&network=hive&user='+hiveUsername
     if (isElectron() || !window.hive_keychain) {
         loginUrl += '&hivecrypt=1'
         usehivecrypt = true

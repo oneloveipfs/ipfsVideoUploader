@@ -23,6 +23,7 @@ async function Hive() {
                     restrict()
                     resolve(null)
                 } else {
+                    window.currentnetwork = authResponse.data.network
                     if (dtconly == 'true') {
                         let grapheneSettings = document.getElementsByClassName('grapheneSettings')
                         for (let i = 0; i < grapheneSettings.length; i++)
