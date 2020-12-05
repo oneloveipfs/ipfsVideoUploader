@@ -928,10 +928,18 @@ function needsBandwidth() {
 }
 
 async function getCommunitySubs(acc,network) {
-    let communities
+    let communities, node
+    switch (network) {
+        case 'hive':
+            node = 'https://techcoderx.com'
+            break
+        case 'steem':
+            node = 'https://api.steemit.com'
+            break
+    }
     try {
         // TODO: use techcoderx.com api once ready
-        communities = await axios.post(network === 'hive' ? 'https://api.hive.blog' : 'https://api.steemit.com',{
+        communities = await axios.post(node,{
             jsonrpc: '2.0',
             method: 'bridge.list_all_subscriptions',
             params: { account: acc },

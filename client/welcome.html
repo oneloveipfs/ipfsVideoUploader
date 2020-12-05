@@ -168,8 +168,14 @@
                 </div>
                 <div class="popup-body">
                     <div id="signupstart">
-                        <h4>To begin, purchase some hosting credits (GBdays). One GBday allows you to store 1GB of files on our service for 24 hours. Each GBDay costs $0.0029.<br><br>Our payment system accepts HIVE, HBD, STEEM and SBD.</h4>
-                        <input type="text" placeholder="HIVE Username (if different from sender address)" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="receiverUsername" class="loginFields">
+                        <h4 style="margin-block-end: 0.5em;">To begin, purchase some hosting credits (GBdays). One GBday allows you to store 1GB of files on our service for 24 hours. Each GBDay costs $0.0029.<br><br>Our payment system accepts HIVE, HBD, STEEM and SBD.</h4>
+                        <select id="signupNetwork" onchange="signupNetworkSelect()">
+                            <option value="none">Select a network for your account...</option>
+                            <option value="all">All</option>
+                            <option value="hive">Hive</option>
+                            <option value="dtc">Avalon</option>
+                        </select>
+                        <input type="text" placeholder="Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="receiverUsername" class="loginFields">
                         <input type="number" placeholder="GBdays to purchase" id="gbdaysInput" class="loginFields">
                         <h4 style="margin-block-start: 0.25em; margin-block-end: 0.6em;">Payment method: 
                         <select id="pymtMtd">

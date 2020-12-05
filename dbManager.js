@@ -294,6 +294,8 @@ let db = {
             return 'all'
     },
     isValidAvalonUsername: (username) => {
+        if (typeof username !== 'string') return 'username must be a string'
+        if (username.length < 1 || username.length > 50) return 'username nust be between 1 and 50 characters long'
         let allowedUsernameChars = 'abcdefghijklmnopqrstuvwxyz0123456789'
         let allowedUsernameCharsOnlyMiddle = '-.'
         username = username.toLowerCase()

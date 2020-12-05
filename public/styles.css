@@ -191,6 +191,12 @@ hr {
     margin-block-end: 0.25em;
 }
 
+#signupNetwork {
+    width: 102%;
+    height: 30px;
+    margin-block-end: 0.75em;
+}
+
 #HiveKeychainBtn, #HiveSignerBtn, #SteemKeychainBtn, #SteemLoginBtn {
     display: none;
     margin-block-end: 0.5em;

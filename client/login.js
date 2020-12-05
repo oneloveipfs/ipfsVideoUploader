@@ -196,11 +196,23 @@ document.getElementById('signupButton').onclick = () => {
 
 document.getElementById('getPaymentBtns').onclick = () => {
     if (document.getElementById('gbdaysInput').value == '') return alert('Please specify GBdays to purchase.')
+    let selectedNetwork = document.getElementById('signupNetwork').value
     let receipient = document.getElementById('receiverUsername').value
     let paymentMethod = document.getElementById('pymtMtd').value
     let creditsToBuy = parseFloat(document.getElementById('gbdaysInput').value)
     let nativePymtProcessors = ['HIVE','HBD','STEEM','SBD']
-    if (receipient && validateAccountName(receipient) !== null) return alert(validateAccountName(receipient))
+    if (selectedNetwork === 'none') return alert('Please select a network for your account.')
+
+    // Validate usernames
+    let hiveValid = validateHiveUsername(receipient)
+    let dtcValid = validateAvalonUsername(receipient)
+    if (selectedNetwork === 'all' && receipient && (hiveValid !== null || dtcValid !== null))
+        return alert(hiveValid || dtcValid)
+    if (selectedNetwork === 'hive' && hiveValid !== null)
+        return alert(hiveValid)
+    if (selectedNetwork === 'dtc' && dtcValid !== null)
+        return alert(dtcValid)
+    
     if (creditsToBuy <= 0) return alert('Purchase quantity must not be less than or equals to zero.')
     if (nativePymtProcessors.includes(paymentMethod)) exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
         if (e) return alert(e)
@@ -210,28 +222,32 @@ document.getElementById('getPaymentBtns').onclick = () => {
         document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
         updateDisplayByIDs(['nativeDisclaimer'],['CoinbaseCommerceBtn','coinbaseDisclaimer'])
 
+        let memo = selectedNetwork === 'all' ? ('to: @' + receipient) : ('to: ' + selectedNetwork + '@' + receipient)
+        if (selectedNetwork === 'all' && !receipient)
+            memo = ''
+
         switch (paymentMethod) {
             case 'HIVE':
             case 'HBD':
                 updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn'],['SteemKeychainBtn','SteemLoginBtn'])
                 document.getElementById('HiveKeychainBtn').onclick = () => {
-                    hive_keychain.requestTransfer(receipient,shawpconfig.HiveReceiver,amt.toString(),receipient ? 'to: @' + receipient : '',paymentMethod,(e) => {
+                    hive_keychain.requestTransfer(receipient,shawpconfig.HiveReceiver,amt.toString(),memo,paymentMethod,(e) => {
                         if (e.error) return alert(e.error)
                         updateDisplayByIDs(['signupcb'],['signuppay'])
                     })
                 }
-                document.getElementById('HiveSignerBtn').href = 'https://hivesigner.com/sign/transfer?to=' + shawpconfig.HiveReceiver + '&amount=' + amt + paymentMethod + (receipient ? '&memo=to: @' + receipient : '')
+                document.getElementById('HiveSignerBtn').href = 'https://hivesigner.com/sign/transfer?to=' + shawpconfig.HiveReceiver + '&amount=' + amt + paymentMethod + (memo !== '' ? '&memo=' + memo : '')
                 break
             case 'STEEM':
             case 'SBD':
                 updateDisplayByIDs(['SteemKeychainBtn','SteemLoginBtn'],['HiveKeychainBtn','HiveSignerBtn'])
                 document.getElementById('SteemKeychainBtn').onclick = () => {
-                    steem_keychain.requestTransfer(receipient,shawpconfig.SteemReceiver,amt.toString(),receipient ? 'to: @' + receipient : '',paymentMethod,(e) => {
+                    steem_keychain.requestTransfer(receipient,shawpconfig.SteemReceiver,amt.toString(),memo,paymentMethod,(e) => {
                         if (e.error) return alert(e.error)
                         updateDisplayByIDs(['signupcb'],['signuppay'])
                     })
                 }
-                document.getElementById('SteemLoginBtn').href = 'https://steemlogin.com/sign/transfer?to=' + shawpconfig.SteemReceiver + '&amount=' + amt + paymentMethod + (receipient ? '&memo=to: @' + receipient : '')
+                document.getElementById('SteemLoginBtn').href = 'https://steemlogin.com/sign/transfer?to=' + shawpconfig.SteemReceiver + '&amount=' + amt + paymentMethod + (memo !== '' ? '&memo=' + memo : '')
                 break
             default:
                 break
@@ -249,7 +265,7 @@ document.getElementById('getPaymentBtns').onclick = () => {
         updateDisplayByIDs(['CoinbaseCommerceBtn','coinbaseDisclaimer','signuppay'],['signupstart','HiveKeychainBtn','HiveSignerBtn','SteemKeychainBtn','SteemLoginBtn','nativeDisclaimer'])
         
         document.getElementById('CoinbaseCommerceBtn').onclick = () =>
-            axios.post('/shawp_refill_coinbase',{ username: receipient, usdAmt: fiatAmt })
+            axios.post('/shawp_refill_coinbase',{ username: receipient, network: selectedNetwork, usdAmt: fiatAmt })
                 .then((response) => window.location.href = response.data.hosted_url)
                 .catch((e) => alert(JSON.stringify(e)))
     }
@@ -259,6 +275,23 @@ document.getElementById('redeemVoucherBtn').onclick = () => {
     alert('Invalid voucher code')
 }
 })
+
+function signupNetworkSelect() {
+    switch (document.getElementById('signupNetwork').value) {
+        case 'none':
+            document.getElementById('receiverUsername').placeholder = 'Username'
+            break
+        case 'all':
+            document.getElementById('receiverUsername').placeholder = 'Username (if different from sender address)'
+            break
+        case 'hive':
+            document.getElementById('receiverUsername').placeholder = 'HIVE Username'
+            break
+        case 'dtc':
+            document.getElementById('receiverUsername').placeholder = 'AVALON Username'
+            break
+    }
+}
 
 function keychainCb(encrypted_message,steemUser,dtconly) {
     let contentType = {
@@ -393,43 +426,4 @@ function getKeychainLoginBtnLabel() {
         return "Proceed with Keychains"
     else
         return "Proceed"
-}
-
-function validateAccountName(value) {
-    var i = void 0,
-        label = void 0,
-        len = void 0,
-        suffix = void 0;
-  
-    suffix = "Hive username must ";
-    if (!value) {
-        return suffix + "not be empty.";
-    }
-    var length = value.length;
-    if (length < 3 || length > 16) {
-        return suffix + "be between 3 and 16 characters.";
-    }
-    if (/\./.test(value)) {
-        suffix = "Each account segment much ";
-    }
-    var ref = value.split(".");
-    for (i = 0, len = ref.length; i < len; i++) {
-        label = ref[i];
-        if (!/^[a-z]/.test(label)) {
-            return suffix + "start with a letter.";
-        }
-        if (!/^[a-z0-9-]*$/.test(label)) {
-            return suffix + "have only letters, digits, or dashes.";
-        }
-        if (/--/.test(label)) {
-            return suffix + "have only one dash in a row.";
-        }
-        if (!/[a-z0-9]$/.test(label)) {
-            return suffix + "end with a letter or digit.";
-        }
-        if (!(label.length >= 3)) {
-            return suffix + "be longer";
-        }
-    }
-    return null;
 }
