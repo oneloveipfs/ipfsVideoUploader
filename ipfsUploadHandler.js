@@ -186,8 +186,8 @@ let uploadOps = {
                 // record as network/streamer/link so that the full list of
                 // hashes can be retrieved from the blockchain later.
                 // TODO: Verify that network/streamer/link exists
-                db.recordHash(username,network,'streams',request.body.streamId,0)
-                db.writeHashesData()
+                if (db.recordHash(username,network,'streams',request.body.streamId,0))
+                    db.writeHashesData()
 
                 let result = {
                     username: username,

@@ -83,7 +83,7 @@ let db = {
         return result
     },
     recordHash: (username,network,type,hash,size) => {
-        if (!hash && !size) return
+        if (!hash && !size) return false
         let fullusername = db.toFullUsername(username,network,true)
         if (!hashes[fullusername]) {
             hashes[fullusername] = {
@@ -98,12 +98,16 @@ let db = {
             hashes[fullusername][type] = []
         }
 
-        if (!hashes[fullusername][type].includes(hash))
+        let isNewHash = !hashes[fullusername][type].includes(hash)
+
+        if (isNewHash)
             hashes[fullusername][type].push(hash)
         
         // Record size of file
         if (size > 0)
             hashSizes[hash] = size
+
+        return isNewHash
     },
     recordSkylink: (username,network,type,skylink) => {
         let fullusername = db.toFullUsername(username,network,true)
