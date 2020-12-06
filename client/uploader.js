@@ -938,7 +938,6 @@ async function getCommunitySubs(acc,network) {
             break
     }
     try {
-        // TODO: use techcoderx.com api once ready
         communities = await axios.post(node,{
             jsonrpc: '2.0',
             method: 'bridge.list_all_subscriptions',

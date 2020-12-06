@@ -129,5 +129,3 @@ describe('Auth',() => {
         }))
     })
 })
-
-Auth.stopWatchingOnWhitelist()

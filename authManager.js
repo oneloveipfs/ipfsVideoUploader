@@ -9,28 +9,31 @@ const { EOL } = require('os')
 const Keys = require('./.auth.json')
 const Config = require('./config.json')
 const Shawp = require('./shawp')
+const dir = require('os').homedir() + '/.oneloveipfs'
 
 Hive.api.setOptions({ url: Config.Shawp.HiveAPI || 'https://hived.techcoderx.com', useAppbaseApi: true })
 Hive.config.set('uri', Config.Shawp.HiveAPI || 'https://hived.techcoderx.com')
 Hive.config.set('alternative_api_endpoints', [])
 
 // If whitelist file doesn't exist create it
-if (Config.whitelistEnabled && !fs.existsSync('whitelist.txt'))
-    fs.writeFileSync('./whitelist.txt','')
+if (Config.whitelistEnabled && !fs.existsSync(dir+'/whitelist.txt'))
+    fs.writeFileSync(dir+'/whitelist.txt','')
 
 // Cache whitelist in a variable, and update variable when fs detects a file change
-let whitelist = fs.readFileSync('whitelist.txt','utf8').split(EOL)
-
-// Watch for external whitelist.txt changes
-let whitelistWatcher = fs.watch('whitelist.txt',() => {
-    fs.readFile('whitelist.txt', 'utf8',(err,readList) => {
-        if (err) return console.log('Error while updating whitelist: ' + err)
-        whitelist = readList.split(EOL)
-        auth.whitelistTrim()
-    })
-})
+let whitelist = fs.readFileSync(dir+'/whitelist.txt','utf8').split(EOL)
 
 let auth = {
+    watch: () => {
+        // Watch for external whitelist.txt changes
+        if (!Config.whitelistEnabled) return
+        fs.watch(dir+'/whitelist.txt',() => {
+            fs.readFile(dir+'/whitelist.txt', 'utf8',(err,readList) => {
+                if (err) return console.log('Error while updating whitelist: ' + err)
+                whitelist = readList.split(EOL)
+                auth.whitelistTrim()
+            })
+        })
+    },
     generateEncryptedMemo: (username,cb,hc) => {
         // Generate encrypted text to be decrypted by Keychain or posting key on client
         let message = username + ':oneloveipfs_login:hive'
@@ -204,13 +207,9 @@ let auth = {
         // TODO: Update for new bot webhook system
     },
     writeWhitelistToDisk: () => {
-        fs.writeFile('whitelist.txt',whitelist.join(EOL),(e) => {
+        fs.writeFile(dir+'/whitelist.txt',whitelist.join(EOL),(e) => {
             if (e) console.log('Error saving whitelist to disk: ' + e)
         })
-    },
-    stopWatchingOnWhitelist: () => {
-        // For unit testing only
-        whitelistWatcher.close()
     }
 }
 
