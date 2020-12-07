@@ -1,4 +1,4 @@
-const Config = require('./config.json')
+const Config = require('./config')
 const FileUploader = require('./ipfsUploadHandler')
 const db = require('./dbManager')
 const Auth = require('./authManager')

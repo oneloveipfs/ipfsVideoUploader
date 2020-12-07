@@ -7,9 +7,9 @@ const Crypto = require('crypto-js')
 const fs = require('fs')
 const { EOL } = require('os')
 const Keys = require('./.auth.json')
-const Config = require('./config.json')
+const Config = require('./config')
 const Shawp = require('./shawp')
-const dir = require('os').homedir() + '/.oneloveipfs'
+const dir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 
 Hive.api.setOptions({ url: Config.Shawp.HiveAPI || 'https://hived.techcoderx.com', useAppbaseApi: true })
 Hive.config.set('uri', Config.Shawp.HiveAPI || 'https://hived.techcoderx.com')

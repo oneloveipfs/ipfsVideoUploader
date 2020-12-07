@@ -1,5 +1,5 @@
 const { app, BrowserWindow } = require('electron')
-const config = require('./config.json')
+const config = require('./config')
 require('./index')
 
 let mainWindow

@@ -1,6 +1,6 @@
 const assert = require('chai').assert
 const db = require('../dbManager')
-const Config = require('../config.json')
+const Config = require('../config')
 
 describe('Database',() => {
     it('userExistInHashesDB should return a boolean',(done) => {

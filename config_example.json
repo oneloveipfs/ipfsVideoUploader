@@ -6,7 +6,6 @@
     "deleteUploadsAfterAdd": true,
     "tokenExpiry": 86400,
     "tokenApp": "oneloveipfs",
-    "dataDir": "",
 
     "admins":["graylan","gray00","d00k13","vaultec","toddmck","priyanarc"],
     "encoderAccounts":[],
@@ -28,7 +27,7 @@
     },
 
     "Skynet": {
-        "enabled": true,
+        "enabled": false,
         "portalUrl": "http://localhost:9980",
         "portalUploadPath": "/skynet/skyfile",
         "portalFileFieldname": "file"
@@ -37,17 +36,8 @@
     "tusdUploadDir": "/Users/techcoderx/tusfiles",
     "socketTimeout": 600000,
 
-    "WooCommerceEnabled": false,
-    "WooCommerceConfig": {
-        "consumerKey": "",
-        "consumerSecret": "",
-        "url": "https://order.oneloveipfs.com",
-        "wpAPI": true,
-        "version": "wc/v1"
-    },
-    "WooCommerceSettings": {},
     "Shawp": {
-        "Enabled": true,
+        "Enabled": false,
         "DefaultUSDRate": 0.0029,
         "HiveAPI": "https://hived.techcoderx.com",
         "SteemAPI": "https://api.steemit.com",

@@ -10,10 +10,10 @@ const async = require('async')
 const WebVTT = require('node-webvtt')
 const MimeType = require('mime-types')
 const Socket = require('socket.io')
-const Config = require('./config.json')
+const Config = require('./config')
 const db = require('./dbManager')
 const Auth = require('./authManager')
-const defaultDir = Config.dataDir || require('os').homedir() + '/.oneloveipfs'
+const defaultDir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 
 let SocketIO
 let ipsync

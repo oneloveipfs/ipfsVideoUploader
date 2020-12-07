@@ -1,4 +1,4 @@
-const Config = require('./config.json')
+const Config = require('./config')
 const db = require('./dbManager')
 const hive = require('@hiveio/hive-js')
 const steem = require('steem')
@@ -6,7 +6,7 @@ const coinbase = require('coinbase-commerce-node')
 const fs = require('fs')
 const axios = require('axios')
 const Scheduler = require('node-schedule')
-const dbDir = (Config.dataDir || require('os').homedir() + '/.oneloveipfs') + '/db'
+const dbDir = (process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs') + '/db'
   
 hive.api.setOptions({url: Config.Shawp.HiveAPI, useAppbaseApi: true })
 steem.api.setOptions({ url: Config.Shawp.SteemAPI, useAppbaseApi: true })
