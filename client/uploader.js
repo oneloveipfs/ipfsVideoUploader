@@ -43,35 +43,38 @@ let avalonKey = sessionStorage.getItem('dtcKey')
 let postparams = {}
 
 // Socket.io connection to server
-let uplStat = io.connect('/uploadStat')
-uplStat.on('result',(r) => {
-    if (r.error) return console.log('uplStat Error', r.error)
-    switch (r.type) {
-        case 'videos':
-            postparams = Object.assign(postparams,r)
-            break
-        case 'video240':
-            postparams.ipfs240hash = r.hash
-            if (r.skylink) postparams.skylink240 = r.skylink
-            break
-        case 'video480':
-            postparams.ipfs480hash = r.hash
-            if (r.skylink) postparams.skylink480 = r.skylink
-            break
-        case 'video720':
-            postparams.ipfs720hash = r.hash
-            if (r.skylink) postparams.skylink720 = r.skylink
-            break
-        case 'video1080':
-            postparams.ipfs1080hash = r.hash
-            if (r.skylink) postparams.skylink1080 = r.skylink
-            break
-        default:
-            return console.log('uplStat Error: missing type in repsonse')
-    }
-    postVideo()
-    console.log(postparams)
-})
+let uplStat
+axios.get('/proxy_server').then((r) => {
+    uplStat = io.connect(r.data.server+'/uploadStat')
+    uplStat.on('result',(r) => {
+        if (r.error) return console.log('uplStat Error', r.error)
+        switch (r.type) {
+            case 'videos':
+                postparams = Object.assign(postparams,r)
+                break
+            case 'video240':
+                postparams.ipfs240hash = r.hash
+                if (r.skylink) postparams.skylink240 = r.skylink
+                break
+            case 'video480':
+                postparams.ipfs480hash = r.hash
+                if (r.skylink) postparams.skylink480 = r.skylink
+                break
+            case 'video720':
+                postparams.ipfs720hash = r.hash
+                if (r.skylink) postparams.skylink720 = r.skylink
+                break
+            case 'video1080':
+                postparams.ipfs1080hash = r.hash
+                if (r.skylink) postparams.skylink1080 = r.skylink
+                break
+            default:
+                return console.log('uplStat Error: missing type in repsonse')
+        }
+        postVideo()
+        console.log(postparams)
+    })
+}).catch((e) => console.log(e))
 
 // Vars loaded from config
 let config;

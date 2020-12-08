@@ -1,5 +1,4 @@
 // Flat file JSON database manager
-const Config = require('./config')
 const fs = require('fs')
 const dir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 const dbDir = dir+'/db'

@@ -31,6 +31,7 @@
     "hivecrypt": "^1.0.0",
     "hivesigner": "^3.2.1",
     "http": "0.0.1-security",
+    "http-proxy": "^1.18.1",
     "ipfs-http-client": "^47.0.0",
     "javalon": "^1.0.29",
     "jsonwebtoken": "^8.5.1",
