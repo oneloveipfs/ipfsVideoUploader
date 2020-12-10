@@ -2,7 +2,7 @@
   "name": "ipfsvideouploader",
   "version": "2.0.0",
   "description": "Alternative IPFS uploader for DTube videos.",
-  "main": "electron.js",
+  "main": "electronApp.js",
   "scripts": {
     "start": "node index.js",
     "keygen": "node scripts/generateKeys.js",
@@ -10,8 +10,8 @@
     "test": "mocha --timeout 5000",
     "snyk-protect": "snyk protect",
     "prepare": "npm run snyk-protect",
-    "devapp": "electron electron.js",
     "buildapp-macos": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2021 TechCoderX' --platform darwin --icon public/macos_icon.icns"
+    "devapp": "electron electronApp.js",
   },
   "author": "techcoderx",
   "license": "GPLv3",
