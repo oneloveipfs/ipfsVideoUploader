@@ -13,4 +13,8 @@ if (fs.existsSync(userconfigdir)) {
     }
 }
 
+// Sprite generation script is not supported on Windows
+if (process.platform == 'win32')
+    defaultConfig.spritesEnabled = false
+
 module.exports = defaultConfig
