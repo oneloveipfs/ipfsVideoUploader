@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let tohide = document.getElementsByClassName('rememberme')
         for (let i = 0; i < tohide.length; i++)
             tohide[i].style.display = "none"
+    } else {
+        document.getElementById('logininfo').innerText = 'Login with your posting or custom keys. COMMENT authority is required at minimum for Avalon custom keys. Private keys are only stored on your computer and will only be used to decrypt access tokens and broadcast transactions.'
     }
 
     axios.get('/config').then((result) => {
