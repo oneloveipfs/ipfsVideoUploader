@@ -8,7 +8,8 @@ const createWindow = () => {
     mainWindow = new BrowserWindow({
         width: 1200,
         height: 700,
-        webPreferences: { nodeIntegration: true }
+        webPreferences: { nodeIntegration: true },
+        icon: process.platform === 'linux' ? __dirname+'/public/favicon.png' : undefined
     })
 
     mainWindow.loadURL('http://localhost:'+config.HTTP_PORT)
