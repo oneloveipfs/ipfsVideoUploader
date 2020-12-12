@@ -3,7 +3,7 @@ if (iskeychain !== 'true') geturl += '&scauth=true'
 
 axios.get('/shawp_config').then((result) => {
     window.shawpconfig = result.data
-    if (!window.shawpconfig.Enabled) updateDisplayByIDs([],['refillCrModeBtn'])
+    if (!window.shawpconfig.Enabled) updateDisplayByIDs([],['refillCrModeBtn','subDetModeBtn'])
 })
 
 document.addEventListener('DOMContentLoaded', () => {

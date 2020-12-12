@@ -14,6 +14,7 @@
     "prepapp": "node scripts/electronPrep.js",
     "buildapp-macos": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2021 TechCoderX' --platform darwin --icon public/macos_icon.icns",
     "buildapp-windows": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2021 TechCoderX' --asar --platform=win32 --version-string.FileDescription 'OneLoveIPFS Uploader' --version-string.ProductName OneLoveIPFS --icon public/win32_icon.ico",
+    "buildapp-linux": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2021 TechCoderX' --platform linux --icon public/favicon.png",
     "remote-prune": "npm un @hiveio/hive-js async axios body-parser coinbase-commerce-node crypto-js express-rate-limit form-data get-video-duration hivecrypt hivesigner ipfs-http-client javalon jsonwebtoken mime-types multer node-schedule node-webvtt shelljs snyk socket.io steem"
   },
   "author": "techcoderx",
