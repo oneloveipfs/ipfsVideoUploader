@@ -466,4 +466,4 @@ function Authenticate(request,response,needscredits,next) {
 
 app.use((req,res) => { return res.status(404).redirect('/404') })
 
-http.listen(Config.HTTP_PORT)
+http.listen(Config.HTTP_PORT,Config.HTTP_BIND_IP)

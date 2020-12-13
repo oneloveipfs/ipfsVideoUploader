@@ -34,4 +34,4 @@ function loadWebpage(HTMLFile,response) {
     });
 }
 
-http.listen(Config.port)
+http.listen(Config.port,Config.bindip)

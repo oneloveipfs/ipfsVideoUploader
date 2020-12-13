@@ -855,11 +855,12 @@ function updateSubtitle() {
 }
 
 function broadcastCompletion(isAvalonSuccess) {
+    let openMethod = isElectron() ? window.openBrowserWindowElectron : window.location.replace
     clearDraft()
     if (isAvalonSuccess)
-        window.location.replace('https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash)
+        openMethod('https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash)
     else
-        window.location.replace('https://d.tube/v/' + username + '/' + postparams.permlink)
+        openMethod('https://d.tube/v/' + username + '/' + postparams.permlink)
 }
 
 function clearDraft() {

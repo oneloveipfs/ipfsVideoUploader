@@ -176,3 +176,12 @@ function validateAvalonUsername(username) {
     }
     return null
 }
+
+function openBrowserWindowElectron(url) {
+    window.electron.ipcRenderer.send('open_browser_window',url)
+}
+
+if (isElectron) {
+    window.electron = require('electron')
+    window.open = (url) => window.electron.ipcRenderer.send('open_browser_window',url)
+}

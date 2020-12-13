@@ -1,6 +1,7 @@
 {
     "IPFS_API_PORT": 5001,
     "HTTP_PORT": 3000,
+    "HTTP_BIND_IP": "127.0.0.1",
     "whitelistEnabled": true,
     "spritesEnabled": true,
     "deleteUploadsAfterAdd": true,

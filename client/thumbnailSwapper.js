@@ -393,6 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             async.parallel(snapSwapOps,(errors,results) => {
+                let openMethod = isElectron() ? window.openBrowserWindowElectron : window.location.assign
                 if (errors) {
                     console.log(errors)
                     if (errors.steem && errors.avalon && errors.hive) {
@@ -400,20 +401,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         reenableSnapSwapFields()
                     } else if (errors.steem) {
                         alert('Failed to broadcast thumbnail changes onto Steem blockchain. You will be redirected to the DTube watch page. Error details: ' + JSON.stringify(errors))
-                        window.location.assign('https://d.tube/#!/v/' + selectedAuthor + '/' + selectedPermlink)
+                        openMethod('https://d.tube/#!/v/' + selectedAuthor + '/' + selectedPermlink)
                     } else if (errors.avalon) {
                         alert('Failed to broadcast thumbnail changes onto Avalon blockchain. You will be redirected to the DTube watch page. Error details: ' + JSON.stringify(errors))
-                        window.location.assign('https://d.tube/#!/v/' + selectedAuthor + '/' + selectedPermlink)
+                        openMethod('https://d.tube/#!/v/' + selectedAuthor + '/' + selectedPermlink)
                     } else if (errors.hive) {
                         alert('Failed to broadcast thumbnail changes onto Hive blockchain. You will be redirected to the DTube watch page. Error details: ' + JSON.stringify(errors))
-                        window.location.assign('https://d.tube/#!/v/' + selectedAuthor + '/' + selectedPermlink)
+                        openMethod('https://d.tube/#!/v/' + selectedAuthor + '/' + selectedPermlink)
                     } else {
                         alert('Unknown error occured while broadcasting thumbnail changes. Check your browser console for error details. The IPFS hash of your new thumbnail is ' + newSnapHash + '.')
                         reenableSnapSwapFields()
                     }
                 } else {
                     alert('Thumbnail changes broadcasted successfully! You will be redirected to the DTube watch page.')
-                    window.location.assign('https://d.tube/#!/v/' + selectedAuthor + '/' + selectedPermlink)
+                    openMethod('https://d.tube/#!/v/' + selectedAuthor + '/' + selectedPermlink)
                 }
             })
         }).catch(function(err) {
