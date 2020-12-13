@@ -603,7 +603,7 @@ function postVideo() {
 
 function steemBroadcaster(isAvalon,method,params) {
     if (steemUser) {
-        document.getElementById('progressBarFront').innerHTML = 'Submitting video to Steem blockchain...'
+        document.getElementById('progressBarFront').innerHTML = 'Submitting video to Steem...'
         method(...params,(steemResponse) => {
             if (!isElectron() && steemResponse.error) alert('Steem error: ' + steemResponse.message)
             else if (isElectron() && steemResponse) alert('Steem error: ' + steemResponse.toString())
