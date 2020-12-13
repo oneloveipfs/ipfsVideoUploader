@@ -181,5 +181,20 @@ function openBrowserWindowElectron(url) {
     window.postMessage({ action: 'open_browser_window', data: url })
 }
 
-if (isElectron)
+if (isElectron) {
     window.open = openBrowserWindowElectron
+    document.addEventListener('DOMContentLoaded',() => {
+        let anchors = document.getElementsByTagName('a')
+        for (let i in anchors)
+            if (typeof anchors[i].href === 'string' &&
+                typeof anchors[i].target === 'string' &&
+                anchors[i].href.startsWith('http') &&
+                !anchors[i].href.startsWith(window.location.origin)) {
+                let urlToOpen = anchors[i].href
+                anchors[i].onclick = (evt) => {
+                    evt.preventDefault()
+                    openBrowserWindowElectron(urlToOpen)
+                }
+            }
+    })
+}
