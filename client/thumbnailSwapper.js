@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (results.avalon && results.avalon.json) {
                 // Valid Avalon link (DTube 0.9+)
                 if (!avalonUser || !avalonKey)
-                    return alert('You need to be logged in with your Avalon blockchain account to make thumbnail swaps of DTube videos posted onto Avalon.')
+                    return alert('You need to be logged in with your Avalon account to make thumbnail swaps of DTube videos posted onto Avalon.')
                 if (results.avalon.author !== avalonUser)
                     return alert('Looks like this is not your DTube video! Please login again with the correct Avalon account that matches the author of this Avalon post.')
                 if (results.avalon.json.providerName !== 'IPFS' && results.avalon.json.files && !results.avalon.json.files.ipfs)

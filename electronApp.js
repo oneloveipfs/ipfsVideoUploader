@@ -80,7 +80,11 @@ const createWindow = () => {
     mainWindow = new BrowserWindow({
         width: 1200,
         height: 700,
-        webPreferences: { nodeIntegration: true },
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            preload: __dirname + '/scripts/electronPreload.js'
+        },
         icon: process.platform === 'linux' ? __dirname+'/public/favicon.png' : undefined
     })
 
