@@ -1,6 +1,10 @@
-const { app, BrowserWindow } = require('electron')
+const axios = require('axios')
+const { app, shell, BrowserWindow, Notification } = require('electron')
 const config = require('./config')
 require('./index')
+
+if (require('electron-squirrel-startup'))
+    return app.quit()
 
 let mainWindow
 
@@ -27,3 +31,16 @@ app.on('activate', () => {
     if (mainWindow === null)
         createWindow()
 })
+
+// Update check
+axios.get('https://uploader.oneloved.tube/latest_build').then((build) => {
+    if (config.Build.number < build.data.number) {
+        let updateNotify = new Notification({
+            title: 'An update is available',
+            body: 'The latest version is ' + build.data.version + ' (build ' + build.data.number + '). Click here to download.',
+            urgency: 'normal'
+        })
+        updateNotify.on('click',() => shell.openExternal(build.data.link))
+        updateNotify.show()
+    }
+}).catch(() => {})

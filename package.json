@@ -1,5 +1,6 @@
 {
   "name": "ipfsvideouploader",
+  "productName": "OneLoveIPFS",
   "version": "2.0.0",
   "description": "Alternative IPFS uploader for DTube videos.",
   "main": "electronApp.js",
@@ -15,7 +16,7 @@
     "buildapp-macos": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2021 TechCoderX' --platform darwin --icon public/macos_icon.icns",
     "buildapp-windows": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2021 TechCoderX' --asar --platform=win32 --version-string.FileDescription 'OneLoveIPFS Uploader' --version-string.ProductName OneLoveIPFS --icon public/win32_icon.ico",
     "buildapp-linux": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2021 TechCoderX' --asar --platform linux",
-    "remote-prune": "npm un @hiveio/hive-js async axios body-parser coinbase-commerce-node crypto-js express-rate-limit form-data get-video-duration hivecrypt hivesigner ipfs-http-client javalon jsonwebtoken mime-types multer node-schedule node-webvtt shelljs snyk socket.io steem"
+    "dep-prune": "npm un @hiveio/hive-js async body-parser coinbase-commerce-node crypto-js express-rate-limit form-data get-video-duration hivecrypt hivesigner ipfs-http-client javalon jsonwebtoken mime-types multer node-schedule node-webvtt shelljs snyk socket.io steem"
   },
   "author": "techcoderx",
   "license": "GPLv3",
@@ -27,6 +28,7 @@
     "coinbase-commerce-node": "^1.0.4",
     "cors": "^2.8.5",
     "crypto-js": "^4.0.0",
+    "electron-squirrel-startup": "^1.0.0",
     "express": "^4.17.1",
     "express-rate-limit": "^5.1.3",
     "form-data": "^3.0.0",
@@ -51,6 +53,7 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "electron": "^11.0.2",
+    "electron-builder": "^22.9.1",
     "electron-packager": "^15.2.0",
     "mocha": "^7.1.2"
   },

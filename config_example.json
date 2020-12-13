@@ -26,6 +26,12 @@
         "noBroadcast": false
     },
 
+    "Build": {
+        "number": 0,
+        "version": "v2",
+        "link": "https://github.com/oneloveipfs/ipfsVideoUploader/releases"
+    },
+
     "Skynet": {
         "enabled": false,
         "portalUrl": "http://localhost:9980",

@@ -362,6 +362,7 @@ app.get('/shawp_user_info_admin',APILimiter,(req,res) => {
 })
 
 app.get('/proxy_server',APILimiter,(req,res) => res.send({server: ''}))
+app.get('/latest_build',APILimiter,(req,res) => res.send(Config.Build))
 
 app.get('/user_info',APILimiter,(req,res) => {
     Authenticate(req,res,false,(user,network) => res.send(db.getUserInfo(user,network)))
