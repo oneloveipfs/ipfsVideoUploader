@@ -46,8 +46,10 @@
     "Shawp": {
         "Enabled": false,
         "DefaultUSDRate": 0.0029,
+        "AvalonAPI": "https://avalon.oneloved.tube",
         "HiveAPI": "https://hived.techcoderx.com",
         "SteemAPI": "https://api.steemit.com",
+        "DtcReceiver": "onelovedtube",
         "HiveReceiver": "onelovedtube",
         "SteemReceiver": "onelovedtube",
         "Coinbase": {

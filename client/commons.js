@@ -72,33 +72,31 @@ function abbrevateFilesize(size) {
 }
 
 function exchageRate (coin,amount,cb) {
+    let coingeckoUrl
+    let precision = 3
     switch (coin) {
         case 'DTC':
-            // DTC payments coming soon
+            coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/dtube-coin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
+            precision = 2
             break
         case 'HIVE':
-            axios.get('https://api.coingecko.com/api/v3/coins/hive?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * shawpconfig.DefaultUSDRate / response.data.market_data.current_price.usd * 1000) / 1000)
-            }).catch((e) => cb(e))
+            coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/hive?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
             break
         case 'HBD':
-            axios.get('https://api.coingecko.com/api/v3/coins/hive_dollar?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * shawpconfig.DefaultUSDRate / response.data.market_data.current_price.usd * 1000) / 1000)
-            }).catch((e) => cb(e))
+            coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/hive_dollar?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
             break
         case 'STEEM':
-            axios.get('https://api.coingecko.com/api/v3/coins/steem?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * shawpconfig.DefaultUSDRate / response.data.market_data.current_price.usd * 1000) / 1000)
-            }).catch((e) => cb(e))
+            coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/steem?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
             break
         case 'SBD':
-            axios.get('https://api.coingecko.com/api/v3/coins/steem-dollars?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                cb(null,Math.ceil(amount * shawpconfig.DefaultUSDRate / response.data.market_data.current_price.usd * 1000) / 1000)
-            }).catch((e) => cb(e))
+            coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/steem-dollars?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
             break
         default:
             break
     }
+    axios.get(coingeckoUrl).then((response) => {
+        cb(null,Math.ceil(amount * shawpconfig.DefaultUSDRate / response.data.market_data.current_price.usd * Math.pow(10,precision)) / Math.pow(10,precision))
+    }).catch((e) => cb(e))
 }
 
 function getAvalonKeyId(avalonUsername,avalonKey) {

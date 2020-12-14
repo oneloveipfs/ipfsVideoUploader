@@ -5,6 +5,15 @@ const Config = require('../config')
 let userAlreadyExist = Shawp.UserExists(Config.test.user,'all')
 
 describe('Shawp',() => {
+    it('Shawp.ExchangeRate should return USD price of DTC',(done) => {
+        let isdone = false
+        Shawp.ExchangeRate(Shawp.coins.DTC,1,(e,r) => {
+            if (r) assert.typeOf(r,'number')
+            if (!isdone) done()
+            isdone = true
+        })
+    })
+
     it('Shawp.ExchangeRate should return USD price of HIVE',(done) => {
         let isdone = false
         Shawp.ExchangeRate(Shawp.coins.Hive,1,(e,r) => {
@@ -39,6 +48,16 @@ describe('Shawp',() => {
             if (!isdone) done()
             isdone = true
         })
+    })
+
+    it('Shawp.ValidatePayment should parse memos attached to payments correctly',(done) => {
+        assert.equal(Shawp.ValidatePayment(Config.test.user,'a').length,0)
+        assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'')),'["techcoderx","all"]')
+        assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'')),'["' + Config.test.user + '","all"]')
+        assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'to: @'+Config.test.user)),'["' + Config.test.user + '","all"]')
+        assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'to: hive@'+Config.test.user)),'["' + Config.test.user + '","hive"]')
+        assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'to: dtc@'+Config.test.user)),'["' + Config.test.user + '","dtc"]')
+        done()
     })
 
     it('Shawp.AddUser should register a new customer',(done) => {

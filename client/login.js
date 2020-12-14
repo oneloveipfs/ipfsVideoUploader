@@ -202,7 +202,7 @@ document.getElementById('getPaymentBtns').onclick = () => {
     let receipient = document.getElementById('receiverUsername').value
     let paymentMethod = document.getElementById('pymtMtd').value
     let creditsToBuy = parseFloat(document.getElementById('gbdaysInput').value)
-    let nativePymtProcessors = ['HIVE','HBD','STEEM','SBD']
+    let nativePymtProcessors = ['DTC','HIVE','HBD','STEEM','SBD']
     if (selectedNetwork === 'none') return alert('Please select a network for your account.')
 
     // Validate usernames
@@ -218,20 +218,27 @@ document.getElementById('getPaymentBtns').onclick = () => {
     if (creditsToBuy <= 0) return alert('Purchase quantity must not be less than or equals to zero.')
     if (nativePymtProcessors.includes(paymentMethod)) exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
         if (e) return alert(e)
-        amt = amt.toFixed(3)
+        amt = paymentMethod === 'DTC' ? amt.toFixed(2) : amt.toFixed(3)
         if (receipient) document.getElementById('receiverAccConfirm').innerText = 'Username: ' + receipient
         document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + creditsToBuy + ' GBdays'
         document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
-        updateDisplayByIDs(['nativeDisclaimer'],['CoinbaseCommerceBtn','coinbaseDisclaimer'])
+        updateDisplayByIDs(['nativeDisclaimer','xferMemo'],['CoinbaseCommerceBtn','coinbaseDisclaimer'])
 
         let memo = selectedNetwork === 'all' ? ('to: @' + receipient) : ('to: ' + selectedNetwork + '@' + receipient)
         if (selectedNetwork === 'all' && !receipient)
             memo = ''
 
+        document.getElementById('xferMemo').innerHTML = memo !== '' ? 'Memo: <u>' + memo + '</u>' : 'No memo required'
+
         switch (paymentMethod) {
+            case 'DTC':
+                updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['SteemKeychainBtn','SteemLoginBtn','HiveKeychainBtn','HiveSignerBtn'])
+                document.getElementById('DTubeChannelBtn').onclick = () => window.open('https://d.tube/#!/c/' + shawpconfig.DtcReceiver)
+                document.getElementById('DTubeChannelBtn').href = 'https://d.tube/#!/c/' + shawpconfig.DtcReceiver
+                break
             case 'HIVE':
             case 'HBD':
-                updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn'],['SteemKeychainBtn','SteemLoginBtn'])
+                updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn'],['SteemKeychainBtn','SteemLoginBtn','DTubeChannelBtn','dtcInstruction'])
                 document.getElementById('HiveKeychainBtn').onclick = () => {
                     hive_keychain.requestTransfer(receipient,shawpconfig.HiveReceiver,amt.toString(),memo,paymentMethod,(e) => {
                         if (e.error) return alert(e.error)
@@ -242,7 +249,7 @@ document.getElementById('getPaymentBtns').onclick = () => {
                 break
             case 'STEEM':
             case 'SBD':
-                updateDisplayByIDs(['SteemKeychainBtn','SteemLoginBtn'],['HiveKeychainBtn','HiveSignerBtn'])
+                updateDisplayByIDs(['SteemKeychainBtn','SteemLoginBtn'],['HiveKeychainBtn','HiveSignerBtn','DTubeChannelBtn','dtcInstruction'])
                 document.getElementById('SteemKeychainBtn').onclick = () => {
                     steem_keychain.requestTransfer(receipient,shawpconfig.SteemReceiver,amt.toString(),memo,paymentMethod,(e) => {
                         if (e.error) return alert(e.error)
@@ -264,7 +271,7 @@ document.getElementById('getPaymentBtns').onclick = () => {
         document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + roundedCredits + ' GBdays'
         document.getElementById('quoteAmt').innerText = 'Amount: $' + fiatAmt + ' USD'
 
-        updateDisplayByIDs(['CoinbaseCommerceBtn','coinbaseDisclaimer','signuppay'],['signupstart','HiveKeychainBtn','HiveSignerBtn','SteemKeychainBtn','SteemLoginBtn','nativeDisclaimer'])
+        updateDisplayByIDs(['CoinbaseCommerceBtn','coinbaseDisclaimer','signuppay'],['signupstart','HiveKeychainBtn','HiveSignerBtn','SteemKeychainBtn','SteemLoginBtn','nativeDisclaimer','DTubeChannelBtn','dtcInstruction','xferMemo'])
         
         document.getElementById('CoinbaseCommerceBtn').onclick = () =>
             axios.post('/shawp_refill_coinbase',{ username: receipient, network: selectedNetwork, usdAmt: fiatAmt })
@@ -322,15 +329,10 @@ async function avalonLogin(avalonUsername,avalonKey,dtconly) {
         let avalonKeyId = false
         try {
             avalonKeyId = await getAvalonKeyId(avalonUsername,avalonKey)
-            if (avalonKeyId === false) {
-                keychainLoginBtn.innerText = getKeychainLoginBtnLabel()
-                proceedAuthBtnDisabled = false
-                return alert('Avalon key is invalid!')
-            }
+            if (avalonKeyId === false)
+                return handleLoginError('Invalid Avalon key')
         } catch (e) {
-            keychainLoginBtn.innerText = getKeychainLoginBtnLabel()
-            proceedAuthBtnDisabled = false
-            return alert('Avalon login error: ' + e)
+            return handleLoginError('Avalon login error: ' + e.toString())
         }
         
         // Storing Avalon login in sessionStorage so that we can access this in the upload page to sign transactions later.
@@ -342,16 +344,16 @@ async function avalonLogin(avalonUsername,avalonKey,dtconly) {
             if (avalonKeyId && avalonKeyId !== true) loginGetUrl += '&dtckeyid=' + avalonKeyId
             axios.get(loginGetUrl).then((response) => {
                 if (response.data.error != null)
-                    return alert(response.data.error)
+                    return handleLoginError(response.data.error)
                 javalon.decrypt(avalonKey,response.data.encrypted_memo,(e,decryptedAES) => {
-                    if (e) {
-                        keychainLoginBtn.innerText = getKeychainLoginBtnLabel()
-                        proceedAuthBtnDisabled = false
-                        return alert('Avalon decrypt error: ' + e.error)
-                    }
+                    if (e)
+                        return handleLoginError('Avalon decrypt error: ' + e.error)
                     keychainCb(decryptedAES,'',true)
                 })
-            }).catch(axiosErrorHandler)
+            }).catch((e) => {
+                axiosErrorHandler(e)
+                handleLoginError()
+            })
         }
     } else {
         // If Avalon username or password not provided, clear existing login (if any) from sessionStorage
@@ -417,7 +419,7 @@ function handleLoginError(msg) {
     keychainLoginBtn.innerText = getKeychainLoginBtnLabel()
     document.getElementById('proceedPersistAuthBtn').innerText = 'Proceed'
     proceedAuthBtnDisabled = false
-    alert(msg)
+    if (msg) alert(msg)
 }
 
 function getKeychainLoginBtnLabel() {

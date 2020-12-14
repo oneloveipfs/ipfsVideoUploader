@@ -1,5 +1,6 @@
 const Config = require('./config')
 const db = require('./dbManager')
+const AvalonStreamer = require('./avalonStreamer')
 const hive = require('@hiveio/hive-js')
 const steem = require('steem')
 const coinbase = require('coinbase-commerce-node')
@@ -48,50 +49,26 @@ let Shawp = {
                     Shawp.ExchangeRate(Shawp.coins.Hive,amt,(e,usd) => {
                         if (e) return console.log(e)
                         let receiver = tx.from
-                        let memo = tx.memo.toLowerCase()
-                        let network = 'all'
-                        if (memo !== '' && !memo.startsWith('to: @') && !memo.startsWith('to: hive@') && !memo.startsWith('to: dtc@')) return // Memo must be empty or begin with "to: @" or "to: network@"
-                        if (memo && memo.startsWith('to: @')) {
-                            let otheruser = memo.replace('to: @','')
-                            if (hive.utils.validateAccountName(otheruser) == null && db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
-                        } else if (memo && memo.startsWith('to: hive@')) {
-                            let otheruser = memo.replace('to: hive@','')
-                            if (hive.utils.validateAccountName(otheruser) == null) receiver = otheruser
-                            network = 'hive'
-                        } else if (memo && memo.startsWith('to: dtc@')) {
-                            let otheruser = memo.replace('to: dtc@','')
-                            if (db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
-                            network = 'dtc'
-                        }
-                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Hive,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
+                        let memo = tx.memo.toLowerCase().trim()
+                        let parsedDetails = Shawp.ValidatePayment(receiver,memo)
+                        if (parsedDetails.length !== 2) return
+                        Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Hive,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled $' + usd + ' to ' + (network != 'all' ? network : '') + '@' + receiver + ' successfully')
+                        console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
                     })
                 } else if (tx.amount.endsWith('HBD')) {
                     let amt = parseFloat(tx.amount.replace(' HBD',''))
                     Shawp.ExchangeRate(Shawp.coins.HiveDollars,amt,(e,usd) => {
                         if (e) return console.log(e)
                         let receiver = tx.from
-                        let memo = tx.memo.toLowerCase()
-                        let network = 'all'
-                        if (memo !== '' && !memo.startsWith('to: @') && !memo.startsWith('to: hive@') && !memo.startsWith('to: dtc@')) return // Memo must be empty or begin with "to: @" or "to: network@"
-                        if (memo && memo.startsWith('to: @')) {
-                            let otheruser = memo.replace('to: @','')
-                            if (hive.utils.validateAccountName(otheruser) == null && db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
-                        } else if (memo && memo.startsWith('to: hive@')) {
-                            let otheruser = memo.replace('to: hive@','')
-                            if (hive.utils.validateAccountName(otheruser) == null) receiver = otheruser
-                            network = 'hive'
-                        } else if (memo && memo.startsWith('to: dtc@')) {
-                            let otheruser = memo.replace('to: dtc@','')
-                            if (db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
-                            network = 'dtc'
-                        }
-                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Hive,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
+                        let memo = tx.memo.toLowerCase().trim()
+                        let parsedDetails = Shawp.ValidatePayment(receiver,memo)
+                        if (parsedDetails.length !== 2) return
+                        Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Hive,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled $' + usd + ' to ' + (network != 'all' ? network : '') + '@' + receiver + ' successfully')
+                        console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
                     })
                 }
             }
@@ -109,54 +86,52 @@ let Shawp = {
                     Shawp.ExchangeRate(Shawp.coins.Steem,amt,(e,usd) => {
                         if (e) return console.log(e)
                         let receiver = tx.from
-                        let memo = tx.memo.toLowerCase()
-                        let network = 'all'
-                        if (memo !== '' && !memo.startsWith('to: @') && !memo.startsWith('to: hive@') && !memo.startsWith('to: dtc@')) return // Memo must be empty or begin with "to: @" or "to: network@"
-                        if (memo && memo.startsWith('to: @')) {
-                            let otheruser = memo.replace('to: @','')
-                            if (steem.utils.validateAccountName(otheruser) == null && db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
-                        } else if (memo && memo.startsWith('to: hive@')) {
-                            let otheruser = memo.replace('to: hive@','')
-                            if (steem.utils.validateAccountName(otheruser) == null) receiver = otheruser
-                            network = 'hive'
-                        } else if (memo && memo.startsWith('to: dtc@')) {
-                            let otheruser = memo.replace('to: dtc@','')
-                            if (db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
-                            network = 'dtc'
-                        }
-                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Steem,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
+                        let memo = tx.memo.toLowerCase().trim()
+                        let parsedDetails = Shawp.ValidatePayment(receiver,memo)
+                        if (parsedDetails.length !== 2) return
+                        Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Steem,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled $' + usd + ' to ' + (network != 'all' ? network : '') + '@' + receiver + ' successfully')
+                        console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
                     })
                 } else if (tx.amount.endsWith('SBD')) {
                     let amt = parseFloat(tx.amount.replace(' SBD',''))
                     Shawp.ExchangeRate(Shawp.coins.SteemDollars,amt,(e,usd) => {
                         if (e) return console.log(e)
                         let receiver = tx.from
-                        let memo = tx.memo.toLowerCase()
-                        let network = 'all'
-                        if (memo !== '' && !memo.startsWith('to: @') && !memo.startsWith('to: hive@') && !memo.startsWith('to: dtc@')) return // Memo must be empty or begin with "to: @" or "to: network@"
-                        if (memo && memo.startsWith('to: @')) {
-                            let otheruser = memo.replace('to: @','')
-                            if (steem.utils.validateAccountName(otheruser) == null && db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
-                        } else if (memo && memo.startsWith('to: hive@')) {
-                            let otheruser = memo.replace('to: hive@','')
-                            if (steem.utils.validateAccountName(otheruser) == null) receiver = otheruser
-                            network = 'hive'
-                        } else if (memo && memo.startsWith('to: dtc@')) {
-                            let otheruser = memo.replace('to: dtc@','')
-                            if (db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
-                            network = 'dtc'
-                        }
-                        Shawp.Refill(tx.from,receiver,network,Shawp.methods.Steem,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
+                        let memo = tx.memo.toLowerCase().trim()
+                        let parsedDetails = Shawp.ValidatePayment(receiver,memo)
+                        if (parsedDetails.length !== 2) return
+                        Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Steem,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
                         Shawp.WriteRefillHistory()
                         Shawp.WriteUserDB()
-                        console.log('Refilled $' + usd + ' to ' + (network != 'all' ? network : '') + '@' + receiver + ' successfully')
+                        console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
                     })
                 }
             }
         })
+
+        if (Config.Shawp.DtcReceiver && (!network || network === 'dtc')) {
+            let dtcStream = new AvalonStreamer(Config.Shawp.AvalonAPI,true)
+            dtcStream.streamBlocks((newBlock) => {
+                for (let txn in newBlock.txs)
+                    if (newBlock.txs[txn].type === 3 && newBlock.txs[txn].data.receiver === Config.Shawp.DtcReceiver) {
+                        let tx = newBlock.txs[txn]
+                        let amt = tx.data.amount / 100
+                        console.log(tx)
+                        Shawp.ExchangeRate(Shawp.coins.DTC,amt,(e,usd) => {
+                            let receiver = tx.sender
+                            let memo = tx.data.memo.toLowerCase().trim()
+                            let parsedDetails = Shawp.ValidatePayment(receiver,memo)
+                            if (parsedDetails.length !== 2) return
+                            Shawp.Refill(tx.sender,parsedDetails[0],parsedDetails[1],Shawp.methods.DTC,tx.hash,tx.ts,amt+' DTC',usd)
+                            Shawp.WriteRefillHistory()
+                            Shawp.WriteUserDB()
+                            console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
+                        })
+                    }
+            })
+        }
 
         if (!network) {
             Scheduler.scheduleJob('0 0 * * *',() => {
@@ -178,6 +153,23 @@ let Shawp = {
                 })
             })
         }
+    },
+    ValidatePayment: (receiver,memo) => {
+        let network = 'all'
+        if (memo !== '' && !memo.startsWith('to: @') && !memo.startsWith('to: hive@') && !memo.startsWith('to: dtc@')) return [] // Memo must be empty or begin with "to: @" or "to: network@"
+        if (memo && memo.startsWith('to: @')) {
+            let otheruser = memo.replace('to: @','')
+            if (steem.utils.validateAccountName(otheruser) == null && db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
+        } else if (memo && memo.startsWith('to: hive@')) {
+            let otheruser = memo.replace('to: hive@','')
+            if (steem.utils.validateAccountName(otheruser) == null) receiver = otheruser
+            network = 'hive'
+        } else if (memo && memo.startsWith('to: dtc@')) {
+            let otheruser = memo.replace('to: dtc@','')
+            if (db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
+            network = 'dtc'
+        }
+        return [receiver,network]
     },
     AddUser: (username,network,nowrite) => {
         let fullusername = db.toFullUsername(username,network,true)
@@ -210,33 +202,29 @@ let Shawp = {
         else return true
     },
     ExchangeRate: (coin,amount,cb) => {
+        let coingeckoUrl
         switch (coin) {
             case 0:
-                // DTC payments coming soon
+                coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/dtube-coin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
                 break
             case 1:
-                axios.get('https://api.coingecko.com/api/v3/coins/hive?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                    cb(null,response.data.market_data.current_price.usd * amount)
-                }).catch((e) => cb(e))
+                coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/hive?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
                 break
             case 2:
-                axios.get('https://api.coingecko.com/api/v3/coins/hive_dollar?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                    cb(null,response.data.market_data.current_price.usd * amount)
-                }).catch((e) => cb(e))
+                coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/hive_dollar?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
                 break
             case 3:
-                axios.get('https://api.coingecko.com/api/v3/coins/steem?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                    cb(null,response.data.market_data.current_price.usd * amount)
-                }).catch((e) => cb(e))
+                coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/steem?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
                 break
             case 4:
-                axios.get('https://api.coingecko.com/api/v3/coins/steem-dollars?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false').then((response) => {
-                    cb(null,response.data.market_data.current_price.usd * amount)
-                }).catch((e) => cb(e))
+                coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/steem-dollars?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
                 break
             default:
                 return cb({ error: 'invalid coin' })
         }
+        axios.get(coingeckoUrl).then((response) => {
+            cb(null,response.data.market_data.current_price.usd * amount)
+        }).catch((e) => cb(e))
     },
     CoinbaseCharge: (username,network,usdAmt,cb,cbUrl,cancelUrl) => {
         let chargeData = {

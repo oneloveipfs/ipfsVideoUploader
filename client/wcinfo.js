@@ -91,38 +91,46 @@ document.addEventListener('DOMContentLoaded', () => {
         if (creditsToBuy <= 0) return alert('Purchase quantity must not be less than or equals to zero.')
         document.getElementById('refillSubmitBtn').value = 'Loading...'
         document.getElementById('refillSubmitBtn').disabled = true
-        let nativePymtProcessors = ['HIVE','HBD','STEEM','SBD']
+        let nativePymtProcessors = ['DTC','HIVE','HBD','STEEM','SBD']
         if (nativePymtProcessors.includes(paymentMethod)) exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
             document.getElementById('refillSubmitBtn').value = 'Refill'
             document.getElementById('refillSubmitBtn').disabled = false
             if (e) return alert(e)
-            amt = amt.toFixed(3)
+            amt = paymentMethod === 'DTC' ? amt.toFixed(2) : amt.toFixed(3)
             document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + creditsToBuy + ' GBdays'
             document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
             updateDisplayByIDs(['nativeDisclaimer'],['coinbaseDisclaimer','CoinbaseCommerceBtn'])
 
+            let memo = currentnetwork === 'all' ? ('to: @' + username) : ('to: ' + currentnetwork + '@' + username)
+            document.getElementById('xferMemo').innerHTML = 'Memo: <u>' + memo + '</u>'
+
             switch (paymentMethod) {
+                case 'DTC':
+                    updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['HiveKeychainBtn','HiveSignerBtn','SteemKeychainBtn','SteemLoginBtn'])
+                    document.getElementById('DTubeChannelBtn').onclick = () => window.open('https://d.tube/#!/c/' + shawpconfig.DtcReceiver)
+                    document.getElementById('DTubeChannelBtn').href = 'https://d.tube/#!/c/' + shawpconfig.DtcReceiver
+                    break
                 case 'HIVE':
                 case 'HBD':
-                    updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn'],['SteemKeychainBtn','SteemLoginBtn'])
+                    updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn'],['SteemKeychainBtn','SteemLoginBtn','DTubeChannelBtn','dtcInstruction'])
                     document.getElementById('HiveKeychainBtn').onclick = () => {
-                        hive_keychain.requestTransfer(username,shawpconfig.HiveReceiver,amt.toString(),(currentnetwork === 'all' ? 'to: @' : ('to: '+currentnetwork+'@')) + username,paymentMethod,(e) => {
+                        hive_keychain.requestTransfer(username,shawpconfig.HiveReceiver,amt.toString(),memo,paymentMethod,(e) => {
                             if (e.error) return alert(e.error)
                             updateDisplayByIDs(['refillcb'],['refillpay'])
                         })
                     }
-                    document.getElementById('HiveSignerBtn').href = 'https://hivesigner.com/sign/transfer?to=' + shawpconfig.HiveReceiver + '&amount=' + amt + paymentMethod + '&memo=' + (currentnetwork === 'all' ? 'to: @' : ('to: '+currentnetwork+'@')) + username
+                    document.getElementById('HiveSignerBtn').href = 'https://hivesigner.com/sign/transfer?to=' + shawpconfig.HiveReceiver + '&amount=' + amt + paymentMethod + '&memo=' + memo
                     break
                 case 'STEEM':
                 case 'SBD':
-                    updateDisplayByIDs(['SteemKeychainBtn','SteemLoginBtn'],['HiveKeychainBtn','HiveSignerBtn'])
+                    updateDisplayByIDs(['SteemKeychainBtn','SteemLoginBtn'],['HiveKeychainBtn','HiveSignerBtn','DTubeChannelBtn','dtcInstruction'])
                     document.getElementById('SteemKeychainBtn').onclick = () => {
-                        steem_keychain.requestTransfer(steemUser,shawpconfig.SteemReceiver,amt.toString(),(currentnetwork === 'all' ? 'to: @' : ('to: '+currentnetwork+'@')) + username,paymentMethod,(e) => {
+                        steem_keychain.requestTransfer(steemUser,shawpconfig.SteemReceiver,amt.toString(),memo,paymentMethod,(e) => {
                             if (e.error) return alert(e.error)
                             updateDisplayByIDs(['refillcb'],['refillpay'])
                         })
                     }
-                    document.getElementById('SteemLoginBtn').href = 'https://steemlogin.com/sign/transfer?to=' + shawpconfig.SteemReceiver + '&amount=' + amt + paymentMethod + '&memo=' + (currentnetwork === 'all' ? 'to: @' : ('to: '+currentnetwork+'@')) + username
+                    document.getElementById('SteemLoginBtn').href = 'https://steemlogin.com/sign/transfer?to=' + shawpconfig.SteemReceiver + '&amount=' + amt + paymentMethod + '&memo=' + memo
                     break
                 default:
                     break
