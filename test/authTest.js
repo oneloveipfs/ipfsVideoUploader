@@ -4,6 +4,8 @@ const Config = require('../src/config')
 const user = Config.test.user
 const app = Config.tokenApp
 
+Auth.loadKeys()
+
 describe('Auth',() => {
     it('generateEncryptedMemo should return a string that starts with a #',function (done) {
         this.timeout(0)

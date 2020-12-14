@@ -4,4 +4,3 @@ node_js:
 install:
   - npm i
   - cp config_example.json config.json
-  - npm run keygen

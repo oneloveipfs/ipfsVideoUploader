@@ -13,15 +13,12 @@ const http = require('http').Server(app)
 
 FileUploader.IPSync.init(http)
 Shawp.init()
+Auth.loadKeys()
 Auth.watch()
 
 // Prohibit access to certain files through HTTP
-app.get('/index.js',(req,res) => {return res.status(404).redirect('/404')})
-app.get('/dbManager.js',(req,res) => {return res.status(404).redirect('/404')})
-app.get('/authManager.js',(req,res) => {return res.status(404).redirect('/404')})
-app.get('/ipfsUploadHandler.js',(req,res) => {return res.status(404).redirect('/404')})
-app.get('/wcHelper.js',(req,res) => {return res.status(404).redirect('/404')})
-app.get('/scripts/generateKeys.js',(req,res) => {return res.status(404).redirect('/404')})
+app.get('/src/*',(req,res) => {return res.status(404).redirect('/404')})
+app.get('/test/*',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/config.json',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package.json',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package-lock.json',(req,res) => {return res.status(404).redirect('/404')})

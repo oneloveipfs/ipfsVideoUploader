@@ -6,7 +6,6 @@ const JWT = require('jsonwebtoken')
 const Crypto = require('crypto-js')
 const fs = require('fs')
 const { EOL } = require('os')
-const Keys = require('../.auth.json')
 const Config = require('./config')
 const Shawp = require('./shawp')
 const dir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
@@ -22,7 +21,28 @@ if (Config.whitelistEnabled && !fs.existsSync(dir+'/whitelist.txt'))
 // Cache whitelist in a variable, and update variable when fs detects a file change
 let whitelist = fs.readFileSync(dir+'/whitelist.txt','utf8').split(EOL)
 
+let Keys = {}
+
 let auth = {
+    loadKeys: () => {
+        if (fs.existsSync(dir+'/.auth.json'))
+            Keys = JSON.parse(fs.readFileSync(dir+'/.auth.json'))
+        else
+            auth.refreshKeys()
+    },
+    refreshKeys: () => {
+        Keys = auth.keygen()
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir)
+        fs.writeFileSync(dir+'/.auth.json',JSON.stringify(Keys,null,4))
+    },
+    keygen: () => {
+        return {
+            wifMessage: Hive.auth.getPrivateKeys('random',Hive.formatter.createSuggestedPassword(),['Posting']).Posting,
+            AESKey: Hive.formatter.createSuggestedPassword(),
+            JWTKey: Hive.formatter.createSuggestedPassword(),
+            avalonKeypair: Avalon.keypair()
+        }
+    },
     watch: () => {
         // Watch for external whitelist.txt changes
         if (!Config.whitelistEnabled) return
