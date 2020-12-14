@@ -1,4 +1,4 @@
-const Config = require('./remoteAppConfig.json')
+const Config = require('../remoteAppConfig.json')
 const fs = require('fs')
 const Express = require('express')
 const Proxy = require('http-proxy')

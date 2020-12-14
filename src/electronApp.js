@@ -83,9 +83,9 @@ const createWindow = () => {
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
-            preload: __dirname + '/scripts/electronPreload.js'
+            preload: __dirname + '/../scripts/electronPreload.js'
         },
-        icon: process.platform === 'linux' ? __dirname+'/public/favicon.png' : undefined
+        icon: process.platform === 'linux' ? __dirname+'/../public/favicon.png' : undefined
     })
 
     let menu = Menu.buildFromTemplate(menuTemplate)

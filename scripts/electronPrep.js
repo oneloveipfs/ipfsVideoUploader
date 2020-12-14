@@ -1,6 +1,6 @@
 const fs = require('fs')
 
-let electronJs = fs.readFileSync(process.cwd()+'/electronApp.js',{encoding: 'utf8'}).toString()
+let electronJs = fs.readFileSync(process.cwd()+'/src/electronApp.js',{encoding: 'utf8'}).toString()
 
 if (process.env.REMOTE_APP == '1') {
     electronJs = electronJs.replace("require('./index')","require('./remoteAppUser')")
@@ -10,4 +10,4 @@ if (process.env.REMOTE_APP == '1') {
     electronJs = electronJs.replace("const REMOTE_APP = 1","const REMOTE_APP = 0")
 }
 
-fs.writeFileSync(process.cwd()+'/electronApp.js',electronJs,'utf8')
+fs.writeFileSync(process.cwd()+'/src/electronApp.js',electronJs,'utf8')

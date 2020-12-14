@@ -1,6 +1,6 @@
 const fs = require('fs')
 const userconfigdir = (process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs') + '/config.json'
-let defaultConfig = require('./config.json')
+let defaultConfig = require('../config.json')
 let userConfig = {}
 
 if (fs.existsSync(userconfigdir)) {

@@ -44,7 +44,7 @@ const APILimiter = RateLimiter({
     windowMs: 1000 // 5 requests per second
 })
 
-app.use(Express.static(__dirname, { dotfiles: 'deny' }));
+app.use(Express.static(__dirname+'/..', { dotfiles: 'deny' }));
 app.use(CORS())
 
 // body parser
@@ -56,9 +56,9 @@ const rawBodySaver = (req, res, buf, encoding) => {
 
 app.use(Parser.text())
 
-app.get('/', (request,response) => loadWebpage(__dirname+'/client/welcome.html',response)) // Home page
-app.get('/upload', (request,response) => loadWebpage(__dirname+'/client/uploader.html',response)) // Upload page
-app.get('/404', (request,response) => loadWebpage(__dirname+'/client/404.html',response)) // 404 page
+app.get('/', (request,response) => loadWebpage(__dirname+'/../client/welcome.html',response)) // Home page
+app.get('/upload', (request,response) => loadWebpage(__dirname+'/../client/uploader.html',response)) // Upload page
+app.get('/404', (request,response) => loadWebpage(__dirname+'/../client/404.html',response)) // 404 page
 
 app.get('/checkuser', APILimiter, (request,response) => {
     // Check if user is in whitelist

@@ -1,6 +1,6 @@
 const assert = require('chai').assert
-const Auth = require('../authManager')
-const Config = require('../config')
+const Auth = require('../src/authManager')
+const Config = require('../src/config')
 const user = Config.test.user
 const app = Config.tokenApp
 
