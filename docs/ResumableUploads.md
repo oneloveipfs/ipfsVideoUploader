@@ -1,6 +1,6 @@
 # Resumable Uploads API
 
-`ipfsVideoUploader` uses [tus](https://tus.io) protocol for resumable video uploads, which handles chunked file uploads over HTTPS. The results of the file upload is stored in an upload register, which may be retrieved over `/uploadStat` Socket IO endpoint.
+OneLoveIPFS uploader uses [tus](https://tus.io) protocol for resumable video uploads, which handles chunked file uploads over HTTPS. The results of the file upload is stored in an upload register, which may be retrieved over `/uploadStat` Socket IO endpoint.
 
 ## Server installation
 
@@ -16,6 +16,17 @@ sudo ./scripts/tusd_macos_install.sh
 sudo ./scripts/tusd_ubuntu_install.sh
 ```
 
+#### Windows (Powershell as admin):
+```
+Invoke-WebRequest -o tusd.zip "https://github.com/tus/tusd/releases/download/v1.4.0/tusd_windows_amd64.zip"
+Expand-Archive -LiteralPath tusd.zip -DestinationPath tusd
+Set-Location tusd/tusd*
+Copy-Item tusd.exe C:\Windows\System32
+Set-Location ../..
+Remove-Item -Recurse tusd
+Remove-Item tusd.zip
+```
+
 #### To start `tusd`:
 ```
 tusd -upload-dir /dir/to/upload/destination -hooks-http http://localhost:3000/uploadVideoResumable -hooks-enabled-events pre-create,post-finish
@@ -29,7 +40,7 @@ Depending on your client platform, you may find different implementations for tu
 OneLoveIPFS's production `tusd` upload endpoint may be reachable at `https://tusd.oneloved.tube/files`.
 
 #### Upload JSON metadata:
-* `access_token` *(required)*: Access token obtained in `/logincb` POST API or SteemConnect access token
+* `access_token` *(required)*: Access token obtained in `/logincb` POST API or HiveSigner access token
 * `keychain` *(optional)*: Set this to "true" (in string) if access token is obtained from `/logincb` POST API.
 * `type` *(required)*: Upload type. Valid values: `videos`, `video240`, `video480`, `video720` and `video1080`.
 

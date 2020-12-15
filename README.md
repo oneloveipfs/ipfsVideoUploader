@@ -2,40 +2,31 @@
 [![OneLoveDTube channel on Discord](https://img.shields.io/discord/418646135725359104.svg?logo=discord)](https://discord.gg/Sc4utKr)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-# IPFS Video Uploader
+# OneLoveIPFS Uploader
 
-This is an alternative IPFS uploader to upload videos onto DTube. Includes a basic web UI.
+This is an alternative IPFS uploader to upload videos onto DTube. Can be run as a standalone upload server or a locally-running Electron app. Also supports Skynet protocol.
 
 ### Dependencies required
 
-* `npm` command line tools
-* `ffmpeg`, `imagemagick` and `bc` for sprite generation
-* `go-ipfs` with a running daemon
-* `tusd` running daemon, which can be installed and configured [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/ResumableUploads.md#server-installation).
+* `nodejs` and `npm` (Latest LTS)
+* `ffmpeg`, `imagemagick` and `bc` for sprite generation, not supported on Windows.
+* `ffprobe` for obtaining video duration, usually included with `ffmpeg`.
+* `go-ipfs` with a running daemon (alternatively [IPFS Desktop](https://github.com/ipfs-shipyard/ipfs-desktop) may be used)
 
 ### Additional requirements
 
 * A HiveSigner application (if HiveSigner authentication is used)
 * A domain name for HTTPS, plus SSL certificate for that domain installed
 * A running `siad` node for Skynet upload support.
+* `tusd` running daemon when running as standalone upload server, which can be installed and configured [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/ResumableUploads.md#server-installation).
 
 # Installation
 
-1. Clone this repository by typing `git clone https://github.com/oneloveipfs/ipfsVideoUploader.git` in a terminal window.
+There are several ways in which OneLoveIPFS uploader can be installed and run.
 
-2. Install all required node modules. `cd ipfsVideoUploader && npm install`
-
-3. Copy the example config file. `cp config_example.json config.json`
-
-4. Configure uploader by modifying `config.json` file. If you need help with the configuration, view the documentation [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/ConfigDocs.md)
-
-5. Run `npm run keygen` to generate encryption and auth keys for Hive Keychain support. Then backup the contents of `.auth.json` file in a safe place.
-
-6. If `whitelistEnabled` is set to `true`, add some Hive accounts to the whitelist by modifying [whitelist.txt](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/whitelist.txt). (one line per Hive user)
-
-7. Run the app by typing `npm start`. Your app will listen to ports you specify in `config.json` file.
-
-All uploaded files (through non-resumable upload APIs) will be saved in the `uploaded` folder within the repo. Image files (for Hive and Steem article body) will be saved in the `imguploads` folder. As for resumable uploads, you may define the directory in `config.json` file as well as the `tusd` daemon startup arguments.
+* [Manual CLI install](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/Installation.md)
+* [Manual desktop app compile](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/Compile.md)
+* [Prebuilt desktop app](https://github.com/oneloveipfs/ipfsVideoUploader/releases)
 
 # Supported file formats
 
