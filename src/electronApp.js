@@ -151,7 +151,7 @@ const createWindow = () => {
 
     app.setAboutPanelOptions({ version: config.Build.number.toString() })
 
-    mainWindow.loadURL(`http://${config.HTTP_BIND_IP}:${config.HTTP_PORT}`)
+    mainWindow.loadURL(`http://localhost:${config.HTTP_PORT}`)
     mainWindow.on('closed', () => mainWindow = null)
 }
 
