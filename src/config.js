@@ -1,6 +1,9 @@
+const REMOTE_APP = 0
 const fs = require('fs')
 const userconfigdir = (process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs') + '/config.json'
 let defaultConfig = require('../config.json')
+if (REMOTE_APP === 1)
+    defaultConfig = require('../remoteAppConfig.json')
 let userConfig = {}
 
 if (fs.existsSync(userconfigdir)) {
@@ -14,7 +17,7 @@ if (fs.existsSync(userconfigdir)) {
 }
 
 // Sprite generation script is not supported on Windows
-if (process.platform == 'win32')
+if (process.platform == 'win32' && REMOTE_APP === 0)
     defaultConfig.spritesEnabled = false
 
 module.exports = defaultConfig
