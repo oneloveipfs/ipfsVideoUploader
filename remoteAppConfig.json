@@ -1,5 +1,10 @@
 {
-    "realEndpoint": "https://uploader.oneloved.tube",
-    "port": 3000,
-    "bindip": "127.0.0.1"
+    "REAL_ENDPOINT": "https://uploader.oneloved.tube",
+    "HTTP_PORT": 3000,
+    "HTTP_BIND_IP": "127.0.0.1",
+    "Build": {
+        "number": 0,
+        "version": "v2",
+        "link": "https://github.com/oneloveipfs/ipfsVideoUploader/releases"
+    }
 }

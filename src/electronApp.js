@@ -3,13 +3,34 @@ const { app, shell, ipcMain, dialog, BrowserWindow, Notification, Menu } = requi
 const config = require('./config')
 const isMac = process.platform === 'darwin'
 const REMOTE_APP = 0
+
+if (require('electron-squirrel-startup'))
+    return app.quit()
+
+let errored = false
+let errorHandler = () => {}
+const errorAlert = (message) => {
+    dialog.showMessageBoxSync(null,{
+        type: 'error',
+        title: 'Error',
+        message: message,
+        icon: __dirname + '/../public/favicon.png'
+    })
+    app.quit()
+}
+
+process.on('uncaughtException',(error) => {
+    errored = true
+    if (error.code === 'EADDRINUSE')
+        errorHandler = () => errorAlert('Port ' + error.port + ' is in use. Perhaps you have another instance running?')
+    else
+        errorHandler = () => errorAlert(error.toString())
+})
+
 require('./index')
 
 if (REMOTE_APP === 0)
     AuthManager = require('./authManager')
-
-if (require('electron-squirrel-startup'))
-    return app.quit()
 
 let mainWindow
 
@@ -113,6 +134,7 @@ const menuTemplate = [
 ]
 
 const createWindow = () => {
+    if (errored) return errorHandler()
     mainWindow = new BrowserWindow({
         width: 1200,
         height: 700,
@@ -129,7 +151,7 @@ const createWindow = () => {
 
     app.setAboutPanelOptions({ version: config.Build.number.toString() })
 
-    mainWindow.loadURL('http://localhost:'+config.HTTP_PORT)
+    mainWindow.loadURL(`http://${config.HTTP_BIND_IP}:${config.HTTP_PORT}`)
     mainWindow.on('closed', () => mainWindow = null)
 }
 
