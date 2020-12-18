@@ -35,9 +35,21 @@ let auth = {
         if (!fs.existsSync(dir)) fs.mkdirSync(dir)
         fs.writeFileSync(dir+'/.auth.json',JSON.stringify(Keys,null,4))
     },
+    setWifMessageKey: (key) => {
+        // sadly Electron does not support steem/hive wif keygen either :\
+        // therefore this will come from ipcRenderer
+        if (!Keys.wifMessage) {
+            Keys.wifMessage = key
+            fs.writeFileSync(dir+'/.auth.json',JSON.stringify(Keys,null,4))
+        }
+    },
     keygen: () => {
+        let w
+        try {
+            w = Hive.auth.getPrivateKeys('random',Hive.formatter.createSuggestedPassword(),['Posting']).Posting
+        } catch {}
         return {
-            wifMessage: Hive.auth.getPrivateKeys('random',Hive.formatter.createSuggestedPassword(),['Posting']).Posting,
+            wifMessage: w || undefined,
             AESKey: Hive.formatter.createSuggestedPassword(),
             JWTKey: Hive.formatter.createSuggestedPassword(),
             avalonKeypair: Avalon.keypair()

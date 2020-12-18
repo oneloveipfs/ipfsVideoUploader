@@ -194,5 +194,6 @@ if (isElectron) {
                     openBrowserWindowElectron(urlToOpen)
                 }
             }
+        window.postMessage({ action: 'set_random_wif', data: steem.auth.getPrivateKeys('random',steem.formatter.createSuggestedPassword(),['Posting']).Posting })
     })
 }

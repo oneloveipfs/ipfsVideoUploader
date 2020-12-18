@@ -17,13 +17,12 @@
         "HiveSignerApp": "ipfsuploader.app",
         "SteemLoginApp": "ipfsuploader.app",
         "AvalonSupportPub": "g1mUHD7s8U7yvAoJPT5xpG5VXg1zqFKBiLU6PGm6T3Ee",
-        "callbackURL": "https://uploader.oneloved.tube/upload",
         "tusdEndpoint": "http://localhost:1080/files",
         "enableSupport": true,
         "disabled": false,
         "disabledMessage": "",
         "disabledMeme": "brbmeme.jpg",
-        "uploadFromFs": false,
+        "uploadFromFs": true,
         "noBroadcast": false
     },
 

@@ -1,14 +1,28 @@
 const axios = require('axios')
-const { app, shell, ipcMain, BrowserWindow, Notification, Menu } = require('electron')
+const { app, shell, ipcMain, dialog, BrowserWindow, Notification, Menu } = require('electron')
 const config = require('./config')
 const isMac = process.platform === 'darwin'
 const REMOTE_APP = 0
 require('./index')
 
+if (REMOTE_APP === 0)
+    AuthManager = require('./authManager')
+
 if (require('electron-squirrel-startup'))
     return app.quit()
 
 let mainWindow
+
+const getIcon = () => {
+    switch (process.platform) {
+        case 'darwin':
+            return __dirname + '/../public/macos_icon.icns'
+        case 'win32':
+            return __dirname + '/../public/win32_icon.ico'
+        default:
+            return __dirname + '/../public/favicon.png'
+    }
+}
 
 const menuTemplate = [
     ...(isMac ? [{
@@ -23,6 +37,28 @@ const menuTemplate = [
             { role: 'quit' }
         ]
     }] : []), {
+        label: 'Uploader',
+        submenu: [...(REMOTE_APP === 0 ? [{ 
+            label: 'Reset Auth Keys',
+            click: async () => {
+                let resetAuthAlert = await dialog.showMessageBox(null,{
+                    type: 'info',
+                    buttons: ['Proceed','Cancel'],
+                    title: 'Reset Auth Keys',
+                    message: 'This will reset the keys used for authentication. The app will be relaunched.',
+                    icon: __dirname + '/../public/favicon.png'
+                })
+                if (resetAuthAlert.response === 0 && REMOTE_APP === 0) {
+                    AuthManager.refreshKeys()
+                    app.relaunch()
+                    app.exit()
+                }
+            }
+        }] : []), {
+            label: 'Configuration Guide',
+            click: () => shell.openExternal('https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/ConfigDocs.md')
+        }]
+    }, {
         label: 'Edit',
         submenu: [
             { role: 'undo' },
@@ -85,7 +121,7 @@ const createWindow = () => {
             contextIsolation: true,
             preload: __dirname + '/../scripts/electronPreload.js'
         },
-        icon: process.platform === 'linux' ? __dirname+'/../public/favicon.png' : undefined
+        icon: getIcon()
     })
 
     let menu = Menu.buildFromTemplate(menuTemplate)
@@ -110,6 +146,10 @@ app.on('activate', () => {
 })
 
 ipcMain.on('open_browser_window',(evt,arg) => shell.openExternal(arg))
+ipcMain.on('set_random_wif',(evt,arg) => {
+    if (REMOTE_APP === 0)
+        AuthManager.setWifMessageKey(arg)
+})
 
 // Update check
 axios.get('https://uploader.oneloved.tube/latest_build').then((build) => {

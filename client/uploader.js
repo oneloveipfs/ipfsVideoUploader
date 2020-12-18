@@ -585,7 +585,7 @@ function postVideo() {
         let hiveapi = new hivesigner.Client({ 
             accessToken: Auth.token,
             app: config.HiveSignerApp,
-            callbackURL: config.callbackURL,
+            callbackURL: window.location.origin + '/upload',
             scope: ['comment','comment_options']
         })
         hiveapi.broadcast(hiveTx,(err) => {

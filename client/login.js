@@ -165,7 +165,7 @@ document.getElementById('altAuthBtn').onclick = () => {
 
     let hiveClient = new hivesigner.Client({
         app: config.HiveSignerApp,
-        callbackURL: config.callbackURL,
+        callbackURL: window.location.origin + '/upload',
         scope: ['comment','comment_options']
     })
 
