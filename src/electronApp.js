@@ -146,10 +146,6 @@ app.on('activate', () => {
 })
 
 ipcMain.on('open_browser_window',(evt,arg) => shell.openExternal(arg))
-ipcMain.on('set_random_wif',(evt,arg) => {
-    if (REMOTE_APP === 0)
-        AuthManager.setWifMessageKey(arg)
-})
 
 // Update check
 axios.get('https://uploader.oneloved.tube/latest_build').then((build) => {

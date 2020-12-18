@@ -1,5 +1,7 @@
 const Hive = require('@hiveio/hive-js')
 const Hivecrypt = require('hivecrypt')
+const HivePk = require('hive-tx/helpers/PrivateKey')
+const crypto = require('crypto')
 const Avalon = require('javalon')
 const HiveSigner = require('hivesigner')
 const JWT = require('jsonwebtoken')
@@ -35,21 +37,13 @@ let auth = {
         if (!fs.existsSync(dir)) fs.mkdirSync(dir)
         fs.writeFileSync(dir+'/.auth.json',JSON.stringify(Keys,null,4))
     },
-    setWifMessageKey: (key) => {
-        // sadly Electron does not support steem/hive wif keygen either :\
-        // therefore this will come from ipcRenderer
-        if (!Keys.wifMessage) {
-            Keys.wifMessage = key
-            fs.writeFileSync(dir+'/.auth.json',JSON.stringify(Keys,null,4))
-        }
+    randomWif: () => {
+        let newPk = new HivePk(crypto.randomBytes(32))
+        return newPk.toString()
     },
     keygen: () => {
-        let w
-        try {
-            w = Hive.auth.getPrivateKeys('random',Hive.formatter.createSuggestedPassword(),['Posting']).Posting
-        } catch {}
         return {
-            wifMessage: w || undefined,
+            wifMessage: auth.randomWif(),
             AESKey: Hive.formatter.createSuggestedPassword(),
             JWTKey: Hive.formatter.createSuggestedPassword(),
             avalonKeypair: Avalon.keypair()
