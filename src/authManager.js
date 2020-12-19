@@ -17,7 +17,7 @@ Hive.config.set('uri', Config.Shawp.HiveAPI || 'https://hived.techcoderx.com')
 Hive.config.set('alternative_api_endpoints', [])
 
 // If whitelist file doesn't exist create it
-if (Config.whitelistEnabled && !fs.existsSync(dir+'/whitelist.txt'))
+if (!fs.existsSync(dir+'/whitelist.txt'))
     fs.writeFileSync(dir+'/whitelist.txt','')
 
 // Cache whitelist in a variable, and update variable when fs detects a file change
