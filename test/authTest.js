@@ -82,12 +82,17 @@ describe('Auth',() => {
             assert.notExists(verifyError)
             assert.equal(result.network,'dtc')
 
-            // Other networks should fail
+            // Other networks should fail if whitelisting is enabled, else they should pass as well
             let completed = [false,false]
             function testResults() {
                 if (completed[0] !== false && completed[1] !== false) {
-                    assert.exists(completed[0])
-                    assert.exists(completed[1])
+                    if (Config.whitelistEnabled) {
+                        assert.exists(completed[0])
+                        assert.exists(completed[1])
+                    } else {
+                        assert.isNull(completed[0])
+                        assert.isNull(completed[1])
+                    }
                     done()
                 }
             }
@@ -109,12 +114,17 @@ describe('Auth',() => {
             assert.notExists(verifyError)
             assert.equal(result.network,'hive')
 
-            // Other networks should fail
+            // Other networks should fail if whitelisting is enabled, else they should pass as well
             let completed = [false,false]
             function testResults() {
                 if (completed[0] !== false && completed[1] !== false) {
-                    assert.exists(completed[0])
-                    assert.exists(completed[1])
+                    if (Config.whitelistEnabled) {
+                        assert.exists(completed[0])
+                        assert.exists(completed[1])
+                    } else {
+                        assert.isNull(completed[0])
+                        assert.isNull(completed[1])
+                    }
                     done()
                 }
             }
