@@ -51,16 +51,22 @@
       "target": "nsis"
     },
     "linux": {
-      "icon": "public/favicon.png",
+      "icon": "public/macos_icon.icns",
       "target": [
         "deb",
         "AppImage",
         "snap"
       ],
       "category": "Video"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "license": "LICENSE",
+      "perMachine": true
     }
   },
-  "author": "techcoderx",
+  "author": "techcoderx <engtianxi@outlook.com>",
   "license": "GPLv3",
   "dependencies": {
     "@hiveio/hive-js": "0.8.10",
