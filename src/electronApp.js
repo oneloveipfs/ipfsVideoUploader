@@ -25,6 +25,8 @@ process.on('uncaughtException',(error) => {
         errorHandler = () => errorAlert('Port ' + error.port + ' is in use. Perhaps you have another instance running?')
     else
         errorHandler = () => errorAlert(error.toString())
+    if (app.isReady())
+        errorHandler()
 })
 
 require('./index')

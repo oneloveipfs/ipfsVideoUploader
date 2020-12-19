@@ -405,6 +405,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 })
 
+function sourceVideoSelect() {
+    // Retrieve video duration from fake audio player
+    let selected = document.getElementById('sourcevideo').files
+    if (selected.length < 1) {
+        if (postparams.duration)
+            delete postparams.duration
+        return
+    }
+    let audioObj = document.createElement('audio')
+    audioObj.autoplay = false
+    audioObj.addEventListener('canplaythrough',(evt) => postparams.duration = evt.currentTarget.duration)
+    let videoObjUrl = URL.createObjectURL(selected[0])
+    audioObj.src = videoObjUrl
+}
+
 function uploadVideo(resolution,next) {
     let fInputElemName
     let resolutionFType

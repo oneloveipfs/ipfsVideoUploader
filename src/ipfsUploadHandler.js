@@ -4,7 +4,6 @@ const IPFS = require('ipfs-http-client')
 const Shell = require('shelljs')
 const FormData = require('form-data')
 const axios = require('axios')
-const getDuration = require('get-video-duration')
 const fs = require('fs')
 const async = require('async')
 const WebVTT = require('node-webvtt')
@@ -81,7 +80,7 @@ const skynetAdd = (path,opts) => {
 const addSprite = async (filepath,id) => {
     return new Promise((rs,rj) => {
         if (!Config.spritesEnabled) return rs({})
-        Shell.exec('./scripts/dtube-sprite.sh ' + filepath + ' ' + defaultDir + '/' + id + '.jpg',() => {
+        Shell.exec(__dirname+'/../scripts/dtube-sprite.sh ' + filepath + ' ' + defaultDir + '/' + id + '.jpg',() => {
             addFile(defaultDir+'/'+id + '.jpg',true,false,(size,hash) => rs({size: size, hash: hash}))
         })
     })
@@ -100,14 +99,12 @@ const processSingleVideo = async (id,user,network,cb) => {
     db.writeHashesData()
     db.writeHashSizesData()
 
-    let duration = await getDuration(vpath)
     let result = {
         username: user,
         network: network,
         type: 'videos',
         ipfshash: uploadRegister[id].hash,
-        spritehash: spriteGen.hash,
-        duration: duration
+        spritehash: spriteGen.hash
     }
 
     uploadRegister[id] = result
@@ -213,7 +210,7 @@ let uploadOps = {
                     }
                 }
 
-                async.parallel(ipfsops, async (errors,results) => {
+                async.parallel(ipfsops, (errors,results) => {
                     if (errors) console.log(errors)
                     console.log(results)
                     db.recordHash(user,network,'videos',results.videohash.ipfshash,json.Upload.Size)
@@ -226,7 +223,6 @@ let uploadOps = {
                         db.writeSkylinksData()
                     }
 
-                    let videoDuration = await getDuration(json.Upload.Storage.Path)
                     let result = {
                         username: user,
                         network: network,
@@ -234,7 +230,6 @@ let uploadOps = {
                         ipfshash: results.videohash.ipfshash,
                         spritehash: results.spritehash.hash,
                         skylink: results.videohash.skylink,
-                        duration: videoDuration,
                         filesize: json.Upload.Size
                     }
 

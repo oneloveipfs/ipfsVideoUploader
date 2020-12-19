@@ -17,7 +17,8 @@ if (fs.existsSync(userconfigdir)) {
 }
 
 // Sprite generation script is not supported on Windows
-if (process.platform == 'win32' && REMOTE_APP === 0)
+// Also disabled on Electron apps for security reasons :\
+if (process.platform == 'win32' && REMOTE_APP === 0 || require('electron').app)
     defaultConfig.spritesEnabled = false
 
 module.exports = defaultConfig

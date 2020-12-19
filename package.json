@@ -20,7 +20,7 @@
     "buildapp-windows": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2021 TechCoderX' --asar --platform=win32 --version-string.FileDescription 'OneLoveIPFS Uploader' --version-string.ProductName OneLoveIPFS --icon public/win32_icon.ico",
     "buildapp-linux": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2021 TechCoderX' --asar --platform linux",
     "buildinstaller": "electron-builder",
-    "dep-prune": "npm un @hiveio/hive-js async body-parser coinbase-commerce-node crypto-js express-rate-limit form-data get-video-duration hive-tx hivecrypt hivesigner ipfs-http-client javalon jsonwebtoken mime-types multer node-schedule node-webvtt shelljs snyk socket.io steem"
+    "dep-prune": "npm un @hiveio/hive-js async body-parser coinbase-commerce-node crypto-js express-rate-limit form-data hive-tx hivecrypt hivesigner ipfs-http-client javalon jsonwebtoken mime-types multer node-schedule node-webvtt shelljs snyk socket.io steem"
   },
   "build": {
     "appId": "com.oneloveipfs.uploader",
@@ -28,7 +28,12 @@
     "copyright": "Copyright (C) 2021 TechCoderX",
     "mac": {
       "category": "public.app-category.utilities",
-      "target": [{"target":"dmg","arch":["x64"]}],
+      "target": [
+        {
+          "target": "dmg",
+          "arch": "x64"
+        }
+      ],
       "icon": "public/macos_icon.icns",
       "minimumSystemVersion": "10.14.6"
     },
@@ -39,15 +44,12 @@
     },
     "linux": {
       "icon": "public/favicon.png",
-      "target": ["deb","AppImage","snap"],
+      "target": [
+        "deb",
+        "AppImage",
+        "snap"
+      ],
       "category": "Video"
-    },
-    "deb": {
-      "depends": [
-        "ffmpeg",
-        "imagemagick",
-        "bc"
-      ]
     }
   },
   "author": "techcoderx",
@@ -65,7 +67,6 @@
     "express-rate-limit": "^5.2.3",
     "form-data": "^3.0.0",
     "fs": "0.0.1-security",
-    "get-video-duration": "^0.3.0",
     "hive-tx": "^3.1.10",
     "hivecrypt": "^1.0.0",
     "hivesigner": "^3.2.1",
