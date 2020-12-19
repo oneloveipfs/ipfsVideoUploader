@@ -2,13 +2,14 @@
     "IPFS_API_PORT": 5001,
     "HTTP_PORT": 3000,
     "HTTP_BIND_IP": "127.0.0.1",
-    "whitelistEnabled": true,
+    "whitelistEnabled": false,
     "spritesEnabled": true,
     "deleteUploadsAfterAdd": true,
+    "enforceIPFSOnline": true,
     "tokenExpiry": 86400,
     "tokenApp": "oneloveipfs",
 
-    "admins":["graylan","gray00","d00k13","vaultec","toddmck","priyanarc"],
+    "admins":[],
     "encoderAccounts":[],
 
     "ClientConfig": {

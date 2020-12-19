@@ -149,7 +149,7 @@ let auth = {
         let scapi = new HiveSigner.Client({ accessToken: access_token })
         scapi.me((err,result) => {
             if (err) return cb(err)
-            if (!auth.isInWhitelist(result.user,'hive'))
+            if (Config.whitelistEnabled && !auth.isInWhitelist(result.user,'hive'))
                 return cb('Looks like you do not have access to the uploader!')
             if (Config.Shawp.Enabled && needscredits) {
                 let network = 'hive'

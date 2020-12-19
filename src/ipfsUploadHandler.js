@@ -112,6 +112,14 @@ const processSingleVideo = async (id,user,network,cb) => {
 }
 
 let uploadOps = {
+    isIPFSOnline: async () => {
+        try {
+            for await (const i of ipfsAPI.stats.bw()) {}
+        } catch {
+            return false
+        }
+        return true
+    },
     uploadImage: (username,network,request,response) => {
         let imgType = request.query.type
         if (!imgType) return response.status(400).send({error: 'Image upload type not specified!'})
