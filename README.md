@@ -27,6 +27,25 @@ There are several ways in which OneLoveIPFS uploader can be installed and run.
 * [Manual desktop app compile](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/Compile.md)
 * [Prebuilt desktop app](https://github.com/oneloveipfs/ipfsVideoUploader/releases)
 
+# Configuration
+
+The ways in which configuration is done depends on how OneLoveIPFS uploader is run. The options may be found [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/ConfigDocs.md).
+
+OneLoveIPFS data dir, which is the working directory for uploader databases and files can be set with `ONELOVEIPFS_DATA_DIR` environment variable.
+
+# Full vs Remote vs Standalone vs Web
+
+|Feature|Full Desktop|Remote Desktop|Standalone Server|Remote Web|
+|-|:-:|:-:|:-:|:-:|
+|Interface|Desktop App|Desktop App|Browser|Browser|
+|Upload Server|Localhost|Remote|Localhost|Remote|
+|Auth|Private Keys|Private Keys|Keychain & Custom Keys|Keychain & Custom Keys|
+|Login Persistence|Yes|Yes|Keychain only|Keychain only|
+|Upload Protocol|Filesystem|Tus|Tus|Tus|
+|Steem/Hive Default Beneficiaries|0%|0%|0%|0%|
+|Config Flexibility|Medium|Low|High|Low|
+|Sprites Support|No|Remote Server|Yes (macOS & Linux)|Remote Server|
+
 # Supported file formats
 
 IPFS works the best for videos with .mp4, therefore only mp4 files will be supported at this moment. Both .jpg and .png file formats are supported for thumbnail uploads.

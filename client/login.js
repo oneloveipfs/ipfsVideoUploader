@@ -42,23 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 paymentOptions[i].disabled = true
             else if ((paymentOptions[i].value == "STEEM" || paymentOptions[i].value == "SBD") && !shawpconfig.SteemReceiver)
                 paymentOptions[i].disabled = true
-            else if (paymentOptions[i].value == "Coinbase" && !shawpconfig.Coinbase.enabled)
+            else if (paymentOptions[i].value == "Coinbase" && !shawpconfig.Coinbase)
                 paymentOptions[i].disabled = true
         }
 
-        if (shawpconfig.Coinbase.enabled) {
-            let signupStartText = document.getElementById('signupstart').children[0]
-            signupStartText.innerHTML += ' You can also pay with '
-
-            for (let i = 0; i < shawpconfig.Coinbase.enabledCurrencies.length; i++) {
-                signupStartText.innerHTML += shawpconfig.Coinbase.enabledCurrencies[i]
-                if (i < shawpconfig.Coinbase.enabledCurrencies.length - 2)
-                    signupStartText.innerHTML += ', '
-                else if (i < shawpconfig.Coinbase.enabledCurrencies.length - 1)
-                    signupStartText.innerHTML += ' and '
-            }
-            signupStartText.innerHTML += ' through Coinbase commerce.'
-        }
+        if (shawpconfig.Coinbase)
+            document.getElementById('signupstart').children[0].innerHTML += ' You can also pay with BTC, ETH, BCH, DAI, LTC and USDC through Coinbase commerce.'
     })
 
     window.keychainLoginBtn = document.getElementById('proceedAuthBtn')

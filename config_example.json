@@ -52,10 +52,7 @@
         "DtcReceiver": "onelovedtube",
         "HiveReceiver": "onelovedtube",
         "SteemReceiver": "onelovedtube",
-        "Coinbase": {
-            "enabled": false,
-            "enabledCurrencies": ["BTC","ETH","BCH","DAI","LTC","USDC"]
-        }
+        "Coinbase": false
     },
 
     "CoinbaseCommerce": {

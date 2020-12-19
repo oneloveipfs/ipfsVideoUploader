@@ -1,1 +1,38 @@
 # Compile
+
+After performing the manual installation [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/Installation.md), the uploader can be compiled from source code into Electron desktop apps that can be installed on Windows, macOS and Linux.
+
+Two types of desktop apps may be compiled, which are full apps that are run fully on your system along with IPFS daemon (optionally `siad`), and remote apps which acts as a desktop interface for remote standalone upload servers.
+
+## Preparation
+
+#### Full app
+```
+REMOTE_APP=0 node scripts/electronPrep.js
+```
+
+#### Remote app
+```
+REMOTE_APP=1 node scripts/electronPrep.js
+```
+
+To cleanup unused dependencies in remote app to save space, run
+```
+npm run dep-prune
+```
+
+To restore dependencies after cleanup, repeat the uploader installation procedure [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/Installation.md#uploader-installation).
+
+## Development app
+```
+npm run devapp
+```
+
+## Build installer
+
+It is recommended to build the installer for a target OS on the OS itself (e.g. DMG installer on macOS, DEB on Linux, EXE on Windows etc). For more info, see [electron-builder documentation](https://www.electron.build/multi-platform-build).
+
+#### Build installer for host OS:
+```
+npm run buildinstaller
+```

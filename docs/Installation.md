@@ -54,6 +54,8 @@ rm -r go-ipfs*
 
 * [NodeJS + npm](https://nodejs.org)
 * [Git for Windows](https://git-scm.com/download/win)
+* [Go-IPFS](https://github.com/ipfs/go-ipfs/releases)
+* [IPFS Desktop](https://github.com/ipfs-shipyard/ipfs-desktop/releases)
 
 ## Uploader installation
 

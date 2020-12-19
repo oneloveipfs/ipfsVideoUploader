@@ -292,7 +292,7 @@ app.get('/shawp_consumption_history_admin',(req,res) => {
 })
 
 app.post('/shawp_refill_coinbase',Parser.json(),(req,res) => {
-    if (!Config.Shawp.Enabled || !Config.Shawp.Coinbase.enabled) return res.status(404).send()
+    if (!Config.Shawp.Enabled || !Config.Shawp.Coinbase) return res.status(404).send()
     if (!req.body.username || !req.body.usdAmt) return res.status(400).send({error:'Username or amount is missing'})
     Shawp.CoinbaseCharge(req.body.username,req.body.network || 'all',req.body.usdAmt,(e,r) => {
         if (e)
@@ -303,7 +303,7 @@ app.post('/shawp_refill_coinbase',Parser.json(),(req,res) => {
 })
 
 app.post('/shawp_refill_coinbase_webhook',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(req,res) => {
-    if (!Config.Shawp.Enabled || !Config.Shawp.Coinbase.enabled) return res.status(404).send()
+    if (!Config.Shawp.Enabled || !Config.Shawp.Coinbase) return res.status(404).send()
     Shawp.CoinbaseWebhookVerify(req,(verified) => {
         if (!verified) return res.status(403).send()
         res.status(200).send()
