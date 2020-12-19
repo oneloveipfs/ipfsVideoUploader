@@ -5,7 +5,6 @@ const Auth = require('./authManager')
 const Shawp = require('./shawp')
 const fs = require('fs')
 const Express = require('express')
-const RateLimiter = require('express-rate-limit')
 const Parser = require('body-parser')
 const CORS = require('cors')
 const app = Express()
@@ -23,24 +22,6 @@ app.get('/config.json',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package.json',(req,res) => {return res.status(404).redirect('/404')})
 app.get('/package-lock.json',(req,res) => {return res.status(404).redirect('/404')})
 
-// Rate limit
-const AuthAPILimiter = RateLimiter({
-    max: 5,
-    windowMs: 60000, // 5 login attempts every 60 seconds
-    message: "You have too many login attempts!",
-    skipSuccessfulRequests: true
-})
-
-const ImageUploadAPILimiter = RateLimiter({
-    max: 10,
-    windowMs: 30000 // 10 requests every 30 seconds
-})
-
-const APILimiter = RateLimiter({
-    max: 10,
-    windowMs: 1000 // 5 requests per second
-})
-
 app.use(Express.static(__dirname+'/..', { dotfiles: 'deny' }));
 app.use(CORS())
 
@@ -57,7 +38,7 @@ app.get('/', (request,response) => loadWebpage(__dirname+'/../client/welcome.htm
 app.get('/upload', (request,response) => loadWebpage(__dirname+'/../client/uploader.html',response)) // Upload page
 app.get('/404', (request,response) => loadWebpage(__dirname+'/../client/404.html',response)) // 404 page
 
-app.get('/checkuser', APILimiter, (request,response) => {
+app.get('/checkuser',(request,response) => {
     // Check if user is in whitelist
     if (!Config.whitelistEnabled)
         response.send({
@@ -71,7 +52,7 @@ app.get('/checkuser', APILimiter, (request,response) => {
         })
 })
 
-app.get('/login',AuthAPILimiter,(request,response) => {
+app.get('/login',(request,response) => {
     // Steem Keychain Auth
     if (!request.query.user || request.query.user === '')
         // Username not specified, throw an error
@@ -105,7 +86,7 @@ app.get('/login',AuthAPILimiter,(request,response) => {
     },request.query.hivecrypt)
 })
 
-app.post('/logincb',AuthAPILimiter,(request,response) => {
+app.post('/logincb',(request,response) => {
     // Keychain Auth Callback
     Auth.decryptMessage(request.body,(decoded) => {
         if (decoded === false)
@@ -121,7 +102,7 @@ app.post('/logincb',AuthAPILimiter,(request,response) => {
     })
 })
 
-app.get('/auth',AuthAPILimiter,(request,response) => {
+app.get('/auth',(request,response) => {
     let access_token = request.query.access_token
     Auth.verifyAuth(access_token,false,(err,res) => {
         if (err) return response.status(401).send({error: err})
@@ -144,11 +125,11 @@ app.post('/uploadVideoFs',Parser.json(),(request,response) => {
     })
 })
 
-app.post('/uploadImage',ImageUploadAPILimiter,(request,response) => {
+app.post('/uploadImage',(request,response) => {
     Authenticate(request,response,true,(user,network) => FileUploader.uploadImage(user,network,request,response))
 })
 
-app.post('/uploadSubtitle',APILimiter,(request,response) => {
+app.post('/uploadSubtitle',(request,response) => {
     Authenticate(request,response,true,(user,network) => FileUploader.uploadSubtitles(user,network,request,response))
 })
 
@@ -199,14 +180,14 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
     }
 })
 
-app.get('/usage',APILimiter, (request,response) => {
+app.get('/usage',(request,response) => {
     // API to get usage info
     if (!request.query.user || request.query.user === '') return response.send('Username is not defined!');
     let usage = db.getUsage(request.query.user,request.query.network)
     response.send(usage)
 })
 
-app.get('/stats',APILimiter,(request,response) => {
+app.get('/stats',(request,response) => {
     response.send({
         count: db.getHashes('videos').videos.length,
         streams: db.getHashes('streams').streams.length,
@@ -215,7 +196,7 @@ app.get('/stats',APILimiter,(request,response) => {
     })
 })
 
-app.get('/hashes',APILimiter, (request,response) => {
+app.get('/hashes',(request,response) => {
     // API to get IPFS hashes of uploaded files
     let typerequested = request.query.hashtype
     if (typerequested === '' || !typerequested) {
@@ -237,7 +218,7 @@ app.get('/hashes',APILimiter, (request,response) => {
     }
 })
 
-app.get('/pinsByType',APILimiter, (request,response) => {
+app.get('/pinsByType',(request,response) => {
     // API to get details of pins by tyle
     let typerequested = request.query.hashtype
     if (typerequested === '' || !typerequested)
@@ -264,26 +245,26 @@ app.get('/pinsByType',APILimiter, (request,response) => {
     response.send(result)
 })
 
-app.get('/config',APILimiter,(req,res) => {
+app.get('/config',(req,res) => {
     res.send(Config.ClientConfig)
 })
 
-app.get('/activeusers',APILimiter,(req,res) => {
+app.get('/activeusers',(req,res) => {
     res.send({count: FileUploader.IPSync.activeCount()})
 })
 
-app.get('/shawp_config',APILimiter,(req,res) => {
+app.get('/shawp_config',(req,res) => {
     res.send(Config.Shawp)
 })
 
-app.get('/shawp_refill_history',APILimiter,(req,res) => {
+app.get('/shawp_refill_history',(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user,network) => {
         return res.send(Shawp.getRefillHistory(user,network,req.query.start || 0,req.query.count || 100))
     })
 })
 
-app.get('/shawp_refill_history_admin',APILimiter,(req,res) => {
+app.get('/shawp_refill_history_admin',(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user) => {
         if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
@@ -291,14 +272,14 @@ app.get('/shawp_refill_history_admin',APILimiter,(req,res) => {
     })
 })
 
-app.get('/shawp_consumption_history',APILimiter,(req,res) => {
+app.get('/shawp_consumption_history',(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user,network) => {
         return res.send(Shawp.getConsumeHistory(user,network,req.query.start || 0,req.query.count || 100))
     })
 })
 
-app.get('/shawp_consumption_history_admin',APILimiter,(req,res) => {
+app.get('/shawp_consumption_history_admin',(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user) => {
         if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
@@ -335,7 +316,7 @@ app.post('/botusage',Parser.json(),(req,res) => {
     return res.status(500).send({error: 'WIP'})
 })
 
-app.get('/shawp_user_info',APILimiter,(req,res) => {
+app.get('/shawp_user_info',(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user,network) => {
         let shawpuserdetail = Shawp.User(user,network)
@@ -348,7 +329,7 @@ app.get('/shawp_user_info',APILimiter,(req,res) => {
     })
 })
 
-app.get('/shawp_user_info_admin',APILimiter,(req,res) => {
+app.get('/shawp_user_info_admin',(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user,network) => {
         if (!Config.admins.includes(db.toFullUsername(user,network)))
@@ -358,14 +339,14 @@ app.get('/shawp_user_info_admin',APILimiter,(req,res) => {
     })
 })
 
-app.get('/proxy_server',APILimiter,(req,res) => res.send({server: ''}))
-app.get('/latest_build',APILimiter,(req,res) => res.send(Config.Build))
+app.get('/proxy_server',(req,res) => res.send({server: ''}))
+app.get('/latest_build',(req,res) => res.send(Config.Build))
 
-app.get('/user_info',APILimiter,(req,res) => {
+app.get('/user_info',(req,res) => {
     Authenticate(req,res,false,(user,network) => res.send(db.getUserInfo(user,network)))
 })
 
-app.put('/update_settings',APILimiter,Parser.json(),(req,res) => {
+app.put('/update_settings',Parser.json(),(req,res) => {
     Authenticate(req,res,false,(user,network) => {
         // Validators
         for (i in req.body) {
@@ -383,11 +364,11 @@ app.put('/update_settings',APILimiter,Parser.json(),(req,res) => {
     })
 })
 
-app.get('/get_alias',APILimiter,(req,res) => {
+app.get('/get_alias',(req,res) => {
     Authenticate(req,res,false,(mainUser,mainNetwork) => res.send(db.getAliasedUsers(mainUser,mainNetwork)))
 })
 
-app.put('/update_alias',APILimiter,Parser.json(),(req,res) => {
+app.put('/update_alias',Parser.json(),(req,res) => {
     // Access token should belong to the main account
     Authenticate(req,res,false,(mainUser,mainNetwork) => {
         if (!req.body.operation)
