@@ -26,6 +26,14 @@
     "appId": "com.oneloveipfs.uploader",
     "productName": "OneLoveIPFS",
     "copyright": "Copyright (C) 2021 TechCoderX",
+    "files": [
+      "!docs/",
+      "!dist/",
+      "!OneLoveIPFS-*/",
+      "!test/",
+      "!handbrake/",
+      "!scripts/"
+    ],
     "mac": {
       "category": "public.app-category.utilities",
       "target": [

@@ -143,7 +143,7 @@ const createWindow = () => {
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
-            preload: __dirname + '/../scripts/electronPreload.js'
+            preload: __dirname + '/electronPreload.js'
         },
         icon: getIcon()
     })

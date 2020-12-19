@@ -55,17 +55,6 @@ rm -r go-ipfs*
 * [NodeJS + npm](https://nodejs.org)
 * [Git for Windows](https://git-scm.com/download/win)
 
-FFProbe (and FFMPEG) Powershell install (run as admin):
-```
-Invoke-WebRequest -o ffmpeg.zip "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
-Expand-Archive -LiteralPath ffmpeg.zip -DestinationPath ffmpeg
-Set-Location ffmpeg/ffmpeg*/bin
-Copy-Item * C:\Windows\System32
-Set-Location ../../..
-Remove-Item -Recurse ffmpeg
-Remove-Item ffmpeg.zip
-```
-
 ## Uploader installation
 
 ```

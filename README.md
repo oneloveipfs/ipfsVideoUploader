@@ -9,8 +9,7 @@ This is an alternative IPFS uploader to upload videos onto DTube. Can be run as 
 ### Dependencies required
 
 * `nodejs` and `npm` (Latest LTS)
-* `ffmpeg`, `imagemagick` and `bc` for sprite generation, not supported on Windows.
-* `ffprobe` for obtaining video duration, usually included with `ffmpeg`.
+* `ffmpeg`, `imagemagick` and `bc` for sprite generation, not supported on Windows and Electron apps.
 * `go-ipfs` with a running daemon (alternatively [IPFS Desktop](https://github.com/ipfs-shipyard/ipfs-desktop) may be used)
 
 ### Additional requirements
