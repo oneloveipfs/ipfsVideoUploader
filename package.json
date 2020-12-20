@@ -63,7 +63,11 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "license": "LICENSE",
-      "perMachine": true
+      "perMachine": true,
+      "differentialPackage": false
+    },
+    "dmg": {
+      "writeUpdateInfo": false
     }
   },
   "author": "techcoderx <engtianxi@outlook.com>",
