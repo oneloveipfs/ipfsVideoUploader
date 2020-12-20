@@ -55,8 +55,7 @@
       "icon": "public/macos_icon.icns",
       "target": [
         "deb",
-        "AppImage",
-        "snap"
+        "AppImage"
       ],
       "category": "Video"
     },

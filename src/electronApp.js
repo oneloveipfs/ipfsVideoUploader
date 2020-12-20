@@ -51,8 +51,7 @@ const getIcon = () => {
 
 const openAboutWindow = () => aboutWindow({
     icon_path: 'file://'+__dirname+'/../public/macos_icon.png',
-    copyright: 'Copyright (C) 2021 TechCoderX. Build: ' + BUILD_STR,
-    show_close_button: 'Close'
+    copyright: 'Copyright (C) 2021 TechCoderX. Build: ' + BUILD_STR
 })
 
 const menuTemplate = [
