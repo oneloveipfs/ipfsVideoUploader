@@ -179,7 +179,7 @@ function openBrowserWindowElectron(url) {
     window.postMessage({ action: 'open_browser_window', data: url })
 }
 
-if (isElectron) {
+if (isElectron()) {
     window.open = openBrowserWindowElectron
     document.addEventListener('DOMContentLoaded',() => {
         let anchors = document.getElementsByTagName('a')

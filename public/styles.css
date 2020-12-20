@@ -847,9 +847,8 @@ textarea {
     display: flex;
     overflow-x: scroll;
     text-align: center;
-    font-family: 'Segoe UI', Geneva, Tahoma, sans-serif;
-    padding-bottom: 20px;
-    margin: 0px 50px 30px;
+    font-family: 'Roboto2';
+    margin: 0px 50px;
 }
 
 .updatelogitem {
@@ -882,6 +881,10 @@ textarea {
 .updatepayout {
     position: absolute;
     bottom: 30px;
+}
+
+.appDlBtn {
+    text-align: center;
 }
 
 td {

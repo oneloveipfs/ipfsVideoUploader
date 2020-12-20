@@ -90,6 +90,8 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let i = updates.length - 1; i >= 0; i--)
         updatesHTML += '<div class="updatelogitem"><div class="updatelog">Version ' + updates[i].version + '<br>Released ' + updates[i].created + '<br><br><a href="' + updates[i].link + '" target="_blank">' + updates[i].description + '</a><div class="updatepayout">Payout: ' + updates[i].payout + '</div></div></div>'
     document.getElementById('updatesContainer').innerHTML = updatesHTML
+    if (isElectron())
+        updateDisplayByIDs([],['appIntro'])
 })
 
 // Load general uploader stats
