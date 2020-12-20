@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     jsonmeta.video.files.ipfs.img[118] = newSnapHash
                     jsonmeta.video.files.ipfs.img[360] = newSnapHash
                 }
-                jsonmeta.app = 'onelovedtube/1.0.1'
+                jsonmeta.app = 'onelovedtube/2.0'
 
                 // Edit Steem article body
                 let oldSnapLink = steemPostToModify.body.match(/\bhttps?:\/\/\S+/gi)[1].replace('\'></a></center><hr>','')
@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     jsonmeta.video.files.ipfs.img[118] = newSnapHash
                     jsonmeta.video.files.ipfs.img[360] = newSnapHash
                 }
-                jsonmeta.app = 'onelovedtube/1.0.1'
+                jsonmeta.app = 'onelovedtube/2.0'
 
                 // Edit Steem article body
                 let oldSnapLink = steemPostToModify.body.match(/\bhttps?:\/\/\S+/gi)[1].replace('\'></a></center><hr>','')
@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     jsonAvalon.files.ipfs.img[118] = newSnapHash
                     jsonAvalon.files.ipfs.img[360] = newSnapHash
                 }
-                jsonAvalon.app = 'onelovedtube/1.0.1'
+                jsonAvalon.app = 'onelovedtube/2.0'
 
                 let avalonSwapTx = {
                     type: 4,
@@ -418,11 +418,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             })
         }).catch(function(err) {
-            // if (err.response.data.error)
-            //     alert('Upload error: ' + err.response.data.error)
-            // else
             console.log(err)
-                //alert('Upload error: ' + err)
+            if (err.response && err.response.data && err.response.data.error)
+                alert(err.response.data.error)
+            else
+                alert('Error: ' + err.toString())
             reenableSnapSwapFields()
         })
     }

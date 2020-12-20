@@ -118,7 +118,7 @@ app.post('/uploadVideoFs',Parser.json(),async (request,response) => {
     if (!Config.ClientConfig.uploadFromFs) return response.status(404).send({error: 'Uploading from local filesystem is not activated. Please enable it in config.json or use Tus resumable uploads.'})
     if (!request.body.type || !db.getPossibleTypes().includes(request.body.type)) return response.status(400).send('Invalid upload type')
     if (!fs.existsSync(request.body.filepath)) return response.status(400).send({error: 'File not found in filesystem'})
-    if (Config.enforceIPFSOnline && await !FileUploader.isIPFSOnline()) return response.status(503).send({error: 'IPFS daemon is offline'})
+    if (Config.enforceIPFSOnline && await FileUploader.isIPFSOnline() === false) return response.status(503).send({error: 'IPFS daemon is offline'})
     Authenticate(request,response,true,(user,network) => {
         let randomID = FileUploader.IPSync.randomID()
         FileUploader.uploadFromFs(request.body.type,request.body.filepath,randomID,user,network,request.body.skynet,() => FileUploader.writeUploadRegister())
@@ -127,17 +127,17 @@ app.post('/uploadVideoFs',Parser.json(),async (request,response) => {
 })
 
 app.post('/uploadImage',async (request,response) => {
-    if (Config.enforceIPFSOnline && await !FileUploader.isIPFSOnline()) return response.status(503).send({error: 'IPFS daemon is offline'})
+    if (Config.enforceIPFSOnline && await FileUploader.isIPFSOnline() === false) return response.status(503).send({error: 'IPFS daemon is offline'})
     Authenticate(request,response,true,(user,network) => FileUploader.uploadImage(user,network,request,response))
 })
 
 app.post('/uploadSubtitle',async (request,response) => {
-    if (Config.enforceIPFSOnline && await !FileUploader.isIPFSOnline()) return response.status(503).send({error: 'IPFS daemon is offline'})
+    if (Config.enforceIPFSOnline && await FileUploader.isIPFSOnline() === false) return response.status(503).send({error: 'IPFS daemon is offline'})
     Authenticate(request,response,true,(user,network) => FileUploader.uploadSubtitles(user,network,request,response))
 })
 
 app.post('/uploadStream',async (request,response) => {
-    if (Config.enforceIPFSOnline && await !FileUploader.isIPFSOnline()) return response.status(503).send({error: 'IPFS daemon is offline'})
+    if (Config.enforceIPFSOnline && await FileUploader.isIPFSOnline() === false) return response.status(503).send({error: 'IPFS daemon is offline'})
     Authenticate(request,response,true,(user,network) => FileUploader.uploadStreamChunk(user,network,request,response))
 })
 

@@ -241,10 +241,10 @@ document.addEventListener('DOMContentLoaded', () => {
             // Upload all videos
             uploadVideo(0,() => console.log('all videos uploaded successfully'))
         }).catch((err) => {
-            if (err.response.data.error)
-                alert('Upload error: ' + JSON.stringify(err.response.data.error))
+            if (err.response && err.response.data && err.response.data.error)
+                alert(err.response.data.error)
             else
-                alert('Upload error: ' + JSON.stringify(err))
+                alert(err.toString())
             progressbar.style.display = "none"
             reenableFields()
         })
@@ -659,7 +659,7 @@ function buildJsonMetadata(network) {
     let jsonMeta = {
         video: buildJsonMetadataAvalon(),
         tags: SteemTags,
-        app: 'onelovedtube/1.0.1',
+        app: 'onelovedtube/2.0',
     }
 
     let ref = []
