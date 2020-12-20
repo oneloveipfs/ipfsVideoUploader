@@ -61,7 +61,7 @@ const menuTemplate = [
         ]
     }] : []), {
         label: 'Uploader',
-        submenu: [...(REMOTE_APP === 0 ? [{ 
+        submenu: [...(!isMac ? [{role: 'about'}] : []),...(REMOTE_APP === 0 ? [{ 
             label: 'Reset Auth Keys',
             click: async () => {
                 let resetAuthAlert = await dialog.showMessageBox(null,{
@@ -152,7 +152,7 @@ const createWindow = () => {
     let menu = Menu.buildFromTemplate(menuTemplate)
     Menu.setApplicationMenu(menu)
 
-    app.setAboutPanelOptions({ version: config.Build.number.toString() })
+    app.setAboutPanelOptions({ version: config.Build.number.toString() + (REMOTE_APP === 1 ? 'R' : '') })
 
     mainWindow.loadURL(`http://localhost:${config.HTTP_PORT}`)
     mainWindow.on('closed', () => mainWindow = null)
