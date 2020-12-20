@@ -5,6 +5,7 @@
   "description": "Alternative IPFS uploader for DTube videos.",
   "homepage": "https://uploader.oneloved.tube",
   "repository": {
+    "type": "git",
     "url": "https://github.com/oneloveipfs/ipfsVideoUploader"
   },
   "main": "src/electronApp.js",
@@ -71,9 +72,11 @@
     }
   },
   "author": "techcoderx <engtianxi@outlook.com>",
+  "bugs": "https://github.com/oneloveipfs/ipfsVideoUploader/issues",
   "license": "GPLv3",
   "dependencies": {
     "@hiveio/hive-js": "0.8.10",
+    "about-window": "^1.13.4",
     "async": "^3.2.0",
     "axios": "^0.21.0",
     "body-parser": "^1.19.0",

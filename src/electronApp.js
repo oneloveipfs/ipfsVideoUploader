@@ -1,8 +1,10 @@
 const axios = require('axios')
 const { app, shell, ipcMain, dialog, BrowserWindow, Notification, Menu } = require('electron')
+const aboutWindow = require('about-window').default
 const config = require('./config')
 const isMac = process.platform === 'darwin'
 const REMOTE_APP = 0
+const BUILD_STR = config.Build.number.toString() + (REMOTE_APP === 1 ? 'R' : '')
 
 if (require('electron-squirrel-startup'))
     return app.quit()
@@ -47,11 +49,17 @@ const getIcon = () => {
     }
 }
 
+const openAboutWindow = () => aboutWindow({
+    icon_path: 'file://'+__dirname+'/../public/macos_icon.png',
+    copyright: 'Copyright (C) 2021 TechCoderX. Build: ' + BUILD_STR,
+    show_close_button: 'Close'
+})
+
 const menuTemplate = [
     ...(isMac ? [{
         label: app.name,
         submenu: [
-            { role: 'about' },
+            { label: 'About OneLoveIPFS', click: openAboutWindow },
             { type: 'separator' },
             { role: 'hide' },
             { role: 'hideothers' },
@@ -61,7 +69,10 @@ const menuTemplate = [
         ]
     }] : []), {
         label: 'Uploader',
-        submenu: [...(!isMac ? [{role: 'about'}] : []),...(REMOTE_APP === 0 ? [{ 
+        submenu: [...(!isMac ? [{
+            label: 'About',
+            click: openAboutWindow
+        }] : []),...(REMOTE_APP === 0 ? [{ 
             label: 'Reset Auth Keys',
             click: async () => {
                 let resetAuthAlert = await dialog.showMessageBox(null,{
@@ -151,8 +162,6 @@ const createWindow = () => {
 
     let menu = Menu.buildFromTemplate(menuTemplate)
     Menu.setApplicationMenu(menu)
-
-    app.setAboutPanelOptions({ version: config.Build.number.toString() + (REMOTE_APP === 1 ? 'R' : '') })
 
     mainWindow.loadURL(`http://localhost:${config.HTTP_PORT}`)
     mainWindow.on('closed', () => mainWindow = null)

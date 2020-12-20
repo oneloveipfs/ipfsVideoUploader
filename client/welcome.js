@@ -72,7 +72,7 @@ let updates = [
         link: "https://hive.blog/hive-134220/@onelovedtube/oneloveipfs-uploader-v1-0-1-a-post-mainnet-update",
         payout: "$1.82"
     }, {
-        created: "20 December 2020",
+        created: "21 December 2020",
         version: "2.0",
         description: "The next generation of IPFS video hosting",
         link: "https://hive.blog/hive-134220/@onelovedtube/oneloveipfs-uploader-v2-the-next-generation-of-ipfs-video-hosting-is-here",
