@@ -1,8 +1,8 @@
 const Config = require('./config')
 const db = require('./dbManager')
 const AvalonStreamer = require('./avalonStreamer')
+const GrapheneStreamer = require('./grapheneStreamer')
 const hive = require('@hiveio/hive-js')
-const steem = require('steem')
 const coinbase = require('coinbase-commerce-node')
 const fs = require('fs')
 const axios = require('axios')
@@ -10,8 +10,6 @@ const Scheduler = require('node-schedule')
 const dbDir = (process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs') + '/db'
   
 hive.api.setOptions({url: Config.Shawp.HiveAPI, useAppbaseApi: true })
-steem.api.setOptions({ url: Config.Shawp.SteemAPI, useAppbaseApi: true })
-
 hive.config.set('uri', Config.Shawp.HiveAPI)
 hive.config.set('alternative_api_endpoints', [])
 
@@ -23,8 +21,8 @@ let Customers = JSON.parse(fs.readFileSync(dbDir+'/shawpUsers.json'))
 let RefillHistory = JSON.parse(fs.readFileSync(dbDir+'/shawpRefills.json'))
 let ConsumeHistory = JSON.parse(fs.readFileSync(dbDir+'/shawpConsumes.json'))
 
-let headBlockHive
-let headBlockSteem
+let hiveStreamer = new GrapheneStreamer(Config.Shawp.HiveAPI || 'https://techcoderx.com',true)
+let steemStreamer = new GrapheneStreamer(Config.Shawp.SteemAPI || 'https://api.steemit.com',true)
 
 let coinbaseClient = coinbase.Client
 let coinbaseCharge = coinbase.resources.Charge
@@ -33,14 +31,11 @@ if (Config.Shawp.Coinbase)
     coinbaseClient.init(Config.CoinbaseCommerce.APIKey)
 
 let Shawp = {
-    init: (network) => {
-        // Stream transactions from blockchain
-        if (network) console.log('Keeping alive for',network)
+    init: () => {
+        // Spawn transaction streamers
         if (!Config.Shawp.Enabled) return
-        if (Config.Shawp.HiveReceiver && (!network || network === 'hive')) hive.api.streamTransactions('irreversible',(err,tx) => {
-            if (err) return
+        if (Config.Shawp.HiveReceiver) hiveStreamer.streamTransactions((tx) => {
             let transaction = tx
-            if (transaction.transaction_num == 0) headBlockHive = transaction.block_num
             if (transaction && transaction.operations && transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.HiveReceiver) {
                 let tx = transaction.operations[0][1]
                 console.log(tx,transaction.transaction_id)
@@ -74,10 +69,8 @@ let Shawp = {
             }
         })
         
-        if (Config.Shawp.SteemReceiver && (!network || network === 'steem')) steem.api.streamTransactions('irreversible',(err,tx) => {
-            if (err) return
+        if (Config.Shawp.SteemReceiver) steemStreamer.streamTransactions((tx) => {
             let transaction = tx
-            if (transaction.transaction_num == 0) headBlockSteem = transaction.block_num
             if (transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.SteemReceiver) {
                 let tx = transaction.operations[0][1]
                 console.log(tx,transaction.transaction_id)
@@ -111,7 +104,7 @@ let Shawp = {
             }
         })
 
-        if (Config.Shawp.DtcReceiver && (!network || network === 'dtc')) {
+        if (Config.Shawp.DtcReceiver) {
             let dtcStream = new AvalonStreamer(Config.Shawp.AvalonAPI,true)
             dtcStream.streamBlocks((newBlock) => {
                 for (let txn in newBlock.txs)
@@ -133,36 +126,22 @@ let Shawp = {
             })
         }
 
-        if (!network) {
-            Scheduler.scheduleJob('0 0 * * *',() => {
-                Shawp.Consume()
-                Shawp.WriteConsumeHistory()
-                Shawp.WriteUserDB()
-                console.log('Daily consumption completed successfully')
-            })
-
-            Scheduler.scheduleJob('* * * * *',() => {
-                hive.api.getDynamicGlobalProperties((e,r) => {
-                    if (!e && Math.abs(r.head_block_number - headBlockHive) > 25) 
-                        Shawp.init('hive') // keep alive
-                })
-
-                steem.api.getDynamicGlobalProperties((e,r) => {
-                    if (!e && Math.abs(r.head_block_number - headBlockSteem) > 25) 
-                        Shawp.init('steem') // keep alive
-                })
-            })
-        }
+        Scheduler.scheduleJob('0 0 * * *',() => {
+            Shawp.Consume()
+            Shawp.WriteConsumeHistory()
+            Shawp.WriteUserDB()
+            console.log('Daily consumption completed successfully')
+        })
     },
     ValidatePayment: (receiver,memo) => {
         let network = 'all'
         if (memo !== '' && !memo.startsWith('to: @') && !memo.startsWith('to: hive@') && !memo.startsWith('to: dtc@')) return [] // Memo must be empty or begin with "to: @" or "to: network@"
         if (memo && memo.startsWith('to: @')) {
             let otheruser = memo.replace('to: @','')
-            if (steem.utils.validateAccountName(otheruser) == null && db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
+            if (hive.utils.validateAccountName(otheruser) == null && db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
         } else if (memo && memo.startsWith('to: hive@')) {
             let otheruser = memo.replace('to: hive@','')
-            if (steem.utils.validateAccountName(otheruser) == null) receiver = otheruser
+            if (hive.utils.validateAccountName(otheruser) == null) receiver = otheruser
             network = 'hive'
         } else if (memo && memo.startsWith('to: dtc@')) {
             let otheruser = memo.replace('to: dtc@','')
