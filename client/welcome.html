@@ -154,9 +154,11 @@
                         <h5 class="sameUsername" id="sameAvalonUser"><a onclick="document.getElementById('avalonLoginUsername').value = document.getElementById('loginUsername').value">Same as Hive username</a></h5>
                         <input type="password" placeholder="AVALON Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginKey" class="loginFields"><br>
                         <div class="rememberme"><label class="switch">
-                            <input type="checkbox" name="rememberme" id="rememberme" checked>
+                            <input type="checkbox" name="rememberme" id="rememberme" onchange="updateRememberMeState()" checked>
                             <span class="slider round"></span>
-                        </label><h4 class="remembermelabel"> Remember Me</h4><br><br></div>
+                            </label><h4 class="remembermelabel"> Remember Me</h4><br><br>
+                            <input type="password" placeholder="Encrypt private keys with password (optional)" autocorrect="off" autocapitalize="off" spellcheck="false" class="loginFields" id="persistPassword">
+                        </div>
                         <a class="roundedBtn" id="proceedAuthBtn">Proceed</a>
                         <h3 class="sclogin">OR</h3>
                         <a class="roundedBtn sclogin" id="altAuthBtn">Proceed with HiveSigner</a>
@@ -164,6 +166,7 @@
                     </div>
                     <div id="persistentform">
                         <h4 id="persistentLoginText"></h4>
+                        <input type="password" placeholder="Enter password" autocorrect="off" autocapitalize="off" spellcheck="false" class="loginFields" id="persistLoginPassword">
                         <a class="roundedBtn" id="clearPersistAuthBtn">Clear login</a><br><br>
                         <a class="roundedBtn" id="proceedPersistAuthBtn">Proceed</a>
                     </div>

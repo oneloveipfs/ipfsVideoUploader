@@ -79,22 +79,29 @@ function loginBtnClicked() {
     // Show popup window of login options
     if (isElectron() && localStorage.getItem('persistentLogin') !== null) {
         let storedLogin
-        try {
-            storedLogin = JSON.parse(localStorage.getItem('persistentLogin'))
-            if ((!storedLogin.dtcUser && !storedLogin.hiveUser && !storedLogin.steemUser) || 
-                (storedLogin.dtcUser && !storedLogin.dtcKey) || 
-                (storedLogin.hiveUser && !storedLogin.hiveKey) || 
-                (storedLogin.steemUser && !storedLogin.steemKey)) throw 'invalid keys'
-        } catch {
-            return updateDisplayByIDs(['loginPopup'],[])
-        }
-        let persistentLoginText = '<h4>Persistent login found.<br>'
-        if (storedLogin.hiveUser) persistentLoginText += '<br>Hive: ' + storedLogin.hiveUser
-        if (storedLogin.steemUser) persistentLoginText += '<br>Steem: ' + storedLogin.steemUser
-        if (storedLogin.dtcUser) persistentLoginText += '<br>Avalon: ' + storedLogin.dtcUser
+        let persistentLoginText = 'Persistent login found.<br>'
+        if (!isEncryptedStore('persistentLogin'))
+            try {
+                storedLogin = JSON.parse(localStorage.getItem('persistentLogin'))
+                if ((!storedLogin.dtcUser && !storedLogin.hiveUser && !storedLogin.steemUser) || 
+                    (storedLogin.dtcUser && !storedLogin.dtcKey) || 
+                    (storedLogin.hiveUser && !storedLogin.hiveKey) || 
+                    (storedLogin.steemUser && !storedLogin.steemKey)) throw 'invalid keys'
+                if (storedLogin.hiveUser) persistentLoginText += '<br>Hive: ' + storedLogin.hiveUser
+                if (storedLogin.steemUser) persistentLoginText += '<br>Steem: ' + storedLogin.steemUser
+                if (storedLogin.dtcUser) persistentLoginText += '<br>Avalon: ' + storedLogin.dtcUser
+            } catch {
+                return updateDisplayByIDs(['loginPopup'],[])
+            }
+        else
+            persistentLoginText = 'Encrypted persistent login found.<br>'
         document.getElementById('persistentLoginText').innerHTML = persistentLoginText
         updateDisplayByIDs(['persistentform','loginPopup'],['loginform'])
-    } else updateDisplayByIDs(['loginPopup'],[])
+        if (isEncryptedStore('persistentLogin'))
+            updateDisplayByIDs(['persistLoginPassword'],[])
+        else
+            updateDisplayByIDs([],['persistLoginPassword'])
+    } else updateDisplayByIDs(['loginPopup','loginform'],['persistentform'])
 }
 
 document.getElementById('proceedAuthBtn').onclick = async function proceedLogin() {
@@ -164,10 +171,17 @@ document.getElementById('altAuthBtn').onclick = () => {
 }
 
 document.getElementById('proceedPersistAuthBtn').onclick = async () => {
+    let dec = retrieveEncrypted('persistentLogin',document.getElementById('persistLoginPassword').value)
+    if (dec === null) return alert('Invalid password')
     if (proceedAuthBtnDisabled) return
     proceedAuthBtnDisabled = true
     document.getElementById('proceedPersistAuthBtn').innerText = 'Logging In...'
-    let storedDetails = JSON.parse(localStorage.getItem('persistentLogin'))
+    let storedDetails
+    try {
+        storedDetails = JSON.parse(dec)
+    } catch {
+        return handleLoginError('Could not parse persistent login info')
+    }
     await avalonLogin(storedDetails.dtcUser,storedDetails.dtcKey,!storedDetails.hiveUser && !storedDetails.steemUser)
     axios.get('/login?network=hive&hivecrypt=1&user='+storedDetails.hiveUser).then((r) => {
         if (r.data.error != null)
@@ -365,6 +379,29 @@ function steemKeyLogin(username,wif) {
     })
 }
 
+function storeEncrypted(key,value,password) {
+    let pubK = steem.auth.getPrivateKeys('',password,['Posting']).PostingPubkey
+    let wif = hivecrypt.randomWif()
+    localStorage.setItem(key,steem.memo.encode(wif,pubK,'#'+value.toString()))
+}
+
+function retrieveEncrypted(key,password) {
+    let wif = steem.auth.getPrivateKeys('',password,['Posting']).Posting
+    let enc = localStorage.getItem(key)
+    if (!enc.startsWith('#')) return enc
+    try {
+        let result = steem.memo.decode(wif,enc).substr(1)
+        return result
+    } catch {
+        return null
+    }
+}
+
+function isEncryptedStore(key) {
+    let val = localStorage.getItem(key)
+    return val === null ? false : localStorage.getItem(key).startsWith('#')
+}
+
 async function handleElectronLogins(memo,steemUsername,steemKey,hiveUsername,hiveKey,avalonUsername,avalonKey,fromPersistence) {
     // Use posting keys to decrypt for Electron app
     let usingSteem = false
@@ -391,15 +428,21 @@ async function handleElectronLogins(memo,steemUsername,steemKey,hiveUsername,hiv
         sessionStorage.setItem('steemKey',steemKey)
     }
 
-    if (document.getElementById('rememberme').checked && !fromPersistence)
-        localStorage.setItem('persistentLogin',JSON.stringify({
+    if (document.getElementById('rememberme').checked && !fromPersistence) {
+        let ptValue = JSON.stringify({
             hiveUser: hiveUsername,
             hiveKey: hiveKey,
             steemUser: steemUsername,
             steemKey: steemKey,
             dtcUser: avalonUsername,
             dtcKey: avalonKey
-        }))
+        })
+        let psw = document.getElementById('persistPassword').value
+        if (psw)
+            storeEncrypted('persistentLogin',ptValue,psw)
+        else
+            localStorage.setItem('persistentLogin',ptValue)
+    }
 
     keychainCb(token,steemUsername,false)
 }
@@ -419,4 +462,11 @@ function getKeychainLoginBtnLabel() {
         return "Proceed with Keychains"
     else
         return "Proceed"
+}
+
+function updateRememberMeState() {
+    if (document.getElementById('rememberme').checked)
+        updateDisplayByIDs(['persistPassword'],[])
+    else
+        updateDisplayByIDs([],['persistPassword'])
 }
