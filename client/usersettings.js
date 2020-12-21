@@ -1,5 +1,9 @@
 axios.get('/user_info'+geturl).then((s) => {
     window.usersettings = s.data.settings
+    if (!window.usersettings) window.usersettings = {
+        uplThreads: 10,
+        descTemplate: ''
+    }
     fillSettings()
 })
 

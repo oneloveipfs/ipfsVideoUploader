@@ -876,6 +876,8 @@ function broadcastCompletion(isAvalonSuccess) {
         openMethod('https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash)
     else
         openMethod('https://d.tube/v/' + username + '/' + postparams.permlink)
+    if (isElectron())
+        document.getElementById('progressBarFront').innerText = 'All done'
 }
 
 function clearDraft() {
