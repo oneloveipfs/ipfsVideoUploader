@@ -15,8 +15,7 @@ const errorAlert = (message) => {
     dialog.showMessageBoxSync(null,{
         type: 'error',
         title: 'Error',
-        message: message,
-        icon: __dirname + '/../public/favicon.png'
+        message: message
     })
     app.quit()
 }
@@ -78,8 +77,7 @@ const menuTemplate = [
                     type: 'info',
                     buttons: ['Proceed','Cancel'],
                     title: 'Reset Auth Keys',
-                    message: 'This will reset the keys used for authentication. The app will be relaunched.',
-                    icon: __dirname + '/../public/favicon.png'
+                    message: 'This will reset the keys used for authentication. The app will be relaunched.'
                 })
                 if (resetAuthAlert.response === 0 && REMOTE_APP === 0) {
                     AuthManager.refreshKeys()
