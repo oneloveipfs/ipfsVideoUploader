@@ -571,31 +571,14 @@ function postVideo() {
 
     // Post to Hive blockchain
     let hiveTx = generatePost('hive')
-    let steemTx = generatePost('steem')
     console.log('Hive tx',hiveTx)
-    console.log('Steem tx',steemTx)
     if (config.noBroadcast) return
-
-    let hiveBCMethod = isElectron() ? hive.broadcast.send : hive_keychain.requestBroadcast
-    let hiveBCParams = isElectron() ? [{ extensions: [], operations: hiveTx },[sessionStorage.getItem('hiveKey')]] : [username,hiveTx,'Posting']
-
-    let steemBCMethod = isElectron() ? steem.broadcast.send : steem_keychain.requestBroadcast
-    let steemBCParams = isElectron() ? [{ extensions: [], operations: steemTx },[sessionStorage.getItem('steemKey')]] : [steemUser,steemTx,'Posting']
-
     if (Auth.iskeychain == 'true') {
         // Broadcast with Keychain
-        hiveBCMethod(...hiveBCParams,(hiveResponse) => {
-            if (!isElectron() && hiveResponse.error)
-                return broadcastErrorHandler('Hive Keychain',hiveResponse.message)
-            else if (isElectron() && hiveResponse)
-                return broadcastErrorHandler('Hive broadcast',hiveResponse.toString())
-
-            // Avalon broadcast
-            if (avalonUser)
-                broadcastAvalon(buildJsonMetadataAvalon(),postparams.ipfshash,() => steemBroadcaster(true,steemBCMethod,steemBCParams))
-            else 
-                steemBroadcaster(false,steemBCMethod,steemBCParams)
-        })
+        if (isElectron())
+            hive.broadcast.send({ extensions: [], operations: hiveTx },[sessionStorage.getItem('hiveKey')],hiveBCb)
+        else
+            hive_keychain.requestBroadcast(username,hiveTx,'Posting',hiveBCb)
     } else {
         let hiveapi = new hivesigner.Client({ 
             accessToken: Auth.token,
@@ -616,15 +599,35 @@ function postVideo() {
     }
 }
 
-function steemBroadcaster(isAvalon,method,params) {
+function hiveBCb(hiveResponse) {
+    if (!isElectron() && hiveResponse.error)
+        return broadcastErrorHandler('Hive Keychain',hiveResponse.message)
+    else if (isElectron() && hiveResponse)
+        return broadcastErrorHandler('Hive broadcast',hiveResponse.toString())
+
+    // Avalon broadcast
+    if (avalonUser)
+        broadcastAvalon(buildJsonMetadataAvalon(),postparams.ipfshash,() => steemBroadcaster())
+    else 
+        steemBroadcaster()
+}
+
+function steemBCb(steemResponse) {
+    if (!isElectron() && steemResponse.error) alert('Steem error: ' + steemResponse.message)
+    else if (isElectron() && steemResponse) alert('Steem error: ' + steemResponse.toString())
+    broadcastCompletion(avalonUser ? true : false)
+}
+
+function steemBroadcaster() {
     if (steemUser) {
+        let steemTx = generatePost('steem')
+        console.log('Steem tx',steemTx)
         document.getElementById('progressBarFront').innerHTML = 'Submitting video to Steem...'
-        method(...params,(steemResponse) => {
-            if (!isElectron() && steemResponse.error) alert('Steem error: ' + steemResponse.message)
-            else if (isElectron() && steemResponse) alert('Steem error: ' + steemResponse.toString())
-            broadcastCompletion(isAvalon)
-        })
-    } else broadcastCompletion(isAvalon)
+        if (isElectron())
+            steem.broadcast.send({ extensions: [], operations: steemTx },[sessionStorage.getItem('steemKey')],steemBCb)
+        else
+            steem_keychain.requestBroadcast(steemUser,steemTx,'Posting',steemBCb)
+    } else broadcastCompletion(avalonUser ? true : false)
 }
 
 function broadcastErrorHandler(tool,e) {
@@ -870,12 +873,18 @@ function updateSubtitle() {
 }
 
 function broadcastCompletion(isAvalonSuccess) {
-    let openMethod = isElectron() ? window.openBrowserWindowElectron : window.location.replace
     clearDraft()
-    if (isAvalonSuccess)
-        openMethod('https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash)
-    else
-        openMethod('https://d.tube/v/' + username + '/' + postparams.permlink)
+    if (isAvalonSuccess) {
+        if (isElectron())
+            window.openBrowserWindowElectron('https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash)
+        else
+            window.location.href = 'https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash
+    } else {
+        if (isElectron())
+            window.openBrowserWindowElectron('https://d.tube/v/' + username + '/' + postparams.permlink)
+        else
+            window.location.href = 'https://d.tube/v/' + username + '/' + postparams.permlink
+    }
     if (isElectron())
         document.getElementById('progressBarFront').innerText = 'All done'
 }
