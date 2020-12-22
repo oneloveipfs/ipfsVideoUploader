@@ -6,14 +6,18 @@ Two types of desktop apps may be compiled, which are full apps that are run full
 
 ## Preparation
 
+Run the suitable command depending on OS.
+
 #### Full app
 ```
-REMOTE_APP=0 node scripts/electronPrep.js
+REMOTE_APP=0 npm run prepapp # macOS/Linux
+$env:REMOTE_APP=0; npm run prepapp # Windows
 ```
 
 #### Remote app
 ```
-REMOTE_APP=1 node scripts/electronPrep.js
+REMOTE_APP=1 npm run prepapp # macOS/Linux
+$env:REMOTE_APP=1; npm run prepapp # Windows
 ```
 
 To cleanup unused dependencies in remote app to save space, run
@@ -27,6 +31,12 @@ To restore dependencies after cleanup, repeat the uploader installation procedur
 ```
 npm run devapp
 ```
+
+## Standalone upload server
+```
+npm start
+```
+By default the upload server will be accessible at localhost:3000, or the port specified in `config.json`.
 
 ## Build installer
 
