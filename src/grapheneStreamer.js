@@ -24,7 +24,7 @@ module.exports = class {
                         this.headBlock = num
                     else
                         this.unparsedBlocks = num - this.headBlock
-            })
+            }).catch(() => {})
         },3000)
     
         setInterval(() => {

@@ -18,7 +18,7 @@ module.exports = class {
                         this.headBlock = bHeight.data.count
                     else
                         this.unparsedBlocks = bHeight.data.count - this.headBlock
-            })
+            }).catch(() => {})
         },3000)
     
         setInterval(() => {
