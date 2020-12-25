@@ -3,7 +3,7 @@ function loadPins(type) {
     let call = '/pinsByType?user=' + username + '&hashtype=' + type
     if (dtconly == 'true')
         call += '&network=dtc'
-    else if (!avalonUser || !avalonKey)
+    else if (!avalonUser || !avalonKey || username != avalonUser)
         call += '&network=hive'
     axios.get(call).then(res => {
         let htmlResult = ''
