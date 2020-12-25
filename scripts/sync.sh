@@ -5,15 +5,18 @@ SERVER="https://uploader.oneloved.tube"
 GATEWAY="https://video.oneloveipfs.com"
 HASHTYPE=$1
 USER=$2
+NETWORK=$3
 CLEANUP=1 # Remove downloaded file after adding to IPFS
 
 # No hash type specified
 if [ $# -eq 0 ]
 then
     echo
-    echo "  Usage: $0 <hash type> [Steem username]"
+    echo "  Usage: $0 <hash type> [Username] [Network]"
     echo
-    echo "  Example: $0 videos,video480,thumbnails,sprites,images techcoderx"
+    echo "  Example: $0 videos,video480,thumbnails,sprites,images techcoderx all"
+    echo
+    echo "  Valid values for network: all, hive and dtc."
     echo
     exit 1
 fi
@@ -66,6 +69,16 @@ done
 if [[ -n $USER ]]
 then
     SERVER="${SERVER}&user=${USER}"
+fi
+
+if [ -n $NETWORK ] && [ "$NETWORK" != "all" ]
+then
+    if [ "$NETWORK" != "hive" ] && [ "$NETWORK" != "dtc" ]
+    then
+        echo "Invalid network. Valid values: 'hive' and 'dtc'."
+        exit 1
+    fi
+    SERVER="${SERVER}&network=${NETWORK}"
 fi
 
 # Call /hashes API and get pinset from ipfs
