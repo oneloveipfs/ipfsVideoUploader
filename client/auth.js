@@ -41,8 +41,7 @@ async function Hive() {
                     alert(error.response.data.error)
                 else
                     alert(error)
-                document.getElementById('loggedInUser').innerHTML = 'Login failed'
-                restrict()
+                displayLoginMessage(true)
                 resolve(null)
             })
         })
@@ -119,7 +118,7 @@ async function Avalon() {
         }
     } catch (e) {
         restrict()
-        return alert('An error occured with Avalon login. Please login again.')
+        return alert('An error occured with Avalon authentication: ' + e.toString())
     }
     dtcDisplayUser = avalonUser
     displayLoginMessage()

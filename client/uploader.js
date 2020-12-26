@@ -2,7 +2,6 @@
 let username
 Auth.Hive().then((result) => {
     username = result
-    Auth.Avalon()
 })
 
 let hiveOptions = {
@@ -79,6 +78,7 @@ axios.get('/proxy_server').then((r) => {
 let config;
 
 document.addEventListener('DOMContentLoaded', () => {
+    Auth.Avalon()
     loadPins('videos')
     // Get configuration, then load accounts and authorities
     axios.get('/config').then((result) => {
