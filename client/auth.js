@@ -4,14 +4,13 @@ let token = url.searchParams.get('access_token') // Access token for logged in u
 let iskeychain = url.searchParams.get('keychain')
 let steemUser = url.searchParams.get('steemuser')
 let dtconly = url.searchParams.get('dtconly')
+let displayUsernameTimeout = -1
+let dtcDisplayUser, hiveDisplayUser = null
 
 async function Hive() {
     if (!token) {
         // Not logged in or no access token
-        window.setTimeout(function() {
-            document.getElementById('loggedInUser').innerHTML = 'You are not logged in!'
-            restrict()
-        },100)
+        displayLoginMessage()
         return null
     } else if (iskeychain == 'true') {
         // Hive Keychain / Avalon only Login
@@ -19,8 +18,7 @@ async function Hive() {
             axios.get('/auth?access_token=' + token).then((authResponse) => {
                 if (authResponse.data.error != null) {
                     alert(authResponse.data.error)
-                    document.getElementById('loggedInUser').innerHTML = 'Not authorized'
-                    restrict()
+                    displayLoginMessage(true)
                     resolve(null)
                 } else {
                     window.currentnetwork = authResponse.data.network
@@ -28,14 +26,17 @@ async function Hive() {
                         let grapheneSettings = document.getElementsByClassName('grapheneSettings')
                         for (let i = 0; i < grapheneSettings.length; i++)
                             grapheneSettings[i].style.display = 'none'
-                        document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + authResponse.data.user + ' on Avalon'
-                    } else
-                        document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + authResponse.data.user + ' on Hive'
-                    if (steemUser) document.getElementById('loggedInUser').innerHTML += HtmlSanitizer.SanitizeHtml(', ' + steemUser + ' on Steem')
+                        dtcDisplayUser = authResponse.data.user
+                        displayLoginMessage()
+                    } else {
+                        hiveDisplayUser = authResponse.data.user
+                        displayLoginMessage()
+                    }
                     retrieveDraft()
                     resolve(authResponse.data.user)
                 }
             }).catch((error) => {
+                console.log(error)
                 if (error.response.data.error)
                     alert(error.response.data.error)
                 else
@@ -56,7 +57,8 @@ async function Hive() {
                     alert(JSON.stringify(err))
                     return resolve(null)
                 }
-                document.getElementById('loggedInUser').innerHTML = 'You are logged in as ' + res.account.name + ' on Hive'
+                hiveDisplayUser = res.account.name
+                displayLoginMessage()
                 
                 axios.get('/checkuser?user=' + res.account.name).then(function(response) {
                     console.log(response)
@@ -119,10 +121,41 @@ async function Avalon() {
         restrict()
         return alert('An error occured with Avalon login. Please login again.')
     }
-
-    if (dtconly != 'true') document.getElementById('loggedInUser').innerHTML += ', and ' + avalonUser + ' on Avalon'
+    dtcDisplayUser = avalonUser
+    displayLoginMessage()
     if (promoteDisabled) document.getElementById('dtcBurnSection').style.display = 'none'
     document.getElementById('avalonZone').style.display = 'block'
+}
+
+function displayLoginMessage(errored) {
+    if (document.readyState === 'loading') {
+        clearTimeout(displayUsernameTimeout)
+        displayUsernameTimeout = setTimeout(() => displayLoginMessage(),100)
+    } else if (!token) {
+        document.getElementById('loggedInUser').innerHTML = 'You are not logged in!'
+        restrict()
+    } else if (errored) {
+        document.getElementById('loggedInUser').innerHTML = 'Login errored'
+        restrict()
+    } else {
+        let shouldInsertComma = false
+        let message = 'You are logged in as '
+        if (hiveDisplayUser) {
+            message += hiveDisplayUser + ' on Hive'
+            shouldInsertComma = true
+        }
+        if (steemUser) {
+            if (shouldInsertComma) message += ', '
+            if (!dtcDisplayUser) message += ' and '
+            message += steemUser + ' on Steem'
+            shouldInsertComma = true
+        }
+        if (dtcDisplayUser) {
+            if (shouldInsertComma) message += ' and '
+            message += dtcDisplayUser + ' on Avalon'
+        }
+        document.getElementById('loggedInUser').innerHTML = HtmlSanitizer.SanitizeHtml(message)
+    }
 }
 
 function restrict() {
