@@ -76,7 +76,7 @@ let updates = [
         version: "2.0",
         description: "The next generation of IPFS video hosting",
         link: "https://hive.blog/hive-134220/@onelovedtube/oneloveipfs-uploader-v2-the-next-generation-of-ipfs-video-hosting-is-here",
-        payout: "Pending"
+        payout: "$0.49"
     }
 ]
 
