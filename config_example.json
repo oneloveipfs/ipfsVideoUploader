@@ -4,6 +4,7 @@
     "HTTP_BIND_IP": "127.0.0.1",
     "whitelistEnabled": false,
     "spritesEnabled": true,
+    "durationAPIEnabled": true,
     "deleteUploadsAfterAdd": true,
     "enforceIPFSOnline": true,
     "tokenExpiry": 86400,

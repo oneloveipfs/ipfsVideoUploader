@@ -4,6 +4,7 @@ const IPFS = require('ipfs-http-client')
 const Shell = require('shelljs')
 const FormData = require('form-data')
 const axios = require('axios')
+const getDuration = require('get-video-duration')
 const fs = require('fs')
 const async = require('async')
 const WebVTT = require('node-webvtt')
@@ -106,6 +107,9 @@ const processSingleVideo = async (id,user,network,cb) => {
         ipfshash: uploadRegister[id].hash,
         spritehash: spriteGen.hash
     }
+
+    if (Config.durationAPIEnabled)
+        result.duration = await getDuration(vpath)
 
     uploadRegister[id] = result
     cb(result)
@@ -218,7 +222,7 @@ let uploadOps = {
                     }
                 }
 
-                async.parallel(ipfsops, (errors,results) => {
+                async.parallel(ipfsops, async (errors,results) => {
                     if (errors) console.log(errors)
                     console.log(results)
                     db.recordHash(user,network,'videos',results.videohash.ipfshash,json.Upload.Size)
@@ -240,6 +244,9 @@ let uploadOps = {
                         skylink: results.videohash.skylink,
                         filesize: json.Upload.Size
                     }
+
+                    if (Config.durationAPIEnabled)
+                        result.duration = await getDuration(filepath)
 
                     if (socketRegister[json.Upload.ID] && socketRegister[json.Upload.ID].socket) socketRegister[json.Upload.ID].socket.emit('result',result)
                     delete socketRegister[json.Upload.ID]
