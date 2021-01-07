@@ -57,6 +57,7 @@ async function Hive() {
                     return resolve(null)
                 }
                 hiveDisplayUser = res.account.name
+                window.currentnetwork = 'hive'
                 displayLoginMessage()
                 
                 axios.get('/checkuser?user=' + res.account.name).then(function(response) {
