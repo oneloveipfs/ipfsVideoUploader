@@ -152,12 +152,12 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
     }).catch((err) => handleLoginError(err && err.response && err.response.data ? err.response.data.error : err))
 }
 
-document.getElementById('altAuthBtn').onclick = () => {
+document.getElementById('altAuthBtn').onclick = async () => {
     // HiveSigner login (plus SteemLogin dual?)
     let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
     let avalonKey = document.getElementById('avalonLoginKey').value
 
-    avalonLogin(avalonUsername,avalonKey,false)
+    await avalonLogin(avalonUsername,avalonKey,false)
 
     let hiveClient = new hivesigner.Client({
         app: config.HiveSignerApp,
