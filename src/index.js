@@ -194,8 +194,8 @@ app.get('/usage',(request,response) => {
 // Get everyone's usage. Admin only API
 app.get('/allusage',(request,response) => {
     if (!Config.Shawp.Enabled) response.status(404).send({ error: 'Shawp is not enabled' })
-    Authenticate(req,res,false,(user) => {
-        if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
+    Authenticate(request,response,false,(user) => {
+        if (!Config.admins.includes(user)) return response.status(403).send({error:'Not an admin'})
         let allusage = {}
         let users = Shawp.AllUsers()
         for (let i = 0; i < users.length; i++)
