@@ -180,6 +180,9 @@ let Shawp = {
         if (!Customers[fullusername]) return false
         else return true
     },
+    AllUsers: () => {
+        return Object.keys(Customers)
+    },
     ExchangeRate: (coin,amount,cb) => {
         let coingeckoUrl
         switch (coin) {

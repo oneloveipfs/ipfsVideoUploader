@@ -191,6 +191,19 @@ app.get('/usage',(request,response) => {
     response.send(usage)
 })
 
+// Get everyone's usage. Admin only API
+app.get('/allusage',(request,response) => {
+    if (!Config.Shawp.Enabled) response.status(404).send({ error: 'Shawp is not enabled' })
+    Authenticate(req,res,false,(user) => {
+        if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
+        let allusage = {}
+        let users = Shawp.AllUsers()
+        for (let i = 0; i < users.length; i++)
+            allusage[users[i]] = db.getUsage(db.toUsername(users[i]),db.toNetwork(users[i]))
+        response.send(allusage)
+    })
+})
+
 app.get('/stats',(request,response) => {
     response.send({
         count: db.getHashes('videos').videos.length,
