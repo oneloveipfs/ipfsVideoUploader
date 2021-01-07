@@ -890,11 +890,11 @@ function broadcastCompletion(isAvalonSuccess) {
 }
 
 function clearDraft() {
-    localStorage.setItem('OneLoveTitle',null)
-    localStorage.setItem('OneLoveDescription',null)
-    localStorage.setItem('OneLoveTags',null)
-    localStorage.setItem('OneLovePostBody',null)
-    localStorage.setItem('OneLoveSubtitles',null)
+    localStorage.setItem('OneLoveTitle','')
+    localStorage.setItem('OneLoveDescription','')
+    localStorage.setItem('OneLoveTags','')
+    localStorage.setItem('OneLovePostBody','')
+    localStorage.setItem('OneLoveSubtitles','')
 }
 
 function estimatedBandwidth() {
