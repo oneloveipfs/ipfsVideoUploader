@@ -241,6 +241,9 @@ app.get('/pinsByType',(request,response) => {
     if (typerequested === '' || !typerequested)
         return response.status(400).send({error: 'Hash type not specified'})
 
+    if (!db.getPossibleTypes().includes(typerequested))
+        return response.status(400).send({error: 'Invalid hash type'})
+
     if (!request.query.user || request.query.user === '')
         // Username not specified, return all hashes (either all videos, snaps or sprites, or all three)
         return response.status(400).send({error: 'Username not specified'})
@@ -253,6 +256,8 @@ app.get('/pinsByType',(request,response) => {
     // BOTH valid username and hash type request are specified
     let result = []
     let hashes = db.getHashesByUser(typerequested,request.query.user,network)
+    if (!hashes[typerequested])
+        return response.status(404).send({error: 'Hash type not found for user'})
     for (let i = 0; i < hashes[typerequested].length; i++) {
         result.push({
             cid: hashes[typerequested][i],
