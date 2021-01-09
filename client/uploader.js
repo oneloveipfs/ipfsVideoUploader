@@ -23,11 +23,11 @@ for(let i = 0; i < allLangCodes.length; i++) {
 }
 
 let subtitleList = []
-let savedSubtitles = JSON.parse(localStorage.getItem('OneLoveSubtitles'))
-if (savedSubtitles) {
-    subtitleList = savedSubtitles
-    setTimeout(() => updateSubtitle(),250)
-}
+try {
+    let savedSubtitles = JSON.parse(localStorage.getItem('OneLoveSubtitles'))
+    if (savedSubtitles)
+        subtitleList = savedSubtitles
+} catch {}
 
 // Beneficiaries
 let hiveBeneficiaries = new Beneficiaries('Hive')
@@ -80,6 +80,7 @@ let config;
 document.addEventListener('DOMContentLoaded', () => {
     Auth.Avalon()
     loadPins('videos')
+    updateSubtitle()
     // Get configuration, then load accounts and authorities
     axios.get('/config').then((result) => {
         config = result.data
