@@ -160,6 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
         return true
     }
 
+    document.getElementById('tags').onchange = () => document.getElementById('tags').value = document.getElementById('tags').value.toLowerCase()
+
     document.getElementById('submitbutton').onclick = () => {
         // Validate data entered
         postparams.postBody = document.getElementById('postBody').value
