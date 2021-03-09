@@ -182,7 +182,7 @@ document.getElementById('proceedPersistAuthBtn').onclick = async () => {
     } catch {
         return handleLoginError('Could not parse persistent login info')
     }
-    await avalonLogin(storedDetails.dtcUser,storedDetails.dtcKey,!storedDetails.hiveUser && !storedDetails.steemUser)
+    await avalonLogin(storedDetails.dtcUser,storedDetails.dtcKey,!storedDetails.hiveUser && !storedDetails.steemUser,true)
     axios.get('/login?network=hive&hivecrypt=1&user='+storedDetails.hiveUser).then((r) => {
         if (r.data.error != null)
             return handleLoginError(r.data.error)
@@ -327,7 +327,7 @@ function keychainCb(encrypted_message,steemUser,dtconly) {
     })
 }
 
-async function avalonLogin(avalonUsername,avalonKey,dtconly) {
+async function avalonLogin(avalonUsername,avalonKey,dtconly,fromPersistence) {
     if (avalonUsername !== '' && avalonKey !== '') {
         let avalonKeyId = false
         try {
@@ -351,6 +351,17 @@ async function avalonLogin(avalonUsername,avalonKey,dtconly) {
                 javalon.decrypt(avalonKey,response.data.encrypted_memo,(e,decryptedAES) => {
                     if (e)
                         return handleLoginError('Avalon decrypt error: ' + e.error)
+                    if (isElectron() && document.getElementById('rememberme').checked && !fromPersistence){
+                        let ptValue = JSON.stringify({
+                            dtcUser: avalonUsername,
+                            dtcKey: avalonKey
+                        })
+                        let psw = document.getElementById('persistPassword').value
+                        if (psw)
+                            storeEncrypted('persistentLogin',ptValue,psw)
+                        else
+                            localStorage.setItem('persistentLogin',ptValue)
+                    }
                     keychainCb(decryptedAES,'',true)
                 })
             }).catch((e) => {
