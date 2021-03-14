@@ -89,7 +89,7 @@
     "fs": "0.0.1-security",
     "get-video-duration": "^3.0.2",
     "hivecrypt": "^1.1.2",
-    "hivesigner": "^3.2.1",
+    "hivesigner": "^3.2.2",
     "http": "0.0.1-security",
     "http-proxy": "^1.18.1",
     "ipfs-http-client": "^48.1.3",
