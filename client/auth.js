@@ -168,22 +168,40 @@ function retrieveDraft() {
     let savedDescription = localStorage.getItem('OneLoveDescription')
     let savedTags = localStorage.getItem('OneLoveTags')
     let savedPostBody = localStorage.getItem('OneLovePostBody')
+    let savedGraphenePermlink = localStorage.getItem('DraftGraphenePermlink')
+    let savedSteemBenefs = localStorage.getItem('DraftSteemBeneficiaries')
+    let savedHiveBenefs = localStorage.getItem('DraftHiveBeneficiaries')
+    let savedPowerUp = localStorage.getItem('DraftPowerUp')
+    let savedSkynetUpload = localStorage.getItem('DraftSkynetUpload')
 
-    if (savedTitle != null) {
+    if (savedTitle)
         document.getElementById('title').value = savedTitle
-    }
-
-    if (savedDescription != null) {
+    if (savedDescription)
         document.getElementById('description').value = savedDescription
-    }
-
-    if (savedTags != null) {
+    if (savedTags)
         document.getElementById('tags').value = savedTags
-    }
-
-    if (savedPostBody != null) {
+    if (savedPostBody)
         document.getElementById('postBody').value = savedPostBody
+    if (savedGraphenePermlink)
+        document.getElementById('customPermlink').value = savedGraphenePermlink
+    if (savedSteemBenefs) {
+        try {
+            let savedSteemBenefsArr = JSON.parse(savedSteemBenefs)
+            for (let b in savedSteemBenefsArr)
+                steemBeneficiaries.addAccount(savedSteemBenefsArr[b].account,savedSteemBenefsArr[b].weight)
+        } catch {}
     }
+    if (savedHiveBenefs) {
+        try {
+            let savedHiveBenefsArr = JSON.parse(savedHiveBenefs)
+            for (let b in savedHiveBenefsArr)
+                hiveBeneficiaries.addAccount(savedHiveBenefsArr[b].account,savedHiveBenefsArr[b].weight)
+        } catch {}
+    }
+    if (savedPowerUp && savedPowerUp === 'true')
+        document.getElementById('powerup').checked = true
+    if (savedSkynetUpload && savedSkynetUpload === 'true')
+        document.getElementById('skynetupload').checked = true
 }
 
 window.Auth = {

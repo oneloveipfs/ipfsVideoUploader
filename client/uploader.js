@@ -404,6 +404,13 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('OneLoveTags',document.getElementById('tags').value)
         localStorage.setItem('OneLovePostBody',document.getElementById('postBody').value)
         localStorage.setItem('OneLoveSubtitles',JSON.stringify(subtitleList))
+        localStorage.setItem('DraftGraphenePermlink',document.getElementById('customPermlink').value)
+        localStorage.setItem('DraftSteemBeneficiaries',JSON.stringify(steemBeneficiaries.accounts))
+        localStorage.setItem('DraftHiveBeneficiaries',JSON.stringify(hiveBeneficiaries.accounts))
+        localStorage.setItem('DraftSteemCommunity',document.getElementById('steemCommunitySelect').value)
+        localStorage.setItem('DraftHiveCommunity',document.getElementById('hiveCommunitySelect').value)
+        localStorage.setItem('DraftPowerUp',document.getElementById('powerup').checked)
+        localStorage.setItem('DraftSkynetUpload',document.getElementById('skynetupload').checked)
         alert('Metadata saved as draft!')
     }
 })
@@ -898,6 +905,13 @@ function clearDraft() {
     localStorage.setItem('OneLoveTags','')
     localStorage.setItem('OneLovePostBody','')
     localStorage.setItem('OneLoveSubtitles','')
+    localStorage.setItem('DraftGraphenePermlink','')
+    localStorage.setItem('DraftSteemBeneficiaries','[]')
+    localStorage.setItem('DraftHiveBeneficiaries','[]')
+    localStorage.setItem('DraftSteemCommunity','')
+    localStorage.setItem('DraftHiveCommunity','')
+    localStorage.setItem('DraftPowerUp','false')
+    localStorage.setItem('DraftSkynetUpload','false')
 }
 
 function estimatedBandwidth() {
@@ -985,4 +999,7 @@ async function getCommunitySubs(acc,network) {
         newoption.value = communities.data.result[i][0]
         selection.appendChild(newoption)
     }
+    let savedCommunity = localStorage.getItem('Draft' + capitalizeFirstLetter(network) + 'Community')
+    if (savedCommunity)
+        document.getElementById(network+'CommunitySelect').value = savedCommunity
 }
