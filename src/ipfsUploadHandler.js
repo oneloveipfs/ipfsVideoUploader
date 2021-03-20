@@ -310,7 +310,12 @@ let uploadOps = {
     },
     IPSync: {
         init: (server) => {
-            SocketIO = Socket(server)
+            SocketIO = Socket(server, {
+                cors: {
+                    origin: '*',
+                    methods: ['GET','POST']
+                }
+            })
             ipsync = SocketIO.of('/ipsync')
 
             ipsync.on('connection',(socket) => {
