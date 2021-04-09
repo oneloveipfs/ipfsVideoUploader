@@ -273,14 +273,9 @@ async function avalonAliasAuth(avalonUsername,avalonKey,cb) {
 }
 
 async function hiveAliasAuth(hiveUsername,hiveKey,cb) {
-    let usehivecrypt = false
     let loginUrl = '/login?noauth=1&network=hive&user='+hiveUsername
-    if (isElectron() || !window.hive_keychain) {
-        loginUrl += '&hivecrypt=1'
-        usehivecrypt = true
-    }
     axios.get(loginUrl).then((r) => {
-        if (usehivecrypt) {
+        if (isElectron()) {
             let token
             try {
                 token = hivecrypt.decode(hiveKey,r.data.encrypted_memo).substr(1)

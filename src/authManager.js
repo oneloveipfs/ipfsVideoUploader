@@ -1,4 +1,4 @@
-const Hive = require('@hiveio/hive-js')
+const axios = require('axios')
 const Hivecrypt = require('hivecrypt')
 const Avalon = require('javalon')
 const HiveSigner = require('hivesigner')
@@ -9,10 +9,6 @@ const { EOL } = require('os')
 const Config = require('./config')
 const Shawp = require('./shawp')
 const dir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
-
-Hive.api.setOptions({ url: Config.Shawp.HiveAPI || 'https://hived.techcoderx.com', useAppbaseApi: true })
-Hive.config.set('uri', Config.Shawp.HiveAPI || 'https://hived.techcoderx.com')
-Hive.config.set('alternative_api_endpoints', [])
 
 // If whitelist file doesn't exist create it
 if (!fs.existsSync(dir+'/whitelist.txt'))
@@ -38,8 +34,8 @@ let auth = {
     keygen: () => {
         return {
             wifMessage: Hivecrypt.randomWif(),
-            AESKey: Hive.formatter.createSuggestedPassword(),
-            JWTKey: Hive.formatter.createSuggestedPassword(),
+            AESKey: Hivecrypt.randomWif().substr(3,32),
+            JWTKey: Hivecrypt.randomWif().substr(3,32),
             avalonKeypair: Avalon.keypair()
         }
     },
@@ -54,7 +50,7 @@ let auth = {
             })
         })
     },
-    generateEncryptedMemo: (username,cb,hc) => {
+    generateEncryptedMemo: (username,cb) => {
         // Generate encrypted text to be decrypted by Keychain or posting key on client
         let message = username + ':oneloveipfs_login:hive'
         if (auth.isInWhitelist(username,null))
@@ -62,17 +58,21 @@ let auth = {
         else if (auth.isInWhitelist(username,'dtc'))
             message = username + ':oneloveipfs_login:dtc'
         let encrypted_message = Crypto.AES.encrypt(message,Keys.AESKey).toString()
-        Hive.api.getAccounts([username],(err,res) => {
-            if (err) return cb(err)
-            let pack = hc == '1' ? Hivecrypt : Hive.memo
+        axios.post(Config.Shawp.HiveAPI || 'https://hived.techcoderx.com',{
+            id: 1,
+            jsonrpc: '2.0',
+            method: 'condenser_api.get_accounts',
+            params: [[username]]
+        }).then(res => {
             let encrypted_memo
             try {
-                encrypted_memo = pack.encode(Keys.wifMessage,res[0].posting.key_auths[0][0],'#' + encrypted_message)
-            } catch {
+                encrypted_memo = Hivecrypt.encode(Keys.wifMessage,res.data.result[0].posting.key_auths[0][0],'#' + encrypted_message)
+            } catch (e) {
+                console.log(e)
                 return cb('Failed to generate memo to decode')
             }
             cb(null,encrypted_memo)
-        })
+        }).catch(e => cb(e))
     },
     generateEncryptedMemoAvalon: async (username,keyid,cb) => {
         if (keyid && keyid.length > 25) return cb({error: 'Invalid custom key identifier'})
@@ -185,8 +185,31 @@ let auth = {
             cb(false)
         else cb(decrypted)
     },
-    invalidHiveUsername: (username) => {
-        return Hive.utils.validateAccountName(username)
+    invalidHiveUsername: (value) => {
+        let suffix = "Hive username must "
+        if (!value)
+            return suffix + "not be empty."
+        let length = value.length
+        if (length < 3 || length > 16)
+            return suffix + "be between 3 and 16 characters."
+        if (/\./.test(value))
+            suffix = "Each account segment much "
+        let ref = value.split(".")
+        let label
+        for (let i = 0, len = ref.length; i < len; i++) {
+            label = ref[i]
+            if (!/^[a-z]/.test(label))
+                return suffix + "start with a letter."
+            if (!/^[a-z0-9-]*$/.test(label))
+                return suffix + "have only letters, digits, or dashes."
+            if (/--/.test(label))
+                return suffix + "have only one dash in a row."
+            if (!/[a-z0-9]$/.test(label))
+                return suffix + "end with a letter or digit."
+            if (!(label.length >= 3))
+                return suffix + "be longer"
+        }
+        return null
     },
     isInWhitelist: (username,network) => {
         if (!network && whitelist.includes(username))

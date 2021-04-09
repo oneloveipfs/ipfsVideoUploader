@@ -2,16 +2,11 @@ const Config = require('./config')
 const db = require('./dbManager')
 const AvalonStreamer = require('./avalonStreamer')
 const GrapheneStreamer = require('./grapheneStreamer')
-const hive = require('@hiveio/hive-js')
 const coinbase = require('coinbase-commerce-node')
 const fs = require('fs')
 const axios = require('axios')
 const Scheduler = require('node-schedule')
 const dbDir = (process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs') + '/db'
-  
-hive.api.setOptions({url: Config.Shawp.HiveAPI, useAppbaseApi: true })
-hive.config.set('uri', Config.Shawp.HiveAPI)
-hive.config.set('alternative_api_endpoints', [])
 
 db.setupDb('shawpUsers')
 db.setupDb('shawpRefills')
@@ -138,10 +133,10 @@ let Shawp = {
         if (memo !== '' && !memo.startsWith('to: @') && !memo.startsWith('to: hive@') && !memo.startsWith('to: dtc@')) return [] // Memo must be empty or begin with "to: @" or "to: network@"
         if (memo && memo.startsWith('to: @')) {
             let otheruser = memo.replace('to: @','')
-            if (hive.utils.validateAccountName(otheruser) == null && db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
+            if (require('./authManager').invalidHiveUsername(otheruser) == null && db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
         } else if (memo && memo.startsWith('to: hive@')) {
             let otheruser = memo.replace('to: hive@','')
-            if (hive.utils.validateAccountName(otheruser) == null) receiver = otheruser
+            if (require('./authManager').invalidHiveUsername(otheruser) == null) receiver = otheruser
             network = 'hive'
         } else if (memo && memo.startsWith('to: dtc@')) {
             let otheruser = memo.replace('to: dtc@','')
