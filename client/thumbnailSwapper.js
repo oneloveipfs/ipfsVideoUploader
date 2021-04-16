@@ -32,6 +32,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('getHelpModeBtn').onclick = () => updateDisplayByIDs(['getHelp'],pages)
     document.getElementById('settingsModeBtn').onclick = () => updateDisplayByIDs(['settings'],pages)
 
+    window.onclick = (event) => closeMenu(event)
+    window.ontouchstart = (event) => closeMenu(event)
+    
+    function closeMenu(event) {
+        let targets = ['modeBtn','headerMenu','dropdownArrow']
+        if (!targets.includes(event.target.id))
+            document.getElementById('dropdownbox').style.display = 'none'
+    }
+
     document.getElementById('linkSubmitBtn').onclick = () => {
         let linkInput = document.getElementById('thumbnailSwapLink')
         if (!linkInput.value.startsWith('https://d.tube/#!/v/') && !linkInput.value.startsWith('https://d.tube/v/'))
