@@ -108,3 +108,5 @@ patch:
         patched: '2020-12-13T05:07:23.768Z'
     - snyk > snyk-python-plugin > snyk-poetry-lockfile-parser > @snyk/cli-interface > @snyk/dep-graph > graphlib > lodash:
         patched: '2020-12-13T05:07:23.768Z'
+    - snyk > snyk-nodejs-lockfile-parser > @yarnpkg/core > lodash:
+        patched: '2021-04-16T01:55:23.971Z'
