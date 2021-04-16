@@ -79,11 +79,12 @@ let config;
 
 document.addEventListener('DOMContentLoaded', () => {
     Auth.Avalon()
-    loadPins('videos')
     updateSubtitle()
     // Get configuration, then load accounts and authorities
     axios.get('/config').then((result) => {
         config = result.data
+
+        loadPins('videos')
 
         if (config.disabled) {
             document.getElementById('disabledText').innerText = config.disabledMessage
