@@ -99,8 +99,10 @@ document.addEventListener('DOMContentLoaded', () => {
             javalon.getAccount(avalonUser,(err,acc) => {
                 if (err) return
                 document.getElementById('dtcBurnInput').placeholder = 'Available: ' + thousandSeperator(acc.balance / 100) + ' DTC'
+                document.getElementById('avalonvwlabel').innerText = 'Avalon vote weight: 1% (~' + thousandSeperator(Math.floor(0.01 * javalon.votingPower(acc))) + ' VP)'
                 window.availableForBurn = acc.balance / 100
                 window.availableAvalonBw = acc.bw
+                window.availableAvalonVP = acc.vt
                 loadAvalonAuthorityStatus(acc)
             })
         }
@@ -256,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('avalonvw').oninput = () => {
         let avalonVW = document.getElementById('avalonvw').value
-        document.getElementById('avalonvwlabel').innerText = 'Avalon vote weight: ' + avalonVW + '%'
+        document.getElementById('avalonvwlabel').innerText = 'Avalon vote weight: ' + avalonVW + '% (~' + thousandSeperator(Math.floor(avalonVW/100 * javalon.votingPower({vt: window.availableAvalonVP, balance: window.availableForBurn * 100}))) + ' VP)'
         if (avalonVW > 30)
             document.getElementById('avalonhighvwalert').style.display = 'block'
         else
