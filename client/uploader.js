@@ -105,6 +105,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.availableAvalonVP = acc.vt
                 loadAvalonAuthorityStatus(acc)
             })
+            if (dtconly === 'true') {
+                document.getElementById('tagLbl').innerText = 'Tag:'
+                document.getElementById('tagInfo1').style.display = 'none'
+            }
         }
 
         if (steemUser) steem.api.getAccounts([steemUser],(e,acc) => {
