@@ -231,7 +231,7 @@ document.getElementById('getPaymentBtns').onclick = () => {
         if (selectedNetwork === 'all' && !receipient)
             memo = ''
 
-        document.getElementById('xferMemo').innerHTML = memo !== '' ? 'Memo: <u>' + memo + '</u>' : 'No memo required'
+        document.getElementById('xferMemo').innerHTML = memo !== '' ? 'Memo: <u>' + memo + '</u> <a onclick="copyToClipboard(\''+ memo + '\',\'copymemo\')"><i class="fas fa-clipboard tooltip" id="copybtn"><span class="tooltiptext" id="copymemo">Click to copy</span></i></a>' : 'No memo required'
 
         switch (paymentMethod) {
             case 'DTC':
@@ -481,4 +481,15 @@ function updateRememberMeState() {
         updateDisplayByIDs(['persistPassword'],[])
     else
         updateDisplayByIDs([],['persistPassword'])
+}
+
+function copyToClipboard(value,tooltiptextcontainer) {
+    let fakeInput = document.createElement("input")
+    fakeInput.value = value
+    document.body.appendChild(fakeInput)
+    fakeInput.select()
+    document.execCommand("copy")
+    document.body.removeChild(fakeInput)
+    if (tooltiptextcontainer)
+        document.getElementById(tooltiptextcontainer).innerText = 'Copied to clipboard'
 }
