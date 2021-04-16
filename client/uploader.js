@@ -673,7 +673,7 @@ function buildJsonMetadata(network) {
     let jsonMeta = {
         video: buildJsonMetadataAvalon(),
         tags: SteemTags,
-        app: 'onelovedtube/2.0.2',
+        app: 'onelovedtube/2.1',
     }
 
     let ref = []
