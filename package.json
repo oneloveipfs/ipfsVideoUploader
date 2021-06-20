@@ -86,7 +86,7 @@
     "express": "^4.17.1",
     "form-data": "^3.0.0",
     "fs": "0.0.1-security",
-    "get-video-duration": "^3.0.2",
+    "get-video-duration": "^3.1.0",
     "hivecrypt": "^2.0.1",
     "hivesigner": "^3.2.1",
     "http": "0.0.1-security",
