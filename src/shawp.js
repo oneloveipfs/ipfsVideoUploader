@@ -101,7 +101,7 @@ let Shawp = {
 
         if (Config.Shawp.DtcReceiver) {
             let dtcStream = new AvalonStreamer(Config.Shawp.AvalonAPI,true)
-            dtcStream.streamBlocks((newBlock) => {
+            dtcStream.streamBlocks(process.env.SHAWP_AVALON_START, (newBlock) => {
                 for (let txn in newBlock.txs)
                     if (newBlock.txs[txn].type === 3 && newBlock.txs[txn].data.receiver === Config.Shawp.DtcReceiver) {
                         let tx = newBlock.txs[txn]
