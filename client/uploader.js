@@ -48,7 +48,11 @@ axios.get('/proxy_server').then((r) => {
         if (r.error) return console.log('uplStat Error', r.error)
         switch (r.type) {
             case 'videos':
+                let existingDuration = postparams.duration
                 postparams = Object.assign(postparams,r)
+                // use duration from fake player if possible
+                if (existingDuration && typeof existingDuration === 'number')
+                    postparams.duration = existingDuration
                 break
             case 'video240':
                 postparams.ipfs240hash = r.hash
