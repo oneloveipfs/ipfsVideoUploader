@@ -18,6 +18,7 @@ let ConsumeHistory = JSON.parse(fs.readFileSync(dbDir+'/shawpConsumes.json'))
 
 let hiveStreamer = new GrapheneStreamer(Config.Shawp.HiveAPI || 'https://techcoderx.com',true)
 let steemStreamer = new GrapheneStreamer(Config.Shawp.SteemAPI || 'https://api.steemit.com',true)
+let avalonStreamer = new AvalonStreamer(Config.Shawp.AvalonAPI,true)
 
 let coinbaseClient = coinbase.Client
 let coinbaseCharge = coinbase.resources.Charge
@@ -31,92 +32,22 @@ let Shawp = {
         if (!Config.Shawp.Enabled) return
         if (Config.Shawp.HiveReceiver) hiveStreamer.streamTransactions((tx) => {
             let transaction = tx
-            if (transaction && transaction.operations && transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.HiveReceiver) {
-                let tx = transaction.operations[0][1]
-                console.log(tx,transaction.transaction_id)
-                if (tx.amount.endsWith('HIVE')) {
-                    let amt = parseFloat(tx.amount.replace(' HIVE',''))
-                    Shawp.ExchangeRate(Shawp.coins.Hive,amt,(e,usd) => {
-                        if (e) return console.log(e)
-                        let receiver = tx.from
-                        let memo = tx.memo.toLowerCase().trim()
-                        let parsedDetails = Shawp.ValidatePayment(receiver,memo)
-                        if (parsedDetails.length !== 2) return
-                        Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Hive,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
-                        Shawp.WriteRefillHistory()
-                        Shawp.WriteUserDB()
-                        console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
-                    })
-                } else if (tx.amount.endsWith('HBD')) {
-                    let amt = parseFloat(tx.amount.replace(' HBD',''))
-                    Shawp.ExchangeRate(Shawp.coins.HiveDollars,amt,(e,usd) => {
-                        if (e) return console.log(e)
-                        let receiver = tx.from
-                        let memo = tx.memo.toLowerCase().trim()
-                        let parsedDetails = Shawp.ValidatePayment(receiver,memo)
-                        if (parsedDetails.length !== 2) return
-                        Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Hive,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
-                        Shawp.WriteRefillHistory()
-                        Shawp.WriteUserDB()
-                        console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
-                    })
-                }
-            }
+            if (transaction && transaction.operations && transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.HiveReceiver)
+                Shawp.ProcessHiveTx(transaction.operations[0][1],transaction.transaction_id)
         })
         
         if (Config.Shawp.SteemReceiver) steemStreamer.streamTransactions((tx) => {
             let transaction = tx
-            if (transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.SteemReceiver) {
-                let tx = transaction.operations[0][1]
-                console.log(tx,transaction.transaction_id)
-                if (tx.amount.endsWith('STEEM')) {
-                    let amt = parseFloat(tx.amount.replace(' STEEM',''))
-                    Shawp.ExchangeRate(Shawp.coins.Steem,amt,(e,usd) => {
-                        if (e) return console.log(e)
-                        let receiver = tx.from
-                        let memo = tx.memo.toLowerCase().trim()
-                        let parsedDetails = Shawp.ValidatePayment(receiver,memo)
-                        if (parsedDetails.length !== 2) return
-                        Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Steem,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
-                        Shawp.WriteRefillHistory()
-                        Shawp.WriteUserDB()
-                        console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
-                    })
-                } else if (tx.amount.endsWith('SBD')) {
-                    let amt = parseFloat(tx.amount.replace(' SBD',''))
-                    Shawp.ExchangeRate(Shawp.coins.SteemDollars,amt,(e,usd) => {
-                        if (e) return console.log(e)
-                        let receiver = tx.from
-                        let memo = tx.memo.toLowerCase().trim()
-                        let parsedDetails = Shawp.ValidatePayment(receiver,memo)
-                        if (parsedDetails.length !== 2) return
-                        Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Steem,transaction.transaction_id,new Date().getTime(),tx.amount,usd)
-                        Shawp.WriteRefillHistory()
-                        Shawp.WriteUserDB()
-                        console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
-                    })
-                }
-            }
+            if (transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.SteemReceiver)
+                Shawp.ProcessSteemTx(transaction.operations[0][1],transaction.transaction_id)
         })
 
         if (Config.Shawp.DtcReceiver) {
-            let dtcStream = new AvalonStreamer(Config.Shawp.AvalonAPI,true)
-            dtcStream.streamBlocks(process.env.SHAWP_AVALON_START, (newBlock) => {
+            avalonStreamer.streamBlocks((newBlock) => {
                 for (let txn in newBlock.txs)
                     if (newBlock.txs[txn].type === 3 && newBlock.txs[txn].data.receiver === Config.Shawp.DtcReceiver) {
                         let tx = newBlock.txs[txn]
-                        let amt = tx.data.amount / 100
-                        console.log(tx)
-                        Shawp.ExchangeRate(Shawp.coins.DTC,amt,(e,usd) => {
-                            let receiver = tx.sender
-                            let memo = tx.data.memo.toLowerCase().trim()
-                            let parsedDetails = Shawp.ValidatePayment(receiver,memo)
-                            if (parsedDetails.length !== 2) return
-                            Shawp.Refill(tx.sender,parsedDetails[0],parsedDetails[1],Shawp.methods.DTC,tx.hash,tx.ts,amt+' DTC',usd)
-                            Shawp.WriteRefillHistory()
-                            Shawp.WriteUserDB()
-                            console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
-                        })
+                        Shawp.ProcessAvalonTx(tx)
                     }
             })
         }
@@ -127,6 +58,132 @@ let Shawp = {
             Shawp.WriteUserDB()
             console.log('Daily consumption completed successfully')
         })
+    },
+    FetchTx: (id,network,cb) => {
+        switch (network) {
+            case Shawp.methods.DTC:
+                axios.get(Config.Shawp.AvalonAPI+'/tx/'+id).then(d => cb(null,d.data)).catch(e => cb(e))
+                break
+            case Shawp.methods.Hive:
+                axios.post(Config.Shawp.HiveAPI,{
+                    id: 1,
+                    jsonrpc: '2.0',
+                    method: 'account_history_api.get_transaction',
+                    params: {
+                        id: id,
+                        include_reversible: false
+                    }
+                }).then(d => {
+                    if (d.data.error)
+                        cb(d.data.error.message)
+                    else
+                        cb(null,d.data.result)
+                })
+                break
+            case Shawp.methods.Steem:
+                axios.post(Config.Shawp.SteemAPI,{
+                    id: 1,
+                    jsonrpc: '2.0',
+                    method: 'account_history_api.get_transaction',
+                    params: {
+                        id: id,
+                        include_reversible: false
+                    }
+                }).then(d => {
+                    if (d.data.error)
+                        cb(d.data.error.message)
+                    else
+                        cb(null,d.data.result)
+                })
+                break
+            default:
+                cb('Invalid network')
+                break
+        }
+    },
+    ProcessAvalonTx: (tx) => {
+        console.log(tx)
+        let amt = tx.data.amount / 100
+        Shawp.ExchangeRate(Shawp.coins.DTC,amt,(e,usd) => {
+            let receiver = tx.sender
+            let memo = tx.data.memo.toLowerCase().trim()
+            let parsedDetails = Shawp.ValidatePayment(receiver,memo)
+            if (parsedDetails.length !== 2) return
+            Shawp.Refill(tx.sender,parsedDetails[0],parsedDetails[1],Shawp.methods.DTC,tx.hash,tx.ts,amt+' DTC',usd)
+            Shawp.WriteRefillHistory()
+            Shawp.WriteUserDB()
+            console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
+        })
+    },
+    ProcessHiveTx: (tx,txid) => {
+        console.log(tx,txid)
+        if (typeof tx.amount === 'object')
+            tx.amount = Shawp.NaiToString(tx.amount)
+        if (tx.amount.endsWith('HIVE')) {
+            let amt = parseFloat(tx.amount.replace(' HIVE',''))
+            Shawp.ExchangeRate(Shawp.coins.Hive,amt,(e,usd) => {
+                if (e) return console.log(e)
+                let receiver = tx.from
+                let memo = tx.memo.toLowerCase().trim()
+                let parsedDetails = Shawp.ValidatePayment(receiver,memo)
+                if (parsedDetails.length !== 2) return
+                Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Hive,txid,new Date().getTime(),tx.amount,usd)
+                Shawp.WriteRefillHistory()
+                Shawp.WriteUserDB()
+                console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
+            })
+        } else if (tx.amount.endsWith('HBD')) {
+            let amt = parseFloat(tx.amount.replace(' HBD',''))
+            Shawp.ExchangeRate(Shawp.coins.HiveDollars,amt,(e,usd) => {
+                if (e) return console.log(e)
+                let receiver = tx.from
+                let memo = tx.memo.toLowerCase().trim()
+                let parsedDetails = Shawp.ValidatePayment(receiver,memo)
+                if (parsedDetails.length !== 2) return
+                Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Hive,txid,new Date().getTime(),tx.amount,usd)
+                Shawp.WriteRefillHistory()
+                Shawp.WriteUserDB()
+                console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
+            })
+        }
+    },
+    ProcessSteemTx: (tx,txid) => {
+        console.log(tx,txid)
+        if (tx.amount.endsWith('STEEM')) {
+            let amt = parseFloat(tx.amount.replace(' STEEM',''))
+            Shawp.ExchangeRate(Shawp.coins.Steem,amt,(e,usd) => {
+                if (e) return console.log(e)
+                let receiver = tx.from
+                let memo = tx.memo.toLowerCase().trim()
+                let parsedDetails = Shawp.ValidatePayment(receiver,memo)
+                if (parsedDetails.length !== 2) return
+                Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Steem,txid,new Date().getTime(),tx.amount,usd)
+                Shawp.WriteRefillHistory()
+                Shawp.WriteUserDB()
+                console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
+            })
+        } else if (tx.amount.endsWith('SBD')) {
+            let amt = parseFloat(tx.amount.replace(' SBD',''))
+            Shawp.ExchangeRate(Shawp.coins.SteemDollars,amt,(e,usd) => {
+                if (e) return console.log(e)
+                let receiver = tx.from
+                let memo = tx.memo.toLowerCase().trim()
+                let parsedDetails = Shawp.ValidatePayment(receiver,memo)
+                if (parsedDetails.length !== 2) return
+                Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Steem,txid,new Date().getTime(),tx.amount,usd)
+                Shawp.WriteRefillHistory()
+                Shawp.WriteUserDB()
+                console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
+            })
+        }
+    },
+    NaiToString: (nai) => {
+        let result = (parseInt(nai.amount) / Math.pow(10,nai.precision)).toString() + ' '
+        if (nai.nai === '@@000000021')
+            result += 'HIVE'
+        else if (nai.nai === '@@000000013')
+            result += 'HBD'
+        return result
     },
     ValidatePayment: (receiver,memo) => {
         let network = 'all'
@@ -340,7 +397,10 @@ let Shawp = {
         Referral: 4, // not sure
         System: 5,
         Coinbase: 6
-    }
+    },
+    steemStreamer,
+    hiveStreamer,
+    avalonStreamer
 }
 
 module.exports = Shawp

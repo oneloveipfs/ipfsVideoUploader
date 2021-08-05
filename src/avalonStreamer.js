@@ -9,11 +9,7 @@ module.exports = class {
         this.irreversible = irreversible ? true : false
     }
 
-    streamBlocks (startBlock = null, cb = () => {}) {
-        // specify start block if needed
-        if (startBlock)
-            this.headBlock = startBlock
-
+    streamBlocks (cb = () => {}) {
         // Stream blocks
         setInterval(() => {
             axios.get(this.api + '/count').then((bHeight) => {
