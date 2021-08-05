@@ -308,6 +308,7 @@ app.get('/shawp_refill_admin',(req,res) => {
                 default:
                     break
             }
+            return res.send({success: true})
         })
     })
 })
