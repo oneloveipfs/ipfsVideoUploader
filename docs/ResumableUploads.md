@@ -33,6 +33,21 @@ tusd -upload-dir /dir/to/upload/destination -hooks-http http://localhost:3000/up
 ```
 Replace `/dir/to/upload/destination` with the full path to folder for upload storage, and adjust `http://localhost:3000` accordingly depending on your `config.json` file.
 
+## Hostnames
+
+In production environment, tus upload protocol requires configuring the hostname of the server to be the `tusd` endpoint domain, such as `tusd.oneloved.tube`. To do this, run the following:
+
+```
+sudo hostnamectl set-hostname tusd.yourdomain.com
+```
+
+It is often required to update the configuration files manually. Open the following files and replace the hostnames accordingly:
+
+1. `/etc/hostname`
+2. `/etc/hosts`
+
+Then reboot your server.
+
 ## Usage
 
 Depending on your client platform, you may find different implementations for tus resumable upload protocol [here](https://tus.io/implementations.html), and Socket IO [here](https://socket.io/docs).
