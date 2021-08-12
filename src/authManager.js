@@ -58,7 +58,7 @@ let auth = {
         else if (auth.isInWhitelist(username,'dtc'))
             message = username + ':oneloveipfs_login:dtc'
         let encrypted_message = Crypto.AES.encrypt(message,Keys.AESKey).toString()
-        axios.post(Config.Shawp.HiveAPI || 'https://hived.techcoderx.com',{
+        axios.post(Config.Shawp.HiveAPI || 'https://techcoderx.com',{
             id: 1,
             jsonrpc: '2.0',
             method: 'condenser_api.get_accounts',

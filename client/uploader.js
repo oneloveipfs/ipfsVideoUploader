@@ -5,7 +5,7 @@ Auth.Hive().then((result) => {
 })
 
 let hiveOptions = {
-    url: 'https://hived.techcoderx.com',
+    url: 'https://techcoderx.com',
     useAppbaseApi: true,
     rebranded_api: true,
 }

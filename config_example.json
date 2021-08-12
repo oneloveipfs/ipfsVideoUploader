@@ -48,7 +48,7 @@
         "Enabled": false,
         "DefaultUSDRate": 0.0029,
         "AvalonAPI": "https://avalon.oneloved.tube",
-        "HiveAPI": "https://hived.techcoderx.com",
+        "HiveAPI": "https://techcoderx.com",
         "SteemAPI": "https://api.steemit.com",
         "DtcReceiver": "onelovedtube",
         "HiveReceiver": "onelovedtube",
