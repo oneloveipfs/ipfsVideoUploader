@@ -138,7 +138,7 @@ app.post('/uploadSubtitle',async (request,response) => {
 
 app.post('/uploadStream',async (request,response) => {
     if (Config.enforceIPFSOnline && await FileUploader.isIPFSOnline() === false) return response.status(503).send({error: 'IPFS daemon is offline'})
-    Authenticate(request,response,true,(user,network) => FileUploader.uploadStreamChunk(user,network,request,response))
+    Authenticate(request,response,true,(user,network) => FileUploader.uploadStream(user,network,request,response))
 })
 
 app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(request,response) => {

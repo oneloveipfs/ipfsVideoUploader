@@ -26,7 +26,7 @@ let uploadRegister = JSON.parse(fs.readFileSync(defaultDir+'/db/register.json','
 let socketRegister = {}
 
 const ipfsAPI = IPFS({ host: 'localhost', port: Config.IPFS_API_PORT, protocol: 'http' })
-const streamUpload = Multer({ dest: defaultDir, limits: { fileSize: 52428800 } }) // 50MB chunks
+const streamUpload = Multer({ dest: defaultDir, limits: { fileSize: 52428800 } }) // 50MB segments
 const imgUpload = Multer({ dest: defaultDir, limits: { fileSize: 7340032 } })
 const { globSource } = IPFS
 
@@ -183,13 +183,13 @@ let uploadOps = {
             break
         }
     },
-    uploadStreamChunk: (username,network,request,response) => {
+    uploadStream: (username,network,request,response) => {
         // video/mp2t
-        streamUpload.single('chunk')(request,response,(err) => {
+        streamUpload.single('segment')(request,response,(err) => {
             if (err) return response.status(400).send({error: err})
             if (!request.body.streamId) return response.status(400).send({error: 'Missing streamId'})
-            let chunkDir = request.file.path
-            addFile(chunkDir,true,false,(size,hash) => {
+            let segmentDir = request.file.path
+            addFile(segmentDir,true,false,(size,hash) => {
                 // We will finalize total stream size after livestream ends,
                 // for now it does not count towards disk usage. Alive streams
                 // record as network/streamer/link so that the full list of
@@ -205,7 +205,7 @@ let uploadOps = {
                     hash: hash
                 }
                 response.status(200).send(result)
-                if (Config.deleteUploadsAfterAdd) fs.unlink(chunkDir,()=>{})
+                if (Config.deleteUploadsAfterAdd) fs.unlink(segmentDir,()=>{})
             })
         })
     },

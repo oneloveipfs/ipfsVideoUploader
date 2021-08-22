@@ -100,14 +100,14 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 }
 ```
 
-#### To upload a HLS stream chunk:
+#### To upload a HLS stream segment:
 ```
 /uploadStream?access_token=AUTH_TOKEN
 ```
 * `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
 * `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 * Content type: multipart/form-data
-* File input: `chunk`
+* File input: `segment`
 * Additional field:
     - `streamId`: ID of on-chain Alive stream in the format of `network/streamer/link`.
 * Output data example:
