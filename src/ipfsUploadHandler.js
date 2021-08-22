@@ -209,6 +209,26 @@ let uploadOps = {
             })
         })
     },
+    uploadChunk: (username,network,request,response) => {
+        let chunkBuf = Buffer.from(request.body,'utf8')
+        let ipfsAddBufOp = ipfsAPI.add(chunkBuf)
+
+        for await (const chk of ipfsAddBufOp) {
+            db.recordHash(username,network,'chunks',chk.cid.toString(),chk.size)
+            db.writeHashesData()
+            db.writeHashSizesData()
+
+            let result = {
+                username: username,
+                network: network,
+                type: 'chunks',
+                hash: chk.cid.toString()
+            }
+            response.send(result)
+            ipsync.emit('upload',result)
+            break
+        }
+    },
     handleTusUpload: (json,user,network,callback) => {
         let filepath = json.Upload.Storage.Path
         switch (json.Upload.MetaData.type) {
