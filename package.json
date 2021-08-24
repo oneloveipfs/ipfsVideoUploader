@@ -13,7 +13,7 @@
     "start": "node src/index.js",
     "v2migration": "node scripts/v2Migration.js",
     "test": "mocha --timeout 5000",
-    "snyk-protect": "snyk protect",
+    "snyk-protect": "snyk-protect",
     "prepare": "npm run snyk-protect",
     "devapp": "electron src/electronApp.js",
     "prepapp": "node scripts/electronPrep.js",
@@ -99,8 +99,8 @@
     "node-schedule": "^2.0.0",
     "node-webvtt": "^1.9.1",
     "shelljs": "^0.8.4",
-    "snyk": "^1.667.0",
-    "socket.io": "^4.0.0"
+    "socket.io": "^4.0.0",
+    "@snyk/protect": "latest"
   },
   "devDependencies": {
     "chai": "^4.2.0",
