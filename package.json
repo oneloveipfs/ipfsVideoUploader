@@ -1,7 +1,7 @@
 {
   "name": "ipfsvideouploader",
   "productName": "OneLoveIPFS",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Alternative IPFS uploader for DTube videos.",
   "homepage": "https://uploader.oneloved.tube",
   "repository": {
@@ -104,8 +104,8 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "electron": "^11.0.2",
-    "electron-builder": "^22.9.1",
+    "electron": "^15.1.1",
+    "electron-builder": "^22.11.7",
     "electron-packager": "^15.2.0",
     "mocha": "^7.1.2"
   },

@@ -209,7 +209,7 @@ let uploadOps = {
             })
         })
     },
-    uploadChunk: (username,network,request,response) => {
+    uploadChunk: async (username,network,request,response) => {
         let chunkBuf = Buffer.from(request.body,'utf8')
         let ipfsAddBufOp = ipfsAPI.add(chunkBuf)
 
