@@ -9,10 +9,11 @@
 sudo apt-get update
 sudo apt-get install curl git wget nodejs npm ffmpeg imagemagick bc
 
-# NVM to use Node v14
+# NVM to use Node v16
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
-nvm install 14
-npm use 14
+source ~/.bashrc
+nvm install 16
+nvm use 16
 
 # go-ipfs (skip this if using IPFS desktop)
 # Get the latest version at https://dist.ipfs.io
@@ -37,7 +38,7 @@ xcode-select --install
 brew install git wget nodejs npm nvm ffmpeg imagemagick bc
 
 # Use Node v14 with NVM
-npm install 14
+nvm install 14
 nvm use 14
 
 # go-ipfs (skip this if using IPFS desktop)
