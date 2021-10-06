@@ -2,6 +2,7 @@ const axios = require('axios')
 const { app, shell, ipcMain, dialog, BrowserWindow, Notification, Menu } = require('electron')
 const aboutWindow = require('about-window').default
 const config = require('./config')
+const package = require('../package.json')
 const isMac = process.platform === 'darwin'
 const REMOTE_APP = 0
 const BUILD_STR = config.Build.number.toString() + (REMOTE_APP === 1 ? 'R' : '')
@@ -49,6 +50,10 @@ const getIcon = () => {
 }
 
 const openAboutWindow = () => aboutWindow({
+    product_name: package.productName,
+    description: package.description,
+    license: package.license,
+    use_version_info: true,
     icon_path: 'file://'+__dirname+'/../public/macos_icon.png',
     copyright: 'Copyright (C) 2021 TechCoderX. Build: ' + BUILD_STR
 })
