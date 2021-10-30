@@ -32,24 +32,6 @@ describe('Shawp',() => {
         })
     })
 
-    it('Shawp.ExchangeRate should return USD price of STEEM',(done) => {
-        let isdone = false
-        Shawp.ExchangeRate(Shawp.coins.Steem,1,(e,r) => {
-            if (r) assert.typeOf(r,'number')
-            if (!isdone) done()
-            isdone = true
-        })
-    })
-
-    it('Shawp.ExchangeRate should return USD price of SBD',(done) => {
-        let isdone = false
-        Shawp.ExchangeRate(Shawp.coins.SteemDollars,1,(e,r) => {
-            if (r) assert.typeOf(r,'number')
-            if (!isdone) done()
-            isdone = true
-        })
-    })
-
     it('Shawp.ValidatePayment should parse memos attached to payments correctly',(done) => {
         assert.equal(Shawp.ValidatePayment(Config.test.user,'a').length,0)
         assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'')),'["techcoderx","all"]')

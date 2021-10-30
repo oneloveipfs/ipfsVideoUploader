@@ -49,19 +49,8 @@
         "DefaultUSDRate": 0.0029,
         "AvalonAPI": "https://avalon.oneloved.tube",
         "HiveAPI": "https://techcoderx.com",
-        "SteemAPI": "https://api.steemit.com",
         "DtcReceiver": "onelovedtube",
-        "HiveReceiver": "onelovedtube",
-        "SteemReceiver": "onelovedtube",
-        "Coinbase": false
-    },
-
-    "CoinbaseCommerce": {
-        "APIKey": "",
-        "WebhookSecret": "",
-        "RedirectURL": "https://beta.oneloved.tube/?callback=signupcb",
-        "CancelURL": "https://beta.oneloved.tube/?callback=signupcancel",
-        "ProductName": "OneLoveIPFS hosting credits"
+        "HiveReceiver": "onelovedtube"
     },
 
     "test": {

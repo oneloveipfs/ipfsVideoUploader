@@ -21,7 +21,7 @@
     "buildapp-windows": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2021 TechCoderX' --asar --platform=win32 --version-string.FileDescription 'OneLoveIPFS Uploader' --version-string.ProductName OneLoveIPFS --icon public/win32_icon.ico",
     "buildapp-linux": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2021 TechCoderX' --asar --platform linux",
     "buildinstaller": "electron-builder",
-    "dep-prune": "npm un async body-parser coinbase-commerce-node crypto-js form-data get-video-duration hivecrypt hivesigner ipfs-http-client javalon jsonwebtoken mime-types multer node-schedule node-webvtt shelljs snyk socket.io"
+    "dep-prune": "npm un async body-parser crypto-js form-data get-video-duration hivecrypt hivesigner ipfs-http-client javalon jsonwebtoken mime-types multer node-schedule node-webvtt shelljs snyk socket.io"
   },
   "build": {
     "appId": "com.oneloveipfs.uploader",
@@ -78,7 +78,6 @@
     "async": "^3.2.0",
     "axios": "^0.21.4",
     "body-parser": "^1.19.0",
-    "coinbase-commerce-node": "^1.0.4",
     "cors": "^2.8.5",
     "crypto-js": "^4.0.0",
     "deepmerge": "^4.2.2",

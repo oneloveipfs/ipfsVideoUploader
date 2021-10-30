@@ -2,7 +2,6 @@ const Config = require('./config')
 const db = require('./dbManager')
 const AvalonStreamer = require('./avalonStreamer')
 const GrapheneStreamer = require('./grapheneStreamer')
-const coinbase = require('coinbase-commerce-node')
 const fs = require('fs')
 const axios = require('axios')
 const Scheduler = require('node-schedule')
@@ -17,14 +16,7 @@ let RefillHistory = JSON.parse(fs.readFileSync(dbDir+'/shawpRefills.json'))
 let ConsumeHistory = JSON.parse(fs.readFileSync(dbDir+'/shawpConsumes.json'))
 
 let hiveStreamer = new GrapheneStreamer(Config.Shawp.HiveAPI || 'https://techcoderx.com',true)
-let steemStreamer = new GrapheneStreamer(Config.Shawp.SteemAPI || 'https://api.steemit.com',true)
 let avalonStreamer = new AvalonStreamer(Config.Shawp.AvalonAPI,true)
-
-let coinbaseClient = coinbase.Client
-let coinbaseCharge = coinbase.resources.Charge
-let coinbaseWebhook = coinbase.Webhook
-if (Config.Shawp.Coinbase)
-    coinbaseClient.init(Config.CoinbaseCommerce.APIKey)
 
 let Shawp = {
     init: () => {
@@ -34,12 +26,6 @@ let Shawp = {
             let transaction = tx
             if (transaction && transaction.operations && transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.HiveReceiver)
                 Shawp.ProcessHiveTx(transaction.operations[0][1],transaction.transaction_id)
-        })
-        
-        if (Config.Shawp.SteemReceiver) steemStreamer.streamTransactions((tx) => {
-            let transaction = tx
-            if (transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.SteemReceiver)
-                Shawp.ProcessSteemTx(transaction.operations[0][1],transaction.transaction_id)
         })
 
         if (Config.Shawp.DtcReceiver) {
@@ -81,21 +67,7 @@ let Shawp = {
                 })
                 break
             case Shawp.methods.Steem:
-                axios.post(Config.Shawp.SteemAPI,{
-                    id: 1,
-                    jsonrpc: '2.0',
-                    method: 'account_history_api.get_transaction',
-                    params: {
-                        id: id,
-                        include_reversible: false
-                    }
-                }).then(d => {
-                    if (d.data.error)
-                        cb(d.data.error.message)
-                    else
-                        cb(null,d.data.result)
-                })
-                break
+                cb('Deprecated')
             default:
                 cb('Invalid network')
                 break
@@ -141,36 +113,6 @@ let Shawp = {
                 let parsedDetails = Shawp.ValidatePayment(receiver,memo)
                 if (parsedDetails.length !== 2) return
                 Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Hive,txid,new Date().getTime(),tx.amount,usd)
-                Shawp.WriteRefillHistory()
-                Shawp.WriteUserDB()
-                console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
-            })
-        }
-    },
-    ProcessSteemTx: (tx,txid) => {
-        console.log(tx,txid)
-        if (tx.amount.endsWith('STEEM')) {
-            let amt = parseFloat(tx.amount.replace(' STEEM',''))
-            Shawp.ExchangeRate(Shawp.coins.Steem,amt,(e,usd) => {
-                if (e) return console.log(e)
-                let receiver = tx.from
-                let memo = tx.memo.toLowerCase().trim()
-                let parsedDetails = Shawp.ValidatePayment(receiver,memo)
-                if (parsedDetails.length !== 2) return
-                Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Steem,txid,new Date().getTime(),tx.amount,usd)
-                Shawp.WriteRefillHistory()
-                Shawp.WriteUserDB()
-                console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
-            })
-        } else if (tx.amount.endsWith('SBD')) {
-            let amt = parseFloat(tx.amount.replace(' SBD',''))
-            Shawp.ExchangeRate(Shawp.coins.SteemDollars,amt,(e,usd) => {
-                if (e) return console.log(e)
-                let receiver = tx.from
-                let memo = tx.memo.toLowerCase().trim()
-                let parsedDetails = Shawp.ValidatePayment(receiver,memo)
-                if (parsedDetails.length !== 2) return
-                Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Steem,txid,new Date().getTime(),tx.amount,usd)
                 Shawp.WriteRefillHistory()
                 Shawp.WriteUserDB()
                 console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
@@ -248,50 +190,14 @@ let Shawp = {
                 coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/hive_dollar?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
                 break
             case 3:
-                coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/steem?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
-                break
             case 4:
-                coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/steem-dollars?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
-                break
+                return cb({ error: 'STEEM/SBD is deprecated' })
             default:
                 return cb({ error: 'invalid coin' })
         }
         axios.get(coingeckoUrl).then((response) => {
             cb(null,response.data.market_data.current_price.usd * amount)
         }).catch((e) => cb(e))
-    },
-    CoinbaseCharge: (username,network,usdAmt,cb,cbUrl,cancelUrl) => {
-        let chargeData = {
-            name: Config.CoinbaseCommerce.ProductName,
-            description: 'Account refill for @' + username,
-            metadata: {
-                customer_username: username,
-                network: network
-            },
-            pricing_type: 'fixed_price',
-            local_price: {
-                amount: usdAmt,
-                currency: 'USD'
-            },
-            redirect_url: cbUrl || Config.CoinbaseCommerce.RedirectURL,
-            cancel_url: cancelUrl || Config.CoinbaseCommerce.CancelURL
-        }
-
-        coinbaseCharge.create(chargeData,(e,response) => {
-            console.log(e,response)
-            if (e)
-                return cb(e)
-            else
-                return cb(null,response)
-        })
-    },
-    CoinbaseWebhookVerify: (request,cb) => {
-        try {
-            coinbaseWebhook.verifySigHeader(request.rawBody,request.headers['x-cc-webhook-signature'],Config.CoinbaseCommerce.WebhookSecret)
-            cb(true)
-        } catch {
-            cb(false)
-        }
     },
     Refill: (from,username,network,method,txid,ts,rawAmt,usdAmt) => {
         let fullusername = db.toFullUsername(username,network,true)
@@ -377,11 +283,12 @@ let Shawp = {
         DTC: 0,
         Hive: 1,
         HiveDollars: 2,
+
+        // Deprecated
         Steem: 3,
         SteemDollars: 4,
 
-        // Coinbase commerce
-        // TODO: Add support for running own node. Not your node, not your rules.
+        // Coinbase commerce, to be replaced with native gateway. Not your node, not your rules.
         BTC: 5,
         ETH: 6,
         LTC: 7,
@@ -392,13 +299,12 @@ let Shawp = {
     methods: {
         DTC: 0,
         Hive: 1,
-        Steem: 2,
+        Steem: 2, // deprecated
         Coupon: 3, // through promo/wc orders
         Referral: 4, // not sure
         System: 5,
-        Coinbase: 6
+        Coinbase: 6 // to be replaced
     },
-    steemStreamer,
     hiveStreamer,
     avalonStreamer
 }

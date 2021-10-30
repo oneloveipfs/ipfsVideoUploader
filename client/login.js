@@ -40,14 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < paymentOptions.length; i++) {
             if ((paymentOptions[i].value == "HIVE" || paymentOptions[i].value == "HBD") && !shawpconfig.HiveReceiver)
                 paymentOptions[i].disabled = true
-            else if ((paymentOptions[i].value == "STEEM" || paymentOptions[i].value == "SBD") && !shawpconfig.SteemReceiver)
-                paymentOptions[i].disabled = true
-            else if (paymentOptions[i].value == "Coinbase" && !shawpconfig.Coinbase)
-                paymentOptions[i].disabled = true
         }
-
-        if (shawpconfig.Coinbase)
-            document.getElementById('signupstart').children[0].innerHTML += ' You can also pay with BTC, ETH, BCH, DAI, LTC and USDC through Coinbase commerce.'
     })
 
     window.keychainLoginBtn = document.getElementById('proceedAuthBtn')
@@ -225,7 +218,7 @@ document.getElementById('getPaymentBtns').onclick = () => {
         if (receipient) document.getElementById('receiverAccConfirm').innerText = 'Username: ' + receipient
         document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + creditsToBuy + ' GBdays'
         document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
-        updateDisplayByIDs(['nativeDisclaimer','xferMemo'],['CoinbaseCommerceBtn','coinbaseDisclaimer'])
+        updateDisplayByIDs(['nativeDisclaimer','xferMemo'],[])
 
         let memo = selectedNetwork === 'all' ? ('to: @' + receipient) : ('to: ' + selectedNetwork + '@' + receipient)
         if (selectedNetwork === 'all' && !receipient)
@@ -250,37 +243,12 @@ document.getElementById('getPaymentBtns').onclick = () => {
                 }
                 document.getElementById('HiveSignerBtn').href = 'https://hivesigner.com/sign/transfer?to=' + shawpconfig.HiveReceiver + '&amount=' + amt + paymentMethod + (memo !== '' ? '&memo=' + memo : '')
                 break
-            case 'STEEM':
-            case 'SBD':
-                updateDisplayByIDs(['SteemKeychainBtn','SteemLoginBtn'],['HiveKeychainBtn','HiveSignerBtn','DTubeChannelBtn','dtcInstruction'])
-                document.getElementById('SteemKeychainBtn').onclick = () => {
-                    steem_keychain.requestTransfer(receipient,shawpconfig.SteemReceiver,amt.toString(),memo,paymentMethod,(e) => {
-                        if (e.error) return alert(e.error)
-                        updateDisplayByIDs(['signupcb'],['signuppay'])
-                    })
-                }
-                document.getElementById('SteemLoginBtn').href = 'https://steemlogin.com/sign/transfer?to=' + shawpconfig.SteemReceiver + '&amount=' + amt + paymentMethod + (memo !== '' ? '&memo=' + memo : '')
-                break
             default:
                 break
         }
 
         updateDisplayByIDs(['signuppay'],['signupstart'])
     })
-    else if (paymentMethod == 'Coinbase') {
-        let fiatAmt = Math.round(creditsToBuy * shawpconfig.DefaultUSDRate * 100) / 100
-        let roundedCredits = (fiatAmt / shawpconfig.DefaultUSDRate).toFixed(6)
-        document.getElementById('receiverAccConfirm').innerText = 'Username: ' + receipient
-        document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + roundedCredits + ' GBdays'
-        document.getElementById('quoteAmt').innerText = 'Amount: $' + fiatAmt + ' USD'
-
-        updateDisplayByIDs(['CoinbaseCommerceBtn','coinbaseDisclaimer','signuppay'],['signupstart','HiveKeychainBtn','HiveSignerBtn','SteemKeychainBtn','SteemLoginBtn','nativeDisclaimer','DTubeChannelBtn','dtcInstruction','xferMemo'])
-        
-        document.getElementById('CoinbaseCommerceBtn').onclick = () =>
-            axios.post('/shawp_refill_coinbase',{ username: receipient, network: selectedNetwork, usdAmt: fiatAmt })
-                .then((response) => window.location.href = response.data.hosted_url)
-                .catch((e) => alert(JSON.stringify(e)))
-    }
 }
 
 document.getElementById('redeemVoucherBtn').onclick = () => {

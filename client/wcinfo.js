@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
             amt = paymentMethod === 'DTC' ? amt.toFixed(2) : amt.toFixed(3)
             document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + creditsToBuy + ' GBdays'
             document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
-            updateDisplayByIDs(['nativeDisclaimer'],['coinbaseDisclaimer','CoinbaseCommerceBtn'])
+            updateDisplayByIDs(['nativeDisclaimer'],[])
 
             let memo = currentnetwork === 'all' ? ('to: @' + username) : ('to: ' + currentnetwork + '@' + username)
             document.getElementById('xferMemo').innerHTML = 'Memo: <u>' + memo + '</u>'
@@ -121,43 +121,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     document.getElementById('HiveSignerBtn').href = 'https://hivesigner.com/sign/transfer?to=' + shawpconfig.HiveReceiver + '&amount=' + amt + paymentMethod + '&memo=' + memo
                     break
-                case 'STEEM':
-                case 'SBD':
-                    updateDisplayByIDs(['SteemKeychainBtn','SteemLoginBtn'],['HiveKeychainBtn','HiveSignerBtn','DTubeChannelBtn','dtcInstruction'])
-                    document.getElementById('SteemKeychainBtn').onclick = () => {
-                        steem_keychain.requestTransfer(steemUser,shawpconfig.SteemReceiver,amt.toString(),memo,paymentMethod,(e) => {
-                            if (e.error) return alert(e.error)
-                            updateDisplayByIDs(['refillcb'],['refillpay'])
-                        })
-                    }
-                    document.getElementById('SteemLoginBtn').href = 'https://steemlogin.com/sign/transfer?to=' + shawpconfig.SteemReceiver + '&amount=' + amt + paymentMethod + '&memo=' + memo
-                    break
                 default:
                     break
             }
             updateDisplayByIDs(['refillPopup'],[])
         })
-        else if (paymentMethod == 'Coinbase') {
-            document.getElementById('refillSubmitBtn').value = 'Refill'
-            document.getElementById('refillSubmitBtn').disabled = false
-            let fiatAmt = Math.round(creditsToBuy * accdetail.rate * 100) / 100
-            let roundedCredits = (fiatAmt / accdetail.rate).toFixed(6)
-            document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + roundedCredits + ' GBdays'
-            document.getElementById('quoteAmt').innerText = 'Amount: $' + fiatAmt + ' USD'
-
-            updateDisplayByIDs(['CoinbaseCommerceBtn','coinbaseDisclaimer','refillpay','refillPopup'],['HiveKeychainBtn','HiveSignerBtn','SteemKeychainBtn','SteemLoginBtn','nativeDisclaimer','refillcb','refillcancel'])
-
-            let cbUrl = new URL(window.location.href)
-            cbUrl.searchParams.set('callback','refillcb')
-
-            let cancelUrl = new URL(window.location.href)
-            cancelUrl.searchParams.set('callback','refillcancel')
-
-            document.getElementById('CoinbaseCommerceBtn').onclick = () =>
-                axios.post('/shawp_refill_coinbase',{ username: username, network: currentnetwork, usdAmt: fiatAmt, cbUrl: cbUrl, cancelUrl: cancelUrl })
-                    .then((response) => window.location.href = response.data.hosted_url)
-                    .catch((e) => alert(JSON.stringify(e)))
-        }
     }
 })
 

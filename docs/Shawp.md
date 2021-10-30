@@ -39,26 +39,3 @@ Shawp offers a set of APIs when enabled in `config.json`. APIs listed below are 
 * `count` *(required)*: Number of days of consumption data to return.
 * `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
 * `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
-
-## Coinbase commerce related
-
-These POST API calls are related to Coinbase commerce integration, which are available if Coinbase commerce is enabled in the config.
-
-#### Initiate a refill
-```
-/shawp_refill_coinbase
-```
-* Content type: application/json
-* JSON data example:
-```
-{
-    username: "techcoderx",
-    usdAmt: 1.5
-}
-```
-
-#### Webhook (for processing refill payments)
-```
-/shawp_refill_coinbase_webhook
-```
-Required event: charge:confirmed

@@ -53,7 +53,7 @@ app.get('/checkuser',(request,response) => {
 })
 
 app.get('/login',(request,response) => {
-    // Steem Keychain Auth
+    // Keychain Auth
     if (!request.query.user || request.query.user === '')
         // Username not specified, throw an error
         return response.status(400).send({error: 'Username not specified!'})
@@ -288,8 +288,7 @@ app.get('/shawp_head_blocks',(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     res.send({
         avalon: Shawp.avalonStreamer.headBlock,
-        hive: Shawp.hiveStreamer.headBlock,
-        steem: Shawp.steemStreamer.headBlock
+        hive: Shawp.hiveStreamer.headBlock
     })
 })
 
@@ -345,31 +344,6 @@ app.get('/shawp_consumption_history_admin',(req,res) => {
     Authenticate(req,res,false,(user) => {
         if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
         return res.send(Shawp.getConsumeHistory(req.query.user,req.query.network || 'all',req.query.start || 0,req.query.count || 100))
-    })
-})
-
-app.post('/shawp_refill_coinbase',Parser.json(),(req,res) => {
-    if (!Config.Shawp.Enabled || !Config.Shawp.Coinbase) return res.status(404).send()
-    if (!req.body.username || !req.body.usdAmt) return res.status(400).send({error:'Username or amount is missing'})
-    Shawp.CoinbaseCharge(req.body.username,req.body.network || 'all',req.body.usdAmt,(e,r) => {
-        if (e)
-            return res.status(400).send({error:e.message})
-        else
-            return res.status(200).send(r)
-    },req.body.cbUrl,req.body.cancelUrl)
-})
-
-app.post('/shawp_refill_coinbase_webhook',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(req,res) => {
-    if (!Config.Shawp.Enabled || !Config.Shawp.Coinbase) return res.status(404).send()
-    Shawp.CoinbaseWebhookVerify(req,(verified) => {
-        if (!verified) return res.status(403).send()
-        res.status(200).send()
-
-        if (req.body.event.data.name == Config.CoinbaseCommerce.ProductName && req.body.event.type == 'charge:confirmed') {
-            Shawp.Refill('',req.body.event.data.metadata.customer_username,req.body.event.data.metadata.network,Shawp.methods.Coinbase,req.body.event.data.code,new Date(req.body.event.data.created_at).getTime(),req.body.event.data.payments[0].value.crypto.amount + ' ' + req.body.event.data.payments[0].value.crypto.currency,parseFloat(req.body.event.data.pricing.local.amount))
-            Shawp.WriteUserDB()
-            Shawp.WriteRefillHistory()
-        }
     })
 })
 

@@ -61,17 +61,8 @@ Changing this section might affect how you receive app updates.
 * `DefaultUSDRate`: Hosting cost in USD for 1GB of files in 24 hours.
 * `AvalonAPI`: Avalon API endpoint URL. It is recommended to run your own [Avalon](https://github.com/dtube/avalon) node to accept payments. Minimal node without enabling extra modules is sufficient. Not your node, not your rules.
 * `HiveAPI`: Hive RPC endpoint URL. It is recommended to run your own [hived](https://gitlab.syncad.com/hive/hive) node to accept payments. Low memory node with `block_api` is sufficient. Not your node, not your rules.
-* `SteemAPI`: Steem RPC endpoint URL.
 * `DtcReceiver`: Avalon account to be used for receiving DTUBE payments.
 * `HiveReceiver`: Hive account to be used for receiving HIVE and HBD payments.
-* `SteemReceiver`: Steem account to be used for receiving STEEM and SBD payments.
-
-#### Coinbase Commerce
-Only effective when `Coinbase` is enabled on Shawp (which should also be enabled).
-* `APIKey`: API key to be used to authenticate to Coinbase Commerce account.
-* `WebhookSecret`: Webhook token to be used for listening to new payments.
-* `RedirectURL`: URL to be navigated to upon successful Coinbase Commerce payments.
-* `CancelURL`: URL to be navigated to upon cancellation of Coinbase Commerce payments.
 
 #### Unit tests settings
 
