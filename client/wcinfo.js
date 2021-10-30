@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (creditsToBuy <= 0) return alert('Purchase quantity must not be less than or equals to zero.')
         document.getElementById('refillSubmitBtn').value = 'Loading...'
         document.getElementById('refillSubmitBtn').disabled = true
-        let nativePymtProcessors = ['DTC','HIVE','HBD','STEEM','SBD']
+        let nativePymtProcessors = ['DTC','HIVE','HBD']
         if (nativePymtProcessors.includes(paymentMethod)) exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
             document.getElementById('refillSubmitBtn').value = 'Refill'
             document.getElementById('refillSubmitBtn').disabled = false
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     break
                 case 'HIVE':
                 case 'HBD':
-                    updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn'],['SteemKeychainBtn','SteemLoginBtn','DTubeChannelBtn','dtcInstruction'])
+                    updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn'],['DTubeChannelBtn','dtcInstruction'])
                     document.getElementById('HiveKeychainBtn').onclick = () => {
                         hive_keychain.requestTransfer(username,shawpconfig.HiveReceiver,amt.toString(),memo,paymentMethod,(e) => {
                             if (e.error) return alert(e.error)

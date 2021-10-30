@@ -202,7 +202,7 @@ hr {
 #dtcInstruction a:hover, #signupcbmsg a:hover { color: #000000; }
 #dtcInstruction a:active, #signupcbmsg a:active { color: #000000; }
 
-#HiveKeychainBtn, #HiveSignerBtn, #SteemKeychainBtn, #SteemLoginBtn, #DTubeChannelBtn {
+#HiveKeychainBtn, #HiveSignerBtn, #DTubeChannelBtn {
     display: none;
     margin-block-end: 0.5em;
 }

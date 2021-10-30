@@ -198,7 +198,7 @@ document.getElementById('getPaymentBtns').onclick = () => {
     let receipient = document.getElementById('receiverUsername').value
     let paymentMethod = document.getElementById('pymtMtd').value
     let creditsToBuy = parseFloat(document.getElementById('gbdaysInput').value)
-    let nativePymtProcessors = ['DTC','HIVE','HBD','STEEM','SBD']
+    let nativePymtProcessors = ['DTC','HIVE','HBD']
     if (selectedNetwork === 'none') return alert('Please select a network for your account.')
 
     // Validate usernames
@@ -228,13 +228,13 @@ document.getElementById('getPaymentBtns').onclick = () => {
 
         switch (paymentMethod) {
             case 'DTC':
-                updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['SteemKeychainBtn','SteemLoginBtn','HiveKeychainBtn','HiveSignerBtn'])
+                updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['HiveKeychainBtn','HiveSignerBtn'])
                 document.getElementById('DTubeChannelBtn').onclick = () => window.open('https://d.tube/#!/c/' + shawpconfig.DtcReceiver)
                 document.getElementById('DTubeChannelBtn').href = 'https://d.tube/#!/c/' + shawpconfig.DtcReceiver
                 break
             case 'HIVE':
             case 'HBD':
-                updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn'],['SteemKeychainBtn','SteemLoginBtn','DTubeChannelBtn','dtcInstruction'])
+                updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn'],['DTubeChannelBtn','dtcInstruction'])
                 document.getElementById('HiveKeychainBtn').onclick = () => {
                     hive_keychain.requestTransfer(receipient,shawpconfig.HiveReceiver,amt.toString(),memo,paymentMethod,(e) => {
                         if (e.error) return alert(e.error)
