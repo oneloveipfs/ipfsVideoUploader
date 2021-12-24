@@ -1,7 +1,7 @@
 {
   "name": "ipfsvideouploader",
   "productName": "OneLoveIPFS",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "Alternative IPFS uploader for DTube videos.",
   "homepage": "https://uploader.oneloved.tube",
   "repository": {
