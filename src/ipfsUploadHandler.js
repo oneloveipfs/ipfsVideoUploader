@@ -25,15 +25,15 @@ db.setupDb('register')
 let uploadRegister = JSON.parse(fs.readFileSync(defaultDir+'/db/register.json','utf8'))
 let socketRegister = {}
 
-const ipfsAPI = IPFS({ host: 'localhost', port: Config.IPFS_API_PORT, protocol: 'http' })
+const ipfsAPI = IPFS.create({ host: 'localhost', port: Config.IPFS_API_PORT, protocol: 'http' })
 const streamUpload = Multer({ dest: defaultDir, limits: { fileSize: 52428800 } }) // 50MB segments
 const imgUpload = Multer({ dest: defaultDir, limits: { fileSize: 7340032 } })
-const { globSource } = IPFS
 
 const addFile = async (dir,trickle,skynetpin,callback,onlyHash) => {
     let opts = { trickle: trickle, cidVersion: 0 }
     if (onlyHash) opts.onlyHash = true
-    let ipfsAdd = await ipfsAPI.add(globSource(dir, {recursive: true}), opts)
+    let readableStream = fs.createReadStream(dir)
+    let ipfsAdd = await ipfsAPI.add(readableStream, opts)
     let hash = ipfsAdd.cid.toString()
     let size = ipfsAdd.size
 

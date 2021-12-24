@@ -88,7 +88,7 @@
     "hivecrypt": "^2.0.2",
     "hivesigner": "^3.2.1",
     "http-proxy": "^1.18.1",
-    "ipfs-http-client": "^49.0.2",
+    "ipfs-http-client": "^55.0.0",
     "javalon": "^1.0.33",
     "jsonwebtoken": "^8.5.1",
     "mime-types": "^2.1.31",
