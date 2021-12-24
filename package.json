@@ -17,16 +17,16 @@
     "prepare": "npm run snyk-protect",
     "devapp": "electron src/electronApp.js",
     "prepapp": "node scripts/electronPrep.js",
-    "buildapp-macos": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2021 TechCoderX' --asar --platform darwin --icon public/macos_icon.icns",
-    "buildapp-windows": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2021 TechCoderX' --asar --platform=win32 --version-string.FileDescription 'OneLoveIPFS Uploader' --version-string.ProductName OneLoveIPFS --icon public/win32_icon.ico",
-    "buildapp-linux": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2021 TechCoderX' --asar --platform linux",
+    "buildapp-macos": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2022 TechCoderX' --asar --platform darwin --icon public/macos_icon.icns",
+    "buildapp-windows": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2022 TechCoderX' --asar --platform=win32 --version-string.FileDescription 'OneLoveIPFS Uploader' --version-string.ProductName OneLoveIPFS --icon public/win32_icon.ico",
+    "buildapp-linux": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2022 TechCoderX' --asar --platform linux",
     "buildinstaller": "electron-builder",
     "dep-prune": "npm un async body-parser crypto-js form-data get-video-duration hivecrypt hivesigner ipfs-http-client javalon jsonwebtoken mime-types multer node-schedule node-webvtt shelljs snyk socket.io"
   },
   "build": {
     "appId": "com.oneloveipfs.uploader",
     "productName": "OneLoveIPFS",
-    "copyright": "Copyright (C) 2021 TechCoderX",
+    "copyright": "Copyright (C) 2022 TechCoderX",
     "files": [
       "!docs/",
       "!dist/",
@@ -40,11 +40,14 @@
       "target": [
         {
           "target": "dmg",
-          "arch": "x64"
+          "arch": [
+            "arm64",
+            "x64"
+          ]
         }
       ],
       "icon": "public/macos_icon.icns",
-      "minimumSystemVersion": "10.14.6"
+      "minimumSystemVersion": "11"
     },
     "win": {
       "icon": "public/win32_icon.ico",
@@ -101,8 +104,8 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "electron": "^15.1.1",
-    "electron-builder": "^22.11.7",
+    "electron": "^16.0.5",
+    "electron-builder": "^22.14.5",
     "electron-packager": "^15.2.0",
     "mocha": "^9.1.3"
   },
