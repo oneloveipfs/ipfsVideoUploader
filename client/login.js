@@ -346,31 +346,40 @@ async function avalonLogin(avalonUsername,avalonKey,dtconly,fromPersistence) {
 
 function steemKeyLogin(username,wif) {
     return new Promise((rs,rj) => {
-        steem.api.getAccounts([username],(e,acc) => {
-            if (e || acc.length == 0) return rj(e)
+        let steemGetAcc = {
+            id: 1,
+            jsonrpc: '2.0',
+            method: 'condenser_api.get_accounts',
+            params: [[username]]
+        }
+        axios.post('https://api.steemit.com',steemGetAcc).then((r) => {
+            if (r.data.error)
+                return rj(r.data.error.message)
+            let acc = r.data.result
+            if (acc.length == 0) return rj('Steem account does not exist')
             try {
-                pubkey = steem.auth.wifToPublic(wif)
+                let pubkey = hive.auth.wifToPublic(wif)
                 for (let i = 0; i < acc[0].posting.key_auths.length; i++)
                     if (acc[0].posting.key_auths[i][0].toString() === pubkey.toString())
                         return rs(true)
                 rj('Invalid Steem username or posting key')
             } catch (err) { return rj('Invalid Steem username or posting key') }
-        })
+        }).catch(() => rj('Failed to fetch Steem account'))
     })
 }
 
 function storeEncrypted(key,value,password) {
-    let pubK = steem.auth.getPrivateKeys('',password,['Posting']).PostingPubkey
+    let pubK = hive.auth.getPrivateKeys('',password,['Posting']).PostingPubkey
     let wif = hivecrypt.randomWif()
-    localStorage.setItem(key,steem.memo.encode(wif,pubK,'#'+value.toString()))
+    localStorage.setItem(key,hive.memo.encode(wif,pubK,'#'+value.toString()))
 }
 
 function retrieveEncrypted(key,password) {
-    let wif = steem.auth.getPrivateKeys('',password,['Posting']).Posting
+    let wif = hive.auth.getPrivateKeys('',password,['Posting']).Posting
     let enc = localStorage.getItem(key)
     if (!enc.startsWith('#')) return enc
     try {
-        let result = steem.memo.decode(wif,enc).substr(1)
+        let result = hive.memo.decode(wif,enc).substr(1)
         return result
     } catch {
         return null
@@ -395,8 +404,8 @@ async function handleElectronLogins(memo,steemUsername,steemKey,hiveUsername,hiv
     if (steemUsername && steemKey) try {
         await steemKeyLogin(steemUsername,steemKey)
         usingSteem = true
-    } catch {
-        alert('Invalid Steem key, proceeding with Hive/Avalon login only')
+    } catch (e) {
+        alert(e.toString()+' Proceeding with Hive/Avalon login only')
     }
 
     // Store private keys in session storage to be used later
