@@ -79,7 +79,7 @@
   "dependencies": {
     "about-window": "^1.15.2",
     "async": "^3.2.2",
-    "axios": "^0.22.0",
+    "axios": "^0.24.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
@@ -88,7 +88,7 @@
     "express": "^4.17.1",
     "form-data": "^3.0.0",
     "get-video-duration": "^4.0.0",
-    "hivecrypt": "^2.0.2",
+    "hivecrypt": "^2.0.3",
     "hivesigner": "^3.2.1",
     "http-proxy": "^1.18.1",
     "ipfs-http-client": "^55.0.0",
@@ -99,7 +99,7 @@
     "node-schedule": "^2.0.0",
     "node-webvtt": "^1.9.1",
     "shelljs": "^0.8.4",
-    "snyk": "^1.667.0",
+    "snyk": "^1.809.0",
     "socket.io": "^4.4.0"
   },
   "devDependencies": {
