@@ -88,6 +88,10 @@ body.darkmode {
 .darkmode #video1080p {
     background-color: transparent;
 }
+.darkmode select {
+    background-color: rgb(30, 32, 34);
+    color: #ffffff;
+}
 
 a {
     text-decoration: none;
