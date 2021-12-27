@@ -228,6 +228,11 @@ let db = {
             if (value.length > 1000)
                 return 'Description template must be less than or equal to 1,000 characters long'
             return null
+        },
+        darkMode: (value) => {
+            if (typeof value !== 'boolean')
+                return 'Dark mode setting must be a boolean'
+            return null
         }
     },
     settingsTranslator: {
@@ -237,7 +242,8 @@ let db = {
                 return undefined
             else
                 return value
-        }
+        },
+        darkMode: (value) => value
     },
     settingsUpdate: (username,network,key,value) => {
         let fullusername = db.toFullUsername(username,network)
