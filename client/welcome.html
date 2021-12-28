@@ -144,25 +144,80 @@
                 </div>
                 <div class="popup-body">
                     <div id="loginform">
-                        <h5 class="logininfo" id="logininfo" style="margin-bottom: 10px;">Hive or Avalon (DTube chain) authentication is required. Steem login requires Hive authentication using Keychain extensions.</h5>
-                        <input type="text" placeholder="HIVE Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginUsername" class="loginFields">
-                        <input type="password" placeholder="HIVE Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginHiveKey" class="loginFields">
-                        <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginSteemUsername" class="loginFields">
-                        <h5 class="sameUsername" id="sameSteemUser"><a onclick="document.getElementById('loginSteemUsername').value = document.getElementById('loginUsername').value">Same as Hive username</a></h5>
-                        <input type="password" placeholder="STEEM Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginSteemKey" class="loginFields">
-                        <input type="text" placeholder="AVALON Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginUsername" class="loginFields">
-                        <h5 class="sameUsername" id="sameAvalonUser"><a onclick="document.getElementById('avalonLoginUsername').value = document.getElementById('loginUsername').value">Same as Hive username</a></h5>
-                        <input type="password" placeholder="AVALON Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginKey" class="loginFields"><br>
-                        <div class="rememberme"><label class="switch">
-                            <input type="checkbox" name="rememberme" id="rememberme" onchange="updateRememberMeState()" checked>
-                            <span class="slider round"></span>
-                            </label><h4 class="remembermelabel"> Remember Me</h4><br><br>
-                            <input type="password" placeholder="Encrypt private keys with password (optional)" autocorrect="off" autocapitalize="off" spellcheck="false" class="loginFields" id="persistPassword">
+                        <!-- Main networks that generate access tokens -->
+                        <div id="loginformmain">
+                            <h4 class="logininfo">Select Networks</h4>
+                            <table class="loginnetworks">
+                                <tr onclick="updateDisplayByIDs(['loginformhive'],['loginformmain'])">
+                                    <td>
+                                        <h4>Hive</h4>
+                                        <h5>Posts to 3Speak/DTube</h5>
+                                    </td>
+                                    <td>></td>
+                                </tr>
+                                <tr onclick="updateDisplayByIDs(['loginformavalon'],['loginformmain'])">
+                                    <td>
+                                        <h4>Avalon</h4>
+                                        <h5>Posts to DTube</h5>
+                                    </td>
+                                    <td>></td>
+                                </tr>
+                            </table>
+                            <!-- Other networks that do not generate access tokens -->
+                            <br>
+                            <h4 class="logininfo">Additional Networks</h4>
+                            <table class="loginnetworks">
+                                <tr onclick="updateDisplayByIDs(['loginformblurt'],['loginformmain'])">
+                                    <td>
+                                        <h4>Blurt</h4>
+                                        <h5>Posts to DTube</h5>
+                                    </td>
+                                    <td>></td>
+                                </tr>
+                                <tr onclick="updateDisplayByIDs(['loginformsteem'],['loginformmain'])">
+                                    <td>
+                                        <h4>Steem</h4>
+                                        <h5>Posts to DTube</h5>
+                                    </td>
+                                    <td>></td>
+                                </tr>
+                            </table><br>
+                            <div class="rememberme"><label class="switch">
+                                <input type="checkbox" name="rememberme" id="rememberme" onchange="updateRememberMeState()" checked>
+                                <span class="slider round"></span>
+                                </label><h4 class="remembermelabel"> Remember Me</h4><br><br>
+                                <input type="password" placeholder="Encrypt private keys with password (optional)" autocorrect="off" autocapitalize="off" spellcheck="false" class="loginFields" id="persistPassword">
+                            </div>
+                            <a class="roundedBtn" id="proceedAuthBtn">Proceed</a>
                         </div>
-                        <a class="roundedBtn" id="proceedAuthBtn">Proceed</a>
-                        <h3 class="sclogin">OR</h3>
-                        <a class="roundedBtn sclogin" id="altAuthBtn">Proceed with HiveSigner</a>
-                        <h5 class="logininfo sclogin">Steem login is not supported with HiveSigner authentication.</h5>
+                        <div id="loginformhive">
+                            <a onclick="updateDisplayByIDs(['loginformmain'],['loginformhive'])"><< Back</a><br><br>
+                            <input type="text" placeholder="HIVE Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginUsername" class="loginFields">
+                            <input type="password" placeholder="HIVE Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginHiveKey" class="loginFields">
+                            <a class="roundedBtn kcAuth" id="hiveAuthBtn">Login with Keychain</a>
+                            <h3 class="loginor sclogin">OR</h3>
+                            <a class="roundedBtn sclogin" id="altAuthBtn">Login with HiveSigner</a>
+                        </div>
+                        <div id="loginformavalon">
+                            <a onclick="updateDisplayByIDs(['loginformmain'],['loginformavalon'])"><< Back</a><br><br>
+                            <input type="text" placeholder="AVALON Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginUsername" class="loginFields">
+                            <input type="password" placeholder="AVALON Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginKey" class="loginFields">
+                            <a class="roundedBtn" id="avalonAuthBtn">Login</a>
+                            <h3 class="loginor kcAuth">OR</h3>
+                            <a class="roundedBtn kcAuth" id="avalonKcAuthBtn">Login with Hive Keychain</a>
+                        </div>
+                        <div id="loginformblurt">
+                            <a onclick="updateDisplayByIDs(['loginformmain'],['loginformblurt'])"><< Back</a><br><br>
+                            <input type="text" placeholder="BLURT Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginBlurtUsername" class="loginFields">
+                            <input type="password" placeholder="BLURT Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginBlurtKey" class="loginFields">
+                            <a class="roundedBtn kcAuth" id="blurtAuthBtn">Login with Keychain</a>
+                        </div>
+                        <div id="loginformsteem">
+                            <a onclick="updateDisplayByIDs(['loginformmain'],['loginformsteem'])"><< Back</a><br><br>
+                            <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginSteemUsername" class="loginFields">
+                            <input type="password" placeholder="STEEM Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginSteemKey" class="loginFields">
+                            <a class="roundedBtn kcAuth" id="steemAuthBtn">Login with Keychain</a>
+                        </div>
                     </div>
                     <div id="persistentform">
                         <h4 id="persistentLoginText"></h4>

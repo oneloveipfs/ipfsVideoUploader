@@ -10,12 +10,14 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplayByIDs(['signupcb','signupPopup'],['signupstart'])
 
     if (!isElectron()) {
-        updateDisplayByIDs([],['loginHiveKey','loginSteemKey'])
+        updateDisplayByIDs([],['loginHiveKey','loginBlurtKey','loginSteemKey'])
         let tohide = document.getElementsByClassName('rememberme')
         for (let i = 0; i < tohide.length; i++)
             tohide[i].style.display = "none"
     } else {
-        document.getElementById('logininfo').innerText = 'Login with your posting or custom keys. COMMENT authority is required at minimum for Avalon custom keys. Private keys are only stored on your computer and will only be used to decrypt access tokens and broadcast transactions.'
+        let tochange = document.getElementsByClassName('kcAuth')
+        for (let i = 0; i < tochange.length; i++)
+            tochange[i].innerText = 'Login'
     }
 
     axios.get('/config').then((result) => {
