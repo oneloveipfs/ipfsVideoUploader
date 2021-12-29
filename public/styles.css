@@ -234,6 +234,10 @@ hr {
     margin-bottom: 10px;
 }
 
+.avalonKcLogin {
+    display: none;
+}
+
 .sameUsername {
     margin-top: -7px;
     text-align: left;
@@ -875,7 +879,8 @@ textarea {
 }
 
 .headerBtn p,
-.loginor {
+.loginor,
+.logindesc {
     margin-block-start: 10px;
     margin-block-end: 10px;
 }

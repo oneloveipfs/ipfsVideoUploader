@@ -147,39 +147,41 @@
                         <!-- Main networks that generate access tokens -->
                         <div id="loginformmain">
                             <h4 class="logininfo">Select Networks</h4>
+                            <h5 class="logindesc">An access token that is required for uploader authentication will be generated for these networks.</h5>
                             <table class="loginnetworks">
-                                <tr onclick="updateDisplayByIDs(['loginformhive'],['loginformmain'])">
+                                <tr onclick="if (!window.logins.hiveUser) updateDisplayByIDs(['loginformhive'],['loginformmain'])">
                                     <td>
                                         <h4>Hive</h4>
                                         <h5>Posts to 3Speak/DTube</h5>
                                     </td>
-                                    <td>></td>
+                                    <td id="loginnetworkhive">></td>
                                 </tr>
-                                <tr onclick="updateDisplayByIDs(['loginformavalon'],['loginformmain'])">
+                                <tr onclick="if (!window.logins.avalonUser) updateDisplayByIDs(['loginformavalon'],['loginformmain'])">
                                     <td>
                                         <h4>Avalon</h4>
                                         <h5>Posts to DTube</h5>
                                     </td>
-                                    <td>></td>
+                                    <td id="loginnetworkavalon">></td>
                                 </tr>
                             </table>
                             <!-- Other networks that do not generate access tokens -->
                             <br>
                             <h4 class="logininfo">Additional Networks</h4>
+                            <h5 class="logindesc">Access tokens are not generated for these networks. Authentication with at least one of the select networks above are required.</h5>
                             <table class="loginnetworks">
-                                <tr onclick="updateDisplayByIDs(['loginformblurt'],['loginformmain'])">
+                                <tr onclick="if (!window.logins.blurtUser) updateDisplayByIDs(['loginformblurt'],['loginformmain'])">
                                     <td>
                                         <h4>Blurt</h4>
                                         <h5>Posts to DTube</h5>
                                     </td>
-                                    <td>></td>
+                                    <td id="loginnetworkblurt">></td>
                                 </tr>
-                                <tr onclick="updateDisplayByIDs(['loginformsteem'],['loginformmain'])">
+                                <tr onclick="if (!window.logins.steemUser) updateDisplayByIDs(['loginformsteem'],['loginformmain'])">
                                     <td>
                                         <h4>Steem</h4>
                                         <h5>Posts to DTube</h5>
                                     </td>
-                                    <td>></td>
+                                    <td id="loginnetworksteem">></td>
                                 </tr>
                             </table><br>
                             <div class="rememberme"><label class="switch">
@@ -192,9 +194,9 @@
                         </div>
                         <div id="loginformhive">
                             <a onclick="updateDisplayByIDs(['loginformmain'],['loginformhive'])"><< Back</a><br><br>
-                            <input type="text" placeholder="HIVE Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginUsername" class="loginFields">
-                            <input type="password" placeholder="HIVE Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginHiveKey" class="loginFields">
-                            <a class="roundedBtn kcAuth" id="hiveAuthBtn">Login with Keychain</a>
+                            <input type="text" placeholder="HIVE Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="hiveLoginUsername" class="loginFields">
+                            <input type="password" placeholder="HIVE Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="hiveLoginKey" class="loginFields">
+                            <a class="roundedBtn kcAuth" id="hiveAuthBtn" onclick="hiveLogin()">Login with Keychain</a>
                             <h3 class="loginor sclogin">OR</h3>
                             <a class="roundedBtn sclogin" id="altAuthBtn">Login with HiveSigner</a>
                         </div>
@@ -202,21 +204,28 @@
                             <a onclick="updateDisplayByIDs(['loginformmain'],['loginformavalon'])"><< Back</a><br><br>
                             <input type="text" placeholder="AVALON Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginUsername" class="loginFields">
                             <input type="password" placeholder="AVALON Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginKey" class="loginFields">
-                            <a class="roundedBtn" id="avalonAuthBtn">Login</a>
-                            <h3 class="loginor kcAuth">OR</h3>
-                            <a class="roundedBtn kcAuth" id="avalonKcAuthBtn">Login with Hive Keychain</a>
+                            <!-- Avalon with Keychain Signer -->
+                            <!--<input type="text" placeholder="Keychain Signer Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonSignerUsername" class="loginFields avalonKcLogin">
+                            <select id="avalonSignerRole" class="loginFields avalonKcLogin" style="width: 100%;">
+                                <option>Posting</option>
+                                <option>Active</option>
+                                <option>Memo</option>
+                            </select>-->
+                            <a class="roundedBtn" id="avalonAuthBtn" onclick="avalonLogin()">Login</a>
+                            <!--<h3 class="loginor" id="avalonKcAuthOr">OR</h3>
+                            <a class="roundedBtn" id="avalonKcAuthBtn">Login with Hive Keychain</a>-->
                         </div>
                         <div id="loginformblurt">
                             <a onclick="updateDisplayByIDs(['loginformmain'],['loginformblurt'])"><< Back</a><br><br>
-                            <input type="text" placeholder="BLURT Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginBlurtUsername" class="loginFields">
-                            <input type="password" placeholder="BLURT Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginBlurtKey" class="loginFields">
-                            <a class="roundedBtn kcAuth" id="blurtAuthBtn">Login with Keychain</a>
+                            <input type="text" placeholder="BLURT Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="blurtLoginUsername" class="loginFields">
+                            <input type="password" placeholder="BLURT Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="blurtLoginKey" class="loginFields">
+                            <a class="roundedBtn kcAuth" id="blurtAuthBtn" onclick="blurtLogin()">Login with Keychain</a>
                         </div>
                         <div id="loginformsteem">
                             <a onclick="updateDisplayByIDs(['loginformmain'],['loginformsteem'])"><< Back</a><br><br>
-                            <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginSteemUsername" class="loginFields">
-                            <input type="password" placeholder="STEEM Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="loginSteemKey" class="loginFields">
-                            <a class="roundedBtn kcAuth" id="steemAuthBtn">Login with Keychain</a>
+                            <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="steemLoginUsername" class="loginFields">
+                            <input type="password" placeholder="STEEM Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="steemLoginKey" class="loginFields">
+                            <a class="roundedBtn kcAuth" id="steemAuthBtn" onclick="steemLogin()">Login with Keychain</a>
                         </div>
                     </div>
                     <div id="persistentform">

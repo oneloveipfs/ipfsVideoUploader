@@ -1,4 +1,5 @@
 let config, shawpconfig
+window.logins = {}
 
 document.addEventListener('DOMContentLoaded', () => {
     let url = new URL(window.location.href)
@@ -10,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplayByIDs(['signupcb','signupPopup'],['signupstart'])
 
     if (!isElectron()) {
-        updateDisplayByIDs([],['loginHiveKey','loginBlurtKey','loginSteemKey'])
+        updateDisplayByIDs([],['hiveLoginKey','blurtLoginKey','steemLoginKey'])
         let tohide = document.getElementsByClassName('rememberme')
         for (let i = 0; i < tohide.length; i++)
             tohide[i].style.display = "none"
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let tochange = document.getElementsByClassName('kcAuth')
         for (let i = 0; i < tochange.length; i++)
             tochange[i].innerText = 'Login'
+        updateDisplayByIDs([],['avalonKcAuthOr','avalonKcAuthBtn'])
     }
 
     axios.get('/config').then((result) => {
@@ -49,9 +51,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.proceedAuthBtnDisabled = document.getElementById('proceedAuthBtn').disabled
     document.getElementById('authButton').onclick = loginBtnClicked
     document.getElementById('authButton2').onclick = loginBtnClicked
-
-    document.getElementById('loginUsername').onchange = () => document.getElementById('proceedAuthBtn').innerText = getKeychainLoginBtnLabel()
-    document.getElementById('loginSteemUsername').onchange = () => document.getElementById('proceedAuthBtn').innerText = getKeychainLoginBtnLabel()
 
 window.onclick = (event) => {
     dismissPopup(event,'loginPopup')
@@ -102,12 +101,12 @@ function loginBtnClicked() {
 document.getElementById('proceedAuthBtn').onclick = async function proceedLogin() {
     if (window.proceedAuthBtnDisabled == true) return
 
-    let username = document.getElementById('loginUsername').value.toLowerCase().replace('@','')
-    let steemUsername = document.getElementById('loginSteemUsername').value.toLowerCase().replace('@','')
+    let username = document.getElementById('hiveLoginUsername').value.toLowerCase().replace('@','')
+    let steemUsername = document.getElementById('steemLoginUsername').value.toLowerCase().replace('@','')
     let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
     let avalonKey = document.getElementById('avalonLoginKey').value
-    let hiveKey = document.getElementById('loginHiveKey').value
-    let steemKey = document.getElementById('loginSteemKey').value
+    let hiveKey = document.getElementById('hiveLoginKey').value
+    let steemKey = document.getElementById('steemLoginKey').value
 
     if (username == '' && avalonUsername == '') return alert('Hive or Avalon username is required')
     if (!window.hive_keychain && username !== '' && !isElectron()) return alert('Hive Keychain is not installed')
@@ -121,7 +120,6 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
     // Keychain login
     // Using public posting key on Hive to initiate login
     let loginUrl = '/login?network=hive&user='+username
-    if (isElectron() && !window.hive_keychain) loginUrl += '&hivecrypt=1'
     if (username) axios.get(loginUrl).then((response) => {
         if (response.data.error != null)
             return handleLoginError(response.data.error)
@@ -275,78 +273,187 @@ function signupNetworkSelect() {
     }
 }
 
-function keychainCb(encrypted_message,steemUser,dtconly) {
-    let contentType = {
-        headers: {
-            "content-type": "text/plain",
-        },
-    }
+function hiveLogin() {
+    if (window.proceedAuthBtnDisabled == true) return
+    let hiveUsername = document.getElementById('hiveLoginUsername').value.toLowerCase().replace('@','')
+    let hiveKey = document.getElementById('hiveLoginKey').value
 
-    axios.post('/logincb',encrypted_message,contentType).then((cbResponse) => {
-        if (cbResponse.data.error != null) {
-            alert(cbResponse.data.error)
-        } else {
-            let cbUrl = '/upload?access_token=' + cbResponse.data.access_token + '&keychain=true'
-            if (steemUser != '') cbUrl += '&steemuser=' + steemUser
-            if (dtconly) cbUrl += '&dtconly=true'
-            window.location.href = cbUrl
-        }
-    }).catch((err) => {
-        if (err.response.data.error) alert(err.response.data.error)
-        else alert(err)
+    if (!hiveUsername) return alert('Username is required')
+    if (!window.hive_keychain && !isElectron()) return alert('Hive Keychain is not installed')
+    if (!hiveKey && isElectron()) return alert('Posting key is required')
+
+    document.getElementById('hiveAuthBtn').innerText = 'Logging in...'
+    proceedAuthBtnDisabled = true
+
+    let loginUrl = '/login?network=hive&user='+hiveUsername
+    axios.get(loginUrl).then((response) => {
+        if (response.data.error != null)
+            return handleLoginError(response.data.error,'hive')
+        else if (isElectron()) {
+            let t
+            try {
+                t = hivecrypt.decode(hiveKey,response.data.encrypted_memo).substr(1)
+            } catch {
+                return handleLoginError('Unable to decode access token with posting key','hive')
+            }
+            keychainCb(t,'hive')
+        } else hive_keychain.requestVerifyKey(hiveUsername,response.data.encrypted_memo,'Posting',(loginResponse) => {
+            if (loginResponse.error != null)
+                return handleLoginError(loginResponse.message,'hive')
+            keychainCb(loginResponse.result.substr(1),'hive')
+        })
     })
 }
 
-async function avalonLogin(avalonUsername,avalonKey,dtconly,fromPersistence) {
-    javalon.init({api: 'https://avalon.oneloved.tube'})
-    if (avalonUsername !== '' && avalonKey !== '') {
-        let avalonKeyId = false
-        try {
-            avalonKeyId = await getAvalonKeyId(avalonUsername,avalonKey)
-            if (avalonKeyId === false)
-                return handleLoginError('Invalid Avalon key')
-        } catch (e) {
-            return handleLoginError('Avalon login error: ' + e.toString())
+function keychainCb(encrypted_message,network) {
+    axios.post('/logincb',encrypted_message,{ headers: { 'content-type': 'text/plain' }}).then((cbResponse) => {
+        if (cbResponse.data.error != null) {
+            alert(cbResponse.data.error)
+        } else {
+            loginCb(network,cbResponse.data.access_token)
+            // let cbUrl = '/upload?access_token=' + cbResponse.data.access_token + '&keychain=true'
+            // if (steemUser != '') cbUrl += '&steemuser=' + steemUser
+            // if (dtconly) cbUrl += '&dtconly=true'
+            // window.location.href = cbUrl
         }
-        
-        // Storing Avalon login in sessionStorage so that we can access this in the upload page to sign transactions later.
-        sessionStorage.setItem('dtcUser',avalonUsername)
-        sessionStorage.setItem('dtcKey',avalonKey)
+    }).catch((err) => {
+        if (err.response.data.error)
+            handleLoginError(err.response.data.error,network)
+        else
+            handleLoginError(err,network)
+    }).finally(() => window.proceedAuthBtnDisabled = false)
+}
 
-        if (dtconly) {
-            let loginGetUrl = '/login?user=' + avalonUsername + '&dtc=true'
-            if (avalonKeyId && avalonKeyId !== true) loginGetUrl += '&dtckeyid=' + avalonKeyId
-            axios.get(loginGetUrl).then((response) => {
-                if (response.data.error != null)
-                    return handleLoginError(response.data.error)
-                javalon.decrypt(avalonKey,response.data.encrypted_memo,(e,decryptedAES) => {
-                    if (e)
-                        return handleLoginError('Avalon decrypt error: ' + e.error)
-                    if (isElectron() && document.getElementById('rememberme').checked && !fromPersistence){
-                        let ptValue = JSON.stringify({
-                            dtcUser: avalonUsername,
-                            dtcKey: avalonKey
-                        })
-                        let psw = document.getElementById('persistPassword').value
-                        if (psw)
-                            storeEncrypted('persistentLogin',ptValue,psw)
-                        else
-                            localStorage.setItem('persistentLogin',ptValue)
-                    }
-                    keychainCb(decryptedAES,'',true)
-                })
-            }).catch((e) => {
-                axiosErrorHandler(e)
-                handleLoginError()
-            })
-        }
+function loginCb(network,token) {
+    let u = document.getElementById(network+'LoginUsername').value.toLowerCase().replace('@','')
+    let k = document.getElementById(network+'LoginKey').value
+    if (!window.logins.token && token) {
+        window.logins.token = token
+        window.logins.keychain = network
+    }
+    window.logins[network+'User'] = u
+    window.logins[network+'Key'] = k
+    window.proceedAuthBtnDisabled = false
+    updateDisplayByIDs(['loginformmain'],['loginform'+network])
+    document.getElementById('loginnetwork'+network).innerHTML = '<h5 id="loginnetwork'+network+'username"></h5>'
+    document.getElementById('loginnetwork'+network+'username').innerText = u
+}
+
+async function avalonLogin() {
+    if (window.proceedAuthBtnDisabled == true) return
+    let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
+    let avalonKey = document.getElementById('avalonLoginKey').value
+
+    document.getElementById('avalonAuthBtn').innerText = 'Logging in...'
+    proceedAuthBtnDisabled = true
+
+    javalon.init({api: 'https://avalon.oneloved.tube'})
+    let avalonKeyId = false
+    try {
+        avalonKeyId = await getAvalonKeyId(avalonUsername,avalonKey)
+        if (avalonKeyId === false)
+            return handleLoginError('Invalid Avalon key','avalon')
+    } catch (e) {
+        return handleLoginError('Avalon login error: ' + e.toString(),'avalon')
+    }
+
+    if (window.logins.token) {
+        // an access token already generated, login is complete
+        loginCb('avalon')
     } else {
-        // If Avalon username or password not provided, clear existing login (if any) from sessionStorage
-        sessionStorage.clear()
+        let loginGetUrl = '/login?user=' + avalonUsername + '&dtc=true'
+        if (avalonKeyId && avalonKeyId !== true) loginGetUrl += '&dtckeyid=' + avalonKeyId
+        axios.get(loginGetUrl).then((response) => {
+            if (response.data.error != null)
+                return handleLoginError(response.data.error,'avalon')
+            javalon.decrypt(avalonKey,response.data.encrypted_memo,(e,decryptedAES) => {
+                if (e)
+                    return handleLoginError('Avalon decrypt error: ' + e.error,'avalon')
+                keychainCb(decryptedAES,'avalon')
+            })
+        }).catch((e) => {
+            axiosErrorHandler(e)
+            handleLoginError('','avalon')
+        })
     }
 }
 
-function steemKeyLogin(username,wif) {
+async function blurtLogin() {
+    if (window.proceedAuthBtnDisabled == true) return
+    let blurtUsername = document.getElementById('blurtLoginUsername').value.toLowerCase().replace('@','')
+    let blurtKey = document.getElementById('blurtLoginKey').value
+
+    if (!blurtUsername) return alert('Username is required')
+    if (!window.blurt_keychain && !isElectron()) return alert('Blurt Keychain is not installed')
+    if (!blurtKey && isElectron()) return alert('Posting key is required')
+
+    document.getElementById('blurtAuthBtn').innerText = 'Logging in...'
+    proceedAuthBtnDisabled = true
+
+    if (isElectron()) {
+        try {
+            // TODO: Replace API with our own
+            await steemKeyLogin(blurtUsername,blurtKey,'https://rpc.blurt.world','BLT')
+        } catch (e) {
+            alert(e.toString())
+            proceedAuthBtnDisabled = false
+            document.getElementById('blurtAuthBtn').innerText = 'Login'
+            return
+        }
+        loginCb('blurt')
+    } else {
+        blurt_keychain.requestSignBuffer(blurtUsername,'login','Posting',(blurtLoginRes) => {
+            if (blurtLoginRes.success)
+                loginCb('blurt')
+            else {
+                alert('Blurt Keychain login error: ' + blurtLoginRes.message)
+                proceedAuthBtnDisabled = false
+                document.getElementById('blurtAuthBtn').innerText = 'Login'
+                return
+            }
+        })
+    }
+}
+
+// NOTE: I really want to remove Steem from OneLoveIPFS entirely, however
+// there are people who still post there so limited support will have to stay unfortunately :\
+async function steemLogin() {
+    if (window.proceedAuthBtnDisabled == true) return
+    let steemUsername = document.getElementById('steemLoginUsername').value.toLowerCase().replace('@','')
+    let steemKey = document.getElementById('steemLoginKey').value
+
+    if (!steemUsername) return alert('Username is required')
+    if (!window.steem_keychain && !isElectron()) return alert('Blurt Keychain is not installed')
+    if (!steemKey && isElectron()) return alert('Posting key is required')
+
+    document.getElementById('steemAuthBtn').innerText = 'Logging in...'
+    proceedAuthBtnDisabled = true
+
+    if (isElectron()) {
+        try {
+            await steemKeyLogin(steemUsername,steemKey)
+        } catch (e) {
+            alert(e.toString())
+            proceedAuthBtnDisabled = true
+            document.getElementById('steemAuthBtn').innerText = 'Login'
+            return
+        }
+        loginCb('steem')
+    } else {
+        steem_keychain.requestSignBuffer(steemUsername,'login','Posting',(steemLoginRes) => {
+            if (steemLoginRes.success)
+                loginCb('steem')
+            else {
+                alert('Steem Keychain login error: ' + steemLoginRes.message)
+                proceedAuthBtnDisabled = false
+                document.getElementById('steemAuthBtn').innerText = 'Login'
+                return
+            }
+        })
+    }
+}
+
+function steemKeyLogin(username,wif,api='https://api.steemit.com',prefix='STM') {
     return new Promise((rs,rj) => {
         let steemGetAcc = {
             id: 1,
@@ -354,19 +461,21 @@ function steemKeyLogin(username,wif) {
             method: 'condenser_api.get_accounts',
             params: [[username]]
         }
-        axios.post('https://api.steemit.com',steemGetAcc).then((r) => {
+        axios.post(api,steemGetAcc).then((r) => {
             if (r.data.error)
                 return rj(r.data.error.message)
             let acc = r.data.result
-            if (acc.length == 0) return rj('Steem account does not exist')
+            if (acc.length == 0) return rj('Account does not exist')
             try {
-                let pubkey = hive.auth.wifToPublic(wif)
+                let pubkey = hive.auth.wifToPublic(wif).toString()
+                if (prefix !== 'STM')
+                    pubkey = pubkey.replace('STM',prefix)
                 for (let i = 0; i < acc[0].posting.key_auths.length; i++)
                     if (acc[0].posting.key_auths[i][0].toString() === pubkey.toString())
                         return rs(true)
-                rj('Invalid Steem username or posting key')
-            } catch (err) { return rj('Invalid Steem username or posting key') }
-        }).catch(() => rj('Failed to fetch Steem account'))
+                rj('Invalid username or posting key')
+            } catch (err) { return rj('Invalid username or posting key') }
+        }).catch(() => rj('Failed to fetch account'))
     })
 }
 
@@ -438,21 +547,11 @@ async function handleElectronLogins(memo,steemUsername,steemKey,hiveUsername,hiv
     keychainCb(token,steemUsername,false)
 }
 
-function handleLoginError(msg) {
-    keychainLoginBtn.innerText = getKeychainLoginBtnLabel()
+function handleLoginError(msg,network) {
+    document.getElementById(network+'AuthBtn').innerText = 'Login'
     document.getElementById('proceedPersistAuthBtn').innerText = 'Proceed'
     proceedAuthBtnDisabled = false
     if (msg) alert(msg)
-}
-
-function getKeychainLoginBtnLabel() {
-    if (isElectron()) return "Proceed"
-    let hiveUsername = document.getElementById('loginUsername').value
-    let steemUsername = document.getElementById('loginSteemUsername').value
-    if (hiveUsername || steemUsername)
-        return "Proceed with Keychains"
-    else
-        return "Proceed"
 }
 
 function updateRememberMeState() {
