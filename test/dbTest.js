@@ -107,16 +107,29 @@ describe('Database',() => {
         done()
     })
 
+    it('darkMode settings validator',(done) => {
+        assert.isNotNull(db.settingsValidator.darkMode('a'))
+        assert.isNotNull(db.settingsValidator.darkMode(1))
+        assert.isNotNull(db.settingsValidator.darkMode(null))
+        assert.isNull(db.settingsValidator.darkMode(true))
+        assert.isNull(db.settingsValidator.darkMode(false))
+        done()
+    })
+
     it('settingsTranslator should transform settings values to appropriate types',(done) => {
         assert.strictEqual(db.settingsTranslator.uplThreads('6.9'),6)
         assert.strictEqual(db.settingsTranslator.descTemplate('a'),'a')
         assert.isUndefined(db.settingsTranslator.descTemplate(''))
+        assert.strictEqual(db.settingsTranslator.darkMode(true),true)
+        assert.strictEqual(db.settingsTranslator.darkMode(false),false)
         done()
     })
 
     it('settingsUpdate should update user settings accordingly',(done) => {
         db.settingsUpdate(Config.test.user,'all','uplThreads','25')
+        db.settingsUpdate(Config.test.user,'all','darkMode',true)
         assert.strictEqual(db.getUserInfo(Config.test.user,'all').settings.uplThreads,25)
+        assert.strictEqual(db.getUserInfo(Config.test.user,'all').settings.darkMode,true)
         done()
     })
 })
