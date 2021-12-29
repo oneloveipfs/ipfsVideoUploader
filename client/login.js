@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.proceedAuthBtnDisabled = document.getElementById('proceedAuthBtn').disabled
     document.getElementById('authButton').onclick = loginBtnClicked
     document.getElementById('authButton2').onclick = loginBtnClicked
+})
 
 window.onclick = (event) => {
     dismissPopup(event,'loginPopup')
@@ -98,7 +99,7 @@ function loginBtnClicked() {
     } else updateDisplayByIDs(['loginPopup','loginform'],['persistentform'])
 }
 
-document.getElementById('proceedAuthBtn').onclick = async function proceedLogin() {
+async function proceedLogin() {
     if (window.proceedAuthBtnDisabled == true) return
 
     let username = document.getElementById('hiveLoginUsername').value.toLowerCase().replace('@','')
@@ -145,7 +146,7 @@ document.getElementById('proceedAuthBtn').onclick = async function proceedLogin(
     }).catch((err) => handleLoginError(err && err.response && err.response.data ? err.response.data.error : err))
 }
 
-document.getElementById('altAuthBtn').onclick = async () => {
+async function hivesignerLogin() {
     // HiveSigner login (plus SteemLogin dual?)
     let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
     let avalonKey = document.getElementById('avalonLoginKey').value
@@ -163,7 +164,7 @@ document.getElementById('altAuthBtn').onclick = async () => {
     })
 }
 
-document.getElementById('proceedPersistAuthBtn').onclick = async () => {
+async function proceedPersistentLogin() {
     let dec = retrieveEncrypted('persistentLogin',document.getElementById('persistLoginPassword').value)
     if (dec === null) return alert('Invalid password')
     if (proceedAuthBtnDisabled) return
@@ -183,16 +184,12 @@ document.getElementById('proceedPersistAuthBtn').onclick = async () => {
     })
 }
 
-document.getElementById('clearPersistAuthBtn').onclick = () => {
+function clearPersistentLogin() {
     localStorage.setItem('persistentLogin',null)
     updateDisplayByIDs(['loginform'],['persistentform'])
 }
 
-document.getElementById('signupButton').onclick = () => {
-    updateDisplayByIDs(['signupPopup'],[])
-}
-
-document.getElementById('getPaymentBtns').onclick = () => {
+function getPaymentInfo() {
     if (document.getElementById('gbdaysInput').value == '') return alert('Please specify GBdays to purchase.')
     let selectedNetwork = document.getElementById('signupNetwork').value
     let receipient = document.getElementById('receiverUsername').value
@@ -251,10 +248,9 @@ document.getElementById('getPaymentBtns').onclick = () => {
     })
 }
 
-document.getElementById('redeemVoucherBtn').onclick = () => {
+function redeemVoucher() {
     alert('Invalid voucher code')
 }
-})
 
 function signupNetworkSelect() {
     switch (document.getElementById('signupNetwork').value) {

@@ -44,7 +44,7 @@
                 <h3>An alternative way of uploading videos to DTube, a decentralized video platform built on Steem, Hive and Avalon blockchain.</h3>
                 <h3 id="homepagePriceLbl">$/GB/month</h3>
                 <table id="buttons"><tr>
-                    <td><a id="signupButton" class="styledButton">Sign Up</a></td>
+                    <td><a id="signupButton" class="styledButton" onclick="updateDisplayByIDs(['signupPopup'],[])">Sign Up</a></td>
                 </tr></table>
                 <div class="scrollarrow">
                     <a onclick="window.scroll(0,window.innerHeight - 50)">
@@ -190,7 +190,7 @@
                                 </label><h4 class="remembermelabel"> Remember Me</h4><br><br>
                                 <input type="password" placeholder="Encrypt private keys with password (optional)" autocorrect="off" autocapitalize="off" spellcheck="false" class="loginFields" id="persistPassword">
                             </div>
-                            <a class="roundedBtn" id="proceedAuthBtn">Proceed</a>
+                            <a class="roundedBtn" id="proceedAuthBtn" onclick="proceedLogin()">Proceed</a>
                         </div>
                         <div id="loginformhive">
                             <a onclick="updateDisplayByIDs(['loginformmain'],['loginformhive'])"><< Back</a><br><br>
@@ -198,7 +198,7 @@
                             <input type="password" placeholder="HIVE Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="hiveLoginKey" class="loginFields">
                             <a class="roundedBtn kcAuth" id="hiveAuthBtn" onclick="hiveLogin()">Login with Keychain</a>
                             <h3 class="loginor sclogin">OR</h3>
-                            <a class="roundedBtn sclogin" id="altAuthBtn">Login with HiveSigner</a>
+                            <a class="roundedBtn sclogin" id="altAuthBtn" onclick="hivesignerLogin()">Login with HiveSigner</a>
                         </div>
                         <div id="loginformavalon">
                             <a onclick="updateDisplayByIDs(['loginformmain'],['loginformavalon'])"><< Back</a><br><br>
@@ -231,8 +231,8 @@
                     <div id="persistentform">
                         <h4 id="persistentLoginText"></h4>
                         <input type="password" placeholder="Enter password" autocorrect="off" autocapitalize="off" spellcheck="false" class="loginFields" id="persistLoginPassword">
-                        <a class="roundedBtn" id="clearPersistAuthBtn">Clear login</a><br><br>
-                        <a class="roundedBtn" id="proceedPersistAuthBtn">Proceed</a>
+                        <a class="roundedBtn" id="clearPersistAuthBtn" onclick="clearPersistentLogin()">Clear login</a><br><br>
+                        <a class="roundedBtn" id="proceedPersistAuthBtn" onclick="proceedPersistentLogin()">Proceed</a>
                     </div>
                 </div>
             </div>
@@ -259,7 +259,7 @@
                             <option>HIVE</option>
                             <option>HBD</option>
                         </select></h4>
-                        <a class="roundedBtn" id="getPaymentBtns">Get payment info</a>
+                        <a class="roundedBtn" id="getPaymentBtns" onclick="getPaymentInfo()">Get payment info</a>
                         <h5 class="redeemVoucherNavBtn"><a onclick="document.getElementById('signupstart').style.display = 'none'; document.getElementById('signupredeem').style.display = 'block';">Redeem a voucher</a></h5>
                     </div>
                     <div id="signuppay" style="display: none;">
@@ -278,7 +278,7 @@
                         <a onclick="document.getElementById('signupredeem').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>
                         <input type="text" placeholder="HIVE Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="redeemerUsername" class="loginFields">
                         <input type="text" placeholder="Voucher Code" autocomplete="off" autocorrent="off" autocapitalize="off" spellcheck="false" id="voucherCode" class="loginFields">
-                        <a class="roundedBtn" id="redeemVoucherBtn">Redeem</a>
+                        <a class="roundedBtn" id="redeemVoucherBtn" onclick="redeemVoucher()">Redeem</a>
                     </div>
                     <div id="signupcb" style="display: none;">
                         <a onclick="document.getElementById('signupcb').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>
