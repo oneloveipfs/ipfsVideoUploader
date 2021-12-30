@@ -54,10 +54,10 @@ describe('Shawp',() => {
     })
 
     it('Shawp.AddUser with network should only add user to network specific whitelist',(done) => {
-        Shawp.AddUser(Config.test.dtcUser+'2','dtc',true)
-        assert.isTrue(Shawp.UserExists(Config.test.dtcUser+'2','dtc'))
-        assert.isFalse(Shawp.UserExists(Config.test.dtcUser+'2','hive'))
-        assert.isFalse(Shawp.UserExists(Config.test.dtcUser+'2'))
+        Shawp.AddUser(Config.test.avalonUser+'2','dtc',true)
+        assert.isTrue(Shawp.UserExists(Config.test.avalonUser+'2','dtc'))
+        assert.isFalse(Shawp.UserExists(Config.test.avalonUser+'2','hive'))
+        assert.isFalse(Shawp.UserExists(Config.test.avalonUser+'2'))
 
         Shawp.AddUser(Config.test.hiveUser+'2','hive',true)
         assert.isTrue(Shawp.UserExists(Config.test.hiveUser+'2','hive'))

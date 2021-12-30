@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let tochange = document.getElementsByClassName('kcAuth')
         for (let i = 0; i < tochange.length; i++)
             tochange[i].innerText = 'Login'
-        updateDisplayByIDs([],['avalonKcAuthOr','avalonKcAuthBtn'])
+        //updateDisplayByIDs([],['avalonKcAuthOr','avalonKcAuthBtn'])
     }
 
     axios.get('/config').then((result) => {
@@ -81,13 +81,15 @@ function loginBtnClicked() {
         if (!isEncryptedStore('persistentLogin'))
             try {
                 storedLogin = JSON.parse(localStorage.getItem('persistentLogin'))
-                if ((!storedLogin.dtcUser && !storedLogin.hiveUser && !storedLogin.steemUser) || 
-                    (storedLogin.dtcUser && !storedLogin.dtcKey) || 
+                if ((!storedLogin.avalonUser && !storedLogin.hiveUser && !storedLogin.steemUser) || 
+                    (storedLogin.avalonUser && !storedLogin.avalonKey) || 
                     (storedLogin.hiveUser && !storedLogin.hiveKey) || 
-                    (storedLogin.steemUser && !storedLogin.steemKey)) throw 'invalid keys'
+                    (storedLogin.steemUser && !storedLogin.steemKey) ||
+                    (storedLogin.blurtUser && !storedLogin.blurtKey)) throw 'invalid keys'
                 if (storedLogin.hiveUser) persistentLoginText += '<br>Hive: ' + storedLogin.hiveUser
                 if (storedLogin.steemUser) persistentLoginText += '<br>Steem: ' + storedLogin.steemUser
-                if (storedLogin.dtcUser) persistentLoginText += '<br>Avalon: ' + storedLogin.dtcUser
+                if (storedLogin.blurtUser) persistentLoginText += '<br>Blurt: ' + storedLogin.blurtUser
+                if (storedLogin.avalonUser) persistentLoginText += '<br>Avalon: ' + storedLogin.avalonUser
             } catch {
                 return updateDisplayByIDs(['loginPopup'],[])
             }
@@ -149,9 +151,37 @@ async function proceedPersistentLogin() {
     } catch {
         return handleLoginError('Could not parse persistent login info')
     }
-    axios.get(`/login?network=${dec.loginNetwork}&user=${dec[dec.loginNetwork+'User']}`).then((r) => {
+    for (let k in storedDetails) {
+        if (k.endsWith('User')) {
+            let n = k.replace('User','')
+            sessionStorage.setItem(n+'User',storedDetails[n+'User'])
+            sessionStorage.setItem(n+'Key',storedDetails[n+'Key'])
+        }
+        window.logins[k] = storedDetails[k]
+    }
+    let network = storedDetails.tokenNetwork
+    if (network === 'avalon')
+        network = 'dtc'
+    axios.get(`/login?network=${network}&user=${storedDetails[storedDetails.tokenNetwork+'User']}`).then((r) => {
         if (r.data.error != null)
             return handleLoginError(r.data.error)
+        console.log(storedDetails,r.data)
+        if (storedDetails.tokenNetwork === 'hive') {
+            let t
+            try {
+                t = hivecrypt.decode(storedDetails.hiveKey,r.data.encrypted_memo).substr(1)
+            } catch {
+                return handleLoginError('Unable to decode access token with posting key','hive')
+            }
+            console.log(t)
+            keychainCb(t,'hive',true)
+        } else if (storedDetails.tokenNetwork === 'avalon') {
+            javalon.decrypt(storedDetails.avalonKey,r.data.encrypted_memo,(e,decryptedAES) => {
+                if (e)
+                    return handleLoginError('Avalon decrypt error: ' + e,'avalon')
+                keychainCb(decryptedAES,'avalon',true)
+            })
+        }
     })
 }
 
@@ -274,12 +304,16 @@ function hiveLogin() {
     })
 }
 
-function keychainCb(encrypted_message,network) {
+function keychainCb(encrypted_message,network,persistence) {
     axios.post('/logincb',encrypted_message,{ headers: { 'content-type': 'text/plain' }}).then((cbResponse) => {
         if (cbResponse.data.error != null) {
             alert(cbResponse.data.error)
         } else {
-            loginCb(network,cbResponse.data.access_token,false)
+            console.log(cbResponse.data)
+            if (isElectron() && persistence)
+                proceedLogin()
+            else
+                loginCb(network,cbResponse.data.access_token,false)
         }
     }).catch((err) => {
         if (err.response.data.error)
@@ -325,8 +359,8 @@ async function avalonLogin() {
         return handleLoginError('Avalon login error: ' + e.toString(),'avalon')
     }
 
-    sessionStorage.setItem('dtcUser',avalonUsername)
-    sessionStorage.setItem('dtcKey',avalonKey)
+    sessionStorage.setItem('avalonUser',avalonUsername)
+    sessionStorage.setItem('avalonKey',avalonKey)
 
     if (window.logins.token) {
         // an access token already generated, login is complete
@@ -479,17 +513,7 @@ function isEncryptedStore(key) {
 
 function storeLogins() {
     if (document.getElementById('rememberme').checked && window.logins.tokenNetwork) {
-        let ptValue = JSON.stringify({
-            hiveUser: window.logins.hiveUser,
-            hiveKey: window.logins.hiveKey,
-            steemUser: window.logins.steemUser,
-            steemKey: window.logins.steemKey,
-            blurtUser: window.logins.blurtUser,
-            blurtKey: window.logins.blurtKey,
-            dtcUser: window.logins.avalonUser,
-            dtcKey: window.logins.avalonKey,
-            tokenNetwork: window.logins.tokenNetwork
-        })
+        let ptValue = JSON.stringify(window.logins)
         let psw = document.getElementById('persistPassword').value
         if (psw)
             storeEncrypted('persistentLogin',ptValue,psw)

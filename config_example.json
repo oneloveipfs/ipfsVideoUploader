@@ -56,7 +56,7 @@
     "test": {
         "hashType": ["videos","thumbnails","sprites","images","video240","video480","video720","video1080","subtitles"],
         "user": "techcoderx",
-        "dtcUser": "alice",
+        "avalonUser": "alice",
         "hiveUser": "bob",
         "aliasedUser": "john"
     }

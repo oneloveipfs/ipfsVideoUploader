@@ -60,10 +60,10 @@ describe('Auth',() => {
     })
 
     it('Adding user to Avalon specific whitelist should not whitelist user for other networks',function (done) {
-        Auth.whitelistAdd(Config.test.dtcUser,'dtc',() => {
-            assert.isTrue(Auth.isInWhitelist(Config.test.dtcUser,'dtc'))
-            assert.isFalse(Auth.isInWhitelist(Config.test.dtcUser,'hive'))
-            assert.isFalse(Auth.isInWhitelist(Config.test.dtcUser,null))
+        Auth.whitelistAdd(Config.test.avalonUser,'dtc',() => {
+            assert.isTrue(Auth.isInWhitelist(Config.test.avalonUser,'dtc'))
+            assert.isFalse(Auth.isInWhitelist(Config.test.avalonUser,'hive'))
+            assert.isFalse(Auth.isInWhitelist(Config.test.avalonUser,null))
             done()
         },true)
     })
@@ -78,7 +78,7 @@ describe('Auth',() => {
     })
 
     it('Avalon only user should only be authenticatable with the correct network',function (done) {
-        Auth.generateJWT(Config.test.dtcUser,'dtc',(e,token) => Auth.verifyAuth(token,false,(verifyError,result) => {
+        Auth.generateJWT(Config.test.avalonUser,'dtc',(e,token) => Auth.verifyAuth(token,false,(verifyError,result) => {
             assert.notExists(verifyError)
             assert.equal(result.network,'dtc')
 
@@ -97,12 +97,12 @@ describe('Auth',() => {
                 }
             }
 
-            Auth.generateJWT(Config.test.dtcUser,'hive',(e,hiveToken) => Auth.verifyAuth(hiveToken,false,(hiveVerifyError) => {
+            Auth.generateJWT(Config.test.avalonUser,'hive',(e,hiveToken) => Auth.verifyAuth(hiveToken,false,(hiveVerifyError) => {
                 completed[0] = hiveVerifyError
                 testResults()
             }))
 
-            Auth.generateJWT(Config.test.dtcUser,'all',(e,allToken) => Auth.verifyAuth(allToken,false,(allVerifyError) => {
+            Auth.generateJWT(Config.test.avalonUser,'all',(e,allToken) => Auth.verifyAuth(allToken,false,(allVerifyError) => {
                 completed[1] = allVerifyError
                 testResults()
             }))

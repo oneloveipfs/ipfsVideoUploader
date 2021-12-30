@@ -31,8 +31,8 @@ let hiveBeneficiaries = new Beneficiaries('Hive')
 let steemBeneficiaries = new Beneficiaries('Steem')
 
 // Load Avalon login
-let avalonUser = sessionStorage.getItem('dtcUser')
-let avalonKey = sessionStorage.getItem('dtcKey')
+let avalonUser = sessionStorage.getItem('avalonUser')
+let avalonKey = sessionStorage.getItem('avalonKey')
 
 // Post parameters (videohash, video240, video480 etc)
 let postparams = {}
@@ -843,7 +843,7 @@ async function broadcastAvalon(json,permlink,cb) {
             tx.data.burn = burnAmt
         }
 
-        let signedtx = javalon.sign(sessionStorage.getItem('dtcKey'),avalonAcc.name,tx)
+        let signedtx = javalon.sign(sessionStorage.getItem('avalonKey'),avalonAcc.name,tx)
         javalon.sendTransaction(signedtx,(err,result) => {
             if (err) alert('Avalon broadcast error: ' + JSON.stringify(err))
             cb()

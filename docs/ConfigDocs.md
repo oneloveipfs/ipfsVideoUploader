@@ -69,6 +69,6 @@ Changing this section might affect how you receive app updates.
 These values do not affect the functionality of the app.
 * `hashType`: Specify hash types in an array to run database unit tests with.
 * `user`: Specify general username to run unit tests with.
-* `dtcUser`: Specify Avalon username to run unit tests with.
+* `avalonUser`: Specify Avalon username to run unit tests with.
 * `hiveUser`: Specify Hive username to run unit tests with.
 * `aliasedUser`: Specify aliased username to run unit tests with.
