@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="shortcut icon" href="public/favicon.png">
+        <title>HiveSigner Callback - OneLoveIPFS Uploader</title>
+    </head>
+    <body>
+        Redirecting back to OneLoveIPFS...
+        <script>
+            let url = new URL(window.location.href)
+            localStorage.setItem('hivesignerToken',url.searchParams.get('access_token'))
+            localStorage.setItem('hivesignerUsername',url.searchParams.get('username'))
+            setTimeout(() => window.close(),1000)
+        </script>
+    </body>
+</html>

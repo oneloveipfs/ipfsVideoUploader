@@ -1,8 +1,5 @@
 // Load auth details
 let username
-Auth.Hive().then((result) => {
-    username = result
-})
 
 let hiveOptions = {
     url: 'https://techcoderx.com',
@@ -81,8 +78,9 @@ axios.get('/proxy_server').then((r) => {
 // Vars loaded from config
 let config;
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     Auth.Avalon()
+    username = await Auth.Hive()
     updateSubtitle()
     // Get configuration, then load accounts and authorities
     axios.get('/config').then((result) => {

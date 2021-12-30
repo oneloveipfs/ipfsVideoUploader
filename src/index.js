@@ -37,6 +37,7 @@ app.use(Parser.text())
 app.get('/', (request,response) => loadWebpage(__dirname+'/../client/welcome.html',response)) // Home page
 app.get('/upload', (request,response) => loadWebpage(__dirname+'/../client/uploader.html',response)) // Upload page
 app.get('/404', (request,response) => loadWebpage(__dirname+'/../client/404.html',response)) // 404 page
+app.get('/hivesigner', (request,response) => loadWebpage(__dirname+'/../client/hivesigner.html',response)) // HiveSigner callback
 
 app.get('/checkuser',(request,response) => {
     // Check if user is in whitelist
@@ -462,7 +463,7 @@ function loadWebpage(HTMLFile,response) {
 function Authenticate(request,response,needscredits,next) {
     let access_token = request.query.access_token
     if (Config.whitelistEnabled && !access_token) return response.status(400).send({error: 'Missing API auth credentials'})
-    if (Config.whitelistEnabled && request.query.scauth === 'true') {
+    if (request.query.scauth === 'true') {
         // Handle HiveSigner access token
         Auth.scAuth(access_token,needscredits,(err,user,network) => {
             if (err) return response.status(401).send({ error: err })

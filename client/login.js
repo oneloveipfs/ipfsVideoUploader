@@ -1,6 +1,9 @@
 let config, shawpconfig
 window.logins = {}
 
+localStorage.setItem('hivesignerToken',null)
+localStorage.setItem('hivesignerUsername',null)
+
 document.addEventListener('DOMContentLoaded', () => {
     let url = new URL(window.location.href)
     if (url.searchParams.get('callback') == 'signupstart')
@@ -100,11 +103,13 @@ function loginBtnClicked() {
 }
 
 async function proceedLogin() {
-    if (!window.logins.hiveUser || !window.logins.avalonUser)
+    if (!window.logins.hiveUser && !window.logins.avalonUser)
         return alert('Hive or Avalon login is required')
     else if (!window.logins.token)
         return alert('Missing access token')
     let cbUrl = '/upload?access_token=' + window.logins.token
+    if (isElectron())
+        storeLogins()
     if (window.logins.keychain) cbUrl += '&keychain=true'
     if (window.logins.steemUser) cbUrl += '&steemuser=' + window.logins.steemUser
     if (window.logins.blurtUser) cbUrl += '&blurtuser=' + window.logins.blurtUser
@@ -113,21 +118,23 @@ async function proceedLogin() {
 }
 
 async function hivesignerLogin() {
-    // HiveSigner login (plus SteemLogin dual?)
-    let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
-    let avalonKey = document.getElementById('avalonLoginKey').value
-
-    await avalonLogin(avalonUsername,avalonKey,false)
-
+    // HiveSigner login
     let hiveClient = new hivesigner.Client({
         app: config.HiveSignerApp,
-        callbackURL: window.location.origin + '/upload',
+        callbackURL: window.location.origin + '/hivesigner',
         scope: ['comment','comment_options']
     })
 
-    hiveClient.login({},(err,token) => {
-        console.log('HiveSigner',err,token)
-    })
+    let hsUrl = hiveClient.getLoginURL()
+    let hsWindow = window.open(hsUrl)
+    let hsInterval = setInterval(() => {
+        if (hsWindow.closed) {
+            clearInterval(hsInterval)
+            window.logins.token = localStorage.getItem('hivesignerToken')
+            window.logins.hiveUser = localStorage.getItem('hivesignerUsername')
+            loginCb('hive',window.logins.token,true)
+        }
+    },1000)
 }
 
 async function proceedPersistentLogin() {
@@ -142,11 +149,9 @@ async function proceedPersistentLogin() {
     } catch {
         return handleLoginError('Could not parse persistent login info')
     }
-    await avalonLogin(storedDetails.dtcUser,storedDetails.dtcKey,!storedDetails.hiveUser && !storedDetails.steemUser,true)
-    axios.get('/login?network=hive&hivecrypt=1&user='+storedDetails.hiveUser).then((r) => {
+    axios.get(`/login?network=${dec.loginNetwork}&user=${dec[dec.loginNetwork+'User']}`).then((r) => {
         if (r.data.error != null)
             return handleLoginError(r.data.error)
-        handleElectronLogins(r.data.encrypted_memo,storedDetails.steemUser,storedDetails.steemKey,storedDetails.hiveUser,storedDetails.hiveKey,storedDetails.dtcUser,storedDetails.dtcKey,true)
     })
 }
 
@@ -258,6 +263,8 @@ function hiveLogin() {
             } catch {
                 return handleLoginError('Unable to decode access token with posting key','hive')
             }
+            sessionStorage.setItem('hiveUser',hiveUsername)
+            sessionStorage.setItem('hiveKey',hiveKey)
             keychainCb(t,'hive')
         } else hive_keychain.requestVerifyKey(hiveUsername,response.data.encrypted_memo,'Posting',(loginResponse) => {
             if (loginResponse.error != null)
@@ -272,7 +279,7 @@ function keychainCb(encrypted_message,network) {
         if (cbResponse.data.error != null) {
             alert(cbResponse.data.error)
         } else {
-            loginCb(network,cbResponse.data.access_token)
+            loginCb(network,cbResponse.data.access_token,false)
         }
     }).catch((err) => {
         if (err.response.data.error)
@@ -282,19 +289,22 @@ function keychainCb(encrypted_message,network) {
     }).finally(() => window.proceedAuthBtnDisabled = false)
 }
 
-function loginCb(network,token) {
+function loginCb(network,token,oauth2) {
     let u = document.getElementById(network+'LoginUsername').value.toLowerCase().replace('@','')
     let k = document.getElementById(network+'LoginKey').value
     if (!window.logins.token && token) {
         window.logins.token = token
-        window.logins.keychain = network
+        window.logins.tokenNetwork = network
+        window.logins.keychain = !oauth2
     }
-    window.logins[network+'User'] = u
-    window.logins[network+'Key'] = k
+    if (!oauth2) {
+        window.logins[network+'User'] = u
+        window.logins[network+'Key'] = k
+    }
     window.proceedAuthBtnDisabled = false
     updateDisplayByIDs(['loginformmain'],['loginform'+network])
     document.getElementById('loginnetwork'+network).innerHTML = '<h5 id="loginnetwork'+network+'username"></h5>'
-    document.getElementById('loginnetwork'+network+'username').innerText = u
+    document.getElementById('loginnetwork'+network+'username').innerText = window.logins[network+'User']
 }
 
 async function avalonLogin() {
@@ -361,6 +371,8 @@ async function blurtLogin() {
             document.getElementById('blurtAuthBtn').innerText = 'Login'
             return
         }
+        sessionStorage.setItem('blurtUser',blurtUsername)
+        sessionStorage.setItem('blurtKey',blurtKey)
         loginCb('blurt')
     } else {
         blurt_keychain.requestSignBuffer(blurtUsername,'login','Posting',(blurtLoginRes) => {
@@ -399,6 +411,8 @@ async function steemLogin() {
             document.getElementById('steemAuthBtn').innerText = 'Login'
             return
         }
+        sessionStorage.setItem('steemUser',steemUsername)
+        sessionStorage.setItem('steemKey',steemKey)
         loginCb('steem')
     } else {
         steem_keychain.requestSignBuffer(steemUsername,'login','Posting',(steemLoginRes) => {
@@ -463,33 +477,18 @@ function isEncryptedStore(key) {
     return val === null ? false : localStorage.getItem(key).startsWith('#')
 }
 
-async function handleElectronLogins(memo,steemUsername,steemKey,hiveUsername,hiveKey,avalonUsername,avalonKey,fromPersistence) {
-    // Use posting keys to decrypt for Electron app
-    let usingSteem = false
-    if (steemUsername && steemKey) try {
-        await steemKeyLogin(steemUsername,steemKey)
-        usingSteem = true
-    } catch (e) {
-        alert(e.toString()+' Proceeding with Hive/Avalon login only')
-    }
-
-    // Store private keys in session storage to be used later
-    sessionStorage.setItem('hiveUser',hiveUsername)
-    sessionStorage.setItem('hiveKey',hiveKey)
-
-    if (usingSteem) {
-        sessionStorage.setItem('steemUser',steemUsername)
-        sessionStorage.setItem('steemKey',steemKey)
-    }
-
-    if (document.getElementById('rememberme').checked && !fromPersistence) {
+function storeLogins() {
+    if (document.getElementById('rememberme').checked && window.logins.tokenNetwork) {
         let ptValue = JSON.stringify({
-            hiveUser: hiveUsername,
-            hiveKey: hiveKey,
-            steemUser: steemUsername,
-            steemKey: steemKey,
-            dtcUser: avalonUsername,
-            dtcKey: avalonKey
+            hiveUser: window.logins.hiveUser,
+            hiveKey: window.logins.hiveKey,
+            steemUser: window.logins.steemUser,
+            steemKey: window.logins.steemKey,
+            blurtUser: window.logins.blurtUser,
+            blurtKey: window.logins.blurtKey,
+            dtcUser: window.logins.avalonUser,
+            dtcKey: window.logins.avalonKey,
+            tokenNetwork: window.logins.tokenNetwork
         })
         let psw = document.getElementById('persistPassword').value
         if (psw)
