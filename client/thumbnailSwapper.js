@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     selectedPermlink = split[1]
                     document.getElementById('thumbnailSwapNoAvalon').style.display = 'none'
 
-                    document.getElementById('currentSnap').innerHTML = '<img class="snapImgPreview" src="https://snap1.d.tube/ipfs/' + jsonmeta.video.info.snaphash + '">'
+                    document.getElementById('currentSnap').innerHTML = '<img class="snapImgPreview" src="https://ipfs.io/ipfs/' + jsonmeta.video.info.snaphash + '">'
                     let resultHTMLToAppend2 = '<h4>Title: ' + results.steem.title + '<br><br>'
                     resultHTMLToAppend2 += 'Permlink: ' + split[1] + '<br><br>'
                     resultHTMLToAppend2 += 'Current thumbnail hash: ' + jsonmeta.video.info.snaphash + '</h4>'
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         thumubnailHash = jsonmeta.video.files.ipfs.img[360] || jsonmeta.video.files.ipfs.img[118]
                     }
 
-                    document.getElementById('currentSnap').innerHTML = '<img class="snapImgPreview" src="https://snap1.d.tube/ipfs/' + thumubnailHash + '">'
+                    document.getElementById('currentSnap').innerHTML = '<img class="snapImgPreview" src="https://ipfs.io/ipfs/' + thumubnailHash + '">'
                     let resultHTMLToAppend2 = '<h4>Title: ' + (results.steem.title || results.hive.title) + '<br><br>'
                     resultHTMLToAppend2 += 'Permlink: ' + split[1] + '<br><br>'
                     resultHTMLToAppend2 += 'Current thumbnail hash: ' + thumubnailHash + '</h4>'
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     thumubnailHash = results.avalon.json.files.ipfs.img[360] || results.avalon.json.files.ipfs.img[118]
                 }
 
-                document.getElementById('currentSnap').innerHTML = '<img class="snapImgPreview" src="https://snap1.d.tube/ipfs/' + thumubnailHash + '">'
+                document.getElementById('currentSnap').innerHTML = '<img class="snapImgPreview" src="https://ipfs.io/ipfs/' + thumubnailHash + '">'
                 let resultHTMLToAppend2 = '<h4>Title: ' + results.avalon.json.title + '<br><br>'
                 resultHTMLToAppend2 += 'Permlink: ' + split[1] + '<br><br>'
                 resultHTMLToAppend2 += 'Current thumbnail hash: ' + thumubnailHash + '</h4>'
@@ -257,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (jsonmeta.video.ipfs) {
                     // DTube 0.9 - 0.9.3
                     jsonmeta.video.ipfs.snaphash = newSnapHash
-                    jsonmeta.video.thumbnailUrl = 'https://snap1.d.tube/ipfs/' + newSnapHash
+                    jsonmeta.video.thumbnailUrl = 'https://ipfs.io/ipfs/' + newSnapHash
                 } else {
                     // DTube 0.9.4+
                     jsonmeta.video.files.ipfs.img[118] = newSnapHash
@@ -310,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (jsonmeta.video.ipfs) {
                     // DTube 0.9 - 0.9.3
                     jsonmeta.video.ipfs.snaphash = newSnapHash
-                    jsonmeta.video.thumbnailUrl = 'https://snap1.d.tube/ipfs/' + newSnapHash
+                    jsonmeta.video.thumbnailUrl = 'https://ipfs.io/ipfs/' + newSnapHash
                 } else {
                     // DTube 0.9.4+
                     jsonmeta.video.files.ipfs.img[118] = newSnapHash
@@ -372,7 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (avalonPostToModify) snapSwapOps.avalon = (cb) => {
                 let jsonAvalon = avalonPostToModify.json
                 if (jsonAvalon.ipfs) {
-                    jsonAvalon.thumbnailUrl = 'https://snap1.d.tube/ipfs/' + newSnapHash
+                    jsonAvalon.thumbnailUrl = 'https://ipfs.io/ipfs/' + newSnapHash
                     jsonAvalon.ipfs.snaphash = newSnapHash
                 } else {
                     jsonAvalon.files.ipfs.img[118] = newSnapHash
