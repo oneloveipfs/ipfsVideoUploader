@@ -766,7 +766,7 @@ textarea {
     display: none;
 }
 
-.darkmode #avalonAuthorizeBtn, #hiveAuthorizeBtn, #steemAuthorizeBtn {
+.darkmode #avalonAuthorizeBtn, .darkmode #hiveAuthorizeBtn, .darkmode #steemAuthorizeBtn {
     color: #ffffff;
 }
 
