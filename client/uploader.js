@@ -192,8 +192,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return alert('Invalid tags!')
 
         let tags = tag.split(' ')
-        if (tags.length > 7)
-            return alert('Please do not use more than 7 tags!')
+        if (tags.length > 8)
+            return alert('Please do not use more than 8 tags!')
 
         // Check for empty fields
         if (sourceVideo.length == 0)
@@ -676,13 +676,9 @@ function buildPostBody(author,permlink,postBody,videoHash,snapHash,description) 
 }
 
 function buildJsonMetadata(network) {
-    // 'dtube' tag as first tag for Hive post
-    let SteemTags = ['dtube']
-    SteemTags = SteemTags.concat(postparams.tags);
-
     let jsonMeta = {
         video: buildJsonMetadataAvalon(),
-        tags: SteemTags,
+        tags: postparams.tags,
         app: 'onelovedtube/2.1.2',
     }
 
