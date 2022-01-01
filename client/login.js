@@ -157,7 +157,8 @@ async function proceedPersistentLogin() {
             sessionStorage.setItem(n+'User',storedDetails[n+'User'])
             sessionStorage.setItem(n+'Key',storedDetails[n+'Key'])
         }
-        window.logins[k] = storedDetails[k]
+        if (k !== 'token')
+            window.logins[k] = storedDetails[k]
     }
     let network = storedDetails.tokenNetwork
     if (network === 'avalon')
@@ -310,9 +311,12 @@ function keychainCb(encrypted_message,network,persistence) {
             alert(cbResponse.data.error)
         } else {
             console.log(cbResponse.data)
-            if (isElectron() && persistence)
+            if (isElectron() && persistence) {
+                window.logins.token = cbResponse.data.access_token
+                window.logins.tokenNetwork = network
+                window.logins.keychain = true
                 proceedLogin()
-            else
+            } else
                 loginCb(network,cbResponse.data.access_token,false)
         }
     }).catch((err) => {
@@ -324,16 +328,14 @@ function keychainCb(encrypted_message,network,persistence) {
 }
 
 function loginCb(network,token,oauth2) {
-    let u = document.getElementById(network+'LoginUsername').value.toLowerCase().replace('@','')
-    let k = document.getElementById(network+'LoginKey').value
     if (!window.logins.token && token) {
         window.logins.token = token
         window.logins.tokenNetwork = network
         window.logins.keychain = !oauth2
     }
     if (!oauth2) {
-        window.logins[network+'User'] = u
-        window.logins[network+'Key'] = k
+        window.logins[network+'User'] = document.getElementById(network+'LoginUsername').value.toLowerCase().replace('@','')
+        window.logins[network+'Key'] = document.getElementById(network+'LoginKey').value
     }
     window.proceedAuthBtnDisabled = false
     updateDisplayByIDs(['loginformmain'],['loginform'+network])
