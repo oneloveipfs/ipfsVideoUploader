@@ -4,7 +4,7 @@ const IPFS = require('ipfs-http-client')
 const Shell = require('shelljs')
 const FormData = require('form-data')
 const axios = require('axios')
-const getDuration = require('get-video-duration').getVideoDurationInSeconds
+const ffmpeg = require('fluent-ffmpeg')
 const fs = require('fs')
 const async = require('async')
 const WebVTT = require('node-webvtt')
@@ -113,6 +113,16 @@ const processSingleVideo = async (id,user,network,cb) => {
 
     uploadRegister[id] = result
     cb(result)
+}
+
+const getDuration = (path) => {
+    return new Promise((rs,rj) => {
+        ffmpeg.ffprobe(path,(e,i) => {
+            if (e)
+                rj(e)
+            else rs(i.format.duration)
+        })
+    })
 }
 
 let uploadOps = {
@@ -370,7 +380,7 @@ let uploadOps = {
                         // Upload ID not found in register, register socket
                         if (!uploadRegister[info.id]) return socketRegister[info.id] = {
                             socket: socket,
-                            ts: new Date().getTime() // TODO: Clear sockets from cache after x minutes
+                            ts: new Date().getTime()
                         }
 
                         // Upload ID exist in register and matches type requested, return result immediately
