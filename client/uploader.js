@@ -858,6 +858,8 @@ function updateProgressBar(progress,text) {
 }
 
 function updateSubtitle() {
+    if (subtitleList.length > 0)
+        document.getElementById('subtitleHeading').style.display = 'block'
     let subtitleTableList = document.getElementById('subList')
     let subTableHtml = ''
     for (let i = 0; i < subtitleList.length; i++) {
