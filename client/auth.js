@@ -92,10 +92,8 @@ async function Avalon() {
     if (!avalonUser || !avalonKey) return
 
     let avalonLoginPromise = new Promise((resolve,reject) => {
-        document.getElementById('connectedAvalonNode').style.display = 'block'
         javalon.init({api: 'https://avalon.oneloved.tube'})
         javalon.getAccount(avalonUser,(err,result) => {
-            document.getElementById('connectedAvalonNode').innerText = 'Connected to ' + javalon.config.api
             if (err) return reject(err)
             let avalonPubKey = javalon.privToPub(avalonKey)
             if (result.pub === avalonPubKey) return resolve(true)

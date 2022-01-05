@@ -367,7 +367,7 @@ hr {
     padding-right: 10px;
 }
 
-#avalonZone, #connectedAvalonNode {
+#avalonZone {
     display: none;
 }
 
