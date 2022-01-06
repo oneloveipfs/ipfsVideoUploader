@@ -42,7 +42,7 @@ By default the upload server will be accessible at localhost:3000, or the port s
 
 It is recommended to build the installer for a target OS on the OS itself (e.g. DMG installer on macOS, DEB on Linux, EXE on Windows etc). For more info, see [electron-builder documentation](https://www.electron.build/multi-platform-build).
 
-#### Build installer for host OS:
+#### Build installer for host OS and architecture:
 ```
 npm run buildinstaller
 ```

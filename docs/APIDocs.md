@@ -29,11 +29,39 @@
 * `network` *(optional)*: Specify username network. Valid values: `hive`, `dtc` and `all`. Default: `all`.
 * `hashtype` *(optional)*: Type of hash to obtain, comma seperated. Valid values: `videos`, `thumbnails`, `sprites`, `images`, `video240`, `video480`, `video720`, `video1080`, `subtitles` and `streams` Default: All.
 
+#### To get pinset by single type:
+```
+/pinsByType?user=USERNAME&hashtype=videos
+```
+* `user` *(required)*: Avalon/Hive account username
+* `network` *(optional)*: Specify username network. Valid values: `hive`, `dtc` and `all`. Default: `all`.
+* `hashtype` *(required)*: Type of hash to obtain, comma seperated. Valid values: `videos`, `thumbnails`, `sprites`, `images`, `video240`, `video480`, `video720`, `video1080`, `subtitles` and `streams`.
+
 #### To get update logs:
 ```
 /updatelogs
 ```
 *(There are no arguments to be specifed in the URL for this API call)*
+
+#### To get latest build release:
+```
+/latest_build
+```
+*(There are no arguments to be specifed in the URL for this API call)*
+
+#### To get user info:
+```
+/user_info?access_token=AUTH_TOKEN
+```
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
+
+#### To get user aliases:
+```
+/get_alias?access_token=AUTH_TOKEN
+```
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 
 #### To initiate a login:
 ```
@@ -100,7 +128,7 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 }
 ```
 
-#### To upload a HLS stream segment:
+#### To upload a HLS stream segment (for live streams):
 ```
 /uploadStream?access_token=AUTH_TOKEN
 ```
@@ -120,8 +148,46 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 }
 ```
 
-#### IPFS Bot usage webhook (currently used in [IPFS Discord pinning bot](https://github.com/techcoderx/DTube-IPFS-Bot))
-This webhook syncs the bot usage data with the uploader so that the correct available quota balance is shown on the account details page. **This is currently WIP**
+# PUT API
+
+#### To update user settings:
+```
+/update_settings?access_token=AUTH_TOKEN
+```
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
+* Content type: application/json
+* Example content JSON:
+```
+{
+    uplThreads: 15,
+    descTemplate: "This is some text to be included in every single video.",
+    darkMode: true
+}
+```
+
+#### To perform operations on user alias:
+```
+/update_alias?access_token=AUTH_TOKEN
+```
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
+* Content type: application/json
+* Example content JSON to set alias:
+```
+{
+    operation: "set",
+    aliasKey: "decrypted value from /login of the alias user to be added"
+}
+```
+* Example content JSON to unset alias:
+```
+{
+    operation: "unset",
+    targetUser: "username of alias user to be removed",
+    targetNetwork: "network of alias user to be removed"
+}
+```
 
 # IPSync
 

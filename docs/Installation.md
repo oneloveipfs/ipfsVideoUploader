@@ -17,17 +17,12 @@ nvm use 16
 
 # go-ipfs (skip this if using IPFS desktop)
 # Get the latest version at https://dist.ipfs.io
-wget https://dist.ipfs.io/go-ipfs/v0.7.0/go-ipfs_v0.7.0_linux-amd64.tar.gz
-tar -xvf go-ipfs*
-cd go-ipfs
-sudo ./install.sh
-cd ..
-rm -r go-ipfs*
+wget https://raw.githubusercontent.com/oneloveipfs/ipfsVideoUploader/master/scripts/ipfs_ubuntu_install.sh
+chmod +x ipfs_ubuntu_install.sh
+sudo ./ipfs_ubuntu_install.sh
 ```
 
 #### macOS
-
-Only x86 Macs or Hackintoshes are supported. IPFS daemon does **not** currently run on Apple Silicon Macs.
 
 ```
 # Install Homebrew if not already
@@ -37,18 +32,15 @@ xcode-select --install
 # Main dependencies
 brew install git wget nodejs npm nvm ffmpeg imagemagick bc
 
-# Use Node v14 with NVM
-nvm install 14
-nvm use 14
+# Use Node v16 with NVM
+nvm install 16
+nvm use 16
 
 # go-ipfs (skip this if using IPFS desktop)
 # Get the latest version at https://dist.ipfs.io
-wget https://dist.ipfs.io/go-ipfs/v0.7.0/go-ipfs_v0.7.0_darwin-amd64.tar.gz
-tar -xvf go-ipfs*
-cd go-ipfs
-sudo ./install.sh
-cd ..
-rm -r go-ipfs*
+wget https://raw.githubusercontent.com/oneloveipfs/ipfsVideoUploader/master/scripts/ipfs_macos_install.sh
+chmod +x ipfs_macos_install.sh
+sudo ./ipfs_macos_install.sh
 ```
 
 #### Windows

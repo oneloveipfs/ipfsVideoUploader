@@ -348,10 +348,6 @@ app.get('/shawp_consumption_history_admin',(req,res) => {
     })
 })
 
-app.post('/botusage',Parser.json(),(req,res) => {
-    return res.status(500).send({error: 'WIP'})
-})
-
 app.get('/shawp_user_info',(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     Authenticate(req,res,false,(user,network) => {

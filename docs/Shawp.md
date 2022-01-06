@@ -39,3 +39,9 @@ Shawp offers a set of APIs when enabled in `config.json`. APIs listed below are 
 * `count` *(required)*: Number of days of consumption data to return.
 * `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
 * `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
+
+#### Blockchain head blocks
+```
+/shawp_head_blocks
+```
+*(There are no arguments to be specifed in the URL for this API call)*
