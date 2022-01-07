@@ -129,14 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 })
 
-window.onclick = (event) => {
-    dismissPopup(event,'refillPopup')
-}
-
-window.ontouchstart = (event) => {
-    dismissPopup(event,'refillPopup')
-}
-
 function dismissPopup(event,popupelement) {
     let popup = document.getElementById(popupelement)
     if (event.target == popup) {

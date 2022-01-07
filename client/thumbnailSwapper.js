@@ -5,42 +5,6 @@ let selectedAuthor
 let selectedPermlink
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('modeBtn').onclick = () => {
-        if (document.getElementById("dropdownbox").style.display === 'block')
-            document.getElementById("dropdownbox").style.display = 'none'
-        else
-            document.getElementById("dropdownbox").style.display = 'block'
-    }
-
-    document.getElementById('modeBtn').onmouseover = () => {
-        document.getElementById('dropdownArrow').style.border = 'solid rgb(54,57,63)'
-        document.getElementById('dropdownArrow').style.borderWidth = '0 3px 3px 0'
-    }
-
-    document.getElementById('modeBtn').onmouseleave = () => {
-        document.getElementById('dropdownArrow').style.border = 'solid #ffffff'
-        document.getElementById('dropdownArrow').style.borderWidth = '0 3px 3px 0'
-    }
-
-    // Menu selection
-    let pages = ['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings']
-    document.getElementById('newUploadModeBtn').onclick = () => updateDisplayByIDs(['uploadForm'],pages)
-    document.getElementById('snapSwapModeBtn').onclick = () => updateDisplayByIDs(['thumbnailSwapper'],pages)
-    document.getElementById('yourFilesModeBtn').onclick = () => updateDisplayByIDs(['yourFiles'],pages)
-    document.getElementById('subDetModeBtn').onclick = () => updateDisplayByIDs(['wcinfo'],pages)
-    document.getElementById('refillCrModeBtn').onclick = () => updateDisplayByIDs(['refiller'],pages)
-    document.getElementById('getHelpModeBtn').onclick = () => updateDisplayByIDs(['getHelp'],pages)
-    document.getElementById('settingsModeBtn').onclick = () => updateDisplayByIDs(['settings'],pages)
-
-    window.onclick = (event) => closeMenu(event)
-    window.ontouchstart = (event) => closeMenu(event)
-    
-    function closeMenu(event) {
-        let targets = ['modeBtn','headerMenu','dropdownArrow']
-        if (!targets.includes(event.target.id))
-            document.getElementById('dropdownbox').style.display = 'none'
-    }
-
     document.getElementById('linkSubmitBtn').onclick = () => {
         let linkInput = document.getElementById('thumbnailSwapLink')
         if (!linkInput.value.startsWith('https://d.tube/#!/v/') && !linkInput.value.startsWith('https://d.tube/v/'))
@@ -436,12 +400,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })
     }
 })
-
-// Close the dropdown menu if the user clicks outside of it
-window.onclick = (event) => {
-    if(!event.target.matches('#modeBtn') && !event.target.matches('#headerMenu') && !event.target.matches('.dropdownArrow'))
-        document.getElementById('dropdownbox').style.display = 'none'
-}
 
 function reenableSnapSwapFields() {
     const toEnable = ['linkSubmitBtn','thumbnailSwapLink','newSnap','swapSubmitBtn']

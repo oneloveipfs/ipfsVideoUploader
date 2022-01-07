@@ -151,19 +151,19 @@ function validateHiveUsername(value) {
     return null
 }
 
-function validateAvalonUsername(username) {
-    if (typeof username !== 'string') return 'username must be a string'
-    if (username.length < 1 || username.length > 50) return 'username nust be between 1 and 50 characters long'
+function validateAvalonUsername(u) {
+    if (typeof u !== 'string') return 'username must be a string'
+    if (u.length < 1 || userunuame.length > 50) return 'username nust be between 1 and 50 characters long'
     let allowedUsernameChars = 'abcdefghijklmnopqrstuvwxyz0123456789'
     let allowedUsernameCharsOnlyMiddle = '-.'
-    username = username.toLowerCase()
-    for (let i = 0; i < username.length; i++) {
-        const c = username[i]
+    u = u.toLowerCase()
+    for (let i = 0; i < u.length; i++) {
+        const c = u[i]
         // allowed username chars
         if (allowedUsernameChars.indexOf(c) === -1) 
             if (allowedUsernameCharsOnlyMiddle.indexOf(c) === -1)
                 return 'invalid character ' + c
-            else if (i === 0 || i === username.length-1)
+            else if (i === 0 || i === u.length-1)
                 return 'character ' + c + ' can only be in the middle'
     }
     return null

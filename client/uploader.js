@@ -79,8 +79,9 @@ axios.get('/proxy_server').then((r) => {
 let config;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    Auth.Avalon()
+    await Auth.Avalon()
     username = await Auth.Hive()
+    loadSelectPlatforms()
     updateSubtitle()
     // Get configuration, then load accounts and authorities
     axios.get('/config').then((result) => {
@@ -205,7 +206,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         postparams.title = title
 
         if (tag.length == 0)
-            return alert('Please enter some tags (up to 7) for your video!')
+            return alert('Please enter some tags (up to 8) for your video!')
         postparams.tags = tags
 
         // Avalon bandwidth check (untested)

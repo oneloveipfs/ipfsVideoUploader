@@ -402,13 +402,55 @@ hr {
 	top:1px;
 }
 
+.tick-mark {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-left: -3px;
+    margin-right: 10px;
+}
+
+.tick-mark::before {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 50%;
+    width: 2px;
+    background-color: black;
+    content: "";
+    transform: translateX(10px) rotate(-45deg);
+    transform-origin: left bottom;
+}
+
+.tick-mark::after {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 2px;
+    width: 100%;
+    background-color: black;
+    content: "";
+    transform: translateX(10px) rotate(-45deg);
+    transform-origin: left bottom;
+}
+
 .dropdownArrow {
     border: solid #ffffff;
     border-width: 0 3px 3px 0;
     display: inline-block;
     padding: 3px;
     transform: rotate(45deg) translate(0px,-5px);
-    -webkit-transform: rotate(45deg) translate(0px,-5px);
+    /* -webkit-transform: rotate(45deg) translate(0px,-5px); */
+}
+
+#dropdownArrowPlatform {
+    transform: rotate(45deg) translate(-6px,-12px);
+    /* -webkit-transform: rotate(45deg) translate(-6px,-12px); */
+}
+
+#dropdownbox2 {
+    right: 116px;
 }
 
 .dropdown-content {
@@ -609,6 +651,25 @@ textarea {
     position: absolute;
     top: 0px;
     right: 0px;
+}
+
+#platformBtn {
+    position: absolute;
+    top: 0px;
+    right: 116px;
+    width: 70px;
+    padding: 0px 5px;
+    text-align: center;
+}
+
+#platformBtn img {
+    width: 30px;
+    height: 30px;
+    margin-top: 7.5px;
+}
+
+.platformLogo {
+    display: none;
 }
 
 /* Beneficiaries */
@@ -1232,6 +1293,28 @@ td {
 }
 
 @media screen and (max-width: 500px) {
+    .popup-content {
+        width: 100%;
+    }
+
+    #headTitleText {
+        display: none;
+    }
+
+    #modeBtn {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    #platformBtn {
+        right: 106px;
+        padding: 0px;
+    }
+
+    #dropdownbox2 {
+        right: 106px;
+    }
+
     #newBeneficiaryUser, #newBeneficiaryPercent, #newBeneficiaryNetwork, #appendBeneficiaryBtn {
         margin-block-start: 0.2em;
         margin-block-end: 0.2em;
@@ -1255,19 +1338,6 @@ td {
 @media screen and (max-width: 360px) {
     .tabs {
         padding: 6px 3%;
-    }
-
-    .popup-content {
-        width: 100%;
-    }
-
-    #modeBtn {
-        padding-left: 20px;
-        padding-right: 20px;
-    }
-
-    #headTitleText {
-        display: none;
     }
 
     #yourFiles table tr td:nth-child(1) { max-width: 160px; }

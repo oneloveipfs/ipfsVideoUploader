@@ -19,6 +19,7 @@
         <script src="client/cdnfallback.js"></script>
         <script src="client/commons.js"></script>
         <script src="client/auth.js"></script>
+        <script src="client/platforms.js"></script>
         <script src="client/languages.js"></script>
         <script src="client/beneficiaries.js"></script>
         <script src="client/uploader.js"></script>
@@ -32,7 +33,18 @@
         <div class='header'>
             <h1 id="siteTitle"><a href="/" class="title"><img id="logoBanner" src="public/logo.png" alt="onelovedtube logo">  <div id="headTitleText">Uploader</div></a></h1>
             <div class="dropdown">
-                <a id="modeBtn" class="headerBtn"><p id="headerMenu">Menu <i id="dropdownArrow" class="dropdownArrow"></i></p></a>
+                <a id="platformBtn" class="headerBtn" onclick="topbarItmClicked('dropdownbox2')" onmouseenter="topbarItmHover('dropdownArrowPlatform')" onmouseleave="topbarItmLeave('dropdownArrowPlatform')">
+                    <img class="platformLogo" id="platformLogoLoading" src="public/thinking.svg" style="display: inline;">
+                    <p class="platformLogo" id="platformLogoMult">2P</p>
+                    <img class="platformLogo" id="platformLogo3Speak" src="public/3speak.svg">
+                    <img class="platformLogo" id="platformLogoDTube" src="public/dtube.png">
+                    <i id="dropdownArrowPlatform" class="dropdownArrow"></i>
+                </a>
+                <div id="dropdownbox2" class="dropdown-content">
+                    <a id="pfSelect3Speak" onclick="pfSelect('3Speak')">3Speak</a>
+                    <a id="pfSelectDTube" onclick="pfSelect('DTube')">DTube</a>
+                </div>
+                <a id="modeBtn" class="headerBtn" onclick="topbarItmClicked('dropdownbox')" onmouseenter="topbarItmHover('dropdownArrow')" onmouseleave="topbarItmLeave('dropdownArrow')"><p id="headerMenu">Menu <i id="dropdownArrow" class="dropdownArrow"></i></p></a>
                 <div id="dropdownbox" class="dropdown-content">
                     <a id="newUploadModeBtn">New Upload</a>
                     <a id="snapSwapModeBtn">Thumbnail Swap</a>
