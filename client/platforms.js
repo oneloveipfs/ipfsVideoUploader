@@ -135,6 +135,16 @@ function updateDisplayPlatforms() {
     else
         joined = selected.slice(0,-1).join(', ') + ' and ' + selected[selected.length-1]
     document.getElementById('platformStr').innerText = 'Posting to ' + joined
+
+    if (selected.includes('3Speak')) {
+        document.getElementById('hlsencode').checked = true
+        document.getElementById('hlsencode').disabled = true
+        document.getElementById('hlsencodetext').innerText = '  All 3Speak uploads are encoded to HLS'
+    } else {
+        document.getElementById('hlsencode').disabled = false
+        document.getElementById('hlsencodetext').innerText = '  Encode video to HLS'
+    }
+    updateEncoderDisplay()
 }
 
 function pfSelect(p) {
@@ -148,4 +158,11 @@ function pfSelect(p) {
         localStorage.setItem('enable'+p,'true')
     }
     updateDisplayPlatforms()
+}
+
+function updateEncoderDisplay() {
+    if (document.getElementById('hlsencode').checked)
+        updateDisplayByIDs([],['mp4encodedupload'])
+    else
+        updateDisplayByIDs(['mp4encodedupload'],[])
 }

@@ -104,12 +104,18 @@
                 <table class="subList" id="subList"></table>
             </div>
             <div id="advanced"> <!-- Advanced tab -->
-                <h3>Upload user encoded videos</h3>
-                <h5>You may choose to upload a lower resolution version of your source video that you have selected in the "Basics" tab, so that your video will be playable in lower resolutions for viewers who have poor internet connection.<br><br>Do not choose the same video file you have selected in the "Basics" tab!</h5>
-                <h4>240p video: <input type="file" accept="video/mp4" name="Video240Upload" id="video240p"></h4>
-                <h4>480p video: <input type="file" accept="video/mp4" name="Video480Upload" id="video480p"></h4>
-                <h4>720p video: <input type="file" accept="video/mp4" name="Video720Upload" id="video720p"></h4>
-                <h4>1080p video: <input type="file" accept="video/mp4" name="Video1080Upload" id="video1080p"></h4>
+                <br><label class="switch">
+                    <input type="checkbox" name="hlsencode" id="hlsencode" onchange="updateEncoderDisplay()">
+                    <span class="slider round"></span>
+                </label><h3 class="poweruptext" id="hlsencodetext"> Encode video to HLS format</h3><br><br>
+                <div id="mp4encodedupload">
+                    <h3 style="margin-block-start: 0.25em;">Upload user encoded videos</h3>
+                    <h5>You may choose to upload a lower resolution version of your source video that you have selected in the "Basics" tab, so that your video will be playable in lower resolutions for viewers who have poor internet connection.<br><br>Do not choose the same video file you have selected in the "Basics" tab!</h5>
+                    <h4>240p video: <input type="file" accept="video/mp4" name="Video240Upload" id="video240p"></h4>
+                    <h4>480p video: <input type="file" accept="video/mp4" name="Video480Upload" id="video480p"></h4>
+                    <h4>720p video: <input type="file" accept="video/mp4" name="Video720Upload" id="video720p"></h4>
+                    <h4>1080p video: <input type="file" accept="video/mp4" name="Video1080Upload" id="video1080p"></h4>
+                </div>
                 <label class="switch">
                     <input type="checkbox" name="skynetupload" id="skynetupload">
                     <span class="slider round"></span>
