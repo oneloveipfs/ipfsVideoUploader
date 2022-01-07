@@ -153,7 +153,7 @@ function validateHiveUsername(value) {
 
 function validateAvalonUsername(u) {
     if (typeof u !== 'string') return 'username must be a string'
-    if (u.length < 1 || userunuame.length > 50) return 'username nust be between 1 and 50 characters long'
+    if (u.length < 1 || u.length > 50) return 'username nust be between 1 and 50 characters long'
     let allowedUsernameChars = 'abcdefghijklmnopqrstuvwxyz0123456789'
     let allowedUsernameCharsOnlyMiddle = '-.'
     u = u.toLowerCase()
