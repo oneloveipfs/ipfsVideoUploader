@@ -130,11 +130,13 @@ function updateDisplayPlatforms() {
         document.getElementById('dropdownArrowPlatform').style.transform = 'rotate(45deg) translate(-6px,-12px)'
     }
     let joined = ''
-    if (selected.length === 1)
+    if (selected.length === 0)
+        joined = 'No platform selected'
+    else if (selected.length === 1)
         joined = selected[0]
     else
         joined = selected.slice(0,-1).join(', ') + ' and ' + selected[selected.length-1]
-    document.getElementById('platformStr').innerText = 'Posting to ' + joined
+    document.getElementById('platformStr').innerText = (selected.length > 0 ? 'Posting to ' : '') + joined
 
     if (selected.includes('3Speak')) {
         document.getElementById('hlsencode').checked = true

@@ -3,6 +3,7 @@ let url = new URL(window.location.href)
 let token = url.searchParams.get('access_token') // Access token for logged in user
 let iskeychain = url.searchParams.get('keychain')
 let steemUser = url.searchParams.get('steemuser')
+let blurtUser = url.searchParams.get('blurtuser')
 let dtconly = url.searchParams.get('dtconly')
 let displayUsernameTimeout = -1
 let dtcDisplayUser, hiveDisplayUser = null
@@ -136,22 +137,20 @@ function displayLoginMessage(errored) {
         document.getElementById('loggedInUser').innerHTML = 'Login errored'
         restrict()
     } else {
-        let shouldInsertComma = false
         let message = 'You are logged in as '
-        if (hiveDisplayUser) {
-            message += hiveDisplayUser + ' on Hive'
-            shouldInsertComma = true
-        }
-        if (steemUser) {
-            if (shouldInsertComma) message += ', '
-            if (!dtcDisplayUser) message += ' and '
-            message += steemUser + ' on Steem'
-            shouldInsertComma = true
-        }
-        if (dtcDisplayUser) {
-            if (shouldInsertComma) message += ' and '
-            message += dtcDisplayUser + ' on Avalon'
-        }
+        let displayAccs = []
+        if (hiveDisplayUser)
+            displayAccs.push(hiveDisplayUser + ' on Hive')
+        if (steemUser)
+            displayAccs.push(steemUser + ' on Steem')
+        if (blurtUser)
+            displayAccs.push(blurtUser + ' on Blurt')
+        if (dtcDisplayUser)
+            displayAccs.push(dtcDisplayUser + ' on Avalon')
+        if (displayAccs.length === 1)
+            message += displayAccs[0]
+        else
+            message += displayAccs.slice(0,-1).join(', ') + ' and ' + displayAccs[displayAccs.length-1]
         document.getElementById('loggedInUser').innerHTML = HtmlSanitizer.SanitizeHtml(message)
     }
 }
