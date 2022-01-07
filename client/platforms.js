@@ -129,15 +129,23 @@ function updateDisplayPlatforms() {
         document.getElementById('platformLogoDTube').style.display = 'inline'
         document.getElementById('dropdownArrowPlatform').style.transform = 'rotate(45deg) translate(-6px,-12px)'
     }
+    let joined = ''
+    if (selected.length === 1)
+        joined = selected[0]
+    else
+        joined = selected.slice(0,-1).join(', ') + ' and ' + selected[selected.length-1]
+    document.getElementById('platformStr').innerText = 'Posting to ' + joined
 }
 
 function pfSelect(p) {
     if (isPlatformSelected[p]) {
         isPlatformSelected[p] = false
         document.getElementById('pfSelect'+p).innerHTML = p
+        localStorage.setItem('enable'+p,'false')
     } else {
         isPlatformSelected[p] = true
         document.getElementById('pfSelect'+p).innerHTML = '<i class="tick-mark"></i>'+p
+        localStorage.setItem('enable'+p,'true')
     }
     updateDisplayPlatforms()
 }
