@@ -11,7 +11,7 @@ function loadAvalonAuthorityStatus(account) {
                 type: 10,
                 data: {
                     id: 'OneLoveIPFS support',
-                    pub: config.AvalonSupportPub,
+                    pub: config.avalonSupportPub,
                     types: [4] // COMMENT
                 }
             }
@@ -65,7 +65,7 @@ function loadGrapheneAuthorityStatus(account,network) {
             if (authorizing) return
             if (network == 'steem' && steem_keychain && steemUser) {
                 authorizing = true
-                steem_keychain.requestAddAccountAuthority(steemUser,config.SteemLoginApp,'Posting',1,(result) => {
+                steem_keychain.requestAddAccountAuthority(steemUser,config.steemloginApp,'Posting',1,(result) => {
                     authorizing = false
                     if (!result.error)
                         steem.api.getAccounts([steemUser],(e,r) => loadGrapheneAuthorityStatus(r[0],'steem'))
@@ -73,10 +73,10 @@ function loadGrapheneAuthorityStatus(account,network) {
                         alert(result.message)
                 })
             } else if (network == 'steem') {
-                window.open('https://steemlogin.com/authorize/' + config.SteemLoginApp)
+                window.open('https://steemlogin.com/authorize/' + config.steemloginApp)
             } else if (network == 'hive' && hive_keychain && username) {
                 authorizing = true
-                hive_keychain.requestAddAccountAuthority(username,config.HiveSignerApp,'Posting',1,(result) => {
+                hive_keychain.requestAddAccountAuthority(username,config.hivesignerApp,'Posting',1,(result) => {
                     authorizing = false
                     if (!result.error)
                         hive.api.getAccounts([username],(e,r) => loadGrapheneAuthorityStatus(r[0],'hive'))
@@ -84,7 +84,7 @@ function loadGrapheneAuthorityStatus(account,network) {
                         alert(result.message)
                 })
             } else if (network == 'hive') {
-                window.open('https://hivesigner.com/authorize/' + config.HiveSignerApp)
+                window.open('https://hivesigner.com/authorize/' + config.hivesignerApp)
             }
         }
     } else {
@@ -93,7 +93,7 @@ function loadGrapheneAuthorityStatus(account,network) {
             if (authorizing) return
             if (network == 'steem' && steem_keychain && steemUser) {
                 authorizing = true
-                steem_keychain.requestRemoveAccountAuthority(steemUser,config.SteemLoginApp,'Posting',(result) => {
+                steem_keychain.requestRemoveAccountAuthority(steemUser,config.steemloginApp,'Posting',(result) => {
                     authorizing = false
                     if (!result.error)
                         steem.api.getAccounts([steemUser],(e,r) => loadGrapheneAuthorityStatus(r[0],'steem'))
@@ -101,10 +101,10 @@ function loadGrapheneAuthorityStatus(account,network) {
                         alert(result.message)
                 })
             } else if (network == 'steem') {
-                window.open('https://steemlogin.com/revoke/' + config.SteemLoginApp)
+                window.open('https://steemlogin.com/revoke/' + config.steemloginApp)
             } else if (network == 'hive' && hive_keychain && username) {
                 authorizing = true
-                hive_keychain.requestRemoveAccountAuthority(username,config.HiveSignerApp,'Posting',(result) => {
+                hive_keychain.requestRemoveAccountAuthority(username,config.hivesignerApp,'Posting',(result) => {
                     authorizing = false
                     if (!result.error)
                         hive.api.getAccounts([username],(e,r) => loadGrapheneAuthorityStatus(r[0],'hive'))
@@ -112,7 +112,7 @@ function loadGrapheneAuthorityStatus(account,network) {
                         alert(result.message)
                 })
             } else if (network == 'hive') {
-                window.open('https://hivesigner.com/revoke/' + config.HiveSignerApp)
+                window.open('https://hivesigner.com/revoke/' + config.hivesignerApp)
             }
         }
     }
@@ -122,17 +122,17 @@ function hasAuthority(account,network) {
     switch (network) {
         case 'avalon':
             for (let i = 0; i < account.keys.length; i++)
-                if (account.keys[i].pub == config.AvalonSupportPub && account.keys[i].types.includes(4))
+                if (account.keys[i].pub == config.avalonSupportPub && account.keys[i].types.includes(4))
                     return true
             return false
         case 'hive':
             for (let i = 0; i < account.posting.account_auths.length; i++)
-                if (account.posting.account_auths[i][0] == config.HiveSignerApp)
+                if (account.posting.account_auths[i][0] == config.hivesignerApp)
                     return true
             return false
         case 'steem':
             for (let i = 0; i < account.posting.account_auths.length; i++)
-                if (account.posting.account_auths[i][0] == config.SteemLoginApp) 
+                if (account.posting.account_auths[i][0] == config.steemloginApp) 
                     return true
             return false
         default:
@@ -142,7 +142,7 @@ function hasAuthority(account,network) {
 
 function getAvalonKeyID(account) {
     for (let i = 0; i < account.keys.length; i++)
-        if (account.keys[i].pub == config.AvalonSupportPub)
+        if (account.keys[i].pub == config.avalonSupportPub)
             return account.keys[i].id
     return null
 }

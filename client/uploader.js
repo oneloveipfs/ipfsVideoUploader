@@ -29,6 +29,7 @@ try {
 // Beneficiaries
 let hiveBeneficiaries = new Beneficiaries('Hive')
 let steemBeneficiaries = new Beneficiaries('Steem')
+let blurtBeneficiaries = new Beneficiaries('Blurt')
 
 // Load Avalon login
 let avalonUser = sessionStorage.getItem('avalonUser')
@@ -602,7 +603,7 @@ function postVideo() {
     } else {
         let hiveapi = new hivesigner.Client({ 
             accessToken: Auth.token,
-            app: config.HiveSignerApp,
+            app: config.hivesignerApp,
             callbackURL: window.location.origin + '/upload',
             scope: ['comment','comment_options']
         })

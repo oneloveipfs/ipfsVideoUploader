@@ -238,6 +238,7 @@ let uploadOps = {
     handleTusUpload: (json,user,network,callback) => {
         let filepath = json.Upload.Storage.Path
         switch (json.Upload.MetaData.type) {
+            case 'hls':
             case 'videos':
                 let ipfsops = {
                     videohash: (cb) => {

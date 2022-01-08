@@ -122,7 +122,7 @@ async function proceedLogin() {
 async function hivesignerLogin() {
     // HiveSigner login
     let hiveClient = new hivesigner.Client({
-        app: config.HiveSignerApp,
+        app: config.hivesignerApp,
         callbackURL: window.location.origin + '/hivesigner',
         scope: ['comment','comment_options']
     })

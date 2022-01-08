@@ -318,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Broadcast with HiveSigner
                     let hiveapi2 = new hivesigner.Client({ 
                         accessToken: Auth.token,
-                        app: config.HiveSignerApp,
+                        app: config.hivesignerApp,
                         callbackURL: window.location.origin + '/upload',
                         scope: ['comment','comment_options']
                     })
