@@ -11,7 +11,14 @@
     "tokenApp": "oneloveipfs",
 
     "admins":[],
-    "encoderAccounts":[],
+    "Encoder": {
+        "accounts": [],
+        "encoder": "libx264",
+        "quality": "-crf 18",
+        "ffmpegPath": "",
+        "ffprobePath": "",
+        "outputs": [2160,1440,1080,720,480]
+    },
 
     "ClientConfig": {
         "gateway": "https://video.oneloveipfs.com",

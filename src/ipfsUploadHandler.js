@@ -13,6 +13,8 @@ const Socket = require('socket.io')
 const Config = require('./config')
 const db = require('./dbManager')
 const Auth = require('./authManager')
+const ProcessingQueue = require('./processingQueue')
+const globSource = IPFS.globSource
 const defaultDir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 
 let SocketIO
@@ -22,8 +24,38 @@ let usercount = 0
 
 db.setupDb('register')
 
+ffmpeg.setFfmpegPath(Config.Encoder.ffmpegPath ? Config.Encoder.ffmpegPath : Shell.which('ffmpeg').toString())
+ffmpeg.setFfprobePath(Config.Encoder.ffprobePath ? Config.Encoder.ffprobePath : Shell.which('ffprobe').toString())
+
+const encoderQueue = new ProcessingQueue()
+const encoderOptions = [
+    '-hls_time 5',
+    '-hls_list_size 0',
+    '-segment_time 10',
+    '-segment_format mpegts',
+    '-f segment',
+    Config.Encoder.quality
+]
+const hlsBandwidth = {
+    4320: 20000000,
+    2160: 6000000,
+    1440: 4000000,
+    1080: 2000000,
+    720: 1256000,
+    480: 680000,
+    240: 340000
+}
+
 let uploadRegister = JSON.parse(fs.readFileSync(defaultDir+'/db/register.json','utf8'))
 let socketRegister = {}
+
+const emitToUID = (id,evt,message,updateTs) => {
+    if (socketRegister[id] && socketRegister[id].socket) {
+        if (updateTs)
+            socketRegister[id].ts = new Date().getTime()
+        socketRegister[id].socket.emit(evt,message)
+    }
+}
 
 const ipfsAPI = IPFS.create({ host: 'localhost', port: Config.IPFS_API_PORT, protocol: 'http' })
 const streamUpload = Multer({ dest: defaultDir, limits: { fileSize: 52428800 } }) // 50MB segments
@@ -85,6 +117,41 @@ const addSprite = async (filepath,id) => {
             addFile(defaultDir+'/'+id + '.jpg',true,false,(size,hash) => rs({size: size, hash: hash}))
         })
     })
+}
+
+const createSpriteInContainer = async (filepath,id) => {
+    return new Promise((rs) => Shell.exec(__dirname+'/../scripts/dtube-sprite.sh ' + filepath + ' ' + defaultDir + '/' + id + '/sprite.jpg',() => rs()))
+}
+
+const getFFprobeVideo = (filepath) => {
+    return new Promise((rs,rj) => {
+        ffmpeg.ffprobe(filepath,(e,probe) => {
+            if (e)
+                return rj(e)
+            let width, height, duration, orientation
+            for (s in probe.streams)
+                if (probe.streams[s].codec_type === 'video') {
+                    width = probe.streams[s].width,
+                    height = probe.streams[s].height,
+                    duration = probe.format.duration
+                    if (width > height)
+                        orientation = 1 // horizontal
+                    else
+                        orientation = 2 // square or vertical
+                    break
+                }
+            return rs({ width, height, duration, orientation })
+        })
+    })
+}
+
+const recursiveFileCount = (dir) => {
+    let c = fs.readdirSync(dir).filter((v) => !v.startsWith('.'))
+    let l = c.length
+    for (let f in c)
+        if (fs.lstatSync(dir+'/'+c[f]).isDirectory())
+            l += recursiveFileCount(dir+'/'+c[f])
+    return l
 }
 
 const trimTrailingSlash = (str) => {
@@ -235,10 +302,126 @@ let uploadOps = {
             break
         }
     },
+    encoderQueue,
     handleTusUpload: (json,user,network,callback) => {
         let filepath = json.Upload.Storage.Path
         switch (json.Upload.MetaData.type) {
             case 'hls':
+                getFFprobeVideo(filepath).then((d) => {
+                    let { width, height, duration, orientation } = d
+                    if (!width || !height || !duration || !orientation)
+                        return emitToUID(json.Upload.ID,'error',{ error: 'could not retrieve ffprobe info on uploaded video' },false)
+
+                    let outputResolutions = []
+                    let sedge = Math.min(width,height)
+                    for (let q in Config.Encoder.outputs)
+                        if (hlsBandwidth[Config.Encoder.outputs[q]] && sedge >= Config.Encoder.outputs[q])
+                            outputResolutions.push(Config.Encoder.outputs[q])
+                    outputResolutions = outputResolutions.sort((a,b) => a-b)
+                    
+                    // TODO: Remote encoders
+                    // Create folders
+                    fs.mkdirSync(defaultDir+'/'+json.Upload.ID)
+                    for (let r in outputResolutions)
+                        fs.mkdirSync(defaultDir+'/'+json.Upload.ID+'/'+outputResolutions[r]+'p')
+                    
+                    // Encoding ops
+                    const ffmpegbase = ffmpeg(filepath)
+                        .videoCodec(Config.Encoder.encoder)
+                        .audioCodec('aac')
+                    const ops = {}
+                    for (let r in outputResolutions) {
+                        let resolution = outputResolutions[r]
+                        ops[resolution] = (cb) =>
+                            ffmpegbase.clone()
+                                .output(defaultDir+'/'+json.Upload.ID+'/'+resolution+'p/%d.ts')
+                                .audioBitrate('256k')
+                                .addOption(encoderOptions)
+                                .addOption('-segment_list',defaultDir+'/'+json.Upload.ID+'/'+resolution+'p/index.m3u8')
+                                .size(orientation === 1 ? '?x'+resolution : resolution+'x?')
+                                .on('progress',(p) => {
+                                    emitToUID(json.Upload.ID,'progress',{
+                                        job: 'encode',
+                                        resolution: resolution,
+                                        frames: p.frames,
+                                        fps: p.currentFps,
+                                        progress: p.percent
+                                    },true)
+                                    console.log('ID '+json.Upload.ID+' - '+resolution+'p --- Frames: '+p.frames+'   FPS: '+p.currentFps+'   Progress: '+p.percent.toFixed(3)+'%')
+                                })
+                                .on('error',(e) => {
+                                    console.error(json.Upload.ID+' - '+resolution+'p --- Error',e)
+                                    emitToUID(json.Upload.ID,'error',{ error: resolution + 'p resolution encoding failed' },false)
+                                    cb(e)
+                                })
+                                .on('end',() => cb(null))
+                                .run()
+                    }
+                    if (json.Upload.MetaData.createSprite)
+                        ops.sprite = (cb) => createSpriteInContainer(filepath,json.Upload.ID).then(() => cb(null))
+                    encoderQueue.push({ id: json.Upload.ID, f: (nextJob) => async.parallel(ops, async (e) => {
+                        if (e)
+                            return nextJob()
+                        
+                        // Construct master playlist
+                        let masterPlaylist = '#EXTM3U\n#EXT-X-VERSION:3'
+                        for (let r in outputResolutions) {
+                            let rd
+                            try {
+                                rd = await getFFprobeVideo(defaultDir+'/'+json.Upload.ID+'/'+outputResolutions[r]+'p/0.ts')
+                            } catch {
+                                emitToUID(json.Upload.ID,'error',{ error: 'could not retrieve ffprobe info on '+outputResolutions[r]+'p encoded video' },false)
+                                return nextJob()
+                            }
+                            masterPlaylist += '\n#EXT-X-STREAM-INF:BANDWIDTH='+hlsBandwidth[outputResolutions[r]]+',RESOLUTION='+rd.width+'x'+rd.height+'\n'+outputResolutions[r]+'p/index.m3u8'
+                        }
+                        fs.writeFileSync(defaultDir+'/'+json.Upload.ID+'/default.m3u8',masterPlaylist)
+
+                        // Add container to IPFS
+                        // TODO: Add to Skynet whenever applicable
+                        let folderhash
+                        let addProgress = {
+                            progress: 0,
+                            total: recursiveFileCount(defaultDir+'/'+json.Upload.ID) + 1
+                        }
+                        for await (const f of ipfsAPI.addAll(globSource(defaultDir,json.Upload.ID+'/**'),{cidVersion: 0, pin: true})) {
+                            if (f.path.endsWith(json.Upload.ID))
+                                folderhash = f
+                            addProgress.progress += 1
+                            emitToUID(json.Upload.ID,'progress',{
+                                job: 'ipfsadd',
+                                progress: addProgress.progress,
+                                total: addProgress.total
+                            },true)
+                        }
+                        if (!folderhash || !folderhash.cid) {
+                            emitToUID(json.Upload.ID,'error',{ error: 'HLS container IPFS add failed' },false)
+                            return nextJob()
+                        }
+
+                        // Record in db and return result
+                        db.recordHash(user,network,'hls',folderhash.cid.toString(),folderhash.size)
+                        db.writeHashesData()
+                        db.writeHashSizesData()
+
+                        let result = {
+                            username: user,
+                            network: network,
+                            type: 'hls',
+                            hash: folderhash.cid.toString(),
+                            size: folderhash.size,
+                            duration: duration
+                        }
+                        console.log(result)
+                        emitToUID(json.Upload.ID,'result',result,false)
+                        delete socketRegister[json.Upload.ID]
+                        uploadRegister[json.Upload.ID] = result
+                        ipsync.emit('upload',result)
+                        callback()
+                        nextJob()
+                    })})
+                })
+                break
             case 'videos':
                 let ipfsops = {
                     videohash: (cb) => {
@@ -319,7 +502,7 @@ let uploadOps = {
         }
     },
     uploadFromFs: (type,filepath,id,user,network,skynet,cb) => {
-        let tusTypes = ['videos','video240','video480','video720','video1080']
+        let tusTypes = ['videos','video240','video480','video720','video1080','hls']
         fs.stat(filepath,(e,s) => {
             if (e) return console.log(e)
             if (tusTypes.includes(type)) uploadOps.handleTusUpload({

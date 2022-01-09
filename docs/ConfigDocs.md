@@ -23,8 +23,14 @@ For full desktop apps, the sections that matter the most to end users are Genera
 
 #### Beta
 These values will only apply to APIs that are currently not used by the interface or other external repositories.
-* `admins`: Array of Hive accounts which have access to administrator APIs. May also act as `encoderAccounts` but with admin privileges.
-* `encoderAccounts`: Array of Hive accounts that may be used by encoding servers. These accounts do not have admin privileges.
+* `admins`: Array of Hive accounts which have access to administrator APIs.
+
+#### Encoder
+* `accounts`: Array of Hive accounts that may be used by remote encoding servers.
+* `encoder`: The hardware encoder to be used for HLS video encoding.
+* `quality`: FFmpeg option to specify output video quality. Parameter varies depending on chosen encoder.
+* `ffmpegPath`: Path to FFmpeg binary. Determine by running `which ffmpeg`.
+* `ffprobePath`: Path to FFprobe binary. Determine by running `which ffprobe`.
 
 #### Client configuration
 * `gateway`: IPFS gateway domain to use as default gateway overwrite on DTube embed player.

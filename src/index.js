@@ -162,7 +162,7 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
                 if (request.body.Upload.MetaData.encoderUser && request.body.Upload.MetaData.encodingCost) { 
                     if (Auth.invalidHiveUsername(request.body.Upload.MetaData.encoderUser))
                         return response.status(401).send({error: 'Invalid encoderUser Hive username'})
-                    else if (!Config.admins.includes(user) && !Config.encoderAccounts.includes(user))
+                    else if (!Config.admins.includes(user) && !Config.Encoder.accounts.includes(user))
                         return response.status(401).send({error: 'Uploads from encoding servers must be an admin or encoder account.'})
                     else if (request.body.Upload.MetaData.type == 'videos')
                         return response.status(401).send({error: 'Uploads from encoding servers may not be source video files.'})
@@ -216,6 +216,16 @@ app.get('/stats',(request,response) => {
         streams: db.getHashes('streams').streams.length,
         usercount: db.allUsersCount(),
         usage: db.getAllUsage()
+    })
+})
+
+app.get('/encoderstats',(req,res) => {
+    let queueIds = []
+    for (let j in FileUploader.encoderQueue.queue)
+        queueIds.push(FileUploader.encoderQueue.queue[j].id)
+    res.send({
+        queue: queueIds,
+        processing: FileUploader.encoderQueue.processing
     })
 })
 
