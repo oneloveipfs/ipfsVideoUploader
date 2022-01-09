@@ -410,7 +410,8 @@ let uploadOps = {
                             type: 'hls',
                             hash: folderhash.cid.toString(),
                             size: folderhash.size,
-                            duration: duration
+                            duration: duration,
+                            resolutions: outputResolutions
                         }
                         console.log(result)
                         emitToUID(json.Upload.ID,'result',result,false)
