@@ -26,11 +26,13 @@ These values will only apply to APIs that are currently not used by the interfac
 * `admins`: Array of Hive accounts which have access to administrator APIs.
 
 #### Encoder
+For more info, see [Encoder.md](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/Encoder.md).
 * `accounts`: Array of Hive accounts that may be used by remote encoding servers.
 * `encoder`: The hardware encoder to be used for HLS video encoding.
 * `quality`: FFmpeg option to specify output video quality. Parameter varies depending on chosen encoder.
 * `ffmpegPath`: Path to FFmpeg binary. Determine by running `which ffmpeg`.
 * `ffprobePath`: Path to FFprobe binary. Determine by running `which ffprobe`.
+* `outputs`: Array of integers consisting of output video qualities. Valid values: `4320`, `2160`, `1440`, `1080`, `720`, `480` and `240`.
 
 #### Client configuration
 * `gateway`: IPFS gateway domain to use as default gateway overwrite on DTube embed player.
