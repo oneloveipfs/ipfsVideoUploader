@@ -164,8 +164,8 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
                         return response.status(401).send({error: 'Invalid encoderUser Hive username'})
                     else if (!Config.admins.includes(user) && !Config.Encoder.accounts.includes(user))
                         return response.status(401).send({error: 'Uploads from encoding servers must be an admin or encoder account.'})
-                    else if (request.body.Upload.MetaData.type == 'videos')
-                        return response.status(401).send({error: 'Uploads from encoding servers may not be source video files.'})
+                    else if (request.body.Upload.MetaData.type !== 'hlsencode')
+                        return response.status(401).send({error: 'Uploads from encoding servers must be a hlsencode type.'})
                 }
                 return response.status(200).send()
             })

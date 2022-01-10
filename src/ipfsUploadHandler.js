@@ -61,6 +61,18 @@ const ipfsAPI = IPFS.create({ host: 'localhost', port: Config.IPFS_API_PORT, pro
 const streamUpload = Multer({ dest: defaultDir, limits: { fileSize: 52428800 } }) // 50MB segments
 const imgUpload = Multer({ dest: defaultDir, limits: { fileSize: 7340032 } })
 
+const imgFilenameChars = 'abcdef0123456789'
+const imgFilenameLength = 32
+const isValidImgFname = (filename = '') => {
+    if (filename.length === imgFilenameLength) {
+        for (let c in filename)
+            if (imgFilenameChars.indexOf(filename[c]) === -1)
+                return false
+        return true
+    } else
+        return false
+}
+
 const addFile = async (dir,trickle,skynetpin,callback,onlyHash) => {
     let opts = { trickle: trickle, cidVersion: 0 }
     if (onlyHash) opts.onlyHash = true
@@ -227,9 +239,12 @@ let uploadOps = {
                     imghash: hash,
                     imgtype: imgType
                 }
+                // reference thumbnail filename for hls uploads
+                if (imgType === 'thumbnails')
+                    result.fsname = uploadedImg
                 response.send(result)
                 ipsync.emit('upload',result)
-                if (Config.deleteUploadsAfterAdd) fs.unlink(defaultDir+'/'+uploadedImg,()=>{})
+                if (Config.deleteUploadsAfterAdd && imgType !== 'thumbnails') fs.unlink(defaultDir+'/'+uploadedImg,()=>{})
             })
         })
     },
@@ -317,6 +332,8 @@ let uploadOps = {
                     for (let q in Config.Encoder.outputs)
                         if (hlsBandwidth[Config.Encoder.outputs[q]] && sedge >= Config.Encoder.outputs[q])
                             outputResolutions.push(Config.Encoder.outputs[q])
+                    if (outputResolutions.length === 0)
+                        outputResolutions.push(Config.Encoder.outputs[Config.Encoder.outputs.length-1])
                     outputResolutions = outputResolutions.sort((a,b) => a-b)
                     
                     // TODO: Remote encoders
@@ -376,6 +393,10 @@ let uploadOps = {
                             masterPlaylist += '\n#EXT-X-STREAM-INF:BANDWIDTH='+hlsBandwidth[outputResolutions[r]]+',RESOLUTION='+rd.width+'x'+rd.height+'\n'+outputResolutions[r]+'p/index.m3u8'
                         }
                         fs.writeFileSync(defaultDir+'/'+json.Upload.ID+'/default.m3u8',masterPlaylist)
+
+                        // Add thumbnail image file in container
+                        if (isValidImgFname(json.Upload.MetaData.thumbnailFname) && fs.existsSync(defaultDir+'/'+json.Upload.MetaData.thumbnailFname))
+                            fs.copyFileSync(defaultDir+'/'+json.Upload.MetaData.thumbnailFname,defaultDir+'/'+json.Upload.ID+'/thumbnail.jpg')
 
                         // Add container to IPFS
                         // TODO: Add to Skynet whenever applicable
@@ -572,6 +593,9 @@ let uploadOps = {
                         if (info.type === uploadRegister[info.id].type) return socket.emit('result',uploadRegister[info.id])
                         
                         // Type requested does not match registered type
+                        // HLS uploads do not transform into other upload types
+                        if (info.type === 'hls') return socket.emit('error',{ error: 'hls uploads cannot be transformed' })
+
                         // Encoded video hash requested, return only hash
                         if (info.type !== 'videos') return socket.emit('result',{
                             username: uploadRegister[info.id].username,
