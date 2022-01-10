@@ -431,7 +431,7 @@ let uploadOps = {
                             username: user,
                             network: network,
                             type: 'hls',
-                            hash: folderhash.cid.toString(),
+                            ipfshash: folderhash.cid.toString(),
                             size: folderhash.size,
                             duration: duration,
                             hasThumbnail: hasThumbnail,

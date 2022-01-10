@@ -212,7 +212,7 @@ app.get('/allusage',(request,response) => {
 
 app.get('/stats',(request,response) => {
     response.send({
-        count: db.getHashes('videos').videos.length,
+        count: db.getHashes('videos').videos.length + db.getHashes('hls').hls.length,
         streams: db.getHashes('streams').streams.length,
         usercount: db.allUsersCount(),
         usage: db.getAllUsage()

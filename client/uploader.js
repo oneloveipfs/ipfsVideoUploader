@@ -42,6 +42,12 @@ let postparams = {}
 let uplStat
 axios.get('/proxy_server').then((r) => {
     uplStat = io.connect(r.data.server+'/uploadStat')
+    uplStat.on('progress',(p) => {
+        console.log('progress',p)
+    })
+    uplStat.on('error',(e) => {
+        console.log('upload processing error',e)
+    })
     uplStat.on('result',(r) => {
         if (r.error) return console.log('uplStat Error', r.error)
         switch (r.type) {
@@ -67,6 +73,9 @@ axios.get('/proxy_server').then((r) => {
             case 'video1080':
                 postparams.ipfs1080hash = r.hash
                 if (r.skylink) postparams.skylink1080 = r.skylink
+                break
+            case 'hls':
+                postparams = Object.assign(postparams,r)
                 break
             default:
                 return console.log('uplStat Error: missing type in repsonse')
@@ -253,7 +262,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             postparams = Object.assign(postparams,uploaderResponse)
 
             // Upload all videos
-            uploadVideo(0,() => console.log('all videos uploaded successfully'))
+            if (document.getElementById('hlsencode').checked)
+                uploadVideo(-1,() => console.log('begin encode'),uploaderResponse.fsname)
+            else
+                uploadVideo(0,() => console.log('all videos uploaded successfully'))
         }).catch((err) => {
             if (err.response && err.response.data && err.response.data.error)
                 alert(err.response.data.error)
@@ -441,11 +453,16 @@ function sourceVideoSelect() {
     audioObj.src = videoObjUrl
 }
 
-function uploadVideo(resolution,next) {
+function uploadVideo(resolution,next,thumbnailFname = '') {
     let fInputElemName
     let resolutionFType
     let progressTxt
     switch (resolution) {
+        case -1:
+            fInputElemName = 'sourcevideo'
+            resolutionFType = 'hls'
+            progressTxt = 'Uploading video...'
+            break
         case 0:
             fInputElemName = 'sourcevideo'
             resolutionFType = 'videos'
@@ -487,6 +504,7 @@ function uploadVideo(resolution,next) {
         progressbarInner.innerText = 'Submitting upload...'
         return axios.post('/uploadVideoFs'+geturl,{
             type: resolutionFType,
+            thumbnailFname: thumbnailFname,
             skynet: document.getElementById('skynetupload').checked ? 'true' : 'false',
             filepath: videoToUpload[0].path
         }).then(result => {
@@ -497,7 +515,10 @@ function uploadVideo(resolution,next) {
                 access_token: Auth.token,
                 keychain: Auth.iskeychain
             })
-            uploadVideo(resolution+1,next)
+            if (resolution >= 0)
+                uploadVideo(resolution+1,next)
+            else
+                next()
         }).catch(e => {
             console.log(e)
             alert('Error occured while submitting file')
@@ -513,6 +534,7 @@ function uploadVideo(resolution,next) {
             access_token: Auth.token,
             keychain: Auth.iskeychain,
             type: resolutionFType,
+            thumbnailFname: thumbnailFname,
             skynet: document.getElementById('skynetupload').checked ? 'true' : 'false'
         },
         onError: (e) => {
@@ -534,7 +556,10 @@ function uploadVideo(resolution,next) {
                 access_token: Auth.token,
                 keychain: Auth.iskeychain
             })
-            uploadVideo(resolution+1,next)
+            if (resolution >= 0)
+                uploadVideo(resolution+1,next)
+            else
+                next()
         }
     })
     
