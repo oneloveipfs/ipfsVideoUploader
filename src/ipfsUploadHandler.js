@@ -8,7 +8,6 @@ const getDuration = require('get-video-duration').getVideoDurationInSeconds
 const fs = require('fs')
 const async = require('async')
 const WebVTT = require('node-webvtt')
-const MimeType = require('mime-types')
 const Socket = require('socket.io')
 const Config = require('./config')
 const db = require('./dbManager')
