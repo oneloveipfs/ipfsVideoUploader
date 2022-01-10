@@ -395,8 +395,11 @@ let uploadOps = {
                         fs.writeFileSync(defaultDir+'/'+json.Upload.ID+'/default.m3u8',masterPlaylist)
 
                         // Add thumbnail image file in container
-                        if (isValidImgFname(json.Upload.MetaData.thumbnailFname) && fs.existsSync(defaultDir+'/'+json.Upload.MetaData.thumbnailFname))
+                        let hasThumbnail = false
+                        if (isValidImgFname(json.Upload.MetaData.thumbnailFname) && fs.existsSync(defaultDir+'/'+json.Upload.MetaData.thumbnailFname)) {
                             fs.copyFileSync(defaultDir+'/'+json.Upload.MetaData.thumbnailFname,defaultDir+'/'+json.Upload.ID+'/thumbnail.jpg')
+                            hasThumbnail = true
+                        }
 
                         // Add container to IPFS
                         // TODO: Add to Skynet whenever applicable
@@ -432,6 +435,7 @@ let uploadOps = {
                             hash: folderhash.cid.toString(),
                             size: folderhash.size,
                             duration: duration,
+                            hasThumbnail: hasThumbnail,
                             resolutions: outputResolutions
                         }
                         console.log(result)
