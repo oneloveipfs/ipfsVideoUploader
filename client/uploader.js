@@ -704,26 +704,10 @@ function buildJsonMetadata(network) {
     let jsonMeta = {
         video: buildJsonMetadataAvalon(),
         tags: postparams.tags,
-        app: 'onelovedtube/2.1.2',
+        app: 'oneloveipfs/3',
     }
 
-    let ref = []
-    if (avalonUser) ref.push('dtc/' + avalonUser + '/' + postparams.ipfshash)
-
-    switch(network) {
-        case 'hive':
-            // Reference to dtc and steem
-            if (steemUser) ref.push('steem/' + steemUser + '/' + postparams.permlink)
-            break
-        case 'steem':
-            // Reference to dtc and hive
-            ref.push('hive/' + username + '/' + postparams.permlink)
-            break
-        default:
-            break
-    }
-
-    jsonMeta.video.refs = ref
+    jsonMeta.video.refs = generateRefs(network)
 
     return jsonMeta;
 }
@@ -753,7 +737,7 @@ function buildJsonMetadataAvalon() {
         hide: 0,
         nsfw: 0,
         oc: 1,
-        refs: []
+        refs: generateRefs('avalon')
     }
 
     // Add Skylinks if applicable
@@ -767,9 +751,6 @@ function buildJsonMetadataAvalon() {
     if (postparams.skylink480) jsonMeta.files.sia.vid['480'] = postparams.skylink480
     if (postparams.skylink720) jsonMeta.files.sia.vid['720'] = postparams.skylink720
     if (postparams.skylink1080) jsonMeta.files.sia.vid['1080'] = postparams.skylink1080
-
-    if (Auth.dtconly != 'true') jsonMeta.refs.push('hive/' + username + '/' + postparams.permlink)
-    if (Auth.dtconly != 'true' && steemUser) jsonMeta.refs.push('steem/' + steemUser + '/' + postparams.permlink)
     if (config.gateway) jsonMeta.files.ipfs.gw = config.gateway 
 
     if (subtitleList.length > 0) {
@@ -782,26 +763,41 @@ function buildJsonMetadataAvalon() {
     return jsonMeta
 }
 
+function generateRefs(network) {
+    let ref = []
+    if (network !== 'avalon' && avalonUser)
+        ref.push('dtc/' + avalonUser + '/' + postparams.ipfshash)
+    if (network !== 'hive' && hiveDisplayUser)
+        ref.push('hive/' + hiveDisplayUser + '/' + postparams.permlink)
+    if (network !== 'steem' && steemUser)
+        ref.push('steem/' + steemUser + '/' + postparams.permlink)
+    if (network !== 'blurt' && blurtUser)
+        ref.push('blurt/' + blurtUser + '/' + postparams.permlink)
+    return ref
+}
+
 function generatePost(network) {
     // Power up all rewards or not
-    let percentSBD = 10000
-    if (postparams.powerup == true) {
-        percentSBD = 0
-    }
+    let rewardPercent = postparams.powerup ? 0 : 10000
+    let hmcExclude = false
 
     // Sort beneficiary list in ascending order
     let sortedBeneficiary = []
-    if (network == 'hive')
+    if (network === 'hive')
         sortedBeneficiary = hiveBeneficiaries.sort()
-    else if (network == 'steem')
+    else if (network === 'steem')
         sortedBeneficiary = steemBeneficiaries.sort()
+    else if (network === 'blurt') {
+        sortedBeneficiary = blurtBeneficiaries.sort()
+        hmcExclude = true
+    }
 
-    // Create transaction to post on Steem blockchain
+    // Create transaction
     let operations = [
         [ 'comment', {
                 parent_author: '',
-                parent_permlink: document.getElementById(network+'CommunitySelect').value,
-                category: document.getElementById(network+'CommunitySelect').value,
+                parent_permlink: !hmcExclude ? document.getElementById(network+'CommunitySelect').value : '',
+                category: !hmcExclude ? document.getElementById(network+'CommunitySelect').value : '',
                 author: username,
                 permlink: postparams.permlink,
                 title: postparams.title,
@@ -813,7 +809,7 @@ function generatePost(network) {
             author: username,
             permlink: postparams.permlink,
             max_accepted_payout: '1000000.000 HBD',
-            percent_hbd: percentSBD,
+            percent_hbd: rewardPercent,
             allow_votes: true,
             allow_curation_rewards: true,
             extensions: []
@@ -825,9 +821,9 @@ function generatePost(network) {
             beneficiaries: sortedBeneficiary
         }])
 
-    if (network == 'steem') {
+    if (network === 'steem') {
         operations[1][1].max_accepted_payout = '1000000.000 SBD'
-        operations[1][1].percent_steem_dollars = percentSBD
+        operations[1][1].percent_steem_dollars = rewardPercent
         delete operations[1][1].percent_hbd
     }
 
