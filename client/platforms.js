@@ -149,6 +149,11 @@ function updateDisplayPlatforms() {
         document.getElementById('hlsencode').checked = true
         document.getElementById('hlsencode').disabled = true
         document.getElementById('hlsencodetext').innerText = '  All 3Speak uploads are encoded to HLS'
+        // 3speak does not have subtitles
+        if (selected.length === 1)
+            updateDisplayByIDs([],['tabSubtitles'])
+        else
+            document.getElementById('tabSubtitles').style.display = 'initial'
     } else {
         document.getElementById('hlsencode').disabled = false
         document.getElementById('hlsencodetext').innerText = '  Encode video to HLS'

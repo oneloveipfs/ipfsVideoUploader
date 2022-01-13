@@ -1042,7 +1042,7 @@ async function getCommunitySubs(acc,network) {
         })
     } catch { return }
     let selection = document.getElementById(network+'CommunitySelect')
-    for (let i = 0; i < communities.data.result.length; i++) if (communities.data.result[i][0] !== 'hive-196037') {
+    for (let i = 0; i < communities.data.result.length; i++) if (communities.data.result[i][0] !== 'hive-134220') {
         let newoption = document.createElement('option')
         newoption.text = communities.data.result[i][1] + ' (' + communities.data.result[i][0] + ')'
         newoption.value = communities.data.result[i][0]
