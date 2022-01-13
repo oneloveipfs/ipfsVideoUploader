@@ -124,13 +124,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        if (steemUser) steem.api.getAccounts([steemUser],(e,acc) => {
+        if (steemUser && config.steemloginApp) steem.api.getAccounts([steemUser],(e,acc) => {
             if (e) return
             loadGrapheneAuthorityStatus(acc[0],'steem')
             getCommunitySubs(acc[0].name,'steem')
         })
         else
             updateDisplayByIDs([],['beneficiaryHeadingSteem','beneficiaryTableListSteem','totalBeneficiariesLabelSteem','steemCommunity'])
+
+        if (blurtUser && config.blurtApp)
+            blurt.api.getAccounts([blurtUser],(e,acc) => {
+                if (e) return
+                loadGrapheneAuthorityStatus(acc[0],'blurt')
+            })
+        else
+            updateDisplayByIDs([],['beneficiaryHeadingBlurt','beneficiaryTableListBlurt','totalBeneficiariesLabelBlurt'])
 
         hive.api.setOptions(hiveOptions)
         if (!dtconly) hive.api.getAccounts([username],(e,acc) => {
@@ -395,25 +403,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         let account = document.getElementById('newBeneficiaryUser').value
         let percentage = Math.floor(document.getElementById('newBeneficiaryPercent').value * 100)
         let network = document.getElementById('newBeneficiaryNetwork').value
-
-        if (network == 'All' || network == 'Hive') hive.api.getAccounts([account],(err,result) => {
-            if (err) return alert('Error while validating Hive account: ' + err)
-            if (result.length === 0) return alert('Beneficiary account specified doesn\'t exist on Hive!')
-
-            // If account name and percentage valid, add account to beneficiaries list and update table
-            try {
-                hiveBeneficiaries.addAccount(account,percentage)
-            } catch (e) {
-                return alert(e)
+        let nobj = {
+            Hive: {
+                method: hive.api.getAccounts,
+                benef: hiveBeneficiaries,
+                cu: hiveDisplayUser
+            },
+            Steem: {
+                method: steem.api.getAccounts,
+                benef: hiveBeneficiaries,
+                cu: steemUser
+            },
+            Blurt: {
+                method: blurt.api.getAccounts,
+                benef: blurtBeneficiaries,
+                cu: blurtUser
             }
-        })
+        }
 
-        if (network == 'All' || network == 'Steem') steem.api.getAccounts([account],(err,result) => {
-            if (err) return alert('Error while validating Steem account: ' + err)
-            if (result.length === 0) return alert('Beneficiary account specified doesn\'t exist on Steem!')
+        for (let n in nobj) if ((network === 'All' || network === n) && nobj[n].cu) nobj[n].method([account],(err,result) => {
+            if (err) return alert('Error while validating '+n+' account: ' + err)
+            if (result.length === 0) return alert('Beneficiary account specified doesn\'t exist on '+n)
 
             try {
-                steemBeneficiaries.addAccount(account,percentage)
+                nobj[n].benef.addAccount(account,percentage)
             } catch (e) {
                 return alert(e)
             }
@@ -430,6 +443,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.setItem('DraftGraphenePermlink',document.getElementById('customPermlink').value)
         localStorage.setItem('DraftSteemBeneficiaries',JSON.stringify(steemBeneficiaries.accounts))
         localStorage.setItem('DraftHiveBeneficiaries',JSON.stringify(hiveBeneficiaries.accounts))
+        localStorage.setItem('DraftBlurtBeneficiaries',JSON.stringify(blurtBeneficiaries.accounts))
         localStorage.setItem('DraftSteemCommunity',document.getElementById('steemCommunitySelect').value)
         localStorage.setItem('DraftHiveCommunity',document.getElementById('hiveCommunitySelect').value)
         localStorage.setItem('DraftPowerUp',document.getElementById('powerup').checked)
@@ -825,6 +839,10 @@ function generatePost(network) {
         operations[1][1].max_accepted_payout = '1000000.000 SBD'
         operations[1][1].percent_steem_dollars = rewardPercent
         delete operations[1][1].percent_hbd
+    } else if (network === 'blurt') {
+        operations[1][1].max_accepted_payout = '1000000.000 BLURT'
+        delete operations[1][1].percent_hbd
+        delete operations[0][1].category
     }
 
     return operations
@@ -938,6 +956,7 @@ function clearDraft() {
     localStorage.setItem('DraftGraphenePermlink','')
     localStorage.setItem('DraftSteemBeneficiaries','[]')
     localStorage.setItem('DraftHiveBeneficiaries','[]')
+    localStorage.setItem('DraftBlurtBeneficiaries','[]')
     localStorage.setItem('DraftSteemCommunity','')
     localStorage.setItem('DraftHiveCommunity','')
     localStorage.setItem('DraftPowerUp','false')

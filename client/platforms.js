@@ -3,6 +3,13 @@ const defaultPlatforms = {
     avalon: 'DTube'
 }
 
+const supportedPlatforms = {
+    hive: ['3Speak','DTube'],
+    avalon: ['DTube'],
+    steem: ['DTube'],
+    blurt: ['DTube']
+}
+
 const allowedPlatformNetworks = {
     '3Speak': ['hive'],
     'DTube': ['avalon','hive','steem','blurt']

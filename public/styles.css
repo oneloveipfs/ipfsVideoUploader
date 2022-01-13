@@ -167,12 +167,13 @@ hr {
 }
 
 .warningbox {
-    width: 96.5%;
+    width: calc(100% - 24px);
     border: solid;
     border-width: 2px;
     border-radius: 5px;
     border-color: goldenrod;
     background-color: gold;
+    color: #000000;
     margin-bottom: 15px;
     text-align: left;
     padding: 10px;
@@ -823,7 +824,7 @@ textarea {
     width: fit-content;
 }
 
-#avalonAuthorizeBtn, #hiveAuthorizeBtn, #steemAuthorizeBtn {
+#avalonAuthorizeBtn, #hiveAuthorizeBtn, #steemAuthorizeBtn, #blurtAuthorizeBtn {
     display: none;
 }
 
