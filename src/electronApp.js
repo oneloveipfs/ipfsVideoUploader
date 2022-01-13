@@ -141,7 +141,7 @@ const menuTemplate = [
             { label: 'Learn More', click: () => shell.openExternal('https://oneloveipfs.com') },
             { label: 'Documentation', click: () => shell.openExternal('https://docs.oneloveipfs.com') },
             { label: 'Report An Issue', click: () => shell.openExternal('https://github.com/oneloveipfs/ipfsVideoUploader/issues') },
-            { label: 'OneLoveDTube Discord Server', click: () => shell.openExternal('https://discord.gg/Sc4utKr') },
+            { label: 'OneLoveIPFS Discord Server', click: () => shell.openExternal('https://discord.gg/Sc4utKr') },
             { type: 'separator' },
             { label: 'Source Code', click: () => shell.openExternal('https://github.com/oneloveipfs/ipfsVideoUploader') },
             { label: 'View License', click: () => shell.openExternal('https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/LICENSE') }
