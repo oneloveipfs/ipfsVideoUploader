@@ -402,7 +402,7 @@ let uploadOps = {
 
                         // Add container to IPFS
                         // TODO: Add to Skynet whenever applicable
-                        let folderhash
+                        let folderhash, spritehash
                         let addProgress = {
                             progress: 0,
                             total: recursiveFileCount(defaultDir+'/'+json.Upload.ID) + 1
@@ -410,6 +410,8 @@ let uploadOps = {
                         for await (const f of ipfsAPI.addAll(globSource(defaultDir,json.Upload.ID+'/**'),{cidVersion: 0, pin: true})) {
                             if (f.path.endsWith(json.Upload.ID))
                                 folderhash = f
+                            else if (f.path.endsWith('sprite.jpg'))
+                                spritehash = f.cid.toString()
                             addProgress.progress += 1
                             emitToUID(json.Upload.ID,'progress',{
                                 job: 'ipfsadd',
@@ -432,6 +434,7 @@ let uploadOps = {
                             network: network,
                             type: 'hls',
                             ipfshash: folderhash.cid.toString(),
+                            spritehash: spritehash,
                             size: folderhash.size,
                             duration: duration,
                             hasThumbnail: hasThumbnail,

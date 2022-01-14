@@ -716,27 +716,50 @@ function buildPostBody(author,permlink,postBody,videoHash,snapHash,description) 
 
 function buildJsonMetadata(network) {
     let jsonMeta = {
-        video: buildJsonMetadataAvalon(),
+        video: {},
         tags: postparams.tags,
         app: 'oneloveipfs/3',
     }
 
-    jsonMeta.video.refs = generateRefs(network)
+    if (isPlatformSelected.DTube && allowedPlatformNetworks.DTube.includes(network)) {
+        let dtubeJson = buildJsonMetadataAvalon()
+        for (let k in dtubeJson)
+            jsonMeta.video[k] = dtubeJson[k]
+        jsonMeta.video.refs = generateRefs(network)
+    }
 
-    return jsonMeta;
+    if (isPlatformSelected['3Speak'] && allowedPlatformNetworks['3Speak'].includes(network)) {
+        jsonMeta.title = postparams.title
+        jsonMeta.description = postparams.description
+        jsonMeta.sourceMap = [
+            ...(postparams.hasThumbnail ? [{
+                type: 'thumbnail',
+                url: 'ipfs://'+postparams.ipfshash+'/thumbnail.jpg'
+            }] : []),
+            {
+                type: 'video',
+                url: 'ipfs://'+postparams.ipfshash+'/default.m3u8',
+                format: 'm3u8'
+            }
+        ]
+        jsonMeta.filesize = postparams.size
+        jsonMeta.created = new Date().toISOString()
+        jsonMeta.type = '3speak/video'
+        jsonMeta.video.duration = postparams.duration
+        jsonMeta.video.info = {
+            author: usernameByNetwork(network),
+            permlink: postparams.permlink
+        }
+    }
+
+    return jsonMeta
 }
 
 function buildJsonMetadataAvalon() {
     let jsonMeta = {
         files: {
             ipfs: {
-                vid: {
-                    src: postparams.ipfshash,
-                    240: postparams.ipfs240hash,
-                    480: postparams.ipfs480hash,
-                    720: postparams.ipfs720hash,
-                    1080: postparams.ipfs1080hash
-                },
+                vid: {},
                 img: {
                     118: postparams.imghash,
                     360: postparams.imghash,
@@ -753,6 +776,19 @@ function buildJsonMetadataAvalon() {
         oc: 1,
         refs: generateRefs('avalon')
     }
+
+    if (postparams.type === 'hls') {
+        for (let r in postparams.resolutions)
+            jsonMeta.files.ipfs.vid[postparams.resolutions[r]] = postparams.ipfshash+'/'+postparams.resolutions[r]+'p/index.m3u8'
+        jsonMeta.files.ipfs.vid.src = postparams.ipfshash+'/'+postparams.resolutions[postparams.resolutions.length-1]+'p/index.m3u8'
+    } else
+        jsonMeta.files.ipfs.vid = {
+            src: postparams.ipfshash,
+            240: postparams.ipfs240hash,
+            480: postparams.ipfs480hash,
+            720: postparams.ipfs720hash,
+            1080: postparams.ipfs1080hash
+        }
 
     // Add Skylinks if applicable
     if (postparams.skylink || postparams.skylink240 || postparams.skylink480 || postparams.skylink720 || postparams.skylink1080) {
@@ -805,6 +841,7 @@ function generatePost(network) {
         sortedBeneficiary = blurtBeneficiaries.sort()
         hmcExclude = true
     }
+    let user = usernameByNetwork(network)
 
     // Create transaction
     let operations = [
@@ -812,15 +849,15 @@ function generatePost(network) {
                 parent_author: '',
                 parent_permlink: !hmcExclude ? document.getElementById(network+'CommunitySelect').value : '',
                 category: !hmcExclude ? document.getElementById(network+'CommunitySelect').value : '',
-                author: username,
+                author: user,
                 permlink: postparams.permlink,
                 title: postparams.title,
-                body: buildPostBody(username,postparams.permlink,postparams.postBody,postparams.ipfshash,postparams.imghash,postparams.description),
+                body: buildPostBody(user,postparams.permlink,postparams.postBody,postparams.ipfshash,postparams.imghash,postparams.description),
                 json_metadata: JSON.stringify(buildJsonMetadata(network)),
             }
         ],
         [ "comment_options", {
-            author: username,
+            author: user,
             permlink: postparams.permlink,
             max_accepted_payout: '1000000.000 HBD',
             percent_hbd: rewardPercent,

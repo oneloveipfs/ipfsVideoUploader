@@ -201,6 +201,19 @@ function retrieveDraft() {
         document.getElementById('skynetupload').checked = true
 }
 
+function usernameByNetwork(network) {
+    switch (network) {
+        case 'hive':
+            return hiveDisplayUser
+        case 'avalon':
+            return dtcDisplayUser
+        case 'steem':
+            return steemUser
+        case 'blurt':
+            return blurtUser
+    }
+}
+
 window.Auth = {
     Hive,
     Avalon,
