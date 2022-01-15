@@ -549,6 +549,7 @@ function uploadVideo(resolution,next,thumbnailFname = '') {
             keychain: Auth.iskeychain,
             type: resolutionFType,
             thumbnailFname: thumbnailFname,
+            createSprite: isPlatformSelected['DTube'] ? 'true' : '',
             skynet: document.getElementById('skynetupload').checked ? 'true' : 'false'
         },
         onError: (e) => {
@@ -684,6 +685,7 @@ async function avalonBroadcast() {
             tx.type = 13
             tx.data.burn = burnAmt
         }
+        console.log('Avalon tx',tx)
 
         let signedtx = javalon.sign(sessionStorage.getItem('avalonKey'),avalonAcc.name,tx)
         javalon.sendRawTransaction(signedtx,(err,result) => {
@@ -901,7 +903,7 @@ function generatePost(network) {
     let operations = [
         [ 'comment', {
                 parent_author: '',
-                parent_permlink: !hmcExclude ? document.getElementById(network+'CommunitySelect').value : '',
+                parent_permlink: !hmcExclude ? document.getElementById(network+'CommunitySelect').value : postparams.tags[0],
                 category: !hmcExclude ? document.getElementById(network+'CommunitySelect').value : '',
                 author: user,
                 permlink: postparams.permlink,
