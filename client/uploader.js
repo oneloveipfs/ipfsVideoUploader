@@ -609,36 +609,29 @@ function postVideo() {
     let encodedVidInputs = ['video240p','video480p','video720p','video1080p']
     let respectiveField = ['ipfs240hash','ipfs480hash','ipfs720hash','ipfs1080hash']
 
-    for (let i = 0; i < encodedVidInputs.length; i++) {
+    for (let i = 0; i < encodedVidInputs.length; i++)
         if (document.getElementById(encodedVidInputs[i]).files.length != 0) requiredFields.push(respectiveField[i])
-    }
 
-    for (let j = 0; j < requiredFields.length; j++) {
+    for (let j = 0; j < requiredFields.length; j++)
         if (!postparams[requiredFields[j]]) return console.log('missing hash, not proceeding with broadcast')
-    }
 
-    let progressbarInner = document.getElementById('progressBarFront')
+    hiveBroadcast()
+}
 
-    if (Auth.dtconly == 'true') {
-        if (config.noBroadcast) return
-        broadcastAvalon(buildJsonMetadataAvalon(),postparams.ipfshash,() => {
-            broadcastCompletion(true)
-        })
-        return
-    }
-
-    progressbarInner.innerHTML = 'Submitting video to Hive...'
-
-    // Post to Hive blockchain
+function hiveBroadcast() {
     let hiveTx = generatePost('hive')
     console.log('Hive tx',hiveTx)
-    if (config.noBroadcast) return
+    if (!hiveDisplayUser || supportedPlatforms.hive.filter((p) => isPlatformSelected[p]).length === 0 || config.noBroadcast)
+        return hiveCb({})
+
+    document.getElementById('progressBarFront').innerHTML = 'Submitting video to Hive...'
+
     if (Auth.iskeychain == 'true') {
         // Broadcast with Keychain
         if (isElectron())
-            hive.broadcast.send({ extensions: [], operations: hiveTx },[sessionStorage.getItem('hiveKey')],hiveBCb)
+            hive.broadcast.send({ extensions: [], operations: hiveTx },[sessionStorage.getItem('hiveKey')],(e) => hiveCb({error: e}))
         else
-            hive_keychain.requestBroadcast(username,hiveTx,'Posting',hiveBCb)
+            hive_keychain.requestBroadcast(username,hiveTx,'Posting',hiveCb)
     } else {
         let hiveapi = new hivesigner.Client({ 
             accessToken: Auth.token,
@@ -646,54 +639,117 @@ function postVideo() {
             callbackURL: window.location.origin + '/upload',
             scope: ['comment','comment_options']
         })
-        hiveapi.broadcast(hiveTx,(err) => {
-            if (err) {
-                return broadcastErrorHandler('HiveSigner',err.error_description)
-            } else if (avalonUser) {
-                // Broadcast to Avalon as well if Avalon login exists
-                broadcastAvalon(buildJsonMetadataAvalon(),postparams.ipfshash,() => {
-                    broadcastCompletion(true)
-                })
-            } else broadcastCompletion(false)
-        })
+        hiveapi.broadcast(hiveTx,(err) => hiveCb({error: err.error_description}))
     }
 }
 
-function hiveBCb(hiveResponse) {
-    if (!isElectron() && hiveResponse.error)
-        return broadcastErrorHandler('Hive Keychain',hiveResponse.message)
-    else if (isElectron() && hiveResponse)
-        return broadcastErrorHandler('Hive broadcast',hiveResponse.toString())
+function hiveCb(r) {
+    if (r.error)
+        return bcError('Hive broadcast',r.error.toString())
 
-    // Avalon broadcast
-    if (avalonUser)
-        broadcastAvalon(buildJsonMetadataAvalon(),postparams.ipfshash,() => steemBroadcaster())
-    else 
-        steemBroadcaster()
+    avalonBroadcast()
 }
 
-function steemBCb(steemResponse) {
-    if (!isElectron() && steemResponse.error) alert('Steem error: ' + steemResponse.message)
-    else if (isElectron() && steemResponse) alert('Steem error: ' + steemResponse.toString())
-    broadcastCompletion(avalonUser ? true : false)
+async function avalonBroadcast() {
+    if (!dtcDisplayUser || supportedPlatforms.avalon.filter((p) => isPlatformSelected[p]).length === 0 || config.noBroadcast)
+        return avalonCb()
+
+    document.getElementById('progressBarFront').innerHTML = 'Submitting video to Avalon...'
+    let tag = ''
+    if (postparams.tags.length !== 0)
+        tag = postparams.tags[0]
+    
+    let avalonGetAccPromise = new Promise((resolve,reject) => {
+        javalon.getAccount(avalonUser,(err,user) => {
+            if (err) return reject(err)
+            resolve(user)
+        })
+    })
+
+    let burnAmt = document.getElementById('dtcBurnInput').value ? Math.floor(parseFloat(document.getElementById('dtcBurnInput').value) * 100) : 0
+
+    try {
+        let avalonAcc = await avalonGetAccPromise
+        let tx = {
+            type: 4,
+            data: {
+                link: postparams.ipfshash,
+                json: buildJsonMetadataAvalon(),
+                vt: Math.floor(javalon.votingPower(avalonAcc)*(document.getElementById('avalonvw').value)/100),
+                tag: tag
+            }
+        }
+
+        if (burnAmt > 0) {
+            tx.type = 13
+            tx.data.burn = burnAmt
+        }
+
+        let signedtx = javalon.sign(sessionStorage.getItem('avalonKey'),avalonAcc.name,tx)
+        javalon.sendRawTransaction(signedtx,(err,result) => {
+            if (err)
+                avalonCb(err.toString())
+            else
+                avalonCb()
+        })
+    } catch (e) {
+        avalonCb(e.toString())
+    }
+}
+
+function avalonCb(e) {
+    if (e)
+        return bcError('Avalon broadcast',e)
+
+    steemBroadcaster()
 }
 
 function steemBroadcaster() {
-    if (steemUser) {
+    if (steemUser && supportedPlatforms.steem.filter((p) => isPlatformSelected[p]).length > 0 && !config.noBroadcast) {
         let steemTx = generatePost('steem')
         console.log('Steem tx',steemTx)
         document.getElementById('progressBarFront').innerHTML = 'Submitting video to Steem...'
         if (isElectron())
-            steem.broadcast.send({ extensions: [], operations: steemTx },[sessionStorage.getItem('steemKey')],steemBCb)
+            steem.broadcast.send({ extensions: [], operations: steemTx },[sessionStorage.getItem('steemKey')],(e) => steemCb({error: e}))
         else
-            steem_keychain.requestBroadcast(steemUser,steemTx,'Posting',steemBCb)
-    } else broadcastCompletion(avalonUser ? true : false)
+            steem_keychain.requestBroadcast(steemUser,steemTx,'Posting',steemCb)
+    } else steemCb({})
 }
 
-function broadcastErrorHandler(tool,e) {
+function steemCb(r) {
+    if (r.error)
+        return bcError('Steem broadcast',r.error.toString())
+    
+    blurtBroadcaster()
+}
+
+function blurtBroadcaster() {
+    if (blurtUser && supportedPlatforms.blurt.filter((p) => isPlatformSelected[p]).length > 0 && !config.noBroadcast) {
+        let blurtTx = generatePost('blurt')
+        console.log('Blurt tx',blurtTx)
+        document.getElementById('progressBarFront').innerHTML = 'Submitting video to Blurt...'
+        if (isElectron())
+            blurt.broadcast.send({ extensions: [], operations: blurtTx },[sessionStorage.getItem('blurtKey')],(e) => blurtCb({error: e}))
+        else
+            blurt_keychain.requestBroadcast(blurtUser,blurtTx,'Posting',blurtCb)
+    } else blurtCb({})
+}
+
+function blurtCb(r) {
+    if (r.error)
+        return bcError('Blurt broadcast',r.error.toString())
+    
+    bcFinish()
+}
+
+function bcError(tool,e) {
     alert(tool+' error: '+e)
     document.getElementById('progressBarBack').style.display = "none"
     reenableFields()
+}
+
+function bcFinish() {
+    document.getElementById('progressBarFront').innerHTML = 'All done'
 }
 
 function generatePermlink() {
@@ -756,6 +812,7 @@ function buildJsonMetadata(network) {
 }
 
 function buildJsonMetadataAvalon() {
+    let defaultRes = [240,480,720,1080]
     let jsonMeta = {
         files: {
             ipfs: {
@@ -781,26 +838,23 @@ function buildJsonMetadataAvalon() {
         for (let r in postparams.resolutions)
             jsonMeta.files.ipfs.vid[postparams.resolutions[r]] = postparams.ipfshash+'/'+postparams.resolutions[r]+'p/index.m3u8'
         jsonMeta.files.ipfs.vid.src = postparams.ipfshash+'/'+postparams.resolutions[postparams.resolutions.length-1]+'p/index.m3u8'
-    } else
-        jsonMeta.files.ipfs.vid = {
-            src: postparams.ipfshash,
-            240: postparams.ipfs240hash,
-            480: postparams.ipfs480hash,
-            720: postparams.ipfs720hash,
-            1080: postparams.ipfs1080hash
-        }
+    } else {
+        jsonMeta.files.ipfs.vid.src = postparams.ipfshash
+        for (let r in defaultRes)
+            if (postparams['ipfs'+defaultRes[r]+'hash'])
+                jsonMeta.files.ipfs.vid[defaultRes[r]] = postparams['ipfs'+defaultRes[r]+'hash']
+    }
 
     // Add Skylinks if applicable
     if (postparams.skylink || postparams.skylink240 || postparams.skylink480 || postparams.skylink720 || postparams.skylink1080) {
         jsonMeta.files.sia = {
             vid: {}
         }
+        if (postparams.skylink) jsonMeta.files.sia.vid.src = postparams.skylink
+        for (let r in defaultRes)
+            if (postparams['skylink'+defaultRes[r]])
+                jsonMeta.files.sia.vid[defaultRes[r]] = postparams['skylink'+defaultRes[r]]
     }
-    if (postparams.skylink) jsonMeta.files.sia.vid.src = postparams.skylink
-    if (postparams.skylink240) jsonMeta.files.sia.vid['240'] = postparams.skylink240
-    if (postparams.skylink480) jsonMeta.files.sia.vid['480'] = postparams.skylink480
-    if (postparams.skylink720) jsonMeta.files.sia.vid['720'] = postparams.skylink720
-    if (postparams.skylink1080) jsonMeta.files.sia.vid['1080'] = postparams.skylink1080
     if (config.gateway) jsonMeta.files.ipfs.gw = config.gateway 
 
     if (subtitleList.length > 0) {
@@ -885,50 +939,6 @@ function generatePost(network) {
     return operations
 }
 
-async function broadcastAvalon(json,permlink,cb) {
-    document.getElementById('progressBarFront').innerHTML = 'Submitting video to Avalon...'
-    let tag = ''
-    if (postparams.tags.length !== 0)
-        tag = postparams.tags[0]
-    
-    let avalonGetAccPromise = new Promise((resolve,reject) => {
-        javalon.getAccount(avalonUser,(err,user) => {
-            if (err) return reject(err)
-            resolve(user)
-        })
-    })
-
-    let burnAmt = document.getElementById('dtcBurnInput').value ? Math.floor(parseFloat(document.getElementById('dtcBurnInput').value) * 100) : 0
-
-    try {
-        let avalonAcc = await avalonGetAccPromise
-        let tx = {
-            type: 4,
-            data: {
-                link: permlink,
-                json: json,
-                vt: Math.floor(javalon.votingPower(avalonAcc)*(document.getElementById('avalonvw').value)/100),
-                tag: tag
-            }
-        }
-
-        if (burnAmt > 0) {
-            tx.type = 13
-            tx.data.burn = burnAmt
-        }
-
-        let signedtx = javalon.sign(sessionStorage.getItem('avalonKey'),avalonAcc.name,tx)
-        javalon.sendTransaction(signedtx,(err,result) => {
-            if (err) alert('Avalon broadcast error: ' + JSON.stringify(err))
-            cb()
-        })
-    } catch (e) {
-        // Alert any Avalon errors after successful Hive tx broadcast then proceed to watch page as usual
-        alert('Avalon broadcast error: ' + JSON.stringify(e))
-        cb()
-    }
-}
-
 function updateProgressBar(progress,text) {
     let progressbarInner = document.getElementById('progressBarFront')
     progressbarInner.style.width = progress + '%'
@@ -965,23 +975,6 @@ function updateSubtitle() {
             updateSubtitle()
         }
     }
-}
-
-function broadcastCompletion(isAvalonSuccess) {
-    clearDraft()
-    if (isAvalonSuccess) {
-        if (isElectron())
-            window.openBrowserWindowElectron('https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash)
-        else
-            window.location.href = 'https://d.tube/v/' + avalonUser + '/' + postparams.ipfshash
-    } else {
-        if (isElectron())
-            window.openBrowserWindowElectron('https://d.tube/v/' + username + '/' + postparams.permlink)
-        else
-            window.location.href = 'https://d.tube/v/' + username + '/' + postparams.permlink
-    }
-    if (isElectron())
-        document.getElementById('progressBarFront').innerText = 'All done'
 }
 
 function clearDraft() {
