@@ -78,14 +78,14 @@
   "license": "GPLv3",
   "dependencies": {
     "about-window": "^1.15.2",
-    "async": "^3.2.2",
-    "axios": "^0.24.0",
-    "body-parser": "^1.19.1",
+    "async": "^3.2.3",
+    "axios": "^0.26.1",
+    "body-parser": "^1.19.2",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "deepmerge": "^4.2.2",
     "electron-squirrel-startup": "^1.0.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "form-data": "^3.0.0",
     "get-video-duration": "^4.0.0",
     "hivecrypt": "^2.0.3",
@@ -98,8 +98,8 @@
     "node-schedule": "^2.1.0",
     "node-webvtt": "^1.9.1",
     "shelljs": "^0.8.5",
-    "snyk": "^1.809.0",
-    "socket.io": "^4.4.0"
+    "snyk": "^1.878.0",
+    "socket.io": "^4.4.1"
   },
   "devDependencies": {
     "chai": "^4.3.4",
