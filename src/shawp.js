@@ -47,7 +47,7 @@ let Shawp = {
     },
     FetchTx: (id,network,cb) => {
         switch (network) {
-            case Shawp.methods.DTC:
+            case Shawp.methods.DTUBE:
                 axios.get(Config.Shawp.AvalonAPI+'/tx/'+id).then(d => cb(null,d.data)).catch(e => cb(e))
                 break
             case Shawp.methods.Hive:
@@ -76,12 +76,12 @@ let Shawp = {
     ProcessAvalonTx: (tx) => {
         console.log(tx)
         let amt = tx.data.amount / 100
-        Shawp.ExchangeRate(Shawp.coins.DTC,amt,(e,usd) => {
+        Shawp.ExchangeRate(Shawp.coins.DTUBE,amt,(e,usd) => {
             let receiver = tx.sender
             let memo = tx.data.memo.toLowerCase().trim()
             let parsedDetails = Shawp.ValidatePayment(receiver,memo)
             if (parsedDetails.length !== 2) return
-            Shawp.Refill(tx.sender,parsedDetails[0],parsedDetails[1],Shawp.methods.DTC,tx.hash,tx.ts,amt+' DTC',usd)
+            Shawp.Refill(tx.sender,parsedDetails[0],parsedDetails[1],Shawp.methods.DTUBE,tx.hash,tx.ts,amt+' DTUBE',usd)
             Shawp.WriteRefillHistory()
             Shawp.WriteUserDB()
             console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
@@ -280,7 +280,7 @@ let Shawp = {
     },
     coins: {
         // Native
-        DTC: 0,
+        DTUBE: 0,
         Hive: 1,
         HiveDollars: 2,
 
@@ -297,7 +297,7 @@ let Shawp = {
         USDC: 10
     },
     methods: {
-        DTC: 0,
+        DTUBE: 0,
         Hive: 1,
         Steem: 2, // deprecated
         Coupon: 3, // through promo/wc orders

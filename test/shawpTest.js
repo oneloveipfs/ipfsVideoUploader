@@ -5,9 +5,9 @@ const Config = require('../src/config')
 let userAlreadyExist = Shawp.UserExists(Config.test.user,'all')
 
 describe('Shawp',() => {
-    it('Shawp.ExchangeRate should return USD price of DTC',(done) => {
+    it('Shawp.ExchangeRate should return USD price of DTUBE',(done) => {
         let isdone = false
-        Shawp.ExchangeRate(Shawp.coins.DTC,1,(e,r) => {
+        Shawp.ExchangeRate(Shawp.coins.DTUBE,1,(e,r) => {
             if (r) assert.typeOf(r,'number')
             if (!isdone) done()
             isdone = true

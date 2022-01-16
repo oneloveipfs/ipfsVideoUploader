@@ -91,12 +91,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (creditsToBuy <= 0) return alert('Purchase quantity must not be less than or equals to zero.')
         document.getElementById('refillSubmitBtn').value = 'Loading...'
         document.getElementById('refillSubmitBtn').disabled = true
-        let nativePymtProcessors = ['DTC','HIVE','HBD']
+        let nativePymtProcessors = ['DTUBE','HIVE','HBD']
         if (nativePymtProcessors.includes(paymentMethod)) exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
             document.getElementById('refillSubmitBtn').value = 'Refill'
             document.getElementById('refillSubmitBtn').disabled = false
             if (e) return alert(e)
-            amt = paymentMethod === 'DTC' ? amt.toFixed(2) : amt.toFixed(3)
+            amt = paymentMethod === 'DTUBE' ? amt.toFixed(2) : amt.toFixed(3)
             document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + creditsToBuy + ' GBdays'
             document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
             updateDisplayByIDs(['nativeDisclaimer'],[])
@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('xferMemo').innerHTML = 'Memo: <u>' + memo + '</u>'
 
             switch (paymentMethod) {
-                case 'DTC':
+                case 'DTUBE':
                     updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['HiveKeychainBtn','HiveSignerBtn','SteemKeychainBtn','SteemLoginBtn'])
                     document.getElementById('DTubeChannelBtn').onclick = () => window.open('https://d.tube/#!/c/' + shawpconfig.DtcReceiver)
                     document.getElementById('DTubeChannelBtn').href = 'https://d.tube/#!/c/' + shawpconfig.DtcReceiver

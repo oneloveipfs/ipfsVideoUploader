@@ -297,13 +297,13 @@ app.get('/shawp_refill_admin',(req,res) => {
     Authenticate(req,res,false,(user) => {
         if (!Config.admins.includes(user)) return res.status(403).send({error:'Not an admin'})
         let network = req.query.network
-        let supportedNetworks = [Shawp.methods.DTC,Shawp.methods.Hive]
+        let supportedNetworks = [Shawp.methods.DTUBE,Shawp.methods.Hive]
         if (!network || isNaN(parseInt(network)) || !supportedNetworks.includes(parseInt(network)))
             return res.status(400).send({error:'Invalid network'})
         Shawp.FetchTx(req.query.id,parseInt(req.query.network),(e,tx) => {
             if (e) return res.status(500).send({error:e})
             switch (parseInt(req.query.network)) {
-                case Shawp.methods.DTC:
+                case Shawp.methods.DTUBE:
                     Shawp.ProcessAvalonTx(tx)
                     break
                 case Shawp.methods.Hive:
