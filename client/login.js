@@ -197,7 +197,7 @@ function getPaymentInfo() {
     let receipient = document.getElementById('receiverUsername').value
     let paymentMethod = document.getElementById('pymtMtd').value
     let creditsToBuy = parseFloat(document.getElementById('gbdaysInput').value)
-    let nativePymtProcessors = ['DTC','HIVE','HBD']
+    let nativePymtProcessors = ['DTUBE','HIVE','HBD']
     if (selectedNetwork === 'none') return alert('Please select a network for your account.')
 
     // Validate usernames
@@ -213,7 +213,7 @@ function getPaymentInfo() {
     if (creditsToBuy <= 0) return alert('Purchase quantity must not be less than or equals to zero.')
     if (nativePymtProcessors.includes(paymentMethod)) exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
         if (e) return alert(e)
-        amt = paymentMethod === 'DTC' ? amt.toFixed(2) : amt.toFixed(3)
+        amt = paymentMethod === 'DTUBE' ? amt.toFixed(2) : amt.toFixed(3)
         if (receipient) document.getElementById('receiverAccConfirm').innerText = 'Username: ' + receipient
         document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + creditsToBuy + ' GBdays'
         document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
@@ -226,7 +226,7 @@ function getPaymentInfo() {
         document.getElementById('xferMemo').innerHTML = memo !== '' ? 'Memo: <u>' + memo + '</u> <a onclick="copyToClipboard(\''+ memo + '\',\'copymemo\')"><i class="fas fa-clipboard tooltip" id="copybtn"><span class="tooltiptext" id="copymemo">Click to copy</span></i></a>' : 'No memo required'
 
         switch (paymentMethod) {
-            case 'DTC':
+            case 'DTUBE':
                 updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['HiveKeychainBtn','HiveSignerBtn'])
                 document.getElementById('DTubeChannelBtn').onclick = () => window.open('https://d.tube/#!/c/' + shawpconfig.DtcReceiver)
                 document.getElementById('DTubeChannelBtn').href = 'https://d.tube/#!/c/' + shawpconfig.DtcReceiver

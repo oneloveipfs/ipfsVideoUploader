@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else {
             javalon.getAccount(avalonUser,(err,acc) => {
                 if (err) return
-                document.getElementById('dtcBurnInput').placeholder = 'Available: ' + thousandSeperator(acc.balance / 100) + ' DTC'
+                document.getElementById('dtcBurnInput').placeholder = 'Available: ' + thousandSeperator(acc.balance / 100) + ' DTUBE'
                 document.getElementById('avalonvwlabel').innerText = 'Avalon vote weight: 1% (~' + thousandSeperator(Math.floor(0.01 * javalon.votingPower(acc))) + ' VP)'
                 window.availableForBurn = acc.balance / 100
                 window.availableAvalonBw = acc.bw
