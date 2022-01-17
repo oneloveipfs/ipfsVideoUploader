@@ -227,9 +227,11 @@ let uploadOps = {
             addFile(defaultDir+'/'+uploadedImg,trickleDagAdd,false,(size,hash) => {
                 // Log IPFS hashes by Steem account
                 // If hash is not in database, add the hash into database
-                db.recordHash(username,network,imgType,hash,request.file.size)
-                db.writeHashesData()
-                db.writeHashSizesData()
+                if (!request.query.onlyhash) {
+                    db.recordHash(username,network,imgType,hash,request.file.size)
+                    db.writeHashesData()
+                    db.writeHashSizesData()
+                }
 
                 // Send image IPFS hash back to client and IPSync
                 let result = {
@@ -242,9 +244,11 @@ let uploadOps = {
                 if (imgType === 'thumbnails')
                     result.fsname = uploadedImg
                 response.send(result)
-                ipsync.emit('upload',result)
-                if (Config.deleteUploadsAfterAdd && imgType !== 'thumbnails') fs.unlink(defaultDir+'/'+uploadedImg,()=>{})
-            })
+                if (!request.query.onlyhash)
+                    ipsync.emit('upload',result)
+                if (Config.deleteUploadsAfterAdd && imgType !== 'thumbnails')
+                    fs.unlink(defaultDir+'/'+uploadedImg,()=>{})
+            },request.query.onlyhash)
         })
     },
     uploadSubtitles: async (username,network,request,response) => {

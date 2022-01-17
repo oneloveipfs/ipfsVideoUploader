@@ -257,6 +257,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         let call = '/uploadImage?type=thumbnails&access_token=' + Auth.token
         if (Auth.iskeychain !== 'true')
             call += '&scauth=true'
+        if (document.getElementById('hlsencode').checked)
+            call += '&onlyhash=true'
         axios.post(call,formdata,contentType).then(function(response) {
             let uploaderResponse = response.data
             console.log(uploaderResponse)
