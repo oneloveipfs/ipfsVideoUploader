@@ -606,9 +606,13 @@ let uploadOps = {
                         if (e) return socket.emit('result', { error: 'Auth error: ' + JSON.stringify(e) })
                         
                         // Upload ID not found in register, register socket
-                        if (!uploadRegister[info.id]) return socketRegister[info.id] = {
-                            socket: socket,
-                            ts: new Date().getTime()
+                        if (!uploadRegister[info.id]) {
+                            if (encoderQueue.processing === info.id)
+                                socket.emit('begin', encoderQueue.s)
+                            return socketRegister[info.id] = {
+                                socket: socket,
+                                ts: new Date().getTime()
+                            }
                         }
 
                         // Upload ID exist in register and matches type requested, return result immediately
@@ -617,10 +621,7 @@ let uploadOps = {
                         // Type requested does not match registered type
                         // HLS uploads do not transform into other upload types
                         if (info.type === 'hls')
-                            if (uploadRegister[info.id].type !== 'hls')
-                                return socket.emit('error',{ error: 'hls uploads cannot be transformed' })
-                            else if (encoderQueue.processing === info.id)
-                                return socket.emit('begin', encoderQueue.s)
+                            return socket.emit('error',{ error: 'hls uploads cannot be transformed' })
 
                         // Encoded video hash requested, return only hash
                         if (info.type !== 'videos') return socket.emit('result',{
