@@ -1,10 +1,11 @@
 class ProcessingQueue {
     constructor() {
         this.queue = []
-        this.processing = false
+        this.processing = ''
+        this.s = {}
     }
 
-    push(f = { id: '', f: (cb) => cb()}) {
+    push(f = { id: '', f: (cb) => cb(), s: {}}) {
         this.queue.push(f)
         if (!this.processing) {
             this.processing = this.queue[0].id
@@ -14,12 +15,15 @@ class ProcessingQueue {
 
     execute() {
         let first = this.queue.shift()
-        first.f(() => {
+        this.s = first.s
+        first.f(first.s, () => {
             if (this.queue.length > 0) {
                 this.processing = this.queue[0].id
                 this.execute()
-            } else
-                this.processing = false
+            } else {
+                this.processing = ''
+                this.s = {}
+            }
         })
     }
 }

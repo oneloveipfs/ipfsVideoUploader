@@ -379,79 +379,91 @@ let uploadOps = {
                     }
                     if (json.Upload.MetaData.createSprite)
                         ops.sprite = (cb) => createSpriteInContainer(filepath,json.Upload.ID).then(() => cb(null))
-                    encoderQueue.push({ id: json.Upload.ID, f: (nextJob) => async.parallel(ops, async (e) => {
-                        if (e)
-                            return nextJob()
-                        
-                        // Construct master playlist
-                        let masterPlaylist = '#EXTM3U\n#EXT-X-VERSION:3'
-                        for (let r in outputResolutions) {
-                            let rd
-                            try {
-                                rd = await getFFprobeVideo(defaultDir+'/'+json.Upload.ID+'/'+outputResolutions[r]+'p/0.ts')
-                            } catch {
-                                emitToUID(json.Upload.ID,'error',{ error: 'could not retrieve ffprobe info on '+outputResolutions[r]+'p encoded video' },false)
+                    encoderQueue.push({ id: json.Upload.ID, f: (s, nextJob) => {
+                        s.step = 'encode'
+                        s.outputs = outputResolutions
+                        emitToUID(json.Upload.ID,'begin',s,true)
+                        async.parallel(ops, async (e) => {
+                            if (e)
+                                return nextJob()
+
+                            s.step = 'container'
+                            delete s.outputs
+                            emitToUID(json.Upload.ID,'begin',s,true)
+                            
+                            // Construct master playlist
+                            let masterPlaylist = '#EXTM3U\n#EXT-X-VERSION:3'
+                            for (let r in outputResolutions) {
+                                let rd
+                                try {
+                                    rd = await getFFprobeVideo(defaultDir+'/'+json.Upload.ID+'/'+outputResolutions[r]+'p/0.ts')
+                                } catch {
+                                    emitToUID(json.Upload.ID,'error',{ error: 'could not retrieve ffprobe info on '+outputResolutions[r]+'p encoded video' },false)
+                                    return nextJob()
+                                }
+                                masterPlaylist += '\n#EXT-X-STREAM-INF:BANDWIDTH='+hlsBandwidth[outputResolutions[r]]+',RESOLUTION='+rd.width+'x'+rd.height+'\n'+outputResolutions[r]+'p/index.m3u8'
+                            }
+                            fs.writeFileSync(defaultDir+'/'+json.Upload.ID+'/default.m3u8',masterPlaylist)
+
+                            // Add thumbnail image file in container
+                            let hasThumbnail = false
+                            if (isValidImgFname(json.Upload.MetaData.thumbnailFname) && fs.existsSync(defaultDir+'/'+json.Upload.MetaData.thumbnailFname)) {
+                                fs.copyFileSync(defaultDir+'/'+json.Upload.MetaData.thumbnailFname,defaultDir+'/'+json.Upload.ID+'/thumbnail.jpg')
+                                hasThumbnail = true
+                            }
+
+                            s.step = 'ipfsadd'
+                            emitToUID(json.Upload.ID,'begin',s,true)
+
+                            // Add container to IPFS
+                            // TODO: Add to Skynet whenever applicable
+                            let folderhash, spritehash
+                            let addProgress = {
+                                progress: 0,
+                                total: recursiveFileCount(defaultDir+'/'+json.Upload.ID) + 1
+                            }
+                            for await (const f of ipfsAPI.addAll(globSource(defaultDir,json.Upload.ID+'/**'),{cidVersion: 0, pin: true})) {
+                                if (f.path.endsWith(json.Upload.ID))
+                                    folderhash = f
+                                else if (f.path.endsWith('sprite.jpg'))
+                                    spritehash = f.cid.toString()
+                                addProgress.progress += 1
+                                emitToUID(json.Upload.ID,'progress',{
+                                    job: 'ipfsadd',
+                                    progress: addProgress.progress,
+                                    total: addProgress.total
+                                },true)
+                            }
+                            if (!folderhash || !folderhash.cid) {
+                                emitToUID(json.Upload.ID,'error',{ error: 'HLS container IPFS add failed' },false)
                                 return nextJob()
                             }
-                            masterPlaylist += '\n#EXT-X-STREAM-INF:BANDWIDTH='+hlsBandwidth[outputResolutions[r]]+',RESOLUTION='+rd.width+'x'+rd.height+'\n'+outputResolutions[r]+'p/index.m3u8'
-                        }
-                        fs.writeFileSync(defaultDir+'/'+json.Upload.ID+'/default.m3u8',masterPlaylist)
 
-                        // Add thumbnail image file in container
-                        let hasThumbnail = false
-                        if (isValidImgFname(json.Upload.MetaData.thumbnailFname) && fs.existsSync(defaultDir+'/'+json.Upload.MetaData.thumbnailFname)) {
-                            fs.copyFileSync(defaultDir+'/'+json.Upload.MetaData.thumbnailFname,defaultDir+'/'+json.Upload.ID+'/thumbnail.jpg')
-                            hasThumbnail = true
-                        }
+                            // Record in db and return result
+                            db.recordHash(user,network,'hls',folderhash.cid.toString(),folderhash.size)
+                            db.writeHashesData()
+                            db.writeHashSizesData()
 
-                        // Add container to IPFS
-                        // TODO: Add to Skynet whenever applicable
-                        let folderhash, spritehash
-                        let addProgress = {
-                            progress: 0,
-                            total: recursiveFileCount(defaultDir+'/'+json.Upload.ID) + 1
-                        }
-                        for await (const f of ipfsAPI.addAll(globSource(defaultDir,json.Upload.ID+'/**'),{cidVersion: 0, pin: true})) {
-                            if (f.path.endsWith(json.Upload.ID))
-                                folderhash = f
-                            else if (f.path.endsWith('sprite.jpg'))
-                                spritehash = f.cid.toString()
-                            addProgress.progress += 1
-                            emitToUID(json.Upload.ID,'progress',{
-                                job: 'ipfsadd',
-                                progress: addProgress.progress,
-                                total: addProgress.total
-                            },true)
-                        }
-                        if (!folderhash || !folderhash.cid) {
-                            emitToUID(json.Upload.ID,'error',{ error: 'HLS container IPFS add failed' },false)
-                            return nextJob()
-                        }
-
-                        // Record in db and return result
-                        db.recordHash(user,network,'hls',folderhash.cid.toString(),folderhash.size)
-                        db.writeHashesData()
-                        db.writeHashSizesData()
-
-                        let result = {
-                            username: user,
-                            network: network,
-                            type: 'hls',
-                            ipfshash: folderhash.cid.toString(),
-                            spritehash: spritehash,
-                            size: folderhash.size,
-                            duration: duration,
-                            hasThumbnail: hasThumbnail,
-                            resolutions: outputResolutions
-                        }
-                        console.log(result)
-                        emitToUID(json.Upload.ID,'result',result,false)
-                        delete socketRegister[json.Upload.ID]
-                        uploadRegister[json.Upload.ID] = result
-                        ipsync.emit('upload',result)
-                        callback()
-                        nextJob()
-                    })})
+                            let result = {
+                                username: user,
+                                network: network,
+                                type: 'hls',
+                                ipfshash: folderhash.cid.toString(),
+                                spritehash: spritehash,
+                                size: folderhash.size,
+                                duration: duration,
+                                hasThumbnail: hasThumbnail,
+                                resolutions: outputResolutions
+                            }
+                            console.log(result)
+                            emitToUID(json.Upload.ID,'result',result,false)
+                            delete socketRegister[json.Upload.ID]
+                            uploadRegister[json.Upload.ID] = result
+                            ipsync.emit('upload',result)
+                            callback()
+                            nextJob()
+                        })
+                    }, s: {}})
                 })
                 break
             case 'videos':
@@ -604,7 +616,11 @@ let uploadOps = {
                         
                         // Type requested does not match registered type
                         // HLS uploads do not transform into other upload types
-                        if (info.type === 'hls') return socket.emit('error',{ error: 'hls uploads cannot be transformed' })
+                        if (info.type === 'hls')
+                            if (uploadRegister[info.id].type !== 'hls')
+                                return socket.emit('error',{ error: 'hls uploads cannot be transformed' })
+                            else if (encoderQueue.processing === info.id)
+                                return socket.emit('begin', encoderQueue.s)
 
                         // Encoded video hash requested, return only hash
                         if (info.type !== 'videos') return socket.emit('result',{

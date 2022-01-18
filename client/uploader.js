@@ -42,6 +42,9 @@ let postparams = {}
 let uplStat
 axios.get('/proxy_server').then((r) => {
     uplStat = io.connect(r.data.server+'/uploadStat')
+    uplStat.on('begin',(s) => {
+        console.log('begin',s)
+    })
     uplStat.on('progress',(p) => {
         console.log('progress',p)
     })

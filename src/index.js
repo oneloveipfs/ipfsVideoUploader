@@ -219,7 +219,16 @@ app.get('/stats',(request,response) => {
     })
 })
 
-app.get('/encoderstats',(req,res) => {
+app.get('/encoder/config',(req,res) => {
+    res.send({
+        accounts: Config.Encoder.accounts,
+        encoder: Config.Encoder.encoder,
+        quality: Config.Encoder.quality,
+        outputs: Config.Encoder.outputs
+    })
+})
+
+app.get('/encoder/stats',(req,res) => {
     let queueIds = []
     for (let j in FileUploader.encoderQueue.queue)
         queueIds.push(FileUploader.encoderQueue.queue[j].id)
