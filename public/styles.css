@@ -535,14 +535,14 @@ hr {
     display: none;
 }
 
-#progressBarBack {
+.progressBack {
     width: 100%;
     background-color: #979797;
     border-radius: 5px;
     display: none;
 }
 
-#progressBarFront {
+.progressFront {
     width: 0%;
     height: 30px;
     background-color: #2196F3;

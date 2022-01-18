@@ -165,9 +165,10 @@
             <input class="styledButton" type="button" value="Save draft" id="draftBtn">
             <h4 id="loggedInUser">Detecting login...</h4>
             <h4 id="platformStr">Loading platforms...</h4>
-            <div id="progressBarBack">
-                <div id="progressBarFront">Uploading... (0%)</div>
+            <div class="progressBack" id="uploadProgressBack">
+                <div class="progressFront" id="uploadProgressFront">Uploading... (0%)</div>
             </div>
+            <div id="encodeProgress"></div>
         </div>
         <div id="thumbnailSwapper">
             <div class="warningbox" id="thumbnailSwapNoAvalon">As you are not logged in with Avalon, the post on Avalon will not be updated. Therefore, only the Hive post will be updated with the new thumbnail.</div>

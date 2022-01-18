@@ -44,9 +44,52 @@ axios.get('/proxy_server').then((r) => {
     uplStat = io.connect(r.data.server+'/uploadStat')
     uplStat.on('begin',(s) => {
         console.log('begin',s)
+        switch (s.step) {
+            case 'encode':
+                let encodeProgressBars = []
+                document.getElementById('uploadProgressFront').innerText = 'Encoding HLS video...'
+                for (let r in s.outputs) {
+                    // create encoding progress bar elements
+                    let back = document.createElement('div')
+                    back.setAttribute('class','progressBack')
+                    back.setAttribute('id','encodeProgressBack'+s.outputs[r])
+                    let front = document.createElement('div')
+                    front.setAttribute('class','progressFront')
+                    front.setAttribute('id','encodeProgressFront'+s.outputs[r])
+                    back.appendChild(front)
+                    document.getElementById('encodeProgress').appendChild(document.createElement('br'))
+                    document.getElementById('encodeProgress').appendChild(back)
+
+                    // setup progress
+                    encodeProgressBars.push('encodeProgressBack'+s.outputs[r])
+                    document.getElementById('encodeProgressFront'+s.outputs[r]).innerText = 'Encoding to '+s.outputs[r]+'... (0%)'
+                }
+                updateDisplayByIDs(encodeProgressBars,[])
+                break
+            case 'container':
+                document.getElementById('encodeProgress').innerHTML = ''
+                document.getElementById('uploadProgressFront').innerText = 'Processing output container...'
+                break
+            case 'ipfsadd':
+                document.getElementById('uploadProgressFront').innerText = 'Adding to IPFS...'
+                break
+            default:
+                break
+        }
     })
     uplStat.on('progress',(p) => {
         console.log('progress',p)
+        switch (p.job) {
+            case 'encode':
+                document.getElementById('encodeProgressFront'+p.resolution).style.width = p.progress+'%'
+                document.getElementById('encodeProgressFront'+p.resolution).innerText = 'Encoding to '+p.resolution+'... ('+Math.round(p.progress)+'%)'
+                break
+            case 'ipfsadd':
+                document.getElementById('uploadProgressFront').innerText = 'Adding to IPFS... ('+p.progress+' of '+p.total+' files)'
+                break
+            default:
+                break
+        }
     })
     uplStat.on('error',(e) => {
         console.log('upload processing error',e)
@@ -240,8 +283,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         let formdata = new FormData()
         formdata.append('image',snap[0])
 
-        let progressbar = document.getElementById('progressBarBack')
-        let progressbarInner = document.getElementById('progressBarFront')
+        let progressbar = document.getElementById('uploadProgressBack')
+        let progressbarInner = document.getElementById('uploadProgressFront')
         progressbar.style.display = "block"
         progressbarInner.innerHTML = "Uploading thumbnail... (0%)"
 
@@ -310,8 +353,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         restrictImg();
 
-        let progressbar = document.getElementById('progressBarBack')
-        let progressbarInner = document.getElementById('progressBarFront')
+        let progressbar = document.getElementById('uploadProgressBack')
+        let progressbarInner = document.getElementById('uploadProgressFront')
         progressbar.style.display = "block";
         progressbarInner.innerHTML = "Uploading... (0%)";
 
@@ -515,8 +558,8 @@ function uploadVideo(resolution,next,thumbnailFname = '') {
 
     if (videoToUpload.length < 1) return uploadVideo(resolution+1,next)
 
-    let progressbar = document.getElementById('progressBarBack')
-    let progressbarInner = document.getElementById('progressBarFront')
+    let progressbar = document.getElementById('uploadProgressBack')
+    let progressbarInner = document.getElementById('uploadProgressFront')
     progressbar.style.display = 'block'
 
     if (config.uploadFromFs && isElectron()) {
@@ -630,7 +673,7 @@ function hiveBroadcast() {
     if (!hiveDisplayUser || supportedPlatforms.hive.filter((p) => isPlatformSelected[p]).length === 0 || config.noBroadcast)
         return hiveCb({})
 
-    document.getElementById('progressBarFront').innerHTML = 'Submitting video to Hive...'
+    document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Hive...'
 
     if (Auth.iskeychain == 'true') {
         // Broadcast with Keychain
@@ -660,7 +703,7 @@ async function avalonBroadcast() {
     if (!dtcDisplayUser || supportedPlatforms.avalon.filter((p) => isPlatformSelected[p]).length === 0 || config.noBroadcast)
         return avalonCb()
 
-    document.getElementById('progressBarFront').innerHTML = 'Submitting video to Avalon...'
+    document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Avalon...'
     let tag = ''
     if (postparams.tags.length !== 0)
         tag = postparams.tags[0]
@@ -715,7 +758,7 @@ function steemBroadcaster() {
     if (steemUser && supportedPlatforms.steem.filter((p) => isPlatformSelected[p]).length > 0 && !config.noBroadcast) {
         let steemTx = generatePost('steem')
         console.log('Steem tx',steemTx)
-        document.getElementById('progressBarFront').innerHTML = 'Submitting video to Steem...'
+        document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Steem...'
         if (isElectron())
             steem.broadcast.send({ extensions: [], operations: steemTx },[sessionStorage.getItem('steemKey')],(e) => steemCb({error: e}))
         else
@@ -734,7 +777,7 @@ function blurtBroadcaster() {
     if (blurtUser && supportedPlatforms.blurt.filter((p) => isPlatformSelected[p]).length > 0 && !config.noBroadcast) {
         let blurtTx = generatePost('blurt')
         console.log('Blurt tx',blurtTx)
-        document.getElementById('progressBarFront').innerHTML = 'Submitting video to Blurt...'
+        document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Blurt...'
         if (isElectron())
             blurt.broadcast.send({ extensions: [], operations: blurtTx },[sessionStorage.getItem('blurtKey')],(e) => blurtCb({error: e}))
         else
@@ -751,12 +794,13 @@ function blurtCb(r) {
 
 function bcError(tool,e) {
     alert(tool+' error: '+e)
-    document.getElementById('progressBarBack').style.display = "none"
+    document.getElementById('uploadProgressBack').style.display = "none"
     reenableFields()
 }
 
 function bcFinish() {
-    document.getElementById('progressBarFront').innerHTML = 'All done'
+    document.getElementById('uploadProgressFront').style.width = '100%'
+    document.getElementById('uploadProgressFront').innerHTML = 'All done'
 }
 
 function generatePermlink() {
@@ -947,7 +991,7 @@ function generatePost(network) {
 }
 
 function updateProgressBar(progress,text) {
-    let progressbarInner = document.getElementById('progressBarFront')
+    let progressbarInner = document.getElementById('uploadProgressFront')
     progressbarInner.style.width = progress + '%'
     progressbarInner.innerHTML = text + ' (' + progress + '%)'
 }
