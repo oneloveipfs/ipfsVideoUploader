@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (result.data.usagedetails.video480) infoToDisplay += '<h4>480p videos: ' + abbrevateFilesize(result.data.usagedetails.video480) + '</h4>'
                     if (result.data.usagedetails.video720) infoToDisplay += '<h4>720p videos: ' + abbrevateFilesize(result.data.usagedetails.video720) + '</h4>'
                     if (result.data.usagedetails.video1080) infoToDisplay += '<h4>1080p videos: ' + abbrevateFilesize(result.data.usagedetails.video1080) + '</h4>'
+                    if (result.data.usagedetails.hls) infoToDisplay += '<h4>HLS videos: ' + abbrevateFilesize(result.data.usagedetails.hls) + '</h4>'
                     if (result.data.usagedetails.thumbnails) infoToDisplay += '<h4>Thumbnails: ' + abbrevateFilesize(result.data.usagedetails.thumbnails) + '</h4>'
                     if (result.data.usagedetails.sprites) infoToDisplay += '<h4>Sprites: ' + abbrevateFilesize(result.data.usagedetails.sprites) + '</h4>'
                     if (result.data.usagedetails.subtitles) infoToDisplay += '<h4>Subtitles: ' + abbrevateFilesize(result.data.usagedetails.subtitles) + '</h4>'

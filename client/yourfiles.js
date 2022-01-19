@@ -31,15 +31,18 @@ function handleTypeSelection(selected) {
             loadPins('video1080')
             break
         case 5:
-            loadPins('thumbnails')
+            loadPins('hls')
             break
         case 6:
-            loadPins('sprites')
+            loadPins('thumbnails')
             break
         case 7:
-            loadPins('subtitles')
+            loadPins('sprites')
             break
         case 8:
+            loadPins('subtitles')
+            break
+        case 9:
             loadPins('images')
             break
         default:
