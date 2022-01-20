@@ -7,9 +7,13 @@ function loadPins(type) {
         call += '&network=hive'
     axios.get(call).then(res => {
         let htmlResult = ''
-        for (let i = 0; i < res.data.length; i++)
+        let totalSize = 0
+        for (let i = 0; i < res.data.length; i++) {
             htmlResult += '<tr><td><a target="_blank" rel="noreferrer" href="https://video.oneloveipfs.com/ipfs/' + res.data[i].cid + '">' + res.data[i].cid + '</a></td><td>' + abbrevateFilesize(res.data[i].size) + '</td></tr>'
+            totalSize += res.data[i].size
+        }
         document.getElementById('hashesTbody').innerHTML = htmlResult
+        document.getElementById('yourFilesTotalSize').innerText = 'Total Size: ' + abbrevateFilesize(totalSize)
     }).catch(e => console.log(e))
 }
 
