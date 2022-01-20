@@ -4,7 +4,6 @@ let token = url.searchParams.get('access_token') // Access token for logged in u
 let iskeychain = url.searchParams.get('keychain')
 let steemUser = url.searchParams.get('steemuser')
 let blurtUser = url.searchParams.get('blurtuser')
-let dtconly = url.searchParams.get('dtconly')
 let displayUsernameTimeout = -1
 let dtcDisplayUser, hiveDisplayUser = null
 
@@ -23,16 +22,15 @@ async function Hive() {
                     resolve(null)
                 } else {
                     window.currentnetwork = authResponse.data.network
-                    if (dtconly == 'true') {
+                    if (authResponse.data.network === 'all' || authResponse.data.network === 'hive') {
+                        hiveDisplayUser = authResponse.data.user
+                    }
+                    if (!hiveDisplayUser && !steemUser && !blurtUser) {
                         let grapheneSettings = document.getElementsByClassName('grapheneSettings')
                         for (let i = 0; i < grapheneSettings.length; i++)
                             grapheneSettings[i].style.display = 'none'
-                        dtcDisplayUser = authResponse.data.user
-                        displayLoginMessage()
-                    } else {
-                        hiveDisplayUser = authResponse.data.user
-                        displayLoginMessage()
                     }
+                    displayLoginMessage()
                     retrieveDraft()
                     resolve(authResponse.data.user)
                 }
@@ -219,6 +217,5 @@ window.Auth = {
     Avalon,
     token,
     iskeychain,
-    dtconly,
     restrict
 }

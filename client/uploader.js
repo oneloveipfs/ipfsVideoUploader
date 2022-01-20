@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 window.availableAvalonVP = acc.vt
                 loadAvalonAuthorityStatus(acc)
             })
-            if (dtconly === 'true') {
+            if (!hiveDisplayUser) {
                 document.getElementById('tagLbl').innerText = 'Tag:'
                 document.getElementById('tagInfo1').style.display = 'none'
             }
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateDisplayByIDs([],['beneficiaryHeadingBlurt','beneficiaryTableListBlurt','totalBeneficiariesLabelBlurt'])
 
         hive.api.setOptions(hiveOptions)
-        if (!dtconly) hive.api.getAccounts([username],(e,acc) => {
+        if (hiveDisplayUser) hive.api.getAccounts([username],(e,acc) => {
             if (e) return
             if (acc.length > 0)
                 loadGrapheneAuthorityStatus(acc[0],'hive')
@@ -1064,7 +1064,7 @@ function estimatedBandwidth() {
     bytes += skylinkBytes
 
     // see which networks we are broadcasting to, assuming we are logged in with Avalon to be relevent
-    let hasHive = dtconly != 'true'
+    let hasHive = hiveDisplayUser ? true : false
     let hasSteem = steemUser ? true : false
 
     bytes += avalonUser.length // base + username length

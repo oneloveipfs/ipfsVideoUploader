@@ -115,7 +115,6 @@ async function proceedLogin() {
     if (window.logins.keychain) cbUrl += '&keychain=true'
     if (window.logins.steemUser) cbUrl += '&steemuser=' + window.logins.steemUser
     if (window.logins.blurtUser) cbUrl += '&blurtuser=' + window.logins.blurtUser
-    if (window.logins.avalonUser && !window.logins.hiveUser) cbUrl += '&dtconly=true'
     window.location.href = cbUrl
 }
 

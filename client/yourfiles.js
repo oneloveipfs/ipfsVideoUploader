@@ -1,10 +1,8 @@
 function loadPins(type) {
     document.getElementById('hashesTbody').innerHTML = ''
     let call = '/pinsByType?user=' + username + '&hashtype=' + type
-    if (dtconly == 'true')
-        call += '&network=dtc'
-    else if (!avalonUser || !avalonKey || username != avalonUser)
-        call += '&network=hive'
+    if (!avalonUser || !hiveDisplayUser)
+        call += '&network='+window.currentnetwork
     axios.get(call).then(res => {
         let htmlResult = ''
         let totalSize = 0
