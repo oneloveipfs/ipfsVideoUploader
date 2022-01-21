@@ -667,6 +667,7 @@ function postVideo() {
     hiveBroadcast()
 }
 
+// Series broadcast
 function hiveBroadcast() {
     let hiveTx = generatePost('hive')
     console.log('Hive tx',hiveTx)
@@ -813,12 +814,28 @@ function generatePermlink() {
     return permlink
 }
 
-function buildPostBody(author,permlink,postBody,videoHash,snapHash,description) {
-    if (postBody == '') {
-        return '<center><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'><img src=\'https://ipfs.io/ipfs/' + snapHash + '\'></a></center><hr>\n\n' + description + '\n\n<hr><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'> ▶️ DTube</a><br /><a href=\'https://ipfs.io/ipfs/' + videoHash + '\'> ▶️ IPFS</a>'
-    } else {
-        return '<center><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'><img src=\'https://ipfs.io/ipfs/' + snapHash + '\'></a></center><hr>\n\n' + postBody + '\n\n<hr><a href=\'https://d.tube/#!/v/' + author + '/' + permlink + '\'> ▶️ DTube</a><br /><a href=\'https://ipfs.io/ipfs/' + videoHash + '\'> ▶️ IPFS</a>'
+function postThumbnailByPlatform(network) {
+    let pf = pfPostEmbed(network)
+    switch (pf) {
+        case '3Speak':
+            return '<center>[![]('+postparams.imghash+')](https://3speak.tv/watch?v='+usernameByNetwork(network)+'/'+postparams.permlink+')</center><hr>'
+        case 'DTube':
+            return '<center><a href=\'https://d.tube/#!/v/'+usernameByNetwork(network)+'/'+postparams.permlink+'\'><img src=\'https://ipfs.io/ipfs/'+postparams.imghash+'\'></a></center><hr>'
     }
+}
+
+function buildPostBody(network) {
+    let result = postThumbnailByPlatform(network)+'\n\n'
+    result += postparams.postBody ? postparams.postBody : postparams.description
+    result += '\n\n<hr>\n'
+    if (isPlatformSelected['3Speak'])
+        result += '\n[▶️ 3Speak Dapp](https://3speak.tv/openDapp?uri=hive:'+usernameByNetwork(network)+':'+postparams.permlink+')'
+    if (isPlatformSelected['DTube'])
+        result += '\n[▶️ DTube](https://d.tube/#!/v/'+usernameByNetwork(network)+'/'+postparams.permlink+')'
+    result += '\n[▶️ IPFS](https://ipfs.io/ipfs/'+postparams.ipfshash+')'
+    if (postparams.skylink)
+        result += '\n[▶️ Skynet](https://siasky.net/'+postparams.skylink+')'
+    return result
 }
 
 function buildJsonMetadata(network) {
@@ -957,7 +974,7 @@ function generatePost(network) {
                 author: user,
                 permlink: postparams.permlink,
                 title: postparams.title,
-                body: buildPostBody(user,postparams.permlink,postparams.postBody,postparams.ipfshash,postparams.imghash,postparams.description),
+                body: buildPostBody(network),
                 json_metadata: JSON.stringify(buildJsonMetadata(network)),
             }
         ],

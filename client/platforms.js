@@ -174,6 +174,22 @@ function pfSelect(p) {
     updateDisplayPlatforms()
 }
 
+function pfPostEmbed(network) {
+    switch (network) {
+        case 'hive':
+            // using dtube player whenever possible until 3speak embeds are fixed
+            if (isPlatformSelected['3Speak'] && !isPlatformSelected.DTube)
+                return '3Speak'
+            else
+                return 'DTube'
+        case 'steem':
+        case 'blurt':
+            return 'DTube'
+        default:
+            return ''
+    }
+}
+
 function updateEncoderDisplay() {
     if (document.getElementById('hlsencode').checked)
         updateDisplayByIDs([],['mp4encodedupload'])
