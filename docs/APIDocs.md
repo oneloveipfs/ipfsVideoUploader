@@ -98,6 +98,7 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
     - `thumbnails` -> Treats the image file as the thumbnail of a video.
 * `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
 * `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
+* `onlyhash` *(optional)*: Set this to `true` to upload image without adding to IPFS.
 * Content type: multipart/form-data
 * File input: `image`
 * Output data example:
