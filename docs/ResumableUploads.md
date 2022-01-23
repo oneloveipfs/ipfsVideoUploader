@@ -83,7 +83,7 @@ In the case of uploading from remote encoding servers, `type` must be `hlsencode
 HTML:
 ```
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@latest/dist/tus.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.js"></script>
 ```
 
 Javascript:
