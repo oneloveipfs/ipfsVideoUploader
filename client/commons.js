@@ -63,9 +63,12 @@ function abbrevateFilesize(size) {
     } else if (size > 1048575) {
         // Megabytes
         abbrevated = thousandSeperator(Math.round(size / 1048576)) + ' MB'
-    } else {
-        // Less than 1 MB
+    } else if (size > 1023) {
+        // Kilobytes
         abbrevated = thousandSeperator(Math.round(size / 1024)) + ' KB'
+    } else {
+        // Bytes
+        abbrevated = thousandSeperator(Math.round(size)) + ' B'
     }
 
     return abbrevated
