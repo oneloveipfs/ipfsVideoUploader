@@ -78,7 +78,7 @@
   "license": "GPLv3",
   "dependencies": {
     "about-window": "^1.15.2",
-    "async": "^3.2.2",
+    "async": "^3.2.3",
     "axios": "^0.24.0",
     "body-parser": "^1.19.1",
     "cors": "^2.8.5",
