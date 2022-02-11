@@ -147,7 +147,7 @@ app.post('/uploadChunk',async (request,response) => {
 })
 
 app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(request,response) => {
-    if (!request.body.Upload.IsFinal)
+    if (request.body.Upload.IsPartial)
         return response.status(200).send()
     // console.log(request.headers['hook-name'],request.body.Upload)
     switch (request.headers['hook-name']) {
