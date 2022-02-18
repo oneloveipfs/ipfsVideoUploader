@@ -596,6 +596,7 @@ let uploadOps = {
                 // Register socket with upload ID
                 socket.on('registerid',(info) => {
                     if (!info) return socket.emit('result',{ error: 'Missing upload info' })
+                    if (typeof info !== 'object') return socket.emit('result', { error: 'Upload info must be a JSON object' })
                     if (!info.id) return socket.emit('result', { error: 'Missing upload ID' })
                     if (!info.type) return socket.emit('result', { error: 'Missing upload type' })
                     if (!info.access_token) return socket.emit('result', { error: 'Missing access token' })
