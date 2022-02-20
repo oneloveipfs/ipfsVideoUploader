@@ -21,7 +21,7 @@ const isPlatformSelected = {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    let pages = ['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings']
+    let pages = ['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings','postpublish']
     document.getElementById('newUploadModeBtn').onclick = () => updateDisplayByIDs(['uploadForm'],pages)
     document.getElementById('snapSwapModeBtn').onclick = () => updateDisplayByIDs(['thumbnailSwapper'],pages)
     document.getElementById('yourFilesModeBtn').onclick = () => updateDisplayByIDs(['yourFiles'],pages)
@@ -117,11 +117,33 @@ function loadSavedPlatforms() {
 }
 
 function updateDisplayPlatforms() {
+    document.getElementById('postpublishwatch').innerHTML = ''
+    document.getElementById('postpublishembed').innerHTML = ''
     let selected = []
     for (let p in isPlatformSelected)
         if (isPlatformSelected[p]) {
             selected.push(p)
             document.getElementById('pfSelect'+p).innerHTML = '<i class="tick-mark"></i>'+p
+
+            // post-publish watch
+            let postpublishwatch = document.createElement('div')
+            let postpublishwatchbtn = document.createElement('a')
+            postpublishwatch.setAttribute('class','grid-item')
+            postpublishwatchbtn.setAttribute('id','postpublishwatch'+p)
+            postpublishwatchbtn.setAttribute('class','styledButton')
+            postpublishwatchbtn.innerText = 'Watch on '+p
+            postpublishwatch.appendChild(postpublishwatchbtn)
+            document.getElementById('postpublishwatch').appendChild(postpublishwatch)
+
+            // post-publish copy embed
+            let postpublishembed = document.createElement('div')
+            let postpublishembedbtn = document.createElement('a')
+            postpublishembed.setAttribute('class','grid-item')
+            postpublishembedbtn.setAttribute('id','postpublishembed'+p)
+            postpublishembedbtn.setAttribute('class','styledButton')
+            postpublishembedbtn.innerText = 'Copy '+p+' embed'
+            postpublishembed.appendChild(postpublishembedbtn)
+            document.getElementById('postpublishembed').appendChild(postpublishembed)
         }
     updateDisplayByIDs([],['platformLogoLoading','platformLogoMult','platformLogo3Speak','platformLogoDTube'])
     if (selected.length > 1 || selected.length === 0) {
@@ -158,6 +180,10 @@ function updateDisplayPlatforms() {
         document.getElementById('hlsencode').disabled = false
         document.getElementById('hlsencodetext').innerText = '  Encode video to HLS'
     }
+    if (selected.length < 2)
+        updateDisplayByIDs([],['postpublishsharetgpf'])
+    else
+        document.getElementById('postpublishsharetgpf').style.display = 'inline-block'
     updateEncoderDisplay()
 }
 

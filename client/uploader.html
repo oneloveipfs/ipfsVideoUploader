@@ -293,6 +293,32 @@
             <input type="button" class="styledButton" id="settingSaveBtn" value="Save" onclick="saveSettings()">
             <input type="button" class="styledButton" id="settingResetBtn" value="Reset" onclick="fillSettings()">
         </div>
+        <div id="postpublish">
+            <h4>Video published to platforms and chains successfully. Some things to do next...</h4>
+            <!-- Watch Video on DTube, 3Speak etc... -->
+            <h3>Watch Video</h3>
+            <div id="postpublishwatch" class="postpublishgrid"></div>
+            <!-- Share Video -->
+            <h3 style="display: inline-block;">Share Video</h3>
+            <select id="postpublishsharetgpf">
+                <option>Select platform...</option>
+                <option>3Speak</option>
+                <option>DTube</option>
+            </select>
+            <div id="postpublishshare">
+                <a class="tooltip"><img src="public/share/dbuzz.png" alt="share-dbuzz"><span class="tooltiptext tooltipshare">DBuzz</span></a>
+                <a class="tooltip"><img src="public/share/twitter.png" alt="share-twitter"><span class="tooltiptext tooltipshare">Twitter</span></a>
+                <a class="tooltip"><img src="public/share/reddit.png" alt="share-reddit"><span class="tooltiptext tooltipshare">Reddit</span></a>
+                <a class="tooltip"><img src="public/share/facebook.png" alt="share-facebook"><span class="tooltiptext tooltipshare">Facebook</span></a>
+                <a class="tooltip"><img src="public/share/tumblr.png" alt="share-tumblr"><span class="tooltiptext tooltipshare">Tumblr</span></a>
+                <a class="tooltip"><img src="public/share/pinterest.png" alt="share-pinterest"><span class="tooltiptext tooltipshare">Pinterest</span></a>
+                <a class="tooltip"><img src="public/share/linkedin.png" alt="share-linkedin"><span class="tooltiptext tooltipshare">Linkedin</span></a>
+                <a class="tooltip"><img src="public/share/email.png" alt="share-email"><span class="tooltiptext tooltipshare">Email</span></a>
+            </div>
+            <!-- Embed Video -->
+            <h3>Embed Video</h3>
+            <div id="postpublishembed" class="postpublishgrid"></div>
+        </div>
         </div>
     </body>
 </html>

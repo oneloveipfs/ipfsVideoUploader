@@ -802,6 +802,8 @@ function bcError(tool,e) {
 function bcFinish() {
     document.getElementById('uploadProgressFront').style.width = '100%'
     document.getElementById('uploadProgressFront').innerHTML = 'All done'
+    if (!config.noBroadcast)
+        updateDisplayByIDs(['postpublish'],['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','settings'])
 }
 
 function generatePermlink() {

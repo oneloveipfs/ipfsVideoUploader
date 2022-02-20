@@ -300,6 +300,12 @@ hr {
     transition: opacity 0.3s;
     font-family: 'Roboto';
 }
+
+.tooltip .tooltipshare {
+    bottom: 120%;
+    left: 90%;
+    width: 100px;
+}
   
 .tooltip .tooltiptext::after {
     content: "";
@@ -317,7 +323,7 @@ hr {
     opacity: 1;
 }
 
-#uploadForm, #thumbnailSwapper, #yourFiles, #wcinfo, #refillnotify, #refiller, #getHelp, #needsrefillnotify, #disabledPage, #settings {
+#uploadForm, #thumbnailSwapper, #yourFiles, #wcinfo, #refillnotify, #refiller, #getHelp, #needsrefillnotify, #disabledPage, #settings, #postpublish {
     margin-left: auto;
     margin-right: auto;
     width: 700px;
@@ -759,7 +765,7 @@ textarea {
     width: 220px;
 }
 
-#newSnapField, #swapSubmitBtn, #yourFiles, #wcinfo, #refiller, #getHelp, #settings {
+#newSnapField, #swapSubmitBtn, #yourFiles, #wcinfo, #refiller, #getHelp, #settings, #postpublish {
     display: none;
 }
 
@@ -830,6 +836,24 @@ textarea {
 
 .darkmode #avalonAuthorizeBtn, .darkmode #hiveAuthorizeBtn, .darkmode #steemAuthorizeBtn {
     color: #ffffff;
+}
+
+/* Post Publish View */
+.postpublishgrid {
+    display: grid;
+    text-align: center;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.postpublishgrid .grid-item a {
+    padding: 6px 40px;
+    font-size: 18px;
+}
+
+#postpublishshare img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
 }
 
 /* Welcome page only */
@@ -1206,7 +1230,8 @@ td {
         row-gap: 40px;
     }
 
-    .featureContainer {
+    .featureContainer,
+    .postpublishgrid {
         grid-template-columns: 1fr;
     }
 
@@ -1225,7 +1250,7 @@ td {
         font-size: 15px;
     }
 
-    #uploadForm, #thumbnailSwapper, #yourFiles, #wcinfo, #refillnotify, #refiller, #getHelp, #needsrefillnotify, #disabledPage, #settings {
+    #uploadForm, #thumbnailSwapper, #yourFiles, #wcinfo, #refillnotify, #refiller, #getHelp, #needsrefillnotify, #disabledPage, #settings, #postpublish {
         margin-left: 15px;
         margin-right: 25px;
         width: auto;
