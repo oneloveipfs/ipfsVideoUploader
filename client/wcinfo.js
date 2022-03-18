@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             switch (paymentMethod) {
                 case 'DTUBE':
-                    updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['HiveKeychainBtn','HiveSignerBtn','SteemKeychainBtn','SteemLoginBtn'])
+                    updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['HiveKeychainBtn','HiveSignerBtn'])
                     document.getElementById('DTubeChannelBtn').onclick = () => window.open('https://d.tube/#!/c/' + shawpconfig.DtcReceiver)
                     document.getElementById('DTubeChannelBtn').href = 'https://d.tube/#!/c/' + shawpconfig.DtcReceiver
                     break
