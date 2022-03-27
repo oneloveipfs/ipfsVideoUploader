@@ -536,14 +536,3 @@ function updateRememberMeState() {
     else
         updateDisplayByIDs([],['persistPassword'])
 }
-
-function copyToClipboard(value,tooltiptextcontainer) {
-    let fakeInput = document.createElement("input")
-    fakeInput.value = value
-    document.body.appendChild(fakeInput)
-    fakeInput.select()
-    document.execCommand("copy")
-    document.body.removeChild(fakeInput)
-    if (tooltiptextcontainer)
-        document.getElementById(tooltiptextcontainer).innerText = 'Copied to clipboard'
-}

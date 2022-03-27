@@ -5,7 +5,7 @@ axios.get('/user_info'+geturl).then((s) => {
         descTemplate: '',
         darkMode: false
     }
-    fillSettings()
+    window.addEventListener('DOMContentLoaded', () => fillSettings())
 })
 
 function saveSettings() {

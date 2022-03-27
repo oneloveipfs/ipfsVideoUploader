@@ -138,10 +138,15 @@ function updateDisplayPlatforms() {
             // post-publish copy embed
             let postpublishembed = document.createElement('div')
             let postpublishembedbtn = document.createElement('a')
+            let postpublishembedtt = document.createElement('span')
             postpublishembed.setAttribute('class','grid-item')
             postpublishembedbtn.setAttribute('id','postpublishembed'+p)
-            postpublishembedbtn.setAttribute('class','styledButton')
+            postpublishembedbtn.setAttribute('class','styledButton tooltip')
             postpublishembedbtn.innerText = 'Copy '+p+' embed'
+            postpublishembedtt.setAttribute('id','postpublishembedtt'+p)
+            postpublishembedtt.setAttribute('class','tooltiptext')
+            postpublishembedtt.innerText = 'Click to copy'
+            postpublishembedbtn.append(postpublishembedtt)
             postpublishembed.appendChild(postpublishembedbtn)
             document.getElementById('postpublishembed').appendChild(postpublishembed)
         }
@@ -221,4 +226,57 @@ function updateEncoderDisplay() {
         updateDisplayByIDs([],['mp4encodedupload'])
     else
         updateDisplayByIDs(['mp4encodedupload'],[])
+}
+
+function postpublish() {
+    if (isPlatformSelected['3Speak']) {
+        document.getElementById('postpublishwatch3Speak').setAttribute('href','https://3speak.tv/openDapp?uri=hive:'+usernameByNetwork('hive')+':'+postparams.permlink)
+        document.getElementById('postpublishembed3Speak').onclick = () => copyToClipboard('','postpublishembedtt3Speak')
+    }
+    if (isPlatformSelected['DTube']) {
+        let du = usernameByNetwork('avalon')
+        let dp = postparams.ipfshash
+        if (!du) {
+            du = username
+            dp = postparams.permlink
+        }
+        document.getElementById('postpublishwatchDTube').setAttribute('href','https://d.tube/#!/v/'+du+'/'+dp)
+        document.getElementById('postpublishembedDTube').onclick = () => copyToClipboard('','postpublishembedttDTube')
+    }
+}
+
+function postpublishshare(dest) {
+    let tgpf = document.getElementById('postpublishsharetgpf').value
+    let tgurl = ''
+    let av = usernameByNetwork('avalon')
+    switch (tgpf) {
+        case 'None':
+            return alert('Please select a target video platform to share links')
+        case 'DTube':
+            tgurl = 'https://d.tube/#!/v/'+(av ? av : username)+'/'+(av ? postparams.ipfshash : postparams.permlink)
+            break
+        case '3Speak':
+            tgurl = 'https://3speak.tv/openDapp?uri=hive:'+usernameByNetwork('hive')+':'+postparams.permlink
+            break
+    }
+    switch (dest) {
+        case 'dbuzz':
+            break
+        case 'twitter':
+            break
+        case 'reddit':
+            break
+        case 'facebook':
+            break
+        case 'tumblr':
+            break
+        case 'pinterest':
+            break
+        case 'linkedin':
+            break
+        case 'email':
+            break
+        default:
+            break
+    }
 }

@@ -97,7 +97,7 @@
                 <h4>Upload a new subtitle<br>
                     <input list="languages" class="meta" id="newLanguageField" placeholder="Choose language">
                     <input type="file" id="subtitleUpload" style="display: none">
-                    <a onclick="document.getElementById('subtitleUpload').click();return true;" id="chooseSubBtn" class="styledButton">Choose subtitle file</a>
+                    <a onclick="document.getElementById('subtitleUpload').click()" id="chooseSubBtn" class="styledButton">Choose subtitle file</a>
                     <a id="uploadSubBtn" class="styledButton">Upload subtitle</a>
                 </h4>
                 <datalist id="languages"></datalist>
@@ -127,7 +127,7 @@
                     <h3>Article Body: <br>
                     <textarea id="postBody" name="postBody"></textarea></h3>
                     <input type="file" accept="image/*" id="postImg" style="display: none">
-                    <a onclick="document.getElementById('postImg').click();return true;" id="postImgBtn" class="roundedBtn">Upload an image for article body</a>
+                    <a onclick="document.getElementById('postImg').click()" id="postImgBtn" class="roundedBtn">Upload an image for article body</a>
                     <h5>Maximum file size for image: 4MB</h5>
                     <h3>Beneficiaries</h3>
                     <h5>Add some Graphene accounts here to automatically receive a portion of your HIVE, STEEM or BLURT post rewards. Avalon beneficiaries are set in blockchain config such that @dtube receives 10% of DTUBE curation rewards.</h5>
@@ -301,19 +301,19 @@
             <!-- Share Video -->
             <h3 style="display: inline-block;">Share Video</h3>
             <select id="postpublishsharetgpf">
-                <option>Select platform...</option>
-                <option>3Speak</option>
-                <option>DTube</option>
+                <option value="None">Select platform...</option>
+                <option value="3Speak">3Speak</option>
+                <option value="DTube">DTube</option>
             </select>
             <div id="postpublishshare">
-                <a class="tooltip"><img src="public/share/dbuzz.png" alt="share-dbuzz"><span class="tooltiptext tooltipshare">DBuzz</span></a>
-                <a class="tooltip"><img src="public/share/twitter.png" alt="share-twitter"><span class="tooltiptext tooltipshare">Twitter</span></a>
-                <a class="tooltip"><img src="public/share/reddit.png" alt="share-reddit"><span class="tooltiptext tooltipshare">Reddit</span></a>
-                <a class="tooltip"><img src="public/share/facebook.png" alt="share-facebook"><span class="tooltiptext tooltipshare">Facebook</span></a>
-                <a class="tooltip"><img src="public/share/tumblr.png" alt="share-tumblr"><span class="tooltiptext tooltipshare">Tumblr</span></a>
-                <a class="tooltip"><img src="public/share/pinterest.png" alt="share-pinterest"><span class="tooltiptext tooltipshare">Pinterest</span></a>
-                <a class="tooltip"><img src="public/share/linkedin.png" alt="share-linkedin"><span class="tooltiptext tooltipshare">Linkedin</span></a>
-                <a class="tooltip"><img src="public/share/email.png" alt="share-email"><span class="tooltiptext tooltipshare">Email</span></a>
+                <a class="tooltip" onclick="postpublishshare('dbuzz')"><img src="public/share/dbuzz.png" alt="share-dbuzz"><span class="tooltiptext tooltipshare">DBuzz</span></a>
+                <a class="tooltip" onclick="postpublishshare('twitter')"><img src="public/share/twitter.png" alt="share-twitter"><span class="tooltiptext tooltipshare">Twitter</span></a>
+                <a class="tooltip" onclick="postpublishshare('reddit')"><img src="public/share/reddit.png" alt="share-reddit"><span class="tooltiptext tooltipshare">Reddit</span></a>
+                <a class="tooltip" onclick="postpublishshare('facebook')"><img src="public/share/facebook.png" alt="share-facebook"><span class="tooltiptext tooltipshare">Facebook</span></a>
+                <a class="tooltip" onclick="postpublishshare('tumblr')"><img src="public/share/tumblr.png" alt="share-tumblr"><span class="tooltiptext tooltipshare">Tumblr</span></a>
+                <a class="tooltip" onclick="postpublishshare('pinterest')"><img src="public/share/pinterest.png" alt="share-pinterest"><span class="tooltiptext tooltipshare">Pinterest</span></a>
+                <a class="tooltip" onclick="postpublishshare('linkedin')"><img src="public/share/linkedin.png" alt="share-linkedin"><span class="tooltiptext tooltipshare">Linkedin</span></a>
+                <a class="tooltip" onclick="postpublishshare('email')"><img src="public/share/email.png" alt="share-email"><span class="tooltiptext tooltipshare">Email</span></a>
             </div>
             <!-- Embed Video -->
             <h3>Embed Video</h3>
