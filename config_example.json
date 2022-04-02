@@ -55,10 +55,10 @@
     "Shawp": {
         "Enabled": false,
         "DefaultUSDRate": 0.0029,
-        "AvalonAPI": "https://avalon.oneloved.tube",
+        "AvalonAPI": "https://avalon.techcoderx.com",
         "HiveAPI": "https://techcoderx.com",
-        "DtcReceiver": "onelovedtube",
-        "HiveReceiver": "onelovedtube"
+        "DtcReceiver": "oneloveipfs",
+        "HiveReceiver": "oneloveipfs"
     },
 
     "test": {

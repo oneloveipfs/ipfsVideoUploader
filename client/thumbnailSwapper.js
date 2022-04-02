@@ -227,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     jsonmeta.video.files.ipfs.img[118] = newSnapHash
                     jsonmeta.video.files.ipfs.img[360] = newSnapHash
                 }
-                jsonmeta.app = 'onelovedtube/2.1.2'
+                jsonmeta.app = 'oneloveipfs/3'
 
                 // Edit Steem article body
                 let oldSnapLink = steemPostToModify.body.match(/\bhttps?:\/\/\S+/gi)[1].replace('\'></a></center><hr>','')
@@ -280,7 +280,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     jsonmeta.video.files.ipfs.img[118] = newSnapHash
                     jsonmeta.video.files.ipfs.img[360] = newSnapHash
                 }
-                jsonmeta.app = 'onelovedtube/2.1.2'
+                jsonmeta.app = 'oneloveipfs/3'
 
                 // Edit Steem article body
                 let oldSnapLink = steemPostToModify.body.match(/\bhttps?:\/\/\S+/gi)[1].replace('\'></a></center><hr>','')
@@ -342,7 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     jsonAvalon.files.ipfs.img[118] = newSnapHash
                     jsonAvalon.files.ipfs.img[360] = newSnapHash
                 }
-                jsonAvalon.app = 'onelovedtube/2.1.2'
+                jsonAvalon.app = 'oneloveipfs/3'
 
                 let avalonSwapTx = {
                     type: 4,

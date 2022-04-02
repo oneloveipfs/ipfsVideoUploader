@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script for syncing all uploaded files across IPFS nodes
 
-SERVER="https://uploader.oneloved.tube"
+SERVER="https://uploader.oneloveipfs.com"
 GATEWAY="https://video.oneloveipfs.com"
 HASHTYPE=$1
 USER=$2

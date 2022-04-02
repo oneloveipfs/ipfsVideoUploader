@@ -3,7 +3,7 @@
   "productName": "OneLoveIPFS",
   "version": "3.0.0",
   "description": "Alternative IPFS uploader for DTube videos.",
-  "homepage": "https://uploader.oneloved.tube",
+  "homepage": "https://uploader.oneloveipfs.com",
   "repository": {
     "type": "git",
     "url": "https://github.com/oneloveipfs/ipfsVideoUploader"

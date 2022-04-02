@@ -35,7 +35,7 @@ Replace `/dir/to/upload/destination` with the full path to folder for upload sto
 
 ## Hostnames
 
-In production environment, tus upload protocol requires configuring the hostname of the server to be the `tusd` endpoint domain, such as `tusd.oneloved.tube`. To do this, run the following:
+In production environment, tus upload protocol requires configuring the hostname of the server to be the `tusd` endpoint domain, such as `tusd.oneloveipfs.com`. To do this, run the following:
 
 ```
 sudo hostnamectl set-hostname tusd.yourdomain.com
@@ -52,7 +52,7 @@ Then reboot your server.
 
 Depending on your client platform, you may find different implementations for tus resumable upload protocol [here](https://tus.io/implementations.html), and Socket IO [here](https://socket.io/docs).
 
-OneLoveIPFS's production `tusd` upload endpoint may be reachable at `https://tusd.oneloved.tube/files`.
+OneLoveIPFS's production `tusd` upload endpoint may be reachable at `https://tusd.oneloveipfs.com/files`.
 
 #### Upload JSON metadata:
 * `access_token` *(required)*: Access token obtained in `/logincb` POST API or HiveSigner access token
@@ -109,7 +109,7 @@ uplStat.on('result',(r) => {
 // tus resumable file upload
 let videoToUpload = document.getElementById('fileInput').files[0]
 let videoUpload = new tus.Upload(videoToUpload[0], {
-    endpoint: 'https://tusd.oneloved.tube/files',
+    endpoint: 'https://tusd.oneloveipfs.com/files',
     retryDelays: [0,3000,5000,10000,20000],
     parallelUploads: 10, // number of upload threads
     metadata: {

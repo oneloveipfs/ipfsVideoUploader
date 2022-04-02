@@ -60,4 +60,4 @@ Yes! We have tested this with actual high quality DTube videos, and they get pic
 
 #### 13. My question is not listed in this document. What can I do?
 
-Contact us in [OneLoveDTube Discord server](https://discord.gg/Sc4utKr), with a screenshot of the console output from your browser (if applicable).
+Contact us in [OneLoveIPFS Discord server](https://discord.gg/ZWj5NqaBeF), with a screenshot of the console output from your browser (if applicable).

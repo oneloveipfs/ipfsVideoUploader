@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/oneloveipfs/ipfsVideoUploader.svg?branch=master)](https://travis-ci.org/oneloveipfs/ipfsVideoUploader)
-[![OneLoveIPFS Discord](https://img.shields.io/discord/418646135725359104.svg?logo=discord)](https://discord.gg/Sc4utKr)
+[![OneLoveIPFS Discord](https://img.shields.io/discord/418646135725359104.svg?logo=discord)](https://discord.gg/ZWj5NqaBeF)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
 # OneLoveIPFS Uploader

@@ -7,8 +7,10 @@ const isMac = process.platform === 'darwin'
 const REMOTE_APP = 0
 const BUILD_STR = config.Build.number.toString() + (REMOTE_APP === 1 ? 'R' : '')
 
-if (require('electron-squirrel-startup'))
-    return app.quit()
+if (require('electron-squirrel-startup')) {
+    app.quit()
+    process.exit(0)
+}
 
 let errored = false
 let errorHandler = () => {}
@@ -141,7 +143,7 @@ const menuTemplate = [
             { label: 'Learn More', click: () => shell.openExternal('https://oneloveipfs.com') },
             { label: 'Documentation', click: () => shell.openExternal('https://docs.oneloveipfs.com') },
             { label: 'Report An Issue', click: () => shell.openExternal('https://github.com/oneloveipfs/ipfsVideoUploader/issues') },
-            { label: 'OneLoveIPFS Discord Server', click: () => shell.openExternal('https://discord.gg/Sc4utKr') },
+            { label: 'OneLoveIPFS Discord Server', click: () => shell.openExternal('https://discord.gg/ZWj5NqaBeF') },
             { type: 'separator' },
             { label: 'Source Code', click: () => shell.openExternal('https://github.com/oneloveipfs/ipfsVideoUploader') },
             { label: 'View License', click: () => shell.openExternal('https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/LICENSE') }
@@ -184,7 +186,7 @@ app.on('activate', () => {
 ipcMain.on('open_browser_window',(evt,arg) => shell.openExternal(arg))
 
 // Update check
-axios.get('https://uploader.oneloved.tube/latest_build').then((build) => {
+axios.get('https://uploader.oneloveipfs.com/latest_build').then((build) => {
     if (config.Build.number < build.data.number) {
         let updateNotify = new Notification({
             title: 'An update is available',

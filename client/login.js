@@ -350,7 +350,7 @@ async function avalonLogin() {
     document.getElementById('avalonAuthBtn').innerText = 'Logging in...'
     proceedAuthBtnDisabled = true
 
-    javalon.init({api: 'https://avalon.oneloved.tube'})
+    javalon.init({api: 'https://avalon.techcoderx.com'})
     let avalonKeyId = false
     try {
         avalonKeyId = await getAvalonKeyId(avalonUsername,avalonKey)
