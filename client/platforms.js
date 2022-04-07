@@ -131,6 +131,7 @@ function updateDisplayPlatforms() {
             postpublishwatch.setAttribute('class','grid-item')
             postpublishwatchbtn.setAttribute('id','postpublishwatch'+p)
             postpublishwatchbtn.setAttribute('class','styledButton')
+            postpublishwatchbtn.setAttribute('target','_blank')
             postpublishwatchbtn.innerText = 'Watch on '+p
             postpublishwatch.appendChild(postpublishwatchbtn)
             document.getElementById('postpublishwatch').appendChild(postpublishwatch)
@@ -221,6 +222,17 @@ function pfPostEmbed(network) {
     }
 }
 
+function pfPlayerEmbed(pf) {
+    let av = usernameByNetwork('avalon')
+    switch (pf) {
+        case '3Speak':
+            // TODO: 3Speak embeds for videos published through desktop app
+            return '<iframe src="https://3speak.tv/embed?v='+usernameByNetwork('hive')+'/'+postparams.permlink+'&autoplay=false" frameborder="0" allowfullscreen></iframe>'
+        case 'DTube':
+            return '<iframe src="https://emb.d.tube/#!/'+(av?av:username)+'/'+(av?postparams.ipfshash:postparams.permlink)+'" frameborder="0" allowfullscreen></iframe>'
+    }
+}
+
 function updateEncoderDisplay() {
     if (document.getElementById('hlsencode').checked)
         updateDisplayByIDs([],['mp4encodedupload'])
@@ -231,7 +243,7 @@ function updateEncoderDisplay() {
 function postpublish() {
     if (isPlatformSelected['3Speak']) {
         document.getElementById('postpublishwatch3Speak').setAttribute('href','https://3speak.tv/openDapp?uri=hive:'+usernameByNetwork('hive')+':'+postparams.permlink)
-        document.getElementById('postpublishembed3Speak').onclick = () => copyToClipboard('','postpublishembedtt3Speak')
+        document.getElementById('postpublishembed3Speak').onclick = () => copyToClipboard(pfPlayerEmbed('3Speak'),'postpublishembedtt3Speak')
     }
     if (isPlatformSelected['DTube']) {
         let du = usernameByNetwork('avalon')
@@ -241,7 +253,7 @@ function postpublish() {
             dp = postparams.permlink
         }
         document.getElementById('postpublishwatchDTube').setAttribute('href','https://d.tube/#!/v/'+du+'/'+dp)
-        document.getElementById('postpublishembedDTube').onclick = () => copyToClipboard('','postpublishembedttDTube')
+        document.getElementById('postpublishembedDTube').onclick = () => copyToClipboard(pfPlayerEmbed('DTube'),'postpublishembedttDTube')
     }
 }
 
@@ -259,24 +271,35 @@ function postpublishshare(dest) {
             tgurl = 'https://3speak.tv/openDapp?uri=hive:'+usernameByNetwork('hive')+':'+postparams.permlink
             break
     }
+    tgurl = encodeURIComponent(tgurl)
+    let popupUrl = ''
     switch (dest) {
         case 'dbuzz':
+            popupUrl = 'https://d.buzz/#/intent/buzz?title='+encodeURIComponent(postparams.title)+'&text='+tgurl
             break
         case 'twitter':
+            popupUrl = 'http://twitter.com/intent/tweet?url='+tgurl
             break
         case 'reddit':
+            popupUrl = 'http://www.reddit.com/submit?title='+encodeURIComponent(postparams.title)+'&url='+tgurl
             break
         case 'facebook':
+            popupUrl = 'http://www.facebook.com/sharer/sharer.php?u='+tgurl
             break
         case 'tumblr':
+            popupUrl = 'http://www.tumblr.com/share/link?url='+tgurl
             break
         case 'pinterest':
+            popupUrl = 'http://www.pinterest.com/pin/create/button/?url='+tgurl+'&media='+encodeURIComponent(config.gateway+'/ipfs/'+postparams.imghash)
             break
         case 'linkedin':
+            popupUrl = 'http://linkedin.com/shareArticle?mini=true&amp;url='+tgurl
             break
         case 'email':
+            popupUrl = 'mailto:user@example.com?subject='+encodeURIComponent(postparams.title)+'&body='+encodeURIComponent('Enjoy this video.\n')+tgurl
             break
         default:
             break
     }
+    window.open(popupUrl,'name')
 }
