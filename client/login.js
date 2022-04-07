@@ -367,7 +367,7 @@ async function avalonLogin() {
         // an access token already generated, login is complete
         loginCb('avalon')
     } else {
-        let loginGetUrl = '/login?user=' + avalonUsername + '&dtc=true'
+        let loginGetUrl = '/login?user=' + avalonUsername + '&network=dtc'
         if (typeof avalonKeyId === 'string') loginGetUrl += '&dtckeyid=' + avalonKeyId
         axios.get(loginGetUrl).then((response) => {
             if (response.data.error != null)

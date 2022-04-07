@@ -59,15 +59,16 @@ app.get('/login',(request,response) => {
         // Username not specified, throw an error
         return response.status(400).send({error: 'Username not specified!'})
 
-    let queryNetwork = request.query.network
-    if (request.query.dtc == 'true') queryNetwork = 'dtc'
+    let queryNetwork = request.query.network || 'all'
 
     if (Config.whitelistEnabled && !request.query.noauth)
         if (!Auth.isInWhitelist(request.query.user,queryNetwork))
             return response.status(403).send({error: 'Looks like you do not have access to the uploader!'})
 
     let isInAllWhitelists = Auth.isInWhitelist(request.query.user,'all')
-    if (Config.Shawp.Enabled && request.query.needscredits == 'true') {
+    if (isInAllWhitelists)
+        queryNetwork = 'all'
+    if (Config.Shawp.Enabled && request.query.needscredits === 'true') {
         let daysRemaining = Shawp.getDaysRemaining(request.query.user,isInAllWhitelists ? 'all' : (request.query.network || 'dtc'))
         if (daysRemaining.days === 0 && daysRemaining.needs)
             return response.status(402).send({
@@ -76,7 +77,7 @@ app.get('/login',(request,response) => {
             })
     }
 
-    if (request.query.dtc == 'true' || request.query.network == 'dtc') {
+    if (request.query.network === 'dtc') {
         Auth.generateEncryptedMemoAvalon(request.query.user,request.query.dtckeyid,(e,memo) => {
             if (e) return response.send(e)
             response.send({encrypted_memo: memo, error: null})

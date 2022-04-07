@@ -220,7 +220,7 @@ async function avalonAliasAuth(avalonUsername,avalonKey,cb) {
         return alert('Avalon login error: ' + e)
     }
     
-    let loginGetUrl = '/login?noauth=1&user=' + avalonUsername + '&dtc=true'
+    let loginGetUrl = '/login?noauth=1&user=' + avalonUsername + '&network=dtc'
     if (avalonKeyId && avalonKeyId !== true) loginGetUrl += '&dtckeyid=' + avalonKeyId
     axios.get(loginGetUrl).then((response) => {
         if (response.data.error != null)
