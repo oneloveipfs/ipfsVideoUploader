@@ -10,7 +10,7 @@ axios.get('/user_info'+geturl).then((s) => {
 
 function saveSettings() {
     let newSettings = {
-        uplThreads: document.getElementById('settingsUplThreads').value,
+        uplThreads: document.getElementById('settingsUplThreads').value || 10,
         descTemplate: document.getElementById('descTemplate').value,
         darkMode: document.getElementById('darkmodeswitch').checked
     }
