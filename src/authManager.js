@@ -52,11 +52,11 @@ let auth = {
     },
     generateEncryptedMemo: (username,cb) => {
         // Generate encrypted text to be decrypted by Keychain or posting key on client
-        let message = username + ':oneloveipfs_login:hive'
+        let message = username + ':'+Config.ClientConfig.authIdentifier+':hive'
         if (auth.isInWhitelist(username,null))
-            message = username + ':oneloveipfs_login:all'
+            message = username + ':'+Config.ClientConfig.authIdentifier+':all'
         else if (auth.isInWhitelist(username,'dtc'))
-            message = username + ':oneloveipfs_login:dtc'
+            message = username + ':'+Config.ClientConfig.authIdentifier+':dtc'
         let encrypted_message = Crypto.AES.encrypt(message,Keys.AESKey).toString()
         axios.post(Config.Shawp.HiveAPI || 'https://techcoderx.com',{
             id: 1,
@@ -76,8 +76,8 @@ let auth = {
     },
     generateEncryptedMemoAvalon: async (username,keyid,cb) => {
         if (keyid && keyid.length > 25) return cb({error: 'Invalid custom key identifier'})
-        let message = username + ':oneloveipfs_login:dtc'
-        if (auth.isInWhitelist(username,null)) message = username + ':oneloveipfs_login:all'
+        let message = username + ':'+Config.ClientConfig.authIdentifier+':dtc'
+        if (auth.isInWhitelist(username,null)) message = username + ':'+Config.ClientConfig.authIdentifier+':all'
         let encrypted_message = Crypto.AES.encrypt(message,Keys.AESKey).toString()
         let avalonGetAccPromise = new Promise((resolve,reject) => {
             Avalon.getAccount(username,(e,acc) => {
@@ -91,7 +91,7 @@ let auth = {
             if (keyid || keyid === '') {
                 // Custom key
                 for (let i = 0; i < avalonAcc.keys.length; i++) 
-                    if (avalonAcc.keys[i].id == keyid && avalonAcc.keys[i].types.includes(4))
+                    if (avalonAcc.keys[i].id === keyid && avalonAcc.keys[i].types.includes(4))
                         pubKey = avalonAcc.keys[i].pub
                 if (!pubKey)
                     return cb({error: 'Custom key identifier not found'})
@@ -181,7 +181,7 @@ let auth = {
         } catch {
             cb(false)
         }
-        if (decrypted.length !== 3 || decrypted[1] !== 'oneloveipfs_login')
+        if (decrypted.length !== 3 || decrypted[1] !== Config.ClientConfig.authIdentifier)
             cb(false)
         else cb(decrypted)
     },
