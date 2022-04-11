@@ -7,7 +7,7 @@ const fs = require('fs')
 const { EOL } = require('os')
 const Config = require('./config')
 const Shawp = require('./shawp')
-const HivecryptPro = require('./hivecryptpro')
+const HivecryptPro = require('./hivecryptPro')
 const dir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 
 // If whitelist file doesn't exist create it

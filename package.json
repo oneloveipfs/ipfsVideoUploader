@@ -21,7 +21,7 @@
     "buildapp-windows": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2022 TechCoderX' --asar --platform=win32 --version-string.FileDescription 'OneLoveIPFS Uploader' --version-string.ProductName OneLoveIPFS --icon public/win32_icon.ico",
     "buildapp-linux": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2022 TechCoderX' --asar --platform linux",
     "build-installer": "electron-builder",
-    "build-hivecryptpro": "browserify -e src/hivecryptpro.js -p tinyify -o lib/hivecryptpro.min.js",
+    "build-hivecryptpro": "browserify -e src/hivecryptPro.js -p tinyify -o lib/hivecryptpro.min.js",
     "dep-prune": "npm un async body-parser bs58 crypto-js form-data fluent-ffmpeg hivesigner ipfs-http-client javalon jsonwebtoken mime-types multer node-schedule node-webvtt secp256k1 shelljs snyk socket.io",
     "install-hivecrypt": "cd src/hivecrypt && npm i"
   },

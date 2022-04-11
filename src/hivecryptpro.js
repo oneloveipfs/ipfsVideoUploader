@@ -2,7 +2,7 @@
 const CryptoJS = require('crypto-js')
 const bs58 = require('bs58')
 const secp256k1 = require('secp256k1')
-const hivecrypt = require('./hivecrypt')
+const hivecrypt = require('./hivecrypt/src')
 
 /**
  * Network id used in WIF-encoding.
