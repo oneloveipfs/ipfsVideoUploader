@@ -44,5 +44,5 @@ It is recommended to build the installer for a target OS on the OS itself (e.g. 
 
 #### Build installer for host OS and architecture:
 ```
-npm run buildinstaller
+npm run build-installer
 ```

@@ -16,4 +16,4 @@ shasum -a 256 /path/to/donwloaded/file
 Get-FileHash C:\path\to\downloaded\file
 ```
 
-You can view the signed SHA256 hashes for the prebuilt installers in the announcement posts linked in the [releases](https://github.com/oneloveipfs/ipfsVideoUploader/releases), or in [@oneloveipfs](https://blocks.techcoderx.com/#/@oneloveipfs) account on Avalon.
+You can view the signed SHA256 hashes for the prebuilt installers in the announcement posts linked in the [releases](https://github.com/oneloveipfs/ipfsVideoUploader/releases), or in [@oneloveipfs](https://avalonblocks.com/#/@oneloveipfs) account on Avalon.

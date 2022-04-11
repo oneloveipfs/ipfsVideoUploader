@@ -1,5 +1,4 @@
 const axios = require('axios')
-const Hivecrypt = require('hivecrypt')
 const Avalon = require('javalon')
 const HiveSigner = require('hivesigner')
 const JWT = require('jsonwebtoken')
@@ -8,6 +7,7 @@ const fs = require('fs')
 const { EOL } = require('os')
 const Config = require('./config')
 const Shawp = require('./shawp')
+const HivecryptPro = require('./hivecryptpro')
 const dir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 
 // If whitelist file doesn't exist create it
@@ -33,9 +33,9 @@ let auth = {
     },
     keygen: () => {
         return {
-            wifMessage: Hivecrypt.randomWif(),
-            AESKey: Hivecrypt.randomWif().substr(3,32),
-            JWTKey: Hivecrypt.randomWif().substr(3,32),
+            wifMessage: HivecryptPro.hivecryptrandomWif(),
+            AESKey: HivecryptPro.hivecryptrandomWif().substr(3,32),
+            JWTKey: HivecryptPro.hivecryptrandomWif().substr(3,32),
             avalonKeypair: Avalon.keypair()
         }
     },
@@ -66,7 +66,7 @@ let auth = {
         }).then(res => {
             let encrypted_memo
             try {
-                encrypted_memo = Hivecrypt.encode(Keys.wifMessage,res.data.result[0].posting.key_auths[0][0],'#' + encrypted_message)
+                encrypted_memo = HivecryptPro.hivecrypt.encode(Keys.wifMessage,res.data.result[0].posting.key_auths[0][0],'#' + encrypted_message)
             } catch (e) {
                 console.log(e)
                 return cb('Failed to generate memo to decode')
