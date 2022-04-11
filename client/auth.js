@@ -4,8 +4,13 @@ let token = url.searchParams.get('access_token') // Access token for logged in u
 let iskeychain = url.searchParams.get('keychain')
 let steemUser = url.searchParams.get('steemuser')
 let blurtUser = url.searchParams.get('blurtuser')
+let avalonKc = url.searchParams.get('avalonkc')
+let avalonKcUser = url.searchParams.get('avalonkcuser')
 let displayUsernameTimeout = -1
 let dtcDisplayUser, hiveDisplayUser = null
+
+if (avalonKc !== 'Active' && avalonKc !== 'Posting' && avalonKc !== 'Memo')
+    avalonKc = ''
 
 async function Hive() {
     if (!token) {
@@ -88,35 +93,37 @@ async function Avalon() {
     let avalonKey = sessionStorage.getItem('avalonKey')
     let promoteDisabled = false
 
-    if (!avalonUser || !avalonKey) return
-
-    let avalonLoginPromise = new Promise((resolve,reject) => {
-        javalon.init({api: 'https://avalon.techcoderx.com'})
-        javalon.getAccount(avalonUser,(err,result) => {
-            if (err) return reject(err)
-            let avalonPubKey = javalon.privToPub(avalonKey)
-            if (result.pub === avalonPubKey) return resolve(true)
-            
-            // Login with "Posting key" (recommended)
-            for (let i = 0; i < result.keys.length; i++) {
-                if (result.keys[i].types.includes(4) && result.keys[i].pub === avalonPubKey) {
-                    if (!result.keys[i].types.includes(13)) promoteDisabled = true
-                    return resolve(true)
+    if ((!avalonUser || !avalonKey) && (!avalonKc || !avalonKcUser))
+        return
+    else if (avalonUser && (!avalonKc || !avalonKcUser)) {
+        let avalonLoginPromise = new Promise((resolve,reject) => {
+            javalon.init({api: 'https://avalon.oneloved.tube'})
+            javalon.getAccount(avalonUser,(err,result) => {
+                if (err) return reject(err)
+                let avalonPubKey = javalon.privToPub(avalonKey)
+                if (result.pub === avalonPubKey) return resolve(true)
+                
+                // Login with "Posting key" (recommended)
+                for (let i = 0; i < result.keys.length; i++) {
+                    if (result.keys[i].types.includes(4) && result.keys[i].pub === avalonPubKey) {
+                        if (!result.keys[i].types.includes(13)) promoteDisabled = true
+                        return resolve(true)
+                    }
                 }
-            }
-            resolve(false)
+                resolve(false)
+            })
         })
-    })
-    
-    try {
-        let avalonLoginResult = await avalonLoginPromise
-        if (avalonLoginResult != true) {
+        
+        try {
+            let avalonLoginResult = await avalonLoginPromise
+            if (avalonLoginResult != true) {
+                restrict()
+                return alert('Avalon key is invalid! Please login again.')
+            }
+        } catch (e) {
             restrict()
-            return alert('Avalon key is invalid! Please login again.')
+            return alert('Avalon auth error: ' + e.toString())
         }
-    } catch (e) {
-        restrict()
-        return alert('An error occured with Avalon authentication: ' + e.toString())
     }
     dtcDisplayUser = avalonUser
     displayLoginMessage()

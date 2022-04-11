@@ -22,7 +22,7 @@
 
     "ClientConfig": {
         "authIdentifier": "oneloveipfs_login",
-        "authTimeout": 30000,
+        "authTimeoutBlocks": 10,
         "gateway": "https://video.oneloveipfs.com",
         "hivesignerEnabled": true,
         "hivesignerApp": "ipfsuploader.app",

@@ -104,6 +104,22 @@ app.post('/logincb',(request,response) => {
     })
 })
 
+app.post('/loginsig',(request,response) => {
+    // Signature based auth
+    Auth.verifyAuthSignature(request.body,(valid) => {
+        if (!valid)
+            return response.status(400).send({error: 'Could not verify signature and/or recent block info'})
+        let split = request.body.split(':')
+        if (Config.whitelistEnabled && !Auth.isInWhitelist(split[0],split[2]))
+            return response.status(403).send({error: 'Uploader access denied'})
+        
+        Auth.generateJWT(split[0],split[2],(err,token) => {
+            if (err) return response.send({error: err})
+            response.send({access_token: token, error: null})
+        })
+    })
+})
+
 app.get('/auth',(request,response) => {
     let access_token = request.query.access_token
     Auth.verifyAuth(access_token,false,(err,res) => {

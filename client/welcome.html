@@ -205,15 +205,15 @@
                             <input type="text" placeholder="AVALON Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginUsername" class="loginFields">
                             <input type="password" placeholder="AVALON Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginKey" class="loginFields">
                             <!-- Avalon with Keychain Signer -->
-                            <!--<input type="text" placeholder="Keychain Signer Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonSignerUsername" class="loginFields avalonKcLogin">
+                            <input type="text" placeholder="Keychain Signer Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonSignerUsername" class="loginFields avalonKcLogin">
                             <select id="avalonSignerRole" class="loginFields avalonKcLogin" style="width: 100%;">
                                 <option>Posting</option>
                                 <option>Active</option>
                                 <option>Memo</option>
-                            </select>-->
+                            </select>
                             <a class="roundedBtn" id="avalonAuthBtn" onclick="avalonLogin()">Login</a>
-                            <!--<h3 class="loginor" id="avalonKcAuthOr">OR</h3>
-                            <a class="roundedBtn" id="avalonKcAuthBtn">Login with Hive Keychain</a>-->
+                            <h3 class="loginor" id="avalonKcAuthOr">OR</h3>
+                            <a class="roundedBtn" id="avalonKcAuthBtn" onclick="avalonKcToggle()">Login with Hive Keychain</a>
                         </div>
                         <div id="loginformblurt">
                             <a onclick="updateDisplayByIDs(['loginformmain'],['loginformblurt'])"><< Back</a><br><br>

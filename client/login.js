@@ -1,4 +1,5 @@
 let config, shawpconfig
+let avalonKcToggled = false
 window.logins = {}
 
 localStorage.setItem('hivesignerToken',null)
@@ -22,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let tochange = document.getElementsByClassName('kcAuth')
         for (let i = 0; i < tochange.length; i++)
             tochange[i].innerText = 'Login'
-        //updateDisplayByIDs([],['avalonKcAuthOr','avalonKcAuthBtn'])
+        updateDisplayByIDs([],['avalonKcAuthOr','avalonKcAuthBtn'])
     }
 
     axios.get('/config').then((result) => {
@@ -115,7 +116,22 @@ async function proceedLogin() {
     if (window.logins.keychain) cbUrl += '&keychain=true'
     if (window.logins.steemUser) cbUrl += '&steemuser=' + window.logins.steemUser
     if (window.logins.blurtUser) cbUrl += '&blurtuser=' + window.logins.blurtUser
+    if (window.logins.avalonHiveKeychain) cbUrl += '&avalonkc=' + window.logins.avalonHiveKeychain + '&avalonkcuser=' + window.logins.avalonHiveKeychainUser
     window.location.href = cbUrl
+}
+
+function avalonKcToggle() {
+    if (document.getElementById('avalonKcAuthBtn').innerText === 'Login with Hive Keychain') {
+        if (!window.hive_keychain)
+            return alert('Hive Keychain is not installed')
+        updateDisplayByIDs(['avalonSignerUsername','avalonSignerRole'],['avalonLoginKey'])
+        document.getElementById('avalonKcAuthBtn').innerText = 'Login with Plaintext Key'
+        avalonKcToggled = true
+    } else {
+        updateDisplayByIDs(['avalonLoginKey'],['avalonSignerUsername','avalonSignerRole'])
+        document.getElementById('avalonKcAuthBtn').innerText = 'Login with Hive Keychain'
+        avalonKcToggled = false
+    }
 }
 
 async function hivesignerLogin() {
@@ -270,6 +286,46 @@ function signupNetworkSelect() {
     }
 }
 
+function generateMessageToSign (username,network,cb) {
+    // Generate text for user to sign
+    // using latest block id
+    let message = username+':'+config.authIdentifier+':'+network+':'
+    switch (network) {
+        case 'hive':
+            axios.post('https://techcoderx.com',{
+                id: 1,
+                jsonrpc: '2.0',
+                method: 'condenser_api.get_dynamic_global_properties',
+                params: []
+            }).then((r) => {
+                if (r.data && r.data.result) {
+                    message += r.data.result.head_block_number+':'+r.data.result.head_block_id
+                    cb(null,message)
+                } else if (r.data && r.data.error)
+                    cb(r.data.error.message)
+            }).catch(e => cb(e.toString()))
+            break
+        case 'dtc':
+            axios.get('https://avalon.oneloved.tube/count').then((r) => {
+                if (r.data && r.data.count) {
+                    message += r.data.count-1
+                    message += ':'
+                    axios.get('https://avalon.oneloved.tube/block/'+(r.data.count-1)).then((b) => {
+                        if (b.data && b.data.hash) {
+                            message += b.data.hash
+                            cb(null,message)
+                        }
+                    }).catch(e => cb(e.toString()))
+                }
+            }).catch(e => cb(e.toString()))
+            break
+    }
+}
+
+function generateMessageToSignPromise (username,network) {
+    return new Promise((rs,rj) => generateMessageToSign(username,network,(e,r) => e ? rj(e) : rs(r)))
+}
+
 function hiveLogin() {
     if (window.proceedAuthBtnDisabled == true) return
     let hiveUsername = document.getElementById('hiveLoginUsername').value.toLowerCase().replace('@','')
@@ -310,13 +366,7 @@ function keychainCb(encrypted_message,network,persistence) {
             alert(cbResponse.data.error)
         } else {
             console.log(cbResponse.data)
-            if (isElectron() && persistence) {
-                window.logins.token = cbResponse.data.access_token
-                window.logins.tokenNetwork = network
-                window.logins.keychain = true
-                proceedLogin()
-            } else
-                loginCb(network,cbResponse.data.access_token,false)
+            keychainPostCall(cbResponse.data.access_token,network,persistence)
         }
     }).catch((err) => {
         if (err.response.data.error)
@@ -326,7 +376,33 @@ function keychainCb(encrypted_message,network,persistence) {
     }).finally(() => window.proceedAuthBtnDisabled = false)
 }
 
-function loginCb(network,token,oauth2) {
+function keychainSigCb(message,network,persistence,role = 'Posting') {
+    axios.post('/loginsig',message,{ headers: { 'content-type': 'text/plain' }}).then((cbResponse) => {
+        if (cbResponse.data.error != null) {
+            alert(cbResponse.data.error)
+        } else {
+            console.log(cbResponse.data)
+            keychainPostCall(cbResponse.data.access_token,network,persistence,role)
+        }
+    }).catch((err) => {
+        if (err.response.data.error)
+            handleLoginError(err.response.data.error,network)
+        else
+            handleLoginError(err,network)
+    }).finally(() => window.proceedAuthBtnDisabled = false)
+}
+
+function keychainPostCall(token,network,persistence,role) {
+    if (isElectron() && persistence) {
+        window.logins.token = token
+        window.logins.tokenNetwork = network
+        window.logins.keychain = true
+        proceedLogin()
+    } else
+        loginCb(network,token,false,role)
+}
+
+function loginCb(network,token,oauth2,role) {
     if (!window.logins.token && token) {
         window.logins.token = token
         window.logins.tokenNetwork = network
@@ -335,6 +411,11 @@ function loginCb(network,token,oauth2) {
     if (!oauth2) {
         window.logins[network+'User'] = document.getElementById(network+'LoginUsername').value.toLowerCase().replace('@','')
         window.logins[network+'Key'] = document.getElementById(network+'LoginKey').value
+    }
+    if (avalonKcToggled && network === 'avalon') {
+        window.logins.avalonHiveKeychain = role
+        window.logins.avalonHiveKeychainUser = document.getElementById('avalonSignerUsername').value
+        sessionStorage.setItem('avalonUser',window.logins.avalonUser)
     }
     window.proceedAuthBtnDisabled = false
     updateDisplayByIDs(['loginformmain'],['loginform'+network])
@@ -350,7 +431,24 @@ async function avalonLogin() {
     document.getElementById('avalonAuthBtn').innerText = 'Logging in...'
     proceedAuthBtnDisabled = true
 
-    javalon.init({api: 'https://avalon.techcoderx.com'})
+    if (avalonKcToggled) {
+        let signerUsername = document.getElementById('avalonSignerUsername').value
+        let signerRole = document.getElementById('avalonSignerRole').value
+        try {
+            let msg = await generateMessageToSignPromise(avalonUsername,'dtc')
+            hive_keychain.requestSignBuffer(signerUsername,msg,signerRole,(signResult) => {
+                if (signResult.error)
+                    return handleLoginError(signResult.error,'avalon')
+                msg += ':'+signResult.result
+                keychainSigCb(msg,'avalon',false,signerRole)
+            })
+        } catch (e) {
+            return handleLoginError(e,'avalon')
+        }
+        return
+    }
+
+    javalon.init({api: 'https://avalon.oneloved.tube'})
     let avalonKeyId = false
     try {
         avalonKeyId = await getAvalonKeyId(avalonUsername,avalonKey)

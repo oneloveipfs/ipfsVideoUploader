@@ -24,4 +24,10 @@ if (process.platform == 'win32' && REMOTE_APP === 0 || require('electron').app) 
     defaultConfig.durationAPIEnabled = false
 }
 
+// authIdentifier must not contain colons
+if (defaultConfig.ClientConfig.authIdentifier.includes(':')) {
+    console.log('removing all colons from authIdentifier')
+    defaultConfig.ClientConfig.authIdentifier = defaultConfig.ClientConfig.authIdentifier.replace(/:/g,'')
+}
+
 module.exports = defaultConfig

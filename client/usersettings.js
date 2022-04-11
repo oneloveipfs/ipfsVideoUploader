@@ -5,7 +5,7 @@ axios.get('/user_info'+geturl).then((s) => {
         descTemplate: '',
         darkMode: false
     }
-    if (document.readyState === 'complete')
+    if (document.readyState !== 'loading')
         fillSettings()
     else
         window.addEventListener('DOMContentLoaded', () => fillSettings())

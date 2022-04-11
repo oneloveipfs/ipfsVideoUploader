@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Hide Avalon first curated tag info if not logged in with Avalon
-        if (!avalonUser || !avalonKey) {
+        if (!avalonUser || (!avalonKey && (!avalonKc || !avalonKcUser))) {
             document.getElementById('tagInfo1').style.display = 'none'
         } else {
             javalon.getAccount(avalonUser,(err,acc) => {
@@ -667,6 +667,10 @@ function postVideo() {
     hiveBroadcast()
 }
 
+function hiveKeychainSignBufferPromize(user,message,role) {
+    return new Promise((rs) => hive_keychain.requestSignBuffer(user,message,role,rs))
+}
+
 // Series broadcast
 function hiveBroadcast() {
     let hiveTx = generatePost('hive')
@@ -727,7 +731,9 @@ async function avalonBroadcast() {
                 json: buildJsonMetadataAvalon(),
                 vt: Math.floor(javalon.votingPower(avalonAcc)*(document.getElementById('avalonvw').value)/100),
                 tag: tag
-            }
+            },
+            sender: avalonAcc.name,
+            ts: new Date().getTime()
         }
 
         if (burnAmt > 0) {
@@ -735,8 +741,18 @@ async function avalonBroadcast() {
             tx.data.burn = burnAmt
         }
         console.log('Avalon tx',tx)
+        let signedtx
+        if (avalonKc && avalonKcUser) {
+            let stringifiedRawTx = JSON.stringify(tx)
+            tx.hash = hivecryptpro.sha256(stringifiedRawTx).toString('hex')
+            let hiveKcSign = await hiveKeychainSignBufferPromize(avalonKcUser,stringifiedRawTx,avalonKc)
+            if (hiveKcSign.error)
+                return avalonCb(hiveKcSign.message)
+            tx.signature = [hivecryptpro.Signature.fromString(hiveKcSign.result).toAvalonSignature()]
+            signedtx = tx
+        } else
+            signedtx = javalon.sign(sessionStorage.getItem('avalonKey'),avalonAcc.name,tx)
 
-        let signedtx = javalon.sign(sessionStorage.getItem('avalonKey'),avalonAcc.name,tx)
         javalon.sendRawTransaction(signedtx,(err,result) => {
             if (err)
                 avalonCb(err.toString())

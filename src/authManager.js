@@ -179,11 +179,75 @@ let auth = {
         try {
             decrypted = Crypto.AES.decrypt(message,Keys.AESKey).toString(Crypto.enc.Utf8).split(':')
         } catch {
-            cb(false)
+            return cb(false)
         }
         if (decrypted.length !== 3 || decrypted[1] !== Config.ClientConfig.authIdentifier)
             cb(false)
         else cb(decrypted)
+    },
+    verifyAuthSignature: (message,cb) => {
+        let split = message.split(':')
+        if (split.length !== 6 ||
+            split[1] !== Config.ClientConfig.authIdentifier ||
+            (split[2] !== 'hive' && split[2] !== 'dtc') ||
+            isNaN(parseInt(split[3])))
+            cb(false)
+        let original = split.slice(0,5).join(':')
+        let hash = HivecryptPro.sha256(original)
+        switch (split[2]) {
+            case 'hive':
+                axios.post(Config.Shawp.HiveAPI,{
+                    id: 1,
+                    jsonrpc: '2.0',
+                    method: 'database_api.verify_signatures',
+                    params: {
+                        hash: hash.toString('hex'),
+                        signatures: [split[5]],
+                        required_owner: [],
+                        required_active: [],
+                        required_posting: [split[0]],
+                        required_other: []
+                    }
+                }).then((r) => {
+                    if (r.data && r.data.result && r.data.result.valid)
+                        auth.verifyBlockInfo('hive',split[3],split[4],cb)
+                    else
+                        cb(false)
+                }).catch(() => cb(false))
+                break
+            case 'dtc':
+                axios.get(Config.Shawp.AvalonAPI+'/account/'+split[0]).then((r) => {
+                    let pub = HivecryptPro.PublicKey.fromString(HivecryptPro.Signature.fromString(split[5]).recover(hash)).toAvalonString()
+                    if (r.data.pub === pub)
+                        return auth.verifyBlockInfo('dtc',split[3],split[4],cb)
+                    if (r.data.keys)
+                        for (let i in r.data.keys)
+                            if (r.data.keys[i].pub === pub && r.data.keys[i].types.includes(4))
+                                return auth.verifyBlockInfo('dtc',split[3],split[4],cb)
+                    return cb(false)
+                }).catch(() => cb(false))
+                break
+        }
+    },
+    verifyBlockInfo: (network,number,id,cb) => {
+        switch (network) {
+            case 'hive':
+                axios.post(Config.Shawp.HiveAPI,{
+                    id: 1,
+                    jsonrpc: '2.0',
+                    method: 'condenser_api.get_block',
+                    params: [parseInt(number)]
+                }).then(r => {
+                    if (r.data && r.data.result)
+                        return cb(r.data.result.block_id === id)
+                    else
+                        return cb(false)
+                }).catch(() => cb(false))
+                break
+            case 'dtc':
+                axios.get(Config.Shawp.AvalonAPI+'/block/'+number).then(r => cb(r.data.hash === id)).catch(() => cb(false))
+                break
+        }
     },
     invalidHiveUsername: (value) => {
         let suffix = "Hive username must "
