@@ -313,7 +313,7 @@ async function avalonLogin(avalonUsername,avalonKey,dtconly,fromPersistence) {
 
         if (dtconly) {
             let loginGetUrl = '/login?user=' + avalonUsername + '&dtc=true'
-            if (avalonKeyId && avalonKeyId !== true) loginGetUrl += '&dtckeyid=' + avalonKeyId
+            if (typeof avalonKeyId === 'string') loginGetUrl += '&dtckeyid=' + avalonKeyId
             axios.get(loginGetUrl).then((response) => {
                 if (response.data.error != null)
                     return handleLoginError(response.data.error)
