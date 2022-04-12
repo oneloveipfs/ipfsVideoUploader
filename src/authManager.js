@@ -238,14 +238,34 @@ let auth = {
                     method: 'condenser_api.get_block',
                     params: [parseInt(number)]
                 }).then(r => {
-                    if (r.data && r.data.result)
-                        return cb(r.data.result.block_id === id)
+                    if (r.data && r.data.result && r.data.result.block_id === id)
+                        return auth.verifyBlockExpiry(network,number,cb)
                     else
                         return cb(false)
                 }).catch(() => cb(false))
                 break
             case 'dtc':
-                axios.get(Config.Shawp.AvalonAPI+'/block/'+number).then(r => cb(r.data.hash === id)).catch(() => cb(false))
+                axios.get(Config.Shawp.AvalonAPI+'/block/'+number).then(r => r.data.hash === id ? auth.verifyBlockExpiry(network,number,cb) : cb(false)).catch(() => cb(false))
+                break
+        }
+    },
+    verifyBlockExpiry: (network,number,cb) => {
+        switch (network) {
+            case 'hive':
+                axios.post(Config.Shawp.HiveAPI,{
+                    id: 1,
+                    jsonrpc: '2.0',
+                    method: 'condenser_api.get_dynamic_global_properties',
+                    params: []
+                }).then(r => {
+                    if (r.data && r.data.result)
+                        return cb(r.data.result.head_block <= parseInt(number) + Config.ClientConfig.authTimeoutBlocks)
+                    else
+                        return cb(false)
+                }).catch(() => cb(false))
+                break
+            case 'dtc':
+                axios.get(Config.Shawp.AvalonAPI+'/count').then(r => cb(r.data.count <= parseInt(number) + Config.ClientConfig.authTimeoutBlocks)).catch(() => cb(false))
                 break
         }
     },
