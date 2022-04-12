@@ -32,15 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('getHelpModeBtn').onclick = () => updateDisplayByIDs(['getHelp'],pages)
     document.getElementById('settingsModeBtn').onclick = () => updateDisplayByIDs(['settings'],pages)
 
-    window.onclick = (event) => closeMenu(event)
-    window.ontouchstart = (event) => closeMenu(event)
-    
-    function closeMenu(event) {
-        let targets = ['modeBtn','headerMenu','dropdownArrow']
-        if (!targets.includes(event.target.id))
-            document.getElementById('dropdownbox').style.display = 'none'
-    }
-
     document.getElementById('linkSubmitBtn').onclick = () => {
         let linkInput = document.getElementById('thumbnailSwapLink')
         if (!linkInput.value.startsWith('https://d.tube/#!/v/') && !linkInput.value.startsWith('https://d.tube/v/'))
@@ -263,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     jsonmeta.video.files.ipfs.img[118] = newSnapHash
                     jsonmeta.video.files.ipfs.img[360] = newSnapHash
                 }
-                jsonmeta.app = 'onelovedtube/2.1.2'
+                jsonmeta.app = 'oneloveipfs/2.1.3'
 
                 // Edit Steem article body
                 let oldSnapLink = steemPostToModify.body.match(/\bhttps?:\/\/\S+/gi)[1].replace('\'></a></center><hr>','')
@@ -316,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     jsonmeta.video.files.ipfs.img[118] = newSnapHash
                     jsonmeta.video.files.ipfs.img[360] = newSnapHash
                 }
-                jsonmeta.app = 'onelovedtube/2.1.2'
+                jsonmeta.app = 'oneloveipfs/2.1.3'
 
                 // Edit Steem article body
                 let oldSnapLink = steemPostToModify.body.match(/\bhttps?:\/\/\S+/gi)[1].replace('\'></a></center><hr>','')
@@ -378,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     jsonAvalon.files.ipfs.img[118] = newSnapHash
                     jsonAvalon.files.ipfs.img[360] = newSnapHash
                 }
-                jsonAvalon.app = 'onelovedtube/2.1.2'
+                jsonAvalon.app = 'oneloveipfs/2.1.3'
 
                 let avalonSwapTx = {
                     type: 4,

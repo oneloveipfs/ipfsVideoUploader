@@ -679,7 +679,7 @@ function buildJsonMetadata(network) {
     let jsonMeta = {
         video: buildJsonMetadataAvalon(),
         tags: postparams.tags,
-        app: 'onelovedtube/2.1.2',
+        app: 'oneloveipfs/2.1.3',
     }
 
     let ref = []

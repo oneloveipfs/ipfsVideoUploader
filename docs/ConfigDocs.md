@@ -6,7 +6,7 @@ While it is possible to change the `config.json` file within the project directo
 
 Remote variants of OneLoveIPFS uploader desktop app have limited configurability (such as binding port and IP), as most settings depend on the remote upload server.
 
-For full desktop apps, the sections that matter the most to end users are General Settings, Client Config and Skynet. The others are mostly used only on standalone upload servers (such as uploader.oneloved.tube endpoint that OneLoveIPFS team operates).
+For full desktop apps, the sections that matter the most to end users are General Settings, Client Config and Skynet. The others are mostly used only on standalone upload servers (such as uploader.oneloveipfs.com endpoint that OneLoveIPFS team operates).
 
 # Config file guide
 
@@ -42,7 +42,7 @@ These values will only apply to APIs that are currently not used by the interfac
 
 #### Build
 Changing this section might affect how you receive app updates.
-* `number`: Integer that indicates the real app version. Increasing this number on production upload servers (defaults to uploader.oneloved.tube) will trigger an update on its users.
+* `number`: Integer that indicates the real app version. Increasing this number on production upload servers (defaults to uploader.oneloveipfs.com) will trigger an update on its users.
 * `version`: A very short text describing the update.
 * `link`: URL to the download page of the latest version of the app, to be opened when update notification clicked on desktop app.
 

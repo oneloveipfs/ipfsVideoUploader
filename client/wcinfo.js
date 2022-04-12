@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             switch (paymentMethod) {
                 case 'DTUBE':
-                    updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['HiveKeychainBtn','HiveSignerBtn','SteemKeychainBtn','SteemLoginBtn'])
+                    updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['HiveKeychainBtn','HiveSignerBtn'])
                     document.getElementById('DTubeChannelBtn').onclick = () => window.open('https://d.tube/#!/c/' + shawpconfig.DtcReceiver)
                     document.getElementById('DTubeChannelBtn').href = 'https://d.tube/#!/c/' + shawpconfig.DtcReceiver
                     break
@@ -130,11 +130,19 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 window.onclick = (event) => {
+    closeMenu(event)
     dismissPopup(event,'refillPopup')
 }
 
 window.ontouchstart = (event) => {
+    closeMenu(event)
     dismissPopup(event,'refillPopup')
+}
+
+function closeMenu(event) {
+    let targets = ['modeBtn','headerMenu','dropdownArrow']
+    if (!targets.includes(event.target.id))
+        document.getElementById('dropdownbox').style.display = 'none'
 }
 
 function dismissPopup(event,popupelement) {

@@ -163,24 +163,20 @@ let uploadOps = {
         }
 
         let subtitleBuffer = new Buffer.from(request.body,'utf8')
-        let ipfsAddSubtitleOp = ipfsAPI.add(subtitleBuffer)
+        let sub = await ipfsAPI.add(subtitleBuffer)
         
-        for await (const sub of ipfsAddSubtitleOp) {
-            db.recordHash(username,network,'subtitles',sub.cid.toString(),sub.size)
-            db.writeHashesData()
-            db.writeHashSizesData()
+        db.recordHash(username,network,'subtitles',sub.cid.toString(),sub.size)
+        db.writeHashesData()
+        db.writeHashSizesData()
 
-            let result = {
-                username: username,
-                network: network,
-                type: 'subtitles',
-                hash: sub.cid.toString()
-            }
-            response.send(result)
-            ipsync.emit('upload',result)
-
-            break
+        let result = {
+            username: username,
+            network: network,
+            type: 'subtitles',
+            hash: sub.cid.toString()
         }
+        response.send(result)
+        ipsync.emit('upload',result)
     },
     uploadStream: (username,network,request,response) => {
         // video/mp2t

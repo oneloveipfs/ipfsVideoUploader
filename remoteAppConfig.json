@@ -1,5 +1,5 @@
 {
-    "REAL_ENDPOINT": "https://uploader.oneloved.tube",
+    "REAL_ENDPOINT": "https://uploader.oneloveipfs.com",
     "HTTP_PORT": 3000,
     "HTTP_BIND_IP": "127.0.0.1",
     "Build": {

@@ -52,7 +52,7 @@ The drafts are stored in your web browser locally, so when you login with the sa
 
 #### 11. How are the beneficiaries set?
 
-For OneLoveDTube's uploader services, beneficiary to @dtube account is set to 2% to support their development and curation efforts (instead of 10%). If authenticated with SteemConnect, [additional fees](https://steemit.com/steemconnect/@fabien/major-incoming-changes-on-steemconnect) may be imposed by the SteemConnect team (up to 2.5%). Other than the $10 USD/month flat rate to use OneLoveDTube's uploader services, we do not take any other additional beneficiaries from your post payouts.
+For OneLoveIPFS's uploader services, beneficiary to @dtube account is set to 2% to support their development and curation efforts (instead of 10%). If authenticated with SteemConnect, [additional fees](https://steemit.com/steemconnect/@fabien/major-incoming-changes-on-steemconnect) may be imposed by the SteemConnect team (up to 2.5%). Other than the $10 USD/month flat rate to use OneLoveIPFS's uploader services, we do not take any other additional beneficiaries from your post payouts.
 
 #### 12. Am I eligible for DTube curation when I upload my videos using this uploader?
 
@@ -60,4 +60,4 @@ Yes! We have tested this with actual high quality DTube videos, and they get pic
 
 #### 13. My question is not listed in this document. What can I do?
 
-Contact us in [OneLoveDTube Discord server](https://discord.gg/Sc4utKr), with a screenshot of the console output from your browser (if applicable).
+Contact us in [OneLoveIPFS Discord server](https://discord.gg/ZWj5NqaBeF), with a screenshot of the console output from your browser (if applicable).

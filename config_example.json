@@ -49,8 +49,8 @@
         "DefaultUSDRate": 0.0029,
         "AvalonAPI": "https://avalon.oneloved.tube",
         "HiveAPI": "https://techcoderx.com",
-        "DtcReceiver": "onelovedtube",
-        "HiveReceiver": "onelovedtube"
+        "DtcReceiver": "oneloveipfs",
+        "HiveReceiver": "oneloveipfs"
     },
 
     "test": {
