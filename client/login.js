@@ -306,11 +306,11 @@ function generateMessageToSign (username,network,cb) {
             }).catch(e => cb(e.toString()))
             break
         case 'dtc':
-            axios.get('https://avalon.oneloved.tube/count').then((r) => {
+            axios.get('https://api.avalonblocks.com/count').then((r) => {
                 if (r.data && r.data.count) {
                     message += r.data.count-1
                     message += ':'
-                    axios.get('https://avalon.oneloved.tube/block/'+(r.data.count-1)).then((b) => {
+                    axios.get('https://api.avalonblocks.com/block/'+(r.data.count-1)).then((b) => {
                         if (b.data && b.data.hash) {
                             message += b.data.hash
                             cb(null,message)
@@ -448,7 +448,7 @@ async function avalonLogin() {
         return
     }
 
-    javalon.init({api: 'https://avalon.oneloved.tube'})
+    javalon.init({api: 'https://api.avalonblocks.com'})
     let avalonKeyId = false
     try {
         avalonKeyId = await getAvalonKeyId(avalonUsername,avalonKey)
