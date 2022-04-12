@@ -296,7 +296,7 @@ function keychainCb(encrypted_message,steemUser,dtconly) {
 }
 
 async function avalonLogin(avalonUsername,avalonKey,dtconly,fromPersistence) {
-    javalon.init({api: 'https://avalon.oneloved.tube'})
+    javalon.init({api: 'https://api.avalonblocks.com'})
     if (avalonUsername !== '' && avalonKey !== '') {
         let avalonKeyId = false
         try {

@@ -29,8 +29,8 @@
     },
 
     "Build": {
-        "number": 5,
-        "version": "v2.1.2",
+        "number": 6,
+        "version": "v2.1.3",
         "link": "https://github.com/oneloveipfs/ipfsVideoUploader/releases"
     },
 
@@ -47,7 +47,7 @@
     "Shawp": {
         "Enabled": false,
         "DefaultUSDRate": 0.0029,
-        "AvalonAPI": "https://avalon.oneloved.tube",
+        "AvalonAPI": "https://api.avalonblocks.com",
         "HiveAPI": "https://techcoderx.com",
         "DtcReceiver": "oneloveipfs",
         "HiveReceiver": "oneloveipfs"
