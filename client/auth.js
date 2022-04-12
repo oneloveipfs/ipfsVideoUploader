@@ -26,10 +26,8 @@ async function Hive() {
                     displayLoginMessage(true)
                     resolve(null)
                 } else {
-                    window.currentnetwork = authResponse.data.network
-                    if (authResponse.data.network === 'all' || authResponse.data.network === 'hive') {
-                        hiveDisplayUser = authResponse.data.user
-                    }
+                    window.currentnetwork = authResponse.data.network // network used for access token
+                    hiveDisplayUser = sessionStorage.getItem('hiveUser')
                     if (!hiveDisplayUser && !steemUser && !blurtUser) {
                         let grapheneSettings = document.getElementsByClassName('grapheneSettings')
                         for (let i = 0; i < grapheneSettings.length; i++)
@@ -68,7 +66,7 @@ async function Hive() {
                     console.log(response)
                     if (response.data.isInWhitelist == false) {
                         restrict()
-                        alert('Looks like you do not have access to the uploader!')
+                        alert('Uploader access denied!')
                         return resolve(res.account.name)
                     }
 

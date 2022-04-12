@@ -63,7 +63,7 @@ app.get('/login',(request,response) => {
 
     if (Config.whitelistEnabled && !request.query.noauth)
         if (!Auth.isInWhitelist(request.query.user,queryNetwork))
-            return response.status(403).send({error: 'Looks like you do not have access to the uploader!'})
+            return response.status(403).send({error: 'Uploader access denied!'})
 
     let isInAllWhitelists = Auth.isInWhitelist(request.query.user,'all')
     if (isInAllWhitelists)
@@ -95,7 +95,7 @@ app.post('/logincb',(request,response) => {
             return response.status(400).send({error: 'Could not decipher message'})
         if (Config.whitelistEnabled)
             if (!Auth.isInWhitelist(decoded[0],decoded[2]))
-                return response.status(403).send({error: 'Looks like you do not have access to the uploader!'})
+                return response.status(403).send({error: 'Uploader access denied!'})
 
         Auth.generateJWT(decoded[0],decoded[2],(err,token) => {
             if (err) return response.send({error: err})

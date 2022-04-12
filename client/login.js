@@ -355,8 +355,12 @@ function hiveLogin() {
         } else hive_keychain.requestVerifyKey(hiveUsername,response.data.encrypted_memo,'Posting',(loginResponse) => {
             if (loginResponse.error != null)
                 return handleLoginError(loginResponse.message,'hive')
+            sessionStorage.setItem('hiveUser',hiveUsername)
             keychainCb(loginResponse.result.substr(1),'hive')
         })
+    }).catch((e) => {
+        axiosErrorHandler(e)
+        handleLoginError('','hive')
     })
 }
 

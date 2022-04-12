@@ -127,7 +127,7 @@ let auth = {
                 cb('Login error: ' + err)
             else if (Config.whitelistEnabled === true) {
                 if (!auth.isInWhitelist(result.user,result.network))
-                    return cb('Looks like you do not have access to the uploader!')
+                    return cb('Uploader access denied!')
                 if (Config.Shawp.Enabled && needscredits) {
                     let daysRemaining = Shawp.getDaysRemaining(result.user,result.network)
                     if (daysRemaining.days === 0 && daysRemaining.needs)
@@ -144,7 +144,7 @@ let auth = {
         scapi.me((err,result) => {
             if (err) return cb(err)
             if (Config.whitelistEnabled && !auth.isInWhitelist(result.user,'hive'))
-                return cb('Looks like you do not have access to the uploader!')
+                return cb('Uploader access denied!')
             if (Config.Shawp.Enabled && needscredits) {
                 let network = 'hive'
                 if (auth.isInWhitelist(result.user,null))
