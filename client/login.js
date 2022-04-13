@@ -83,17 +83,24 @@ function dismissPopup(event,popupelement) {
 function loginBtnClicked() {
     // Show popup window of login options
     if (isElectron() && localStorage.getItem('persistentLogin') !== null) {
-        let storedLogin
+        let storedLogin, persistentHiveAuth
         let persistentLoginText = 'Persistent login found.<br>'
         if (!isEncryptedStore('persistentLogin'))
             try {
                 storedLogin = JSON.parse(localStorage.getItem('persistentLogin'))
+                try {
+                    persistentHiveAuth = JSON.parse(localStorage.getItem('hiveAuth'))
+                } catch {
+                    // Failed to retrieve persistent HiveAuth authentication info
+                }
+
+                // All other key based logins
                 if ((!storedLogin.avalonUser && !storedLogin.hiveUser && !storedLogin.steemUser) || 
                     (storedLogin.avalonUser && !storedLogin.avalonKey) || 
-                    (storedLogin.hiveUser && !storedLogin.hiveKey) || 
+                    (storedLogin.hiveUser && !storedLogin.hiveKey && !persistentHiveAuth) || 
                     (storedLogin.steemUser && !storedLogin.steemKey) ||
                     (storedLogin.blurtUser && !storedLogin.blurtKey)) throw 'invalid keys'
-                if (storedLogin.hiveUser) persistentLoginText += '<br>Hive: ' + storedLogin.hiveUser
+                if (storedLogin.hiveUser) persistentLoginText += '<br>Hive: ' + storedLogin.hiveUser + (persistentHiveAuth ? ' (HiveAuth)' : '')
                 if (storedLogin.steemUser) persistentLoginText += '<br>Steem: ' + storedLogin.steemUser
                 if (storedLogin.blurtUser) persistentLoginText += '<br>Blurt: ' + storedLogin.blurtUser
                 if (storedLogin.avalonUser) persistentLoginText += '<br>Avalon: ' + storedLogin.avalonUser
@@ -166,7 +173,7 @@ async function proceedPersistentLogin() {
     if (proceedAuthBtnDisabled) return
     proceedAuthBtnDisabled = true
     document.getElementById('proceedPersistAuthBtn').innerText = 'Logging In...'
-    let storedDetails
+    let storedDetails, persistentHiveAuth
     try {
         storedDetails = JSON.parse(dec)
     } catch {
@@ -180,6 +187,50 @@ async function proceedPersistentLogin() {
         }
         if (k !== 'token')
             window.logins[k] = storedDetails[k]
+    }
+    // HiveAuth specifics
+    if (window.logins.hiveUser && !window.logins.hiveKey) {
+        try {
+            let ha = JSON.parse(localStorage.getItem('hiveAuth'))
+            if (ha.username === window.logins.hiveUser && ha.expire > new Date().getTime())
+                persistentHiveAuth = ha
+        } catch {}
+        if (persistentHiveAuth) {
+            let challenge = {
+                key_type: 'posting',
+                challenge: ''
+            }
+            try {
+                challenge.challenge = await generateMessageToSignPromise(window.logins.hiveUser,'hive')
+            } catch {
+                return handleLoginError('Challenge generation failed for HiveAuth login')
+            }
+            window.hiveauth.authenticate(window.logins.hiveAuth,APP_META,challenge,(evt) => {
+                let payload = {
+                    account: window.logins.hiveAuth.username,
+                    uuid: evt.uuid,
+                    key: evt.key,
+                    host: HAS_SERVER
+                }
+                document.getElementById('persistenthiveauthqr').innerHTML = ''
+                new QRCode(document.getElementById('persistenthiveauthqr'),'has://auth_req/'+btoa(JSON.stringify(payload)))
+                updateDisplayByIDs(['persistenthiveauth'],[])
+            }).then(res => {
+                updateDisplayByIDs([],['persistenthiveauth'])
+                localStorage.setItem('hiveAuth',JSON.stringify(window.logins.hiveAuth))
+                keychainSigCb(challenge.challenge+':'+res.data.challenge.challenge,'hive',true,'Posting')
+            }).catch(e => {
+                updateDisplayByIDs([],['persistenthiveauth'])
+                if (e.toString() === 'Error: expired')
+                    handleLoginError('HiveAuth authentication request expired')
+                else if (e.cmd === 'auth_nack')
+                    handleLoginError('HiveAuth authentication request rejected')
+                else if (e.cmd === 'auth_err')
+                    handleLoginError(e.error)
+            })
+            return
+        } else
+            return handleLoginError('Missing both hiveAuth and hiveKey?')
     }
     let network = storedDetails.tokenNetwork
     if (network === 'avalon')
@@ -684,7 +735,8 @@ function storeLogins() {
 }
 
 function handleLoginError(msg,network) {
-    document.getElementById(network+'AuthBtn').innerText = 'Login'
+    if (network)
+        document.getElementById(network+'AuthBtn').innerText = 'Login'
     document.getElementById('proceedPersistAuthBtn').innerText = 'Proceed'
     proceedAuthBtnDisabled = false
     if (msg) alert(msg)

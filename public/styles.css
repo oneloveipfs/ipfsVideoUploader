@@ -154,8 +154,8 @@ hr {
     margin: 5px 0px;
     font-size: 20px;
 }
-#persistentform, #loginformhive, #loginformhiveauth, #loginformavalon, #loginformblurt, #loginformsteem { display: none; }
-#hiveauthqr img {
+#persistentform, #persistenthiveauth, #loginformhive, #loginformhiveauth, #loginformavalon, #loginformblurt, #loginformsteem { display: none; }
+#hiveauthqr img, #persistenthiveauthqr img {
     margin-left: auto;
     margin-right: auto;
 }
