@@ -259,7 +259,7 @@ let auth = {
                     params: []
                 }).then(r => {
                     if (r.data && r.data.result)
-                        return cb(r.data.result.head_block <= parseInt(number) + Config.ClientConfig.authTimeoutBlocks)
+                        return cb(r.data.result.head_block_number <= parseInt(number) + Config.ClientConfig.authTimeoutBlocks)
                     else
                         return cb(false)
                 }).catch(() => cb(false))

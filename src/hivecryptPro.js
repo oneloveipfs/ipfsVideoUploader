@@ -73,6 +73,20 @@ function decodePrivate(encodedKey) {
 }
 
 /**
+ * Crypto-JS AES encrypt
+ */
+function aesEncrypt(data,key) {
+    return CryptoJS.AES.encrypt(data,key).toString()
+}
+
+/**
+ * Crypto-JS AES decrypt to UTF-8 format
+ */
+function aesDecrypt(data,key) {
+    return CryptoJS.AES.decrypt(data,key).toString(CryptoJS.enc.Utf8)
+}
+
+/**
  * ECDSA (secp256k1) public key.
  */
  class PublicKey {
@@ -238,6 +252,10 @@ if (typeof window !== 'undefined')
         PrivateKey,
         PublicKey,
         Signature,
+        aes: {
+            encrypt: aesEncrypt,
+            decrypt: aesDecrypt
+        },
         sha256,
         hivecrypt
     }
@@ -246,6 +264,10 @@ module.exports = {
     PrivateKey,
     PublicKey,
     Signature,
+    aes: {
+        encrypt: aesEncrypt,
+        decrypt: aesDecrypt
+    },
     sha256,
     hivecrypt
 }

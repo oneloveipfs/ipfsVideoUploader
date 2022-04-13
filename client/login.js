@@ -2,6 +2,12 @@ let config, shawpconfig
 let avalonKcToggled = false
 window.logins = {}
 
+// HiveAuth
+const APP_META = {
+    name: 'oneloveipfs',
+    description: 'IPFS hosting service'
+}
+
 localStorage.setItem('hivesignerToken',null)
 localStorage.setItem('hivesignerUsername',null)
 
@@ -364,6 +370,52 @@ function hiveLogin() {
     })
 }
 
+async function hiveAuthLogin() {
+    let hiveUsername = document.getElementById('hiveLoginUsername').value.toLowerCase().replace('@','')
+    if (!hiveUsername) return alert('Username is required')
+    try {
+        if (!(await axios.get('/checkuser?network=hive&user='+hiveUsername)).data.isInWhitelist)
+            return alert('Uploader access denied')
+    } catch (e) {
+        return alert('User whitelist check failed')
+    }
+    let challenge = {
+        key_type: 'posting',
+        challenge: ''
+    }
+    window.logins.hiveAuth = {
+        username: hiveUsername
+    }
+    try {
+        challenge.challenge = await generateMessageToSignPromise(hiveUsername,'hive')
+    } catch (e) {
+        return alert('Challenge generation failed')
+    }
+    window.hiveauth.authenticate(window.logins.hiveAuth,APP_META,challenge,(evt) => {
+        let payload = {
+            account: window.logins.hiveAuth.username,
+            uuid: evt.uuid,
+            key: evt.key,
+            host: HAS_SERVER
+        }
+        document.getElementById('hiveauthqr').innerHTML = ''
+        new QRCode(document.getElementById('hiveauthqr'),'has://auth_req/'+btoa(JSON.stringify(payload)))
+        updateDisplayByIDs(['loginformhiveauth'],['loginformhive'])
+    }).then((res) => {
+        sessionStorage.setItem('hiveUser',hiveUsername)
+        sessionStorage.setItem('hiveAuth',JSON.stringify(window.logins.hiveAuth))
+        keychainSigCb(challenge.challenge+':'+res.data.challenge.challenge,'hive',false,'Posting')
+    }).catch((e) => {
+        if (e.toString() === 'Error: expired')
+            alert('HiveAuth authentication request expired')
+        else if (e.cmd === 'auth_nack')
+            alert('HiveAuth authentication request rejected')
+        else if (e.cmd === 'auth_err')
+            alert(e.error)
+        updateDisplayByIDs(['loginformhive'],['loginformhiveauth'])
+    })
+}
+
 function keychainCb(encrypted_message,network,persistence) {
     axios.post('/logincb',encrypted_message,{ headers: { 'content-type': 'text/plain' }}).then((cbResponse) => {
         if (cbResponse.data.error != null) {
@@ -422,7 +474,7 @@ function loginCb(network,token,oauth2,role) {
         sessionStorage.setItem('avalonUser',window.logins.avalonUser)
     }
     window.proceedAuthBtnDisabled = false
-    updateDisplayByIDs(['loginformmain'],['loginform'+network])
+    updateDisplayByIDs(['loginformmain'],['loginform'+network,'loginformhiveauth'])
     document.getElementById('loginnetwork'+network).innerHTML = '<h5 id="loginnetwork'+network+'username"></h5>'
     document.getElementById('loginnetwork'+network+'username').innerText = window.logins[network+'User']
 }

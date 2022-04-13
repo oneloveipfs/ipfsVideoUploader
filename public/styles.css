@@ -154,7 +154,11 @@ hr {
     margin: 5px 0px;
     font-size: 20px;
 }
-#persistentform, #loginformhive, #loginformavalon, #loginformblurt, #loginformsteem { display: none; }
+#persistentform, #loginformhive, #loginformhiveauth, #loginformavalon, #loginformblurt, #loginformsteem { display: none; }
+#hiveauthqr img {
+    margin-left: auto;
+    margin-right: auto;
+}
 
 @-webkit-keyframes animatetop {
     from {top:-300px; opacity:0} 

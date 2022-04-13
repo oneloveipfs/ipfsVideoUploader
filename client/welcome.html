@@ -26,7 +26,10 @@
         <script src="https://unpkg.com/javalon/bin/javalon.min.js"></script>
         <script src="https://unpkg.com/hivesigner@3.2.7/lib/hivesigner.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@hiveio/hive-js@latest/dist/hive.min.js"></script>
+        <script src="https://unpkg.com/uuid@latest/dist/umd/uuidv4.min.js"></script>
+        <script src="https://unpkg.com/qrcodejs@latest/qrcode.min.js"></script>
         <script src="lib/hivecryptpro.min.js"></script>
+        <script src="client/hiveauth.js"></script>
         <script src="client/cdnfallback.js"></script>
         <script src="client/commons.js"></script>
         <script src="client/login.js"></script>
@@ -197,8 +200,15 @@
                             <input type="text" placeholder="HIVE Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="hiveLoginUsername" class="loginFields">
                             <input type="password" placeholder="HIVE Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="hiveLoginKey" class="loginFields">
                             <a class="roundedBtn kcAuth" id="hiveAuthBtn" onclick="hiveLogin()">Login with Keychain</a>
+                            <h3 class="loginor">OR</h3>
+                            <a class="roundedBtn" id="hasAuthBtn" onclick="hiveAuthLogin()">Login with HiveAuth</a>
                             <h3 class="loginor sclogin">OR</h3>
                             <a class="roundedBtn sclogin" id="altAuthBtn" onclick="hivesignerLogin()">Login with HiveSigner</a>
+                        </div>
+                        <div id="loginformhiveauth">
+                            <a onclick="updateDisplayByIDs(['loginformhive'],['loginformhiveauth'])"><< Back</a><br>
+                            <h4>Scan the QR code below using a compatible HiveAuth PKSA to continue.</h4>
+                            <div id="hiveauthqr"></div>
                         </div>
                         <div id="loginformavalon">
                             <a onclick="updateDisplayByIDs(['loginformmain'],['loginformavalon'])"><< Back</a><br><br>
