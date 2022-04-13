@@ -391,6 +391,12 @@ async function hiveAuthLogin() {
     } catch (e) {
         return alert('Challenge generation failed')
     }
+    let persistedHiveAuth = localStorage.getItem('hiveAuth')
+    try {
+        persistedHiveAuth = JSON.parse(persistedHiveAuth)
+        if (persistedHiveAuth.username === hiveUsername && persistedHiveAuth.expire > new Date().getTime())
+            window.logins.hiveAuth = persistedHiveAuth
+    } catch (e) {}
     window.hiveauth.authenticate(window.logins.hiveAuth,APP_META,challenge,(evt) => {
         let payload = {
             account: window.logins.hiveAuth.username,
@@ -403,7 +409,7 @@ async function hiveAuthLogin() {
         updateDisplayByIDs(['loginformhiveauth'],['loginformhive'])
     }).then((res) => {
         sessionStorage.setItem('hiveUser',hiveUsername)
-        sessionStorage.setItem('hiveAuth',JSON.stringify(window.logins.hiveAuth))
+        localStorage.setItem('hiveAuth',JSON.stringify(window.logins.hiveAuth))
         keychainSigCb(challenge.challenge+':'+res.data.challenge.challenge,'hive',false,'Posting')
     }).catch((e) => {
         if (e.toString() === 'Error: expired')
