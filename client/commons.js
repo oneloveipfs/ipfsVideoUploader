@@ -1,3 +1,9 @@
+// HiveAuth
+const APP_META = {
+    name: 'oneloveipfs',
+    description: 'IPFS hosting service'
+}
+
 function arrContainsInt(arr,value) {
     for (var i = 0; i < arr.length; i++) {
         if (arr[i] === value) return true

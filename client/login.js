@@ -2,12 +2,6 @@ let config, shawpconfig
 let avalonKcToggled = false
 window.logins = {}
 
-// HiveAuth
-const APP_META = {
-    name: 'oneloveipfs',
-    description: 'IPFS hosting service'
-}
-
 localStorage.setItem('hivesignerToken',null)
 localStorage.setItem('hivesignerUsername',null)
 
@@ -260,6 +254,7 @@ async function proceedPersistentLogin() {
 
 function clearPersistentLogin() {
     localStorage.setItem('persistentLogin',null)
+    window.logins = {}
     updateDisplayByIDs(['loginform'],['persistentform'])
 }
 

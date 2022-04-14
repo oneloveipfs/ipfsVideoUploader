@@ -172,15 +172,6 @@ async function checkConnection(uuid=undefined) {
   }
 }
 
-class Auth {
-    constructor(username, token=undefined, expire=undefined, key=undefined) {
-      this.username = username
-      this.token = token
-      this.expire = expire
-      this.key = key
-    }
-}
-
 window.hiveauth = {
   setOptions: function(options) {
     assert(options.host===undefined || options.host.match("^((ws|wss)?:\/\/)"),"invalid host URL")

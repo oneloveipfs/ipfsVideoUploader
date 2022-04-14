@@ -8,6 +8,7 @@ let avalonKc = url.searchParams.get('avalonkc')
 let avalonKcUser = url.searchParams.get('avalonkcuser')
 let displayUsernameTimeout = -1
 let dtcDisplayUser, hiveDisplayUser = null
+let hiveAuthLogin = null
 
 if (avalonKc !== 'Active' && avalonKc !== 'Posting' && avalonKc !== 'Memo')
     avalonKc = ''
@@ -18,7 +19,7 @@ async function Hive() {
         displayLoginMessage()
         return null
     } else if (iskeychain == 'true') {
-        // Hive Keychain / Avalon only Login
+        // Non-HiveSigner login
         let keychainLoginPromise = new Promise((resolve,reject) => {
             axios.get('/auth?access_token=' + token).then((authResponse) => {
                 if (authResponse.data.error != null) {
@@ -32,6 +33,12 @@ async function Hive() {
                         let grapheneSettings = document.getElementsByClassName('grapheneSettings')
                         for (let i = 0; i < grapheneSettings.length; i++)
                             grapheneSettings[i].style.display = 'none'
+                    } else {
+                        // HiveAuth login
+                        try {
+                            hiveAuthLogin = JSON.parse(localStorage.getItem('hiveAuth'))
+                            window.hiveauth.authenticate(hiveAuthLogin,APP_META,{})
+                        } catch {}
                     }
                     displayLoginMessage()
                     retrieveDraft()
@@ -143,7 +150,7 @@ function displayLoginMessage(errored) {
         let message = 'You are logged in as '
         let displayAccs = []
         if (hiveDisplayUser)
-            displayAccs.push(hiveDisplayUser + ' on Hive')
+            displayAccs.push(hiveDisplayUser + ' on Hive' + (hiveAuthLogin ? ' (HiveAuth)' : ''))
         if (steemUser)
             displayAccs.push(steemUser + ' on Steem')
         if (blurtUser)
