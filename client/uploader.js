@@ -688,9 +688,9 @@ function hiveBroadcast() {
                 .catch((e) => {
                     let em = ''
                     if (e.toString() === 'Error: expired')
-                        em = 'HiveAuth authentication request expired'
+                        em = 'HiveAuth broadcast request expired'
                     else if (e.cmd === 'sign_nack')
-                        em = 'HiveAuth authentication request rejected'
+                        em = 'HiveAuth broadcast request rejected'
                     else if (e.cmd === 'sign_err')
                         em = e.error
                     hiveCb({error: em})
