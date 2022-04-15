@@ -13,7 +13,7 @@
     "start": "node src/index.js",
     "v2migration": "node scripts/v2Migration.js",
     "test": "mocha --timeout 5000",
-    "snyk-protect": "snyk protect",
+    "snyk-protect": "snyk-protect",
     "prepare": "npm run snyk-protect",
     "devapp": "electron src/electronApp.js",
     "prepapp": "node scripts/electronPrep.js",
@@ -79,6 +79,7 @@
   "bugs": "https://github.com/oneloveipfs/ipfsVideoUploader/issues",
   "license": "GPLv3",
   "dependencies": {
+    "@snyk/protect": "^1.906.0",
     "about-window": "^1.15.2",
     "async": "^3.2.3",
     "axios": "^0.26.1",
@@ -107,8 +108,8 @@
   "devDependencies": {
     "browserify": "^17.0.0",
     "chai": "^4.3.4",
-    "electron": "^16.0.6",
-    "electron-builder": "^22.14.12",
+    "electron": "^18.0.4",
+    "electron-builder": "^23.0.6",
     "electron-packager": "^15.4.0",
     "mocha": "^9.1.3",
     "tinyify": "^3.0.0"
