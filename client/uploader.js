@@ -682,7 +682,20 @@ function hiveBroadcast() {
 
     if (Auth.iskeychain == 'true') {
         // Broadcast with Keychain
-        if (isElectron())
+        if (hiveAuthLogin)
+            hiveauth.broadcast(hiveAuthLogin,'posting',hiveTx,() => document.getElementById('uploadProgressFront').innerText = 'Approve Hive transaction in HiveAuth PKSA')
+                .then(() => hiveCb({}))
+                .catch((e) => {
+                    let em = ''
+                    if (e.toString() === 'Error: expired')
+                        em = 'HiveAuth authentication request expired'
+                    else if (e.cmd === 'auth_nack')
+                        em = 'HiveAuth authentication request rejected'
+                    else if (e.cmd === 'auth_err')
+                        em = e.error
+                    hiveCb({error: em})
+                })
+        else if (isElectron())
             hive.broadcast.send({ extensions: [], operations: hiveTx },[sessionStorage.getItem('hiveKey')],(e) => hiveCb({error: e}))
         else
             hive_keychain.requestBroadcast(username,hiveTx,'Posting',hiveCb)
@@ -983,6 +996,23 @@ function generatePost(network) {
     }
     let user = usernameByNetwork(network)
 
+    let commentOptions = [
+        "comment_options", {
+            author: user,
+            permlink: postparams.permlink,
+            max_accepted_payout: '1000000.000 HBD',
+            percent_hbd: rewardPercent,
+            allow_votes: true,
+            allow_curation_rewards: true,
+            extensions: []
+        }
+    ]
+
+    if (sortedBeneficiary.length > 0)
+        commentOptions[1].extensions.push([0, {
+            beneficiaries: sortedBeneficiary
+        }])
+
     // Create transaction
     let operations = [
         [ 'comment', {
@@ -995,31 +1025,20 @@ function generatePost(network) {
                 body: buildPostBody(network),
                 json_metadata: JSON.stringify(buildJsonMetadata(network)),
             }
-        ],
-        [ "comment_options", {
-            author: user,
-            permlink: postparams.permlink,
-            max_accepted_payout: '1000000.000 HBD',
-            percent_hbd: rewardPercent,
-            allow_votes: true,
-            allow_curation_rewards: true,
-            extensions: []
-        }]
+        ]
     ]
 
-    if (sortedBeneficiary.length > 0)
-        operations[1][1].extensions.push([0, {
-            beneficiaries: sortedBeneficiary
-        }])
-
-    if (network === 'steem') {
-        operations[1][1].max_accepted_payout = '1000000.000 SBD'
-        operations[1][1].percent_steem_dollars = rewardPercent
-        delete operations[1][1].percent_hbd
-    } else if (network === 'blurt') {
-        operations[1][1].max_accepted_payout = '1000000.000 BLURT'
-        delete operations[1][1].percent_hbd
-        delete operations[0][1].category
+    if (sortedBeneficiary.length > 0 || rewardPercent < 10000) {
+        operations.push(commentOptions)
+        if (network === 'steem') {
+            operations[1][1].max_accepted_payout = '1000000.000 SBD'
+            operations[1][1].percent_steem_dollars = rewardPercent
+            delete operations[1][1].percent_hbd
+        } else if (network === 'blurt') {
+            operations[1][1].max_accepted_payout = '1000000.000 BLURT'
+            delete operations[1][1].percent_hbd
+            delete operations[0][1].category
+        }
     }
 
     return operations
