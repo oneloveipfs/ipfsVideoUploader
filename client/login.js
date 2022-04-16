@@ -396,11 +396,13 @@ function hiveLogin() {
             }
             sessionStorage.setItem('hiveUser',hiveUsername)
             sessionStorage.setItem('hiveKey',hiveKey)
+            localStorage.removeItem('hiveAuth')
             keychainCb(t,'hive')
         } else hive_keychain.requestVerifyKey(hiveUsername,response.data.encrypted_memo,'Posting',(loginResponse) => {
             if (loginResponse.error != null)
                 return handleLoginError(loginResponse.message,'hive')
             sessionStorage.setItem('hiveUser',hiveUsername)
+            localStorage.removeItem('hiveAuth')
             keychainCb(loginResponse.result.substr(1),'hive')
         })
     }).catch((e) => {
