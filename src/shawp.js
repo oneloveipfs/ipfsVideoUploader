@@ -15,7 +15,7 @@ let Customers = JSON.parse(fs.readFileSync(dbDir+'/shawpUsers.json'))
 let RefillHistory = JSON.parse(fs.readFileSync(dbDir+'/shawpRefills.json'))
 let ConsumeHistory = JSON.parse(fs.readFileSync(dbDir+'/shawpConsumes.json'))
 
-let hiveStreamer = new GrapheneStreamer(Config.Shawp.HiveAPI || 'https://techcoderx.com',true)
+let hiveStreamer = new GrapheneStreamer(Config.Shawp.HiveAPI || 'https://techcoderx.com',true,'hive')
 let avalonStreamer = new AvalonStreamer(Config.Shawp.AvalonAPI,true)
 
 let Shawp = {
@@ -24,8 +24,14 @@ let Shawp = {
         if (!Config.Shawp.Enabled) return
         if (Config.Shawp.HiveReceiver) hiveStreamer.streamTransactions((tx) => {
             let transaction = tx
-            if (transaction && transaction.operations && transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.HiveReceiver)
-                Shawp.ProcessHiveTx(transaction.operations[0][1],transaction.transaction_id)
+            for (let op in transaction.operations)
+                if (transaction.operations[op].type === 'transfer_operation' && transaction.operations[op].value.to === Config.Shawp.HiveReceiver)
+                    Shawp.ProcessHiveTx(transaction.operations[op].value,transaction.transaction_id)
+            // if (transaction && transaction.operations && transaction.operations[0][0] === 'transfer' && transaction.operations[0][1].to === Config.Shawp.HiveReceiver)
+        },null,(vop) => {
+            let virtualop = vop
+            if (virtualop.op.type === 'fill_recurrent_transfer_operation' && virtualop.op.value.to === Config.Shawp.HiveReceiver)
+                Shawp.ProcessHiveTx(virtualop.op.value,'vop'+virtualop.block)
         })
 
         if (Config.Shawp.DtcReceiver) {
