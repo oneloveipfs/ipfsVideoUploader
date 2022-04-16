@@ -178,6 +178,54 @@ function validateAvalonUsername(u) {
     return null
 }
 
+function hivePaymentClickListener(u,to,amt,currency,memo,p = 'signup') {
+    updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'],['DTubeChannelBtn','dtcInstruction'])
+    document.getElementById('HiveKeychainBtn').onclick = () => {
+        if (document.getElementById('hiveRecPaymentCheckbox').checked) {
+            let recurrence = parseInt(document.getElementById('hiveRecPaymentRecurrence').value)
+            let frequency = parseInt(document.getElementById('hiveRecPaymentFrequency').value)
+            let repeatPymtValidation = validateRepeatPaymentFields(recurrence,frequency)
+            if (repeatPymtValidation)
+                return alert(repeatPymtValidation)
+            hive_keychain.requestRecurrentTransfer(u,to,amt,currency,memo,recurrence,frequency,(e) => {
+                if (e.error) return alert(e.message)
+                updateDisplayByIDs([p+'cb'],[p+'pay'])
+            })
+        } else
+            hive_keychain.requestTransfer(u,to,amt.toString(),memo,currency,(e) => {
+                if (e.error) return alert(e.message)
+                updateDisplayByIDs([p+'cb'],[p+'pay'])
+            })
+    }
+    document.getElementById('HiveSignerBtn').onclick = () => {
+        let recurrence, frequency
+        if (document.getElementById('hiveRecPaymentCheckbox').checked) {
+            recurrence = parseInt(document.getElementById('hiveRecPaymentRecurrence').value)
+            frequency = parseInt(document.getElementById('hiveRecPaymentFrequency').value)
+            let repeatPymtValidation = validateRepeatPaymentFields(recurrence,frequency)
+            if (repeatPymtValidation)
+                return alert(repeatPymtValidation)
+        }
+        window.open(hivesignerPaymentUrl(to,amt,currency,memo,recurrence,frequency))
+    }
+}
+
+function validateRepeatPaymentFields(recurrence, frequency) {
+    if (isNaN(recurrence) || recurrence < 24)
+        return 'Recurrence must be at least 24 hours'
+    else if (isNaN(frequency) || frequency < 2)
+        return 'Frequency must be at least 2'
+    else
+        return ''
+}
+
+function hivesignerPaymentUrl(to,amount,currency,memo,recurrence,frequency) {
+    if (recurrence && frequency)
+        return 'https://hivesigner.com/sign/recurrentTransfer?to='+to+'&amount='+amount+currency+'&memo='+memo+'&recurrence='+recurrence+'&executions='+frequency
+    else
+        return 'https://hivesigner.com/sign/transfer?to='+to+'&amount='+amount+currency+'&memo='+memo
+}
+
 function copyToClipboard(value,tooltiptextcontainer) {
     let fakeInput = document.createElement("input")
     fakeInput.value = value

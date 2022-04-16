@@ -253,7 +253,17 @@
                             <h4 id="dtcInstruction">Make a DTUBE transfer with the details below. DTUBE payments take approximately 42 seconds (14 blocks) to process.<br><br></h4>
                             <h4 id="gbdaysconfirm">Credits: 0 GBdays</h4>
                             <h4 id="quoteAmt">Amount: </h4>
-                            <h4 id="xferMemo">Memo: </h4><br>
+                            <h4 id="xferMemo">Memo: </h4>
+                            <div id="hiveRecPayment" style="margin-top: 15px;">
+                                <label class="switch switchsmall">
+                                    <input type="checkbox" name="hiveRecPaymentCheckbox" id="hiveRecPaymentCheckbox" onchange="document.getElementById('hiveRecPaymentCheckbox').checked ? updateDisplayByIDs(['hiveRecPaymentFields'],[]) : updateDisplayByIDs([],['hiveRecPaymentFields'])">
+                                    <span class="slider slidersmall round"></span>
+                                </label><h4 class="switchtextsmall" id="hiveRecPaymentCheckboxText"> Repeat refills</h4>
+                                <div id="hiveRecPaymentFields"><br>
+                                    <input type="number" placeholder="Recurrence (in hours, min 24)" id="hiveRecPaymentRecurrence" class="loginFields" min="24">
+                                    <input type="number" placeholder="Frequency" id="hiveRecPaymentFrequency" class="loginFields" min="2">
+                                </div>
+                            </div><br>
                             <a class="roundedBtn" id="HiveKeychainBtn">Pay with Hive Keychain</a>
                             <a class="roundedBtn" id="HiveSignerBtn" target="_blank" rel="noreferrer">Pay with HiveSigner</a>
                             <a class="roundedBtn" id="DTubeChannelBtn" target="_blank" rel="noreferrer">Pay on d.tube</a>
