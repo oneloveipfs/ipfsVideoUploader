@@ -28,12 +28,15 @@ module.exports = class {
             method: 'condenser_api.get_dynamic_global_properties',
             params: []
         }).then((props) => {
-            let num = this.irreversible ? props.data.result.last_irreversible_block_num : props.data.result.head_block_number
-            if (num > this.headBlock && this.headBlock === 0) {
-                this.parsedBlock = num
-                this.parsedBlockVops = num
-            }
-            this.headBlock = num
+            if (props.data.result) {
+                let num = this.irreversible ? props.data.result.last_irreversible_block_num : props.data.result.head_block_number
+                if (num > this.headBlock && this.headBlock === 0) {
+                    this.parsedBlock = num
+                    this.parsedBlockVops = num
+                }
+                this.headBlock = num
+            } else
+                console.log(this.network,'get_dynamic_global_properties error',props.data.error)
         }).catch((e) => console.log(this.network,'get_dynamic_global_properties error',e))
     }
 
