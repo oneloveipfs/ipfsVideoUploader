@@ -1,3 +1,0 @@
-[submodule "src/hivecrypt"]
-	path = src/hivecrypt
-	url = https://github.com/techcoderx/hivecrypt
