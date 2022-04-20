@@ -78,6 +78,14 @@ function topbarItmLeave(id) {
     document.getElementById(id).style.borderWidth = '0 3px 3px 0'
 }
 
+function getSelectedPlatforms() {
+    let result = []
+    for (let pf in isPlatformSelected)
+        if (isPlatformSelected[pf])
+            result.push(pf)
+    return result
+}
+
 function loadSelectPlatforms() {
     if (!loadSavedPlatforms())
         loadDefaultPlatforms()
@@ -261,6 +269,9 @@ function postpublishshare(dest) {
     let tgpf = document.getElementById('postpublishsharetgpf').value
     let tgurl = ''
     let av = usernameByNetwork('avalon')
+    let selected = getSelectedPlatforms()
+    if (selected.length === 1)
+        tgpf = selected[0]
     switch (tgpf) {
         case 'None':
             return alert('Please select a target video platform to share links')
