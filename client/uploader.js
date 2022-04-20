@@ -884,6 +884,8 @@ function buildJsonMetadata(network) {
     }
 
     if (isPlatformSelected['3Speak'] && allowedPlatformNetworks['3Speak'].includes(network)) {
+        // Desktop app format
+        /*
         jsonMeta.title = postparams.title
         jsonMeta.description = postparams.description
         jsonMeta.sourceMap = [
@@ -905,6 +907,26 @@ function buildJsonMetadata(network) {
         jsonMeta.video.info = {
             author: usernameByNetwork(network),
             permlink: postparams.permlink
+        }
+        */
+        // 3speak.tv format
+        jsonMeta.type = '3speak/video'
+        jsonMeta.image = ['https://ipfs-3speak.b-cdn.net/ipfs/'+postparams.imghash]
+        jsonMeta.video.info = {
+            author: usernameByNetwork(network),
+            permlink: postparams.permlink,
+            platform: '3speak',
+            title: postparams.title,
+            duration: postparams.duration,
+            filesize: postparams.size,
+            lang: 'en', // todo add lang field
+            firstUpload: false,
+            ipfs: postparams.ipfshash+'/default.m3u8',
+            ipfsThumbnail: postparams.imghash
+        }
+        jsonMeta.video.content = {
+            description: postparams.description,
+            tags: postparams.tags
         }
     }
 
@@ -1041,6 +1063,21 @@ function generatePost(network) {
             delete operations[0][1].category
         }
     }
+
+    if (isPlatformSelected['3Speak'] && allowedPlatformNetworks['3Speak'].includes(network))
+        operations.push(['custom_json', {
+            required_auths: [],
+            required_posting_auths: [user],
+            id: '3speak-publish',
+            json: JSON.stringify({
+                author: user,
+                permlink: postparams.permlink,
+                category: 'general',
+                language: 'en',
+                duration: postparams.duration,
+                title: postparams.title
+            })
+        }])
 
     return operations
 }
