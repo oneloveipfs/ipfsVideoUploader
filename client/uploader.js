@@ -897,6 +897,7 @@ function buildJsonMetadata(network) {
                 format: 'm3u8'
             }
         ]
+        jsonMeta.image = ['https://ipfs-3speak.b-cdn.net/ipfs/'+postparams.imghash]
         jsonMeta.filesize = postparams.size
         jsonMeta.created = new Date().toISOString()
         jsonMeta.type = '3speak/video'
