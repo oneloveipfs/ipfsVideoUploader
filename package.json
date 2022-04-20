@@ -2,7 +2,7 @@
   "name": "ipfsvideouploader",
   "productName": "OneLoveIPFS",
   "version": "3.0.0",
-  "description": "Alternative IPFS uploader for DTube videos.",
+  "description": "Cross-platform IPFS uploader for 3Speak and DTube videos.",
   "homepage": "https://uploader.oneloveipfs.com",
   "repository": {
     "type": "git",
@@ -22,8 +22,7 @@
     "buildapp-linux": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2022 TechCoderX' --asar --platform linux",
     "build-installer": "electron-builder",
     "build-hivecryptpro": "browserify -e src/hivecryptPro.js -p tinyify -o lib/hivecryptpro.min.js",
-    "dep-prune": "npm un async body-parser bs58 crypto-js form-data fluent-ffmpeg hivesigner ipfs-http-client javalon jsonwebtoken mime-types multer node-schedule node-webvtt secp256k1 shelljs snyk socket.io",
-    "install-hivecrypt": "cd src/hivecrypt && npm i"
+    "dep-prune": "npm un @snyk/protect async body-parser bs58 crypto-js form-data fluent-ffmpeg hivecrypt hivesigner ipfs-http-client javalon jsonwebtoken mime-types multer node-schedule node-webvtt secp256k1 shelljs socket.io"
   },
   "build": {
     "appId": "com.oneloveipfs.uploader",
@@ -83,7 +82,7 @@
     "about-window": "^1.15.2",
     "async": "^3.2.3",
     "axios": "^0.26.1",
-    "body-parser": "^1.19.2",
+    "body-parser": "^1.20.0",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "deepmerge": "^4.2.2",
@@ -93,14 +92,13 @@
     "form-data": "^3.0.0",
     "hivesigner": "^3.2.1",
     "http-proxy": "^1.18.1",
-    "ipfs-http-client": "^55.0.0",
+    "ipfs-http-client": "^56.0.2",
     "javalon": "^1.0.33",
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.4",
     "node-schedule": "^2.1.0",
     "node-webvtt": "^1.9.1",
     "shelljs": "^0.8.5",
-    "snyk": "^1.878.0",
     "socket.io": "^4.4.1"
   },
   "devDependencies": {

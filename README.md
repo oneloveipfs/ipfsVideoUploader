@@ -8,7 +8,7 @@ Cross-platform IPFS uploader for 3Speak and DTube. Can be run as a standalone up
 
 ### Dependencies required
 
-* `nodejs` and `npm` (Latest LTS, v14 minimum supported)
+* `nodejs` and `npm` (Latest LTS, v16 minimum supported)
 * `ffmpeg`, `imagemagick` and `bc` for sprite generation and HLS video encoding.
 * `go-ipfs` with a running daemon (alternatively [IPFS Desktop](https://github.com/ipfs-shipyard/ipfs-desktop) may be used)
 
