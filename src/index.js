@@ -514,7 +514,17 @@ const route404 = () => app.use((req,res) => { return res.status(404).redirect('/
 
 if (Config.Olisc.enabled) {
     const olisc = require('olisc')
-    olisc.init(app,Config.Olisc).finally(route404)
+    const oliscAuthFunc = (req) => {
+        return new Promise((rs) => {
+            Auth.verifyAuth(req.query.access_token,false,(e,result) => {
+                if (e)
+                    rs({ error: e })
+                else
+                    rs(result)
+            })
+        })
+    }
+    olisc.init(app,Config.Olisc,null,oliscAuthFunc).finally(route404)
 } else
     route404()
 
