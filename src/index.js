@@ -510,6 +510,12 @@ function Authenticate(request,response,needscredits,next) {
     }
 }
 
-app.use((req,res) => { return res.status(404).redirect('/404') })
+const route404 = () => app.use((req,res) => { return res.status(404).redirect('/404') })
+
+if (Config.Olisc.enabled) {
+    const olisc = require('olisc')
+    olisc.init(app,Config.Olisc).finally(route404)
+} else
+    route404()
 
 http.listen(Config.HTTP_PORT,Config.HTTP_BIND_IP)

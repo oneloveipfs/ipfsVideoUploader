@@ -22,6 +22,7 @@
     "buildapp-linux": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2022 TechCoderX' --asar --platform linux",
     "build-installer": "electron-builder",
     "build-hivecryptpro": "browserify -e src/hivecryptPro.js -p tinyify -o lib/hivecryptpro.min.js",
+    "install-olisc": "npm i https://github.com/oneloveipfs/olisc --save-optional",
     "dep-prune": "npm un @snyk/protect async body-parser bs58 crypto-js form-data fluent-ffmpeg hivecrypt hivesigner ipfs-http-client javalon jsonwebtoken mime-types multer node-schedule node-webvtt secp256k1 shelljs socket.io"
   },
   "build": {

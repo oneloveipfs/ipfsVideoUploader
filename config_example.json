@@ -63,6 +63,16 @@
         "HiveReceiver": "oneloveipfs"
     },
 
+    "Olisc": {
+        "enabled": false,
+        "mongodbUrl": "mongodb://localhost:27017",
+        "mongodbName": "olisc",
+        "apiNamespace": "/olisc",
+        "runInterval": 300000,
+        "rpcs": {},
+        "wifs": {}
+    },
+
     "test": {
         "hashType": ["videos","thumbnails","sprites","images","video240","video480","video720","video1080","subtitles"],
         "user": "techcoderx",

@@ -30,4 +30,14 @@ if (defaultConfig.ClientConfig.authIdentifier.includes(':')) {
     defaultConfig.ClientConfig.authIdentifier = defaultConfig.ClientConfig.authIdentifier.replace(/:/g,'')
 }
 
+// check olisc installation if enabled
+if (defaultConfig.Olisc.enabled) {
+    try {
+        require.resolve('olisc')
+    } catch {
+        console.log('Olisc is not installed but enabled in config, disabling it now')
+        defaultConfig.Olisc.enabled = false
+    }
+}
+
 module.exports = defaultConfig
