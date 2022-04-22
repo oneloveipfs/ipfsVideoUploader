@@ -691,6 +691,11 @@ textarea {
 }
 
 /* Beneficiaries */
+#beneficiaryHeadingHive, #beneficiaryHeadingSteem, #beneficiaryHeadingBlurt {
+    margin-block-start: 0.25em;
+    margin-block-end: 0.25em;
+}
+
 #newBeneficiaryUser {
     width: 253px;
 }
@@ -1002,9 +1007,20 @@ textarea {
     opacity: 0.6;
     cursor: not-allowed;
 }
+.styledButtonSmall {
+    padding: 6px 18px;
+    font-size: 15px;
+    border-width: 1px;
+}
 .darkmode .styledButton {
     border: 2px solid #ffffff;
     color: #ffffff;
+}
+.darkmode .styledButtonSmall {
+    border: 1px solid #ffffff;
+}
+#uploadActions .styledButtonSmall {
+    transform: translate(0px, 10px);
 }
 #buttons {
     margin-left: auto;

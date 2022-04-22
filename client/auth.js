@@ -37,7 +37,8 @@ async function Hive() {
                         // HiveAuth login
                         try {
                             hiveAuthLogin = JSON.parse(localStorage.getItem('hiveAuth'))
-                            window.hiveauth.authenticate(hiveAuthLogin,APP_META,{})
+                            if (hiveAuthLogin)
+                                window.hiveauth.authenticate(hiveAuthLogin,APP_META,{})
                         } catch {}
                     }
                     displayLoginMessage()

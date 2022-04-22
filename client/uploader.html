@@ -140,14 +140,14 @@
                         <option>Steem</option>
                         <option>Blurt</option>
                     </select>
-                    <a class="styledButton" id="appendBeneficiaryBtn">+</a><br>
-                    <h3 style="margin-block-end: 0.25em;">Hive beneficiaries</h3>
+                    <a class="styledButton" id="appendBeneficiaryBtn">+</a><br><br>
+                    <h3 id="beneficiaryHeadingHive">Hive beneficiaries</h3>
                     <table class="beneficiaryTableList" id="beneficiaryTableListHive"></table>
                     <h4 class="totalBeneficiariesLabel" id="totalBeneficiariesLabelHive">Total Hive beneficiaries: 0%</h4>
-                    <h3 style="margin-block-end: 0.25em;" id="beneficiaryHeadingSteem">Steem beneficiaries</h3>
+                    <h3 id="beneficiaryHeadingSteem">Steem beneficiaries</h3>
                     <table class="beneficiaryTableList" id="beneficiaryTableListSteem"></table>
                     <h4 class="totalBeneficiariesLabel" id="totalBeneficiariesLabelSteem">Total Steem beneficiaries: 0%</h4>
-                    <h3 style="margin-block-end: 0.25em;" id="beneficiaryHeadingBlurt">Blurt beneficiaries</h3>
+                    <h3 id="beneficiaryHeadingBlurt">Blurt beneficiaries</h3>
                     <table class="beneficiaryTableList" id="beneficiaryTableListBlurt"></table>
                     <h4 class="totalBeneficiariesLabel" id="totalBeneficiariesLabelBlurt">Total Blurt beneficiaries: 0%</h4>
                     <div id="hiveCommunity">
@@ -162,8 +162,10 @@
                     </div><br>
                 </div>
             </div>
-            <input class="styledButton" type="submit" value="Upload!" id="submitbutton">
-            <input class="styledButton" type="button" value="Save draft" id="draftBtn">
+            <div id="uploadActions">
+                <input class="styledButton" type="submit" value="Upload!" id="submitbutton">
+                <input class="styledButton styledButtonSmall" type="button" value="Save draft" id="draftBtn">
+            </div>
             <h4 id="loggedInUser">Detecting login...</h4>
             <h4 id="platformStr">Loading platforms...</h4>
             <div class="progressBack" id="uploadProgressBack">
