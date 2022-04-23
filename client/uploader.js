@@ -37,6 +37,7 @@ let avalonKey = sessionStorage.getItem('avalonKey')
 
 // Post parameters (videohash, video240, video480 etc)
 let postparams = {}
+let scheduleDatePicker
 
 // Socket.io connection to server
 let uplStat
@@ -201,6 +202,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else {
         console.log('tus is not supported')
     }
+
+    // Scheduled uploads date and time picker
+    const oneYear = 31536000000
+    const now = Math.ceil(new Date().getTime() / 300000) * 300000
+    scheduleDatePicker = flatpickr('#scheduleposttime',{
+        enableTime: true,
+        dateFormat: 'F j, Y G:i K',
+        minDate: new Date(now),
+        maxDate: new Date(now+(100*oneYear)),
+        minuteIncrement: 5,
+        onChange: (selectedTime, dateStr, instance) => {
+            let s = new Date(selectedTime[0]).getTime()
+            if (!Number.isInteger(s/300000))
+                scheduleDatePicker.setDate(Math.ceil(s / 300000) * 300000)
+        }
+    })
 
     document.getElementById('languages').innerHTML = langOptions
 

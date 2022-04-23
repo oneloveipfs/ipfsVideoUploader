@@ -37,6 +37,19 @@ window.ontouchstart = windowClick
 function windowClick(event) {
     closeMenu(event)
     dismissPopup(event,'refillPopup')
+    let target = event.target
+    if (target.tagName.toLowerCase() === 'svg')
+        target = target.parentElement
+    if (scheduleDatePicker && target.id !== ('scheduleposttime') && !isClickingDateTimePicker(target.classList))
+        scheduleDatePicker.close()
+}
+
+function isClickingDateTimePicker(classList = []) {
+    classList = Array.from(classList)
+    for (let i in classList)
+        if (classList[i].startsWith('flatpickr') || classList[i].startsWith('numInput') || classList[i] === 'arrowUp' || classList[i] === 'arrowDown')
+            return true
+    return false
 }
 
 function closeMenu(event) {
