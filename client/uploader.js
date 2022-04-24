@@ -167,6 +167,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             beneficiariesDescText += ' Avalon beneficiaries are set in blockchain config such that @dtube receives 10% of DTUBE curation rewards.'
         document.getElementById('beneficiariesDesc').innerText = beneficiariesDescText
 
+        if (config.olisc)
+            updateDisplayByIDs(['schedulepost'],[])
+
         // Hide Avalon first curated tag info if not logged in with Avalon
         if (!avalonUser || (!avalonKey && (!avalonKc || !avalonKcUser))) {
             document.getElementById('tagInfo1').style.display = 'none'

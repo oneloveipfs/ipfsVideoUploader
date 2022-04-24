@@ -310,7 +310,15 @@ app.get('/pinsByType',(request,response) => {
 })
 
 app.get('/config',(req,res) => {
-    res.send(Config.ClientConfig)
+    let configRes = {}
+    for (let c in Config.ClientConfig)
+        configRes[c] = Config.ClientConfig[c]
+    if (Config.Olisc.enabled)
+        configRes.olisc = {
+            apiNamespace: Config.Olisc.apiNamespace,
+            runInterval: Config.Olisc.runInterval
+        }
+    res.send(configRes)
 })
 
 app.get('/activeusers',(req,res) => {
