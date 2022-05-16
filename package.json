@@ -100,7 +100,7 @@
     "node-schedule": "^2.1.0",
     "node-webvtt": "^1.9.1",
     "shelljs": "^0.8.5",
-    "socket.io": "^4.4.1"
+    "socket.io": "^4.5.0"
   },
   "devDependencies": {
     "browserify": "^17.0.0",
