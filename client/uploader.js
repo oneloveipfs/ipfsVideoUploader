@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('beneficiariesDesc').innerText = beneficiariesDescText
 
         if (config.olisc)
-            updateDisplayByIDs(['schedulepost'],[])
+            updateDisplayByIDs(['schedulepost','scheduledStr'],[])
 
         // Hide Avalon first curated tag info if not logged in with Avalon
         if (!avalonUser || (!avalonKey && (!avalonKc || !avalonKcUser))) {
@@ -234,8 +234,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             let s = new Date(selectedTime[0]).getTime()
             if (!Number.isInteger(s/300000))
                 scheduleDatePicker.setDate(Math.ceil(s / 300000) * 300000)
+            document.getElementById('scheduledStr').innerText = 'Scheduled to publish at '+new Date(Math.ceil(s / 300000) * 300000).toLocaleString()
         }
     })
+
+    document.getElementById('schedulepostswitch').onchange = () => {
+        if (document.getElementById('schedulepostswitch').checked) {
+            updateDisplayByIDs(['schedulepostdetails'],[])
+            if (scheduleDatePicker.selectedDates.length > 0)
+                document.getElementById('scheduledStr').innerText = 'Scheduled to publish at '+new Date(scheduleDatePicker.selectedDates[0]).toLocaleString()
+            else
+                document.getElementById('scheduledStr').innerText = 'Please select a date and time to schedule'
+        } else {
+            updateDisplayByIDs([],['schedulepostdetails'])
+            document.getElementById('scheduledStr').innerText = 'Publishing immediately'
+        }
+    }
 
     document.getElementById('languages').innerHTML = langOptions
 
@@ -307,6 +321,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (tag.length == 0)
             return alert('Please enter some tags (up to 8) for your video!')
         postparams.tags = tags
+
+        if (document.getElementById('schedulepostswitch').checked) {
+            if (scheduleDatePicker.selectedDates.length === 0)
+                return alert('Please select a date/time to schedule posting')
+            postparams.scheduled = scheduleDatePicker.selectedDates[0].getTime()
+        } else
+            postparams.scheduled = false
 
         // Avalon bandwidth check (untested)
         // if (avalonUser && avalonKey && needsBandwidth())
@@ -699,6 +720,9 @@ function postVideo() {
     for (let j = 0; j < requiredFields.length; j++)
         if (!postparams[requiredFields[j]]) return console.log('missing hash, not proceeding with broadcast')
 
+    if (postparams.scheduled)
+        document.getElementById('uploadProgressFront').innerHTML = 'Scheduling broadcasts...'
+
     hiveBroadcast()
 }
 
@@ -712,6 +736,9 @@ function hiveBroadcast() {
     console.log('Hive tx',hiveTx)
     if (!hiveDisplayUser || supportedPlatforms.hive.filter((p) => isPlatformSelected[p]).length === 0 || config.noBroadcast)
         return hiveCb({})
+
+    if (postparams.scheduled)
+        return olisc.new(hiveTx,'hive',postparams.scheduled).then(() => hiveCb({})).catch((e) => hiveCb({error: axiosErrorMessage(e)}))
 
     document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Hive...'
 
@@ -756,7 +783,8 @@ async function avalonBroadcast() {
     if (!dtcDisplayUser || supportedPlatforms.avalon.filter((p) => isPlatformSelected[p]).length === 0 || config.noBroadcast)
         return avalonCb()
 
-    document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Avalon...'
+    if (!postparams.scheduled)
+        document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Avalon...'
     let tag = ''
     if (postparams.tags.length !== 0)
         tag = postparams.tags[0]
@@ -789,6 +817,8 @@ async function avalonBroadcast() {
             tx.data.burn = burnAmt
         }
         console.log('Avalon tx',tx)
+        if (postparams.scheduled)
+            return olisc.new(tx,'avalon',postparams.scheduled).then(() => avalonCb()).catch((e) => avalonCb(axiosErrorMessage(e)))
         let signedtx
         if (avalonKc && avalonKcUser) {
             let stringifiedRawTx = JSON.stringify(tx)
@@ -842,6 +872,8 @@ function blurtBroadcaster() {
     if (blurtUser && supportedPlatforms.blurt.filter((p) => isPlatformSelected[p]).length > 0 && !config.noBroadcast) {
         let blurtTx = generatePost('blurt')
         console.log('Blurt tx',blurtTx)
+        if (postparams.scheduled)
+            return olisc.new(blurtTx,'blurt',postparams.scheduled).then(() => blurtCb({})).catch((e) => blurtCb({error: axiosErrorMessage(e)}))
         document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Blurt...'
         if (isElectron())
             blurt.broadcast.send({ extensions: [], operations: blurtTx },[sessionStorage.getItem('blurtKey')],(e) => blurtCb({error: e}))
@@ -866,8 +898,10 @@ function bcError(tool,e) {
 function bcFinish() {
     document.getElementById('uploadProgressFront').style.width = '100%'
     document.getElementById('uploadProgressFront').innerHTML = 'All done'
-    postpublish()
-    updateDisplayByIDs(['postpublish'],['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','settings'])
+    if (!postparams.scheduled) {
+        postpublish()
+        updateDisplayByIDs(['postpublish'],['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','settings'])
+    }
 }
 
 function generatePermlink() {

@@ -524,9 +524,11 @@ if (Config.Olisc.enabled) {
     const olisc = require('olisc')
     const oliscAuthFunc = (req) => {
         return new Promise((rs) => {
-            if (request.query.scauth === 'true')
+            if (req.route.path === Config.Olisc.apiNamespace+'/')
+                return rs({})
+            if (req.query.scauth === 'true')
                 // Handle HiveSigner access token
-                Auth.scAuth(access_token,needscredits,(err,user,network) => err ? rs({error: err}) : rs({user: user, network: network}))
+                Auth.scAuth(req.query.access_token,false,(err,user,network) => err ? rs({error: err}) : rs({user: user, network: network}))
             else
                 // Handle access token from /logincb
                 Auth.verifyAuth(req.query.access_token,false,(e,result) => e ? rs({ error: e }) : rs(result))

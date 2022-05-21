@@ -36,10 +36,14 @@ function updateDisplayByIDs(toshow,tohide) {
 }
 
 function axiosErrorHandler(e) {
+    alert(axiosErrorMessage(e))
+}
+
+function axiosErrorMessage(e) {
     if (e.response && e.response.data && e.response.data.error)
-        alert(e.response.data.error)
+        return e.response.data.error
     else
-        alert(e.toString())
+        return e.toString()
 }
 
 function thousandSeperator(num) {

@@ -747,7 +747,7 @@ textarea {
     margin-block-start: 0.25em;
     margin-block-end: 0.5em;
 }
-#schedulepostdetails, #schedulepost { display: none; }
+#schedulepostdetails, #schedulepost, #scheduledStr { display: none; }
 #scheduleposttime { width: 200px; }
 
 /* Thumbnail swapper tool */
