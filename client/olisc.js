@@ -10,10 +10,10 @@ let olisc = {
         return await olisc.call('delete','/delete',{id})
     },
     get: async (id) => {
-        return await olisc.call('get','/get',{id})
+        return await olisc.call('get','/get/'+id,{})
     },
     list: async (filter) => {
-        return await olisc.call('get','/list',{filter})
+        return await olisc.call('post','/list',{filter})
     },
     call: async (verb,method,json) => {
         return (await axios[verb]('/olisc'+method+geturl,json)).data
