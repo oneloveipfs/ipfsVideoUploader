@@ -900,7 +900,7 @@ function bcFinish() {
     document.getElementById('uploadProgressFront').innerHTML = 'All done'
     if (!postparams.scheduled) {
         postpublish()
-        updateDisplayByIDs(['postpublish'],['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','settings'])
+        updateDisplayByIDs(['postpublish'],['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','settings','scheduledPublishes'])
     }
 }
 

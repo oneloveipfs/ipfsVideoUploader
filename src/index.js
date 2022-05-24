@@ -531,7 +531,12 @@ if (Config.Olisc.enabled) {
                 Auth.scAuth(req.query.access_token,false,(err,user,network) => err ? rs({error: err}) : rs({user: user, network: network}))
             else
                 // Handle access token from /logincb
-                Auth.verifyAuth(req.query.access_token,false,(e,result) => e ? rs({ error: e }) : rs(result))
+                Auth.verifyAuth(req.query.access_token,false,(e,result) => {
+                    if (e) return rs({ error: e })
+                    if (result.network === 'dtc')
+                        result.network = 'avalon'
+                    rs(result)
+                })
         })
     }
     olisc.init(app,Config.Olisc,null,oliscAuthFunc).finally(route404)

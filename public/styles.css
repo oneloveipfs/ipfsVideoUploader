@@ -334,7 +334,7 @@ hr {
     opacity: 1;
 }
 
-#uploadForm, #thumbnailSwapper, #yourFiles, #wcinfo, #refillnotify, #refiller, #getHelp, #needsrefillnotify, #disabledPage, #settings, #postpublish {
+#uploadForm, #thumbnailSwapper, #yourFiles, #wcinfo, #refillnotify, #refiller, #getHelp, #needsrefillnotify, #disabledPage, #settings, #scheduledPublishes, #postpublish {
     margin-left: auto;
     margin-right: auto;
     width: 700px;
@@ -783,36 +783,43 @@ textarea {
     width: 220px;
 }
 
-#newSnapField, #swapSubmitBtn, #yourFiles, #wcinfo, #refiller, #getHelp, #settings, #postpublish {
+#newSnapField, #swapSubmitBtn, #yourFiles, #wcinfo, #refiller, #getHelp, #settings, #scheduledPublishes, #postpublish {
     display: none;
 }
 
-#yourFiles table tr td:nth-child(1) { text-align: left; }
+#yourFiles table tr td:nth-child(1),
+#scheduledPublishes tbody tr td:nth-child(1),
+#scheduledPublishes tbody tr td:nth-child(2) { text-align: left; }
+#scheduledPublishes tbody tr td:nth-child(3) { text-align: center; }
 #yourFiles table tr td:nth-child(2),
 #refillHistoryTbl tbody tr td:nth-child(1),
 #refillHistoryTbl tbody tr td:nth-child(2) { text-align: right; }
-#yourFiles table thead tr td, #refillHistoryTbl thead tr td, #aliasList thead tr td { font-size: 23px; }
-#yourFiles table tbody tr td, #refillHistoryTbl tbody tr td, #aliasList tbody tr td { font-size: 16px; }
+#yourFiles table thead tr td, #refillHistoryTbl thead tr td, #aliasList thead tr td, #scheduledPublishes thead tr td { font-size: 23px; }
+#yourFiles table tbody tr td, #refillHistoryTbl tbody tr td, #aliasList tbody tr td, #scheduledPublishes tbody tr td { font-size: 16px; }
 #yourFiles a { color: #000000; }
 #yourFiles a:visited { color: #000000; }
 #yourFiles a:hover { color: #000000; }
 #yourFiles a:active { color: #000000; }
-#refillHistoryTbl, #yourFiles table, #aliasList { border-collapse: collapse; }
+#refillHistoryTbl, #yourFiles table, #aliasList, #scheduledPublishes table { border-collapse: collapse; }
 #refillHistoryTbl, #refillHistoryTbl tr, #refillHistoryTbl td,
 #yourFiles table, #yourFiles table tr, #yourFiles table td,
-#aliasList, #aliasList tr, #aliasList td { border: 1px solid black; }
+#aliasList, #aliasList tr, #aliasList td,
+#scheduledPublishes tr, #scheduledPublishes td { border: 1px solid black; }
 #newAliasUser, #newAliasKey { width: 95%; }
 #newAliasNet { width: 100%; }
 #newAlias td:nth-child(5) { width: 32px; }
 
 /* Dark mode */
-.darkmode #yourFiles a { color: #ffffff; }
-.darkmode #yourFiles a:visited { color: #ffffff; }
-.darkmode #yourFiles a:hover { color: #ffffff; }
+.darkmode #yourFiles a,
+.darkmode #yourFiles a:visited,
+.darkmode #yourFiles a:hover,
 .darkmode #yourFiles a:active { color: #ffffff; }
 .darkmode #refillHistoryTbl, .darkmode #refillHistoryTbl tr, .darkmode #refillHistoryTbl td,
 .darkmode #yourFiles table, .darkmode #yourFiles table tr, .darkmode #yourFiles table td,
-.darkmode #aliasList, .darkmode #aliasList tr, .darkmode #aliasList td { border: 1px solid #ffffff; }
+.darkmode #aliasList, .darkmode #aliasList tr, .darkmode #aliasList td,
+.darkmode #scheduledPublishes table,
+.darkmode #scheduledPublishes tr,
+.darkmode #scheduledPublishes td { border: 1px solid #ffffff; }
 
 #wcinfo h4 {
     font-size: 17px;

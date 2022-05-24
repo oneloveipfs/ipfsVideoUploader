@@ -21,3 +21,42 @@ let olisc = {
 }
 
 window.olisc = olisc
+
+function handleOliscFilterSelection(selected) {
+    switch (selected.selectedIndex) {
+        case 0:
+            break
+        case 1:
+            loadOliscList('pending')
+            break
+        case 2:
+            loadOliscList('success')
+            break
+        case 3:
+            loadOliscList('errored')
+            break
+        default:
+            break
+    }
+}
+
+async function loadOliscList(status) {
+    let list = await olisc.list({status})
+    let result = ''
+    for (let i in list) {
+        result += '<tr><td>'+list[i]._id+'</td><td>'+list[i].operationNetwork+'</td><td>'
+        if (list[i].operationNetwork === 'avalon')
+            result += 'Type '+list[i].operation.type
+        else
+            result += joinGrapheneOps(list[i].operation)
+        result += '</td><td>View</td>'
+    }
+    document.getElementById('oliscTbody').innerHTML = result
+}
+
+function joinGrapheneOps(operations) {
+    let opNames = []
+    for (let op in operations)
+        opNames.push(operations[op][0])
+    return opNames.join(', ')
+}

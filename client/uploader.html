@@ -59,6 +59,7 @@
                     <a id="refillCrModeBtn">Refill Credits</a>
                     <a id="getHelpModeBtn">Get Help</a>
                     <a id="settingsModeBtn">User Settings</a>
+                    <a id="oliscModeBtn">Scheduled Publishes</a>
                 </div>
             </div>
         </div>
@@ -319,6 +320,20 @@
             </label><h3 class="poweruptext"> Dark Mode</h3><br><br>
             <input type="button" class="styledButton" id="settingSaveBtn" value="Save" onclick="saveSettings()">
             <input type="button" class="styledButton" id="settingResetBtn" value="Reset" onclick="fillSettings()">
+        </div>
+        <div id="scheduledPublishes">
+            <h2>Scheduled Publishes</h2>
+            <h4>View operations that have been scheduled through our Olisc API.</h4>
+            <h4>Filter by status: <select onchange="handleOliscFilterSelection(this)">
+                <option>Select...</option>
+                <option>Pending</option>
+                <option>Success</option>
+                <option>Errored</option>
+            </select></h4>
+            <table style="width: 100%;">
+                <thead><tr><td>ID</td><td>Network</td><td>Operation</td><td>View</td></tr></thead>
+                <tbody id="oliscTbody"></tbody>
+            </table>
         </div>
         <div id="postpublish">
             <h4>Video published to platforms and chains successfully. Some things to do next...</h4>

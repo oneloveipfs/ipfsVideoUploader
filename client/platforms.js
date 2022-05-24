@@ -21,7 +21,7 @@ const isPlatformSelected = {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    let pages = ['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings','postpublish']
+    let pages = ['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings','scheduledPublishes','postpublish']
     document.getElementById('newUploadModeBtn').onclick = () => updateDisplayByIDs(['uploadForm'],pages)
     document.getElementById('snapSwapModeBtn').onclick = () => updateDisplayByIDs(['thumbnailSwapper'],pages)
     document.getElementById('yourFilesModeBtn').onclick = () => updateDisplayByIDs(['yourFiles'],pages)
@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('refillCrModeBtn').onclick = () => updateDisplayByIDs(['refiller'],pages)
     document.getElementById('getHelpModeBtn').onclick = () => updateDisplayByIDs(['getHelp'],pages)
     document.getElementById('settingsModeBtn').onclick = () => updateDisplayByIDs(['settings'],pages)
+    document.getElementById('oliscModeBtn').onclick = () => updateDisplayByIDs(['scheduledPublishes'],pages)
 })
 
 window.onclick = windowClick
