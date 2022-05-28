@@ -10,6 +10,8 @@ const Shawp = require('./shawp')
 const HivecryptPro = require('./hivecryptPro')
 const dir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 
+Avalon.init({api: Config.Shawp.AvalonAPI})
+
 // If whitelist file doesn't exist create it
 if (!fs.existsSync(dir+'/whitelist.txt'))
     fs.writeFileSync(dir+'/whitelist.txt','')
