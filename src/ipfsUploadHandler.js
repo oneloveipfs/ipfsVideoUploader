@@ -280,7 +280,7 @@ let uploadOps = {
             if (err) return response.status(400).send({error: err})
             if (!request.body.streamId) return response.status(400).send({error: 'Missing streamId'})
             let segmentDir = request.file.path
-            addFile(segmentDir,true,false,(size,hash) => {
+            addFile(segmentDir,false,false,(size,hash) => {
                 // We will finalize total stream size after livestream ends,
                 // for now it does not count towards disk usage. Alive streams
                 // record as network/streamer/link so that the full list of
