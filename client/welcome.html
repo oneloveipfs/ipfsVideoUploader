@@ -181,7 +181,7 @@
                                 </tr>
                                 <tr onclick="if (!window.logins.steemUser) updateDisplayByIDs(['loginformsteem'],['loginformmain'])">
                                     <td>
-                                        <h4>Steem</h4>
+                                        <h4>Steem (deprecated)</h4>
                                         <h5>Posts to DTube</h5>
                                     </td>
                                     <td id="loginnetworksteem">></td>
@@ -232,11 +232,13 @@
                             <a class="roundedBtn kcAuth" id="blurtAuthBtn" onclick="blurtLogin()">Login with Keychain</a>
                         </div>
                         <div id="loginformsteem">
-                            <div class="warningbox">Please note that OneLoveIPFS provides very limited support for Steem network. We reserve the right not to resolve any posting issues associated with Steem, therefore please be cautious if you choose to proceed.</div>
                             <a onclick="updateDisplayByIDs(['loginformmain'],['loginformsteem'])"><< Back</a><br><br>
+                            <div class="warningbox">Please note that Steem has been deprecated in OneLoveIPFS and may be removed in the future. We reserve the right not to resolve any posting issues associated with Steem, therefore please be cautious if you choose to proceed.</div>
+                            <a class="roundedBtn" id="steemProceedAnyway" onclick="updateDisplayByIDs(['actualSteemLoginForm'],['steemProceedAnyway'])">I understand the above, proceed anyway</a>
+                            <div id="actualSteemLoginForm" style="display: none;">
                             <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="steemLoginUsername" class="loginFields">
                             <input type="password" placeholder="STEEM Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="steemLoginKey" class="loginFields">
-                            <a class="roundedBtn kcAuth" id="steemAuthBtn" onclick="steemLogin()">Login with Keychain</a>
+                            <a class="roundedBtn kcAuth" id="steemAuthBtn" onclick="steemLogin()">Login with Keychain</a></div>
                         </div>
                     </div>
                     <div id="persistentform">
