@@ -53,7 +53,7 @@
                 <a id="modeBtn" class="headerBtn" onclick="topbarItmClicked('dropdownbox')" onmouseenter="topbarItmHover('dropdownArrow')" onmouseleave="topbarItmLeave('dropdownArrow')"><p id="headerMenu">Menu <i id="dropdownArrow" class="dropdownArrow"></i></p></a>
                 <div id="dropdownbox" class="dropdown-content">
                     <a id="newUploadModeBtn">New Upload</a>
-                    <a id="snapSwapModeBtn">Thumbnail Swap</a>
+                    <a id="snapSwapModeBtn">Metadata Editor</a>
                     <a id="yourFilesModeBtn">Your Files</a>
                     <a id="subDetModeBtn">Account Details</a>
                     <a id="refillCrModeBtn">Refill Credits</a>
@@ -190,9 +190,11 @@
         </div>
         <div id="thumbnailSwapper">
             <div class="warningbox" id="thumbnailSwapNoAvalon">As you are not logged in with Avalon, the post on Avalon will not be updated. Therefore, only the Hive post will be updated with the new thumbnail.</div>
-            <h3>Link to d.tube video to swap thumbnail:</h3>
-            <input type="text" class="meta" placeholder="Paste d.tube link here" id="thumbnailSwapLink">
+            <h2>Metadata Edit</h2>
+            <h4>Edit your video title, description, tags, subtitles and thumbnails with our editing tool. Useful for cross-posted videos as the editing tool of one platform may break the video metadata of the same video posted to other platforms.</h4>
+            <input type="text" class="meta" placeholder="Paste URL here (supported: dtube links, 3speak app uri, hive/blurt frontends)" id="thumbnailSwapLink">
             <a class="roundedBtn" id="linkSubmitBtn">Submit Link</a>
+            <!--
             <div id="linkResult">
                 <table><tr>
                     <td id="currentSnap"></td>
@@ -200,7 +202,7 @@
                 </tr></table>
                 <h3 id="newSnapField">Upload new thumbnail to replace (4MB max): <input type="file" accept="image/jpeg,image/png" id="newSnap"></h3>
                 <input class="styledButton" type="submit" value="Submit!" id="swapSubmitBtn"><br>
-            </div>
+            </div>-->
         </div>
         <div id="yourFiles">
             <h2>Your files</h2>

@@ -1,3 +1,4 @@
+/*
 let steemPostToModify
 let avalonPostToModify
 let hivePostToModify
@@ -405,3 +406,4 @@ function reenableSnapSwapFields() {
     const toEnable = ['linkSubmitBtn','thumbnailSwapLink','newSnap','swapSubmitBtn']
     for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i]).disabled = false
 }
+*/
