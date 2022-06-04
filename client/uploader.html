@@ -325,7 +325,7 @@
             <div id="scheduledList">
                 <h2>Scheduled Publishes</h2>
                 <h4>View operations that have been scheduled through our Olisc API.</h4>
-                <h4>Filter by status: <select onchange="handleOliscFilterSelection(this)">
+                <h4>Filter by status: <select onchange="handleOliscFilterSelection(this)" id="oliscStatusSelection">
                     <option>Select...</option>
                     <option>Pending</option>
                     <option>Success</option>
@@ -343,7 +343,8 @@
                 <p id="oliscNetwork"></p>
                 <p id="oliscScheduled"></p>
                 <h3>Operation:</h3>
-                <div id="oliscEditor" style="height: 500px;"></div>
+                <div id="oliscEditor" style="height: 500px;"></div><br>
+                <input class="styledButton" type="submit" value="Delete" id="oliscDeleteBtn">
             </div>
         </div>
         <div id="postpublish">

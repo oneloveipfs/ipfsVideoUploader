@@ -16,7 +16,10 @@ let olisc = {
         return await olisc.call('post','/list',{filter})
     },
     call: async (verb,method,json) => {
-        return (await axios[verb]('/olisc'+method+geturl,json)).data
+        if (verb !== 'delete')
+            return (await axios[verb]('/olisc'+method+geturl,json)).data
+        else
+            return (await axios[verb]('/olisc'+method+geturl,{ data: json, headers: { 'content-type': 'application/json' }})).data
     }
 }
 
@@ -80,6 +83,17 @@ function viewOliscOp(id) {
         ace: ace
     })
     oliscEditor.set(oliscLoaded[id].operation)
+    document.getElementById('oliscDeleteBtn').onclick = () => {
+        let confirmation = confirm('Do you wish to delete this operation from Olisc? This action cannot be undone.')
+        if (confirmation)
+            olisc.delete(id).then(() => {
+                updateDisplayByIDs(['scheduledList'],['scheduledView'])
+                handleOliscFilterSelection(document.getElementById('oliscStatusSelection'))
+            }).catch((e) => {
+                console.log(e.response)
+                alert('Failed to delete operation, check the browser console for details.')
+            })
+    }
     updateDisplayByIDs(['scheduledView'],['scheduledList'])
 }
 
