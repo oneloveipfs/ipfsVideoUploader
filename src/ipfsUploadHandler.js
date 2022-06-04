@@ -225,7 +225,7 @@ let uploadOps = {
             if (!request.file) return response.status(400).send({error: 'No files have been uploaded.'})
             let uploadedImg = request.file.filename
             addFile(defaultDir+'/'+uploadedImg,trickleDagAdd,false,(size,hash) => {
-                // Log IPFS hashes by Steem account
+                // Log IPFS hashes by account
                 // If hash is not in database, add the hash into database
                 if (!request.query.onlyhash) {
                     db.recordHash(username,network,imgType,hash,request.file.size)

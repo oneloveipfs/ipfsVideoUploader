@@ -64,18 +64,7 @@ function loadGrapheneAuthorityStatus(account,network) {
         document.getElementById(network + 'AuthorizeBtn').innerText = 'Authorize ' + capNetwork
         document.getElementById(network + 'AuthorizeBtn').onclick = () => {
             if (authorizing) return
-            if (network === 'steem' && steem_keychain && steemUser) {
-                authorizing = true
-                steem_keychain.requestAddAccountAuthority(steemUser,config.steemloginApp,'Posting',1,(result) => {
-                    authorizing = false
-                    if (!result.error)
-                        steem.api.getAccounts([steemUser],(e,r) => loadGrapheneAuthorityStatus(r[0],'steem'))
-                    else
-                        alert(result.message)
-                })
-            } else if (network === 'steem') {
-                window.open('https://steemlogin.com/authorize/' + config.steemloginApp)
-            } else if (network === 'hive' && hive_keychain && username) {
+            if (network === 'hive' && hive_keychain && username) {
                 authorizing = true
                 hive_keychain.requestAddAccountAuthority(username,config.hivesignerApp,'Posting',1,(result) => {
                     authorizing = false
@@ -103,18 +92,7 @@ function loadGrapheneAuthorityStatus(account,network) {
         document.getElementById(network + 'AuthorizeBtn').innerText = 'Revoke ' + capNetwork
         document.getElementById(network + 'AuthorizeBtn').onclick = () => {
             if (authorizing) return
-            if (network === 'steem' && steem_keychain && steemUser) {
-                authorizing = true
-                steem_keychain.requestRemoveAccountAuthority(steemUser,config.steemloginApp,'Posting',(result) => {
-                    authorizing = false
-                    if (!result.error)
-                        steem.api.getAccounts([steemUser],(e,r) => loadGrapheneAuthorityStatus(r[0],'steem'))
-                    else
-                        alert(result.message)
-                })
-            } else if (network === 'steem') {
-                window.open('https://steemlogin.com/revoke/' + config.steemloginApp)
-            } else if (network == 'hive' && hive_keychain && username) {
+            if (network == 'hive' && hive_keychain && username) {
                 authorizing = true
                 hive_keychain.requestRemoveAccountAuthority(username,config.hivesignerApp,'Posting',(result) => {
                     authorizing = false
