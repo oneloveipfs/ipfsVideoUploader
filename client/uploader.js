@@ -918,7 +918,7 @@ function postThumbnailByPlatform(network) {
     let pf = pfPostEmbed(network)
     switch (pf) {
         case '3Speak':
-            return '<center>[![]('+postparams.imghash+')](https://3speak.tv/watch?v='+usernameByNetwork(network)+'/'+postparams.permlink+')</center><hr>'
+            return '<center>[![](https://ipfs.io/ipfs/'+postparams.imghash+')](https://3speak.tv/watch?v='+usernameByNetwork(network)+'/'+postparams.permlink+')</center><hr>'
         case 'DTube':
             return '<center><a href=\'https://d.tube/#!/v/'+usernameByNetwork(network)+'/'+postparams.permlink+'\'><img src=\'https://ipfs.io/ipfs/'+postparams.imghash+'\'></a></center><hr>'
     }
