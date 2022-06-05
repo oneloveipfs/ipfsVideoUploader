@@ -29,7 +29,7 @@
         <script src="client/beneficiaries.js"></script>
         <script src="client/olisc.js"></script>
         <script src="client/uploader.js"></script>
-        <script src="client/thumbnailSwapper.js"></script>
+        <script src="client/editor.js"></script>
         <script src="client/yourfiles.js"></script>
         <script src="client/wcinfo.js"></script>
         <script src="client/getHelp.js"></script>
@@ -193,7 +193,7 @@
             <h2>Metadata Edit</h2>
             <h4>Edit your video title, description, tags, subtitles and thumbnails with our editing tool. Useful for cross-posted videos as the editing tool of one platform may break the video metadata of the same video posted to other platforms.</h4>
             <input type="text" class="meta" placeholder="Paste URL here (supported: dtube links, 3speak app uri, hive/blurt frontends)" id="thumbnailSwapLink">
-            <a class="roundedBtn" id="linkSubmitBtn">Submit Link</a>
+            <a class="roundedBtn" id="linkSubmitBtn" onclick="onEditLinkSubmit()">Submit Link</a>
             <!--
             <div id="linkResult">
                 <table><tr>

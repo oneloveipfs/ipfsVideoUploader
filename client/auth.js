@@ -167,7 +167,7 @@ function displayLoginMessage(errored) {
 }
 
 function restrict() {
-    const toDisable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton','newLanguageField','chooseSubBtn','uploadSubBtn','thumbnailSwapLink','linkSubmitBtn','newSnap','swapSubmitBtn']
+    const toDisable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton','newLanguageField','chooseSubBtn','uploadSubBtn','metadataEditLink','linkSubmitBtn','newSnap','swapSubmitBtn']
     for (let i = 0; i < toDisable.length; i++) document.getElementById(toDisable[i]).disabled = true
 }
 
