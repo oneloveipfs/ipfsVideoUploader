@@ -20,11 +20,11 @@ const dtubeLinks = [
 const threespeakUri = '/watch/hive:'
 
 let editor = {
-    editing: false,
     editingPosts: {},
     editingPlatforms: [],
     steemIgnored: false,
-    refs: []
+    refs: [],
+    params: {}
 }
 
 function onEditLinkSubmit() {
@@ -118,6 +118,7 @@ function onEditLinkSubmit() {
 }
 
 // json metadata check up to 1 refs deep
+// editable metadata: title, description, tags (graphene chains only) and thumbnails only
 function editorJsonCheck(network, isRef = false) {
     let json = {}
     let refs = []
@@ -136,12 +137,30 @@ function editorJsonCheck(network, isRef = false) {
     // NOT 3speak.tv until we get to publish there without @threespeak posting auth
     if (network === 'hive' &&
         json.type === '3speak/video' &&
+        Array.isArray(json.tags) &&
         json.video && json.video.info &&
         (Array.isArray(json.sourceMap) || (json.video.content && json.video.info.platform === '3speak')) &&
         json.video.info.author === editor.editingPosts[network].author &&
         json.video.info.permlink === editor.editingPosts[network].permlink &&
-        !editor.editingPlatforms.includes('3Speak'))
+        !editor.editingPlatforms.includes('3Speak')) {
         editor.editingPlatforms.push('3Speak')
+        if (!isRef) {
+            // not sure which one
+            editor.params.title = json.title || json.video.info.title
+            editor.params.description = json.description || json.video.content.description
+            editor.params.tags = json.tags
+            if (Array.isArray(json.sourceMap))
+                for (let s in json.sourceMap) {
+                    if (json.sourceMap[s].type === 'thumbnail') {
+                        editor.params.imghash = json.sourceMap[s].url.replace('ipfs://','')
+                        break
+                    }
+                }
+            else {
+                editor.params.imghash = json.video.info.ipfsThumbnail
+            }
+        }
+    }
     
     // dtube 1.0+ on hive/blurt
     if ((network === 'hive' || network === 'blurt') &&
@@ -156,6 +175,17 @@ function editorJsonCheck(network, isRef = false) {
         editor.editingPlatforms.push('DTube')
         if (Array.isArray(json.refs))
             refs = json.refs
+    }
+    if (editor.editingPlatforms.indexOf('DTube') === 0) {
+        if (network === 'avalon') {
+            editor.params.title = json.title
+            editor.params.description = json.desc
+            editor.params.imghash = json.thumbnailURL || json.files.ipfs ? (json.files.ipfs.img ? (json.files.ipfs.img[360] || json.files.ipfs.img[118]) : '') : ''
+        } else {
+            editor.params.title = json.video.title
+            editor.params.description = json.video.desc
+            editor.params.imghash = json.video.thumbnailURL || json.video.files.ipfs ? (json.video.files.ipfs.img ? (json.video.files.ipfs.img[360] || json.video.files.ipfs.img[118]) : '') : ''
+        }
     }
 
     if (!isRef && editor.editingPlatforms.length === 0)
@@ -193,8 +223,22 @@ function editorJsonCheck(network, isRef = false) {
                         editorJsonCheck('avalon',true)
                     }
                 })
+            else if (refSplit === 'steem')
+                editor.steemIgnored = true
         }
-        editor.editing = true
+        document.getElementById('editTitle').value = editor.params.title
+        document.getElementById('editDescription').value = editor.params.description
+        if (Array.isArray(editor.params.tags))
+            document.getElementById('editTags').value = editor.params.tags.join(' ')
+        else
+            updateDisplayByIDs([],['editTagsField'])
+        let thumbUrl = ''
+        if (typeof editor.params.imghash === 'string' && editor.params.imghash.startsWith('http'))
+            thumbUrl = editor.params.imghash
+        else
+            thumbUrl = 'https://ipfs.io/ipfs/'+editor.params.imghash
+        document.getElementById('metaEditOldImg').setAttribute('src',thumbUrl)
+        updateDisplayByIDs(['linkResult'],['metaEditIntro'])
     } else
         editor.refs.push(network)
 }

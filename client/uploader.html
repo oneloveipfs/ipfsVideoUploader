@@ -191,17 +191,17 @@
         <div id="thumbnailSwapper">
             <div class="warningbox" id="thumbnailSwapNoAvalon">As you are not logged in with Avalon, the post on Avalon will not be updated. Therefore, only the Hive post will be updated with the new thumbnail.</div>
             <h2>Metadata Edit</h2>
-            <div id="metaEditIntro" style="display: none;">
+            <div id="metaEditIntro">
                 <h4>Edit your video title, description, tags and thumbnails with our editing tool. Useful for cross-posted videos as the editing tool of one platform may break the video metadata of the same video posted to other platforms.</h4>
                 <h4>NOTE: This editing tool is optimised for videos posted with OneLoveIPFS. If your video was posted through another uploader, it may be better to use the editing features on their respective frontends.</h4>
                 <input type="text" class="meta" placeholder="Paste URL here (supported: dtube links, 3speak app uri, hive/blurt frontends)" id="thumbnailSwapLink">
                 <a class="roundedBtn" id="linkSubmitBtn" onclick="onEditLinkSubmit()">Submit Link</a>
             </div>
-            <div id="linkResult">
+            <div id="linkResult" style="display: none;">
                 <a onclick="updateDisplayByIDs(['metaEditIntro'],['linkResult'])"><< Back</a>
                 <div id="metaEditThumbnail">
                     <div class="metaEditThumbItm metaEditThumb">
-                        <img src="https://ipfs.io/ipfs/QmR87Zd5LNbXqKX3ncDnKXDuDZgWTvQtnDKjptzX1xBpd5">
+                        <img id="metaEditOldImg" src="https://ipfs.io/ipfs/QmR87Zd5LNbXqKX3ncDnKXDuDZgWTvQtnDKjptzX1xBpd5">
                         <a class="metaEditOverlay" onclick="chooseReplacementThumbnail()">
                             <p>Replace Thumbnail</p>
                             <input type="file" accept="image/*" id="metaEditImg" style="display: none" onchange="selectReplacementThumbnail()">
@@ -216,10 +216,10 @@
                         <div class="metaEditThumbItm metaEditThumb" id="metaEditThumbNewImg"></div>
                     </div>
                 </div>
-                <h3>Title: <br><input type="text" id="title" name="title" class="meta"></h3>
+                <h3>Title: <br><input type="text" id="editTitle" name="title" class="meta"></h3>
                 <h3>Description: <br>
-                <textarea id="description" name="description"></textarea><a style="font-size: 15px;" onclick="fillDescription()">Insert from template</a><a style="font-size: 15px; margin-left: 15px;" onclick="updateDisplayByIDs(['settings'],['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings'])">Edit template</a></h3>
-                <h3><div id="tagLbl">Tags (seperated by space):</div><input type="text" id="tags" name="tags" class="meta"></h3>
+                <textarea id="editDescription" name="description"></textarea><a style="font-size: 15px;" onclick="fillDescription()">Insert from template</a><a style="font-size: 15px; margin-left: 15px;" onclick="updateDisplayByIDs(['settings'],['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings'])">Edit template</a></h3>
+                <h3 id="editTagsField"><div>Tags (seperated by space):</div><input type="text" id="editTags" name="tags" class="meta"></h3>
                 <input class="styledButton" type="submit" value="Submit!" id="swapSubmitBtn"><br>
             </div>
         </div>
