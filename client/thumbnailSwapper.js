@@ -7,7 +7,7 @@ let selectedPermlink
 
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('linkSubmitBtn').onclick = () => {
-        let linkInput = document.getElementById('metadataEditLink')
+        let linkInput = document.getElementById('metaEditLink')
         if (!linkInput.value.startsWith('https://d.tube/#!/v/') && !linkInput.value.startsWith('https://d.tube/v/'))
             return alert('Link provided is not a valid d.tube video link.')
         let split = linkInput.value.replace('/#!','').replace('https://d.tube/v/','').split('/')
@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         snapFormData.append('image',newSnap[0])
 
         document.getElementById('linkSubmitBtn').disabled = true
-        document.getElementById('metadataEditLink').disabled = true
+        document.getElementById('metaEditLink').disabled = true
         document.getElementById('newSnap').disabled = true
         document.getElementById('swapSubmitBtn').disabled = true
         
@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 function reenableSnapSwapFields() {
-    const toEnable = ['linkSubmitBtn','metadataEditLink','newSnap','swapSubmitBtn']
+    const toEnable = ['linkSubmitBtn','metaEditLink','newSnap','swapSubmitBtn']
     for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i]).disabled = false
 }
 */

@@ -695,7 +695,7 @@ function restrictImg() {
 }
 
 function reenableFields() {
-    const toEnable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton','newLanguageField','chooseSubBtn','uploadSubBtn','metadataEditLink','linkSubmitBtn','newSnap','swapSubmitBtn']
+    const toEnable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton','newLanguageField','chooseSubBtn','uploadSubBtn','metaEditLink','linkSubmitBtn','newSnap','swapSubmitBtn']
     for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i]).disabled = false
 }
 

@@ -80,12 +80,7 @@ body.darkmode {
     background-color: rgb(30, 32, 34);
     color: #ffffff;
 }
-.darkmode #sourcevideo,
-.darkmode #snapfile,
-.darkmode #video240p,
-.darkmode #video480p,
-.darkmode #video720p,
-.darkmode #video1080p {
+.darkmode input[type="file"] {
     background-color: transparent;
 }
 .darkmode select {
@@ -768,8 +763,64 @@ textarea {
     width: 100%;
 }
 
-#currentSnap {
-    width: 220px;
+#metaEditThumbnail {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-top: 20px;
+}
+
+.metaEditThumbItm {
+    display: table-cell;
+    position: relative;
+}
+
+.metaEditThumbItm img {
+    max-width: 220px;
+    height: auto;
+}
+
+.metaEditOverlay {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    bottom: 0;
+    background: rgb(0, 0, 0);
+    background: rgba(0, 0, 0, 0.5); /* Black see-through */
+    color: #f1f1f1;
+    width: 100%;
+    height: 100%;
+    transition: .5s ease;
+    opacity:0;
+    color: white;
+    font-size: 20px;
+    padding: 0px;
+}
+
+.metaEditOverlay p {
+    width: 100%;
+    text-align: center;
+}
+
+.metaEditThumb:hover .metaEditOverlay {
+    opacity: 1;
+}
+
+.metaEditThumbItm svg {
+    position: relative;
+    margin: 0px 10px;
+}
+
+#metaEditArrow {
+    width: 70px;
+}
+
+#metaEditArrowInner {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    height: 100%;
 }
 
 #videoInfo {
@@ -779,11 +830,7 @@ textarea {
     padding-left: 5px;
 }
 
-.snapImgPreview {
-    width: 220px;
-}
-
-#newSnapField, #swapSubmitBtn, #yourFiles, #wcinfo, #refiller, #getHelp, #settings, #scheduledPublishes, #postpublish {
+#yourFiles, #wcinfo, #refiller, #getHelp, #settings, #scheduledPublishes, #postpublish {
     display: none;
 }
 
@@ -1419,6 +1466,20 @@ input:checked + .slider.slidersmall:before {
     #newAlias a { width: 190%; }
     #newAlias input { width: 200%; }
     #newAlias select { width: 207%; }
+
+    .metaEditThumbItm img {
+        width: 100%;
+    }
+
+    .metaEditThumbItm svg {
+        width: 20px;
+        height: 20px;
+        margin: 0px 5px;
+    }
+
+    #metaEditArrow {
+        width: 30px;
+    }
 }
 
 @media screen and (max-width: 360px) {

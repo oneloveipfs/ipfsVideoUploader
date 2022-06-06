@@ -163,7 +163,7 @@ function editorJsonCheck(network, isRef = false) {
     else
         editor.editingPosts[network].parsed = true
 
-    // load refs and non-ref metadata into post params for editing
+    // load refs
     if (!isRef) {
         for (let r in refs) if (typeof refs[r] === 'string') {
             let refSplit = refs[r].split('/')
@@ -194,6 +194,33 @@ function editorJsonCheck(network, isRef = false) {
                     }
                 })
         }
+        editor.editing = true
     } else
         editor.refs.push(network)
+}
+
+function chooseReplacementThumbnail() {
+    document.getElementById('metaEditImg').click()
+}
+
+function selectReplacementThumbnail() {
+    let thumbs = document.getElementById('metaEditImg').files
+    if (thumbs.length === 0)
+        return updateDisplayByIDs([],['metaEditThumbNew'])
+    let img = document.createElement('img')
+    img.src = URL.createObjectURL(thumbs[0])
+    document.getElementById('metaEditThumbNewImg').innerHTML = ''
+    document.getElementById('metaEditThumbNewImg').appendChild(img)
+
+    let a = document.createElement('a')
+    a.onclick = () => {
+        document.getElementById('metaEditImg').value = ''
+        updateDisplayByIDs([],['metaEditThumbNew'])
+    }
+    let removeText = document.createElement('p')
+    removeText.innerText = 'Remove'
+    a.setAttribute('class','metaEditOverlay')
+    a.appendChild(removeText)
+    document.getElementById('metaEditThumbNewImg').appendChild(a)
+    updateDisplayByIDs(['metaEditThumbNew'],[])
 }
