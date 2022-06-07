@@ -100,12 +100,19 @@
             <div id="subtitles"> <!-- Subtitles tab -->
                 <h3>Add subtitles to your video</h3>
                 <h5>You may wish to create subtitles for your videos for multiple languages. To create your subtitles, use a subtitle creator tool and upload the subtitle file here.<br><br>Only WebVTT files are accepted as this is the only format DTube supports right now!</h5>
-                <h4>Upload a new subtitle<br>
-                    <input list="languages" class="meta" id="newLanguageField" placeholder="Choose language">
-                    <input type="file" id="subtitleUpload" style="display: none">
-                    <a onclick="document.getElementById('subtitleUpload').click()" id="chooseSubBtn" class="styledButton">Choose subtitle file</a>
-                    <a id="uploadSubBtn" class="styledButton">Upload subtitle</a>
-                </h4>
+                <h4 style="margin-block-end: 0.25em;">Upload a new subtitle</h4>
+                <div class="subtitleAdd">
+                    <div class="subtitleAddCol">
+                        <input list="languages" class="meta" id="newLanguageField" placeholder="Choose language">
+                    </div>
+                    <div class="subtitleAddCol">
+                        <input type="file" id="subtitleUpload" style="display: none">
+                        <a onclick="document.getElementById('subtitleUpload').click()" id="chooseSubBtn" class="styledButton styledButtonSmall">Choose subtitle file</a>
+                    </div>
+                    <div class="subtitleAddCol">
+                        <a id="uploadSubBtn" class="styledButton styledButtonSmall">Upload subtitle</a>
+                    </div>
+                </div>
                 <datalist id="languages"></datalist>
                 <h4 style="margin-block-end: 0.5em; display: none;" id="subtitleHeading">Your subtitles</h4>
                 <table class="subList" id="subList"></table>
@@ -145,7 +152,7 @@
                         <option>Steem</option>
                         <option>Blurt</option>
                     </select>
-                    <a class="styledButton" id="appendBeneficiaryBtn">+</a><br><br>
+                    <a class="styledButton styledButtonSmall" id="appendBeneficiaryBtn">+</a><br><br>
                     <h3 id="beneficiaryHeadingHive">Hive beneficiaries</h3>
                     <table class="beneficiaryTableList" id="beneficiaryTableListHive"></table>
                     <h4 class="totalBeneficiariesLabel" id="totalBeneficiariesLabelHive">Total Hive beneficiaries: 0%</h4>
@@ -178,7 +185,7 @@
             </div>
             <div id="uploadActions">
                 <input class="styledButton" type="submit" value="Upload!" id="submitbutton">
-                <input class="styledButton styledButtonSmall" type="button" value="Save draft" id="draftBtn">
+                <input class="styledButton styledButtonSmall" type="button" value="Save draft" id="draftBtn" style="width: 95px;">
             </div>
             <h4 id="loggedInUser">Detecting login...</h4>
             <h4 id="platformStr">Loading platforms...</h4>

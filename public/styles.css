@@ -599,9 +599,10 @@ textarea {
 }
 
 #newLanguageField {
-    width: 35%;
+    width: 100%;
 }
 
+/*
 #chooseSubBtn {
     padding: 6px 20px;
     font-size: 15px;
@@ -616,6 +617,22 @@ textarea {
     text-align: center;
     width: 22%;
     margin-top: 1px;
+}*/
+
+.subtitleAdd {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.subtitleAddCol {
+    display: table-cell;
+    width: 230px;
+}
+
+.subtitleAddCol a {
+    width: 100%;
+    margin: 0px 10px;
 }
 
 /* Render uploaded subtitles list in a table */
@@ -702,19 +719,6 @@ textarea {
 #newBeneficiaryNetwork {
     line-height: 32px;
     height: 32px;
-}
-
-#appendBeneficiaryBtn, #newAliasAdd {
-    font-size: 15px;
-    font-weight: bold;
-    width: 30px;
-    height: 26px;
-    padding-left: 10px;
-    padding-right: 10px;
-    padding-top: 5.5px;
-    padding-bottom: 0px;
-    margin: 0px;
-    text-align: center;
 }
 
 .beneficiaryTableList { width: 100%; }
@@ -1064,9 +1068,10 @@ textarea {
     cursor: not-allowed;
 }
 .styledButtonSmall {
-    padding: 6px 18px;
+    padding: 6px 0px;
     font-size: 15px;
     border-width: 1px;
+    text-align: center;
 }
 .darkmode .styledButton {
     border: 2px solid #ffffff;
@@ -1363,21 +1368,25 @@ input:checked + .slider.slidersmall:before {
         width: auto;
     }
 
-    #newLanguageField {
+    .subtitleAdd {
+        flex-direction: column;
+    }
+
+    .subtitleAddCol { width: 100%; }
+    .subtitleAddCol a {
         width: 100%;
+        margin: 5px 0px;
     }
 
     #chooseSubBtn {
         margin-top: 5px;
         margin-left: auto;
         margin-right: auto;
-        width: 89.5%;
     }
 
     #uploadSubBtn {
         margin-left: auto;
         margin-right: auto;
-        width: 93%;
     }
 
     .subListPrev a {
