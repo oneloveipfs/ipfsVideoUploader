@@ -581,6 +581,7 @@ hr {
     border: 1px solid #ccc;
     padding-left: 5px;
     font-size: 12px;
+    box-sizing: border-box;
 }
 .darkmode .meta,
 .darkmode textarea {
@@ -596,6 +597,7 @@ textarea {
     padding-left: 5px;
     padding-top: 5px;
     font-size: 12px;
+    box-sizing: border-box;
 }
 
 #newLanguageField {
@@ -719,6 +721,16 @@ textarea {
 #newBeneficiaryNetwork {
     line-height: 32px;
     height: 32px;
+    width: 65px;
+}
+
+#appendBeneficiaryBtn {
+    width: 40px;
+    margin: 0px;
+}
+
+#beneficiariesDesc {
+    margin-block-end: 0.5em;
 }
 
 .beneficiaryTableList { width: 100%; }
@@ -745,6 +757,9 @@ textarea {
 #steemCommunity h5 {
     margin-block-start: 0.25em;
     margin-block-end: 0.5em;
+}
+.communitySelect {
+    width: 300px;
 }
 #schedulepostdetails, #schedulepost, #scheduledStr { display: none; }
 #scheduleposttime { width: 200px; }
@@ -1058,6 +1073,7 @@ textarea {
 	padding: 15px 40px;
     margin: 5px;
     transition-duration: 0.2s;
+    box-sizing: border-box;
 }
 .styledButton:hover {
     color: #ffffff;
@@ -1072,6 +1088,7 @@ textarea {
     font-size: 15px;
     border-width: 1px;
     text-align: center;
+    border-radius: 5px;
 }
 .darkmode .styledButton {
     border: 2px solid #ffffff;
@@ -1463,8 +1480,9 @@ input:checked + .slider.slidersmall:before {
     }
 
     #newBeneficiaryUser, #newBeneficiaryPercent { width: 100%; }
-    #newBeneficiaryNetwork { width: 102%; }
-    #appendBeneficiaryBtn { width: 95%; }
+    #newBeneficiaryNetwork { width: 100%; }
+    #appendBeneficiaryBtn { width: 100%; }
+    .communitySelect { width: 100%; }
 
     #newAlias td {
         display: table-row;
