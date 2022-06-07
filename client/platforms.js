@@ -214,7 +214,7 @@ function updateDisplayPlatforms() {
     if (selected.length < 2)
         updateDisplayByIDs([],['postpublishsharetgpf'])
     else
-        document.getElementById('postpublishsharetgpf').style.display = 'inline-block'
+        updateDisplayByIDs(['postpublishsharetgpf'],[],'inline-block')
     updateEncoderDisplay()
 }
 

@@ -66,6 +66,8 @@ let auth = {
             method: 'condenser_api.get_accounts',
             params: [[username]]
         }).then(res => {
+            if (res.data.result.length === 0)
+                return cb('Account does not exist')
             let encrypted_memo
             try {
                 encrypted_memo = HivecryptPro.hivecrypt.encode(Keys.wifMessage,res.data.result[0].posting.key_auths[0][0],'#' + encrypted_message)

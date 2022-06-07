@@ -216,7 +216,7 @@
                             <input type="password" placeholder="AVALON Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginKey" class="loginFields">
                             <!-- Avalon with Keychain Signer -->
                             <input type="text" placeholder="Keychain Signer Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonSignerUsername" class="loginFields avalonKcLogin">
-                            <select id="avalonSignerRole" class="loginFields avalonKcLogin" style="width: 100%;">
+                            <select id="avalonSignerRole" class="loginFields avalonKcLogin meta">
                                 <option>Posting</option>
                                 <option>Active</option>
                                 <option>Memo</option>
@@ -262,7 +262,7 @@
                 <div class="popup-body">
                     <div id="signupstart">
                         <h4 style="margin-block-end: 0.5em;">To begin, purchase some hosting credits (GBdays). One GBday allows you to store 1GB of files on our service for 24 hours. Each GBDay costs $0.0029.<br><br>Our payment system accepts DTUBE, HIVE and HBD.</h4>
-                        <select id="signupNetwork" onchange="signupNetworkSelect()">
+                        <select class="meta" id="signupNetwork" onchange="signupNetworkSelect()">
                             <option value="none">Select a network for your account...</option>
                             <option value="all">All</option>
                             <option value="hive">Hive</option>
@@ -271,7 +271,7 @@
                         <input type="text" placeholder="Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="receiverUsername" class="loginFields">
                         <input type="number" placeholder="GBdays to purchase" id="gbdaysInput" class="loginFields">
                         <h4 style="margin-block-start: 0.25em; margin-block-end: 0.6em;">Payment method: 
-                        <select id="pymtMtd">
+                        <select class="meta" id="pymtMtd">
                             <option>DTUBE</option>
                             <option>HIVE</option>
                             <option>HBD</option>

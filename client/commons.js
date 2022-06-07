@@ -27,12 +27,12 @@ function toReadableNetwork(network) {
     }
 }
 
-function updateDisplayByIDs(toshow,tohide) {
+function updateDisplayByIDs(toshow,tohide,type = 'block') {
     for (let i = 0; i < tohide.length; i++)
         document.getElementById(tohide[i]).style.display = 'none'
     
     for (let i = 0; i < toshow.length; i++)
-        document.getElementById(toshow[i]).style.display = 'block'
+        document.getElementById(toshow[i]).style.display = type
 }
 
 function axiosErrorHandler(e) {

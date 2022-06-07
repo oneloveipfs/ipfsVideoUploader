@@ -233,7 +233,7 @@
         <div id="yourFiles">
             <h2>Your files</h2>
             <h4>Here you may find the list of files pinned on our service and its file sizes. Click on each hash to preview them.</h4>
-            <h4>Filter by type: <select id="yourFilesSelection" onchange="handleTypeSelection(this)">
+            <h4>Filter by type: <select class="meta" onchange="handleTypeSelection(this)">
                 <option>Source video</option>
                 <option>240p video</option>
                 <option>480p video</option>
@@ -272,7 +272,7 @@
             </div>
             <h5 style="margin-block-start: 0.5em; margin-block-end: 0em;">Disclaimer: The calculated values does not take into account of future increased disk usage. 1 GBday allows you to store 1GB of data on our service for 24 hours.</h5>
             <h4>Payment method:
-                <select id="pymtMtd">
+                <select class="meta" id="pymtMtd">
                     <option>DTUBE</option>
                     <option>HIVE</option>
                     <option>HBD</option>
@@ -280,7 +280,7 @@
             </h4>
             <input class="styledButton" type="submit" value="Refill" id="refillSubmitBtn"><br><br><hr>
             <h2>Refill history</h2>
-            <h4>Amount view: <select id="refillHistoryAmtSelection" onchange="handleAmtViewChange(this)">
+            <h4>Amount view: <select class="meta" style="width: 70px;" onchange="handleAmtViewChange(this)">
                 <option>USD</option>
                 <option>Crypto</option>
             </select></h4>
@@ -353,7 +353,7 @@
             <div id="scheduledList">
                 <h2>Scheduled Publishes</h2>
                 <h4>View operations that have been scheduled through our Olisc API.</h4>
-                <h4>Filter by status: <select onchange="handleOliscFilterSelection(this)" id="oliscStatusSelection">
+                <h4>Filter by status: <select class="meta" style="width: 100px;" onchange="handleOliscFilterSelection(this)" id="oliscStatusSelection">
                     <option>Select...</option>
                     <option>Pending</option>
                     <option>Success</option>
@@ -382,7 +382,7 @@
             <div id="postpublishwatch" class="postpublishgrid"></div>
             <!-- Share Video -->
             <h3 style="display: inline-block;">Share Video</h3>
-            <select id="postpublishsharetgpf">
+            <select class="meta" style="width: 150px;" id="postpublishsharetgpf">
                 <option value="None">Select platform...</option>
                 <option value="3Speak">3Speak</option>
                 <option value="DTube">DTube</option>

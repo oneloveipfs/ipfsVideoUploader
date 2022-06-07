@@ -234,13 +234,14 @@ hr {
 }
 
 .loginFields {
-    width: calc(100% - 8px);
+    width: 100%;
     height: 29px;
     border-radius: 5px;
     border: 1px solid #ccc;
     padding-left: 5px;
     font-size: 12px;
     margin-bottom: 10px;
+    box-sizing: border-box;
 }
 
 .avalonKcLogin {
@@ -265,17 +266,16 @@ hr {
     width: fit-content;
 }
 
+#pymtMtd {
+    width: 70px;
+}
+
 #signuppay h6, #signuppay h4, #refillPopup h6, #refillPopup h4 {
     margin-block-start: 0.25em;
     margin-block-end: 0.25em;
 }
 
-#signupNetwork {
-    width: 102%;
-    height: 30px;
-    margin-block-end: 0.75em;
-}
-
+#signupNetwork { margin-block-end: 0.75em; }
 #dtcInstruction a, #signupcbmsg a { color: #000000; }
 #dtcInstruction a:visited, #signupcbmsg a:visited { color: #000000; }
 #dtcInstruction a:hover, #signupcbmsg a:hover { color: #000000; }
@@ -716,7 +716,8 @@ textarea {
     width: 65px;
 }
 
-#appendBeneficiaryBtn {
+#appendBeneficiaryBtn,
+#newAliasAdd {
     width: 40px;
     margin: 0px;
 }
@@ -858,6 +859,7 @@ textarea {
 #yourFiles a:visited { color: #000000; }
 #yourFiles a:hover { color: #000000; }
 #yourFiles a:active { color: #000000; }
+#yourFiles select { width: 150px; }
 #refillHistoryTbl, #yourFiles table, #aliasList, #scheduledPublishes table { border-collapse: collapse; }
 #refillHistoryTbl, #refillHistoryTbl tr, #refillHistoryTbl td,
 #yourFiles table, #yourFiles table tr, #yourFiles table td,
