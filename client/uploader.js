@@ -94,6 +94,9 @@ axios.get('/proxy_server').then((r) => {
     })
     uplStat.on('error',(e) => {
         console.log('upload processing error',e)
+        alert(e.error)
+        updateDisplayByIDs([],['uploadProgressBack'])
+        reenableFields()
     })
     uplStat.on('result',(r) => {
         if (r.error) return console.log('uplStat Error', r.error)
@@ -695,7 +698,7 @@ function restrictImg() {
 }
 
 function reenableFields() {
-    const toEnable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton','newLanguageField','chooseSubBtn','uploadSubBtn','metaEditLink','linkSubmitBtn','newSnap','swapSubmitBtn']
+    const toEnable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton','newLanguageField','chooseSubBtn','uploadSubBtn','linkSubmitBtn','swapSubmitBtn']
     for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i]).disabled = false
 }
 

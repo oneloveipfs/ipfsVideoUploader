@@ -463,6 +463,15 @@ let uploadOps = {
                             nextJob()
                         })
                     }, s: {}})
+                }).catch(() => {
+                    let error = {
+                        username: user,
+                        network: network,
+                        type: 'hls',
+                        error: 'could not obtain ffprobe video metadata, this is probably not a video'
+                    }
+                    uploadRegister[json.Upload.ID] = error
+                    return emitToUID(json.Upload.ID,'error',error,false)
                 })
                 break
             case 'videos':
@@ -603,7 +612,7 @@ let uploadOps = {
 
                     // Authenticate & get username
                     Auth.authenticate(info.access_token,info.keychain,false,(e,user,network) => {
-                        if (e) return socket.emit('result', { error: 'Auth error: ' + JSON.stringify(e) })
+                        if (e) return socket.emit('error', { error: 'Auth error: ' + JSON.stringify(e) })
                         
                         // Upload ID not found in register, register socket
                         if (!uploadRegister[info.id]) {
@@ -616,7 +625,12 @@ let uploadOps = {
                         }
 
                         // Upload ID exist in register and matches type requested, return result immediately
-                        if (info.type === uploadRegister[info.id].type) return socket.emit('result',uploadRegister[info.id])
+                        if (info.type === uploadRegister[info.id].type) {
+                            if (uploadRegister[info.id].error)
+                                return socket.emit('error',uploadRegister[info.id])
+                            else
+                                return socket.emit('result',uploadRegister[info.id])
+                        }
                         
                         // Type requested does not match registered type
                         // HLS uploads do not transform into other upload types
