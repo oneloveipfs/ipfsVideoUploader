@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateDisplayByIDs(['nativeDisclaimer'],[])
 
             let memo = currentnetwork === 'all' ? ('to: @' + username) : ('to: ' + currentnetwork + '@' + username)
-            document.getElementById('xferMemo').innerHTML = 'Memo: <u>' + memo + '</u>'
+            document.getElementById('xferMemo').innerHTML = 'Memo: <u>' + memo + '</u> <a onclick="copyToClipboard(\''+ memo + '\',\'copymemo\')"><i class="fas fa-clipboard tooltip" id="copybtn"><span class="tooltiptext" id="copymemo">Click to copy</span></i></a>'
 
             switch (paymentMethod) {
                 case 'DTUBE':
