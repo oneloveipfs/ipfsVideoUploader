@@ -16,9 +16,7 @@ const ProcessingQueue = require('./processingQueue')
 const globSource = IPFS.globSource
 const defaultDir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 
-let SocketIO
-let ipsync
-let uplstatusio
+let SocketIO, ipsync, uplstatusio, encoderdio
 let usercount = 0
 
 db.setupDb('register')
@@ -47,6 +45,7 @@ const hlsBandwidth = {
 
 let uploadRegister = JSON.parse(fs.readFileSync(defaultDir+'/db/register.json','utf8'))
 let socketRegister = {}
+let encoderRegister = {}
 
 const emitToUID = (id,evt,message,updateTs) => {
     if (socketRegister[id] && socketRegister[id].socket) {
@@ -612,7 +611,7 @@ let uploadOps = {
 
                     // Authenticate & get username
                     Auth.authenticate(info.access_token,info.keychain,false,(e,user,network) => {
-                        if (e) return socket.emit('error', { error: 'Auth error: ' + JSON.stringify(e) })
+                        if (e) return socket.emit('error', { error: e })
                         
                         // Upload ID not found in register, register socket
                         if (!uploadRegister[info.id]) {
@@ -662,6 +661,40 @@ let uploadOps = {
                     if (Math.abs(socketRegister[ids].ts - currentTime) > Config.socketTimeout) delete socketRegister[ids]
                 }
             },60000)
+
+            encoderdio = SocketIO.of('/encoderdaemon')
+
+            encoderdio.on('connection',(socket) => {
+                socket.emit('message','Remote encoder connected')
+
+                socket.on('auth',(info) => {
+                    if (!info) return socket.emit('result',{ error: 'Missing authentication info' })
+                    if (typeof info !== 'object') return socket.emit('result', { error: 'Authentication info must be a JSON object' })
+                    if (!info.access_token) return socket.emit('result', { error: 'Missing access token' })
+
+                    Auth.authenticate(info.access_token,info.keychain,false,(e,user,network) => {
+                        if (e) return socket.emit('error', { error: e })
+
+                        let fullUsername = db.toFullUsername(user,network,false)
+                        if (!Config.Encoder.accounts.includes(fullUsername))
+                            return socket.emit('error',{ error: 'not authorized as encoder' })
+                        
+                        for (let r in encoderRegister)
+                            if (encoderRegister[r].socket && encoderRegister[r].socket.id === socket.id)
+
+                        if (!encoderRegister[fullUsername])
+                            encoderRegister[fullUsername] = {}
+                        encoderRegister[fullUsername].socket = socket
+                        encoderRegister[fullUsername].lastAuth = new Date().getTime()
+                    })
+                })
+
+                socket.on('disconnect',() => {
+                    for (let r in encoderRegister)
+                        if (encoderRegister[r].socket && encoderRegister[r].socket.id === socket.id)
+                            delete encoderRegister[r]
+                })
+            })
         },
         activeCount: () => {
             return usercount

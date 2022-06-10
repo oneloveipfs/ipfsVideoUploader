@@ -127,9 +127,9 @@ let auth = {
     verifyAuth: (access_token,needscredits,cb) => {
         if (!access_token) return cb('Missing access token')
         JWT.verify(access_token,Keys.JWTKey,(err,result) => {
-            if (err != null)
-                cb('Login error: ' + err)
-            else if (Config.whitelistEnabled === true) {
+            if (err)
+                cb('JWT error: ' + err)
+            else if (Config.whitelistEnabled) {
                 if (!auth.isInWhitelist(result.user,result.network))
                     return cb('Uploader access denied!')
                 if (Config.Shawp.Enabled && needscredits) {
