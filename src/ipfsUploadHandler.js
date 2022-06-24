@@ -33,6 +33,15 @@ const encoderOptions = [
     '-f segment',
     Config.Encoder.quality
 ]
+const supportedEncoders = [
+    'libx264',
+    'h264_videotoolbox',
+    'h264_nvenc',
+    'h264_qsv',
+    'h264_amf',
+    'h264_vaapi',
+    'h264_omx'
+]
 const hlsBandwidth = {
     4320: 20000000,
     2160: 6000000,
@@ -328,6 +337,20 @@ let uploadOps = {
                     if (!width || !height || !duration || !orientation)
                         return emitToUID(json.Upload.ID,'error',{ error: 'could not retrieve ffprobe info on uploaded video' },false)
 
+                    if (json.Upload.MetaData.encoder) {
+                        if (!encoderRegister[json.Upload.MetaData.encoder])
+                            return emitToUID(json.Upload.ID,'error',{ error: 'Encoder is not online' })
+                        let remotejob = {
+                            id: json.Upload.ID,
+                            username: user,
+                            network: network,
+                            step: ''
+                        }
+                        encoderRegister[json.Upload.MetaData.encoder].queue.push(remotejob)
+                        encoderRegister[json.Upload.MetaData.encoder].socket.emit('job', remotejob)
+                        return
+                    }
+
                     let outputResolutions = []
                     let sedge = Math.min(width,height)
                     for (let q in Config.Encoder.outputs)
@@ -336,8 +359,7 @@ let uploadOps = {
                     if (outputResolutions.length === 0)
                         outputResolutions.push(Config.Encoder.outputs[Config.Encoder.outputs.length-1])
                     outputResolutions = outputResolutions.sort((a,b) => a-b)
-                    
-                    // TODO: Remote encoders
+
                     // Create folders
                     fs.mkdirSync(defaultDir+'/'+json.Upload.ID)
                     for (let r in outputResolutions)
@@ -668,9 +690,16 @@ let uploadOps = {
                 socket.emit('message','Remote encoder connected')
 
                 socket.on('auth',(info) => {
-                    if (!info) return socket.emit('result',{ error: 'Missing authentication info' })
-                    if (typeof info !== 'object') return socket.emit('result', { error: 'Authentication info must be a JSON object' })
-                    if (!info.access_token) return socket.emit('result', { error: 'Missing access token' })
+                    if (!info) return socket.emit('error',{ error: 'Missing authentication info' })
+                    if (typeof info !== 'object') return socket.emit('error', { error: 'Authentication info must be a JSON object' })
+                    if (!info.access_token) return socket.emit('error', { error: 'Missing access token' })
+                    if (typeof info.encoder !== 'string') return socket.emit('error', { error: 'Encoder must be specified. Valid values: '+supportedEncoders.join(', ') })
+                    if (!supportedEncoders.includes(info.encoder)) return socket.emit('error', { error: 'Invalid encoder' })
+                    if (typeof info.quality !== 'string') return socket.emit('error', { error: 'Quality (string) must be specified' })
+                    if (!Array.isArray(info.outputs)) return socket.emit('error', { error: 'Qutputs array must be specified. Valid array values: '+Object.keys(hlsBandwidth).join(', ') })
+                    for (let o in info.outputs)
+                        if (!hlsBandwidth[info.outputs[o]])
+                            return socket.emit('error', { error: 'Invalid output quality '+info.outputs[o] })
 
                     Auth.authenticate(info.access_token,info.keychain,false,(e,user,network) => {
                         if (e) return socket.emit('error', { error: e })
@@ -683,9 +712,14 @@ let uploadOps = {
                             if (encoderRegister[r].socket && encoderRegister[r].socket.id === socket.id)
 
                         if (!encoderRegister[fullUsername])
-                            encoderRegister[fullUsername] = {}
+                            encoderRegister[fullUsername] = {
+                                queue: []
+                            }
                         encoderRegister[fullUsername].socket = socket
                         encoderRegister[fullUsername].lastAuth = new Date().getTime()
+                        encoderRegister[fullUsername].encoder = info.encoder
+                        encoderRegister[fullUsername].quality = info.quality
+                        encoderRegister[fullUsername].outputs = info.outputs
                     })
                 })
 
