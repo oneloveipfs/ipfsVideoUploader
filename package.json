@@ -94,7 +94,7 @@
     "hivesigner": "^3.2.1",
     "http-proxy": "^1.18.1",
     "ipfs-http-client": "^56.0.3",
-    "javalon": "^1.0.33",
+    "javalon": "^1.0.36",
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.4",
     "node-schedule": "^2.1.0",
