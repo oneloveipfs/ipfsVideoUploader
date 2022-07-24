@@ -91,7 +91,7 @@
     "express": "^4.18.1",
     "fluent-ffmpeg": "^2.1.2",
     "form-data": "^3.0.0",
-    "hivesigner": "^3.2.1",
+    "hivesigner": "^3.2.8",
     "http-proxy": "^1.18.1",
     "ipfs-http-client": "^56.0.3",
     "javalon": "^1.0.36",
