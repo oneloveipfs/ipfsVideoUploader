@@ -690,26 +690,23 @@ let uploadOps = {
                 socket.emit('message','Remote encoder connected')
 
                 socket.on('auth',(info) => {
-                    if (!info) return socket.emit('error',{ error: 'Missing authentication info' })
-                    if (typeof info !== 'object') return socket.emit('error', { error: 'Authentication info must be a JSON object' })
-                    if (!info.access_token) return socket.emit('error', { error: 'Missing access token' })
-                    if (typeof info.encoder !== 'string') return socket.emit('error', { error: 'Encoder must be specified. Valid values: '+supportedEncoders.join(', ') })
-                    if (!supportedEncoders.includes(info.encoder)) return socket.emit('error', { error: 'Invalid encoder' })
-                    if (typeof info.quality !== 'string') return socket.emit('error', { error: 'Quality (string) must be specified' })
-                    if (!Array.isArray(info.outputs)) return socket.emit('error', { error: 'Qutputs array must be specified. Valid array values: '+Object.keys(hlsBandwidth).join(', ') })
+                    if (!info) return socket.emit('error',{ method: 'auth', error: 'Missing authentication info' })
+                    if (typeof info !== 'object') return socket.emit('error', { method: 'auth', error: 'Authentication info must be a JSON object' })
+                    if (!info.access_token) return socket.emit('error', { method: 'auth', error: 'Missing access token' })
+                    if (typeof info.encoder !== 'string') return socket.emit('error', { method: 'auth', error: 'Encoder must be specified. Valid values: '+supportedEncoders.join(', ') })
+                    if (!supportedEncoders.includes(info.encoder)) return socket.emit('error', { method: 'auth', error: 'Invalid encoder' })
+                    if (typeof info.quality !== 'string') return socket.emit('error', { method: 'auth', error: 'Quality (string) must be specified' })
+                    if (!Array.isArray(info.outputs)) return socket.emit('error', { method: 'auth', error: 'Qutputs array must be specified. Valid array values: '+Object.keys(hlsBandwidth).join(', ') })
                     for (let o in info.outputs)
                         if (!hlsBandwidth[info.outputs[o]])
-                            return socket.emit('error', { error: 'Invalid output quality '+info.outputs[o] })
+                            return socket.emit('error', { method: 'auth', error: 'Invalid output quality '+info.outputs[o] })
 
                     Auth.authenticate(info.access_token,info.keychain,false,(e,user,network) => {
-                        if (e) return socket.emit('error', { error: e })
+                        if (e) return socket.emit('error', { method: 'auth', error: e })
 
                         let fullUsername = db.toFullUsername(user,network,false)
-                        if (!Config.Encoder.accounts.includes(fullUsername))
-                            return socket.emit('error',{ error: 'not authorized as encoder' })
-                        
-                        for (let r in encoderRegister)
-                            if (encoderRegister[r].socket && encoderRegister[r].socket.id === socket.id)
+                        if (!Config.Encoder.accounts.includes(fullUsername) && !Config.Encoder.accounts.includes(user))
+                            return socket.emit('error',{ method: 'auth', error: 'not authorized as encoder' })
 
                         if (!encoderRegister[fullUsername])
                             encoderRegister[fullUsername] = {
@@ -720,7 +717,21 @@ let uploadOps = {
                         encoderRegister[fullUsername].encoder = info.encoder
                         encoderRegister[fullUsername].quality = info.quality
                         encoderRegister[fullUsername].outputs = info.outputs
+
+                        socket.emit('result', { method: 'auth', success: true })
                     })
+                })
+
+                socket.on('status',() => {
+                    for (let r in encoderRegister)
+                        if (encoderRegister[r].socket && encoderRegister[r].socket.id === socket.id) {
+                            return socket.emit('status', {
+                                lastAuth: encoderRegister[r].lastAuth,
+                                queue: encoderRegister[r].queue
+                            })
+                        }
+                    
+                    return socket.emit('error', { method: 'status', error: 'not authenticated or session expired' })
                 })
 
                 socket.on('disconnect',() => {
