@@ -189,14 +189,21 @@ function updateDisplayPlatforms() {
         document.getElementById('platformLogoDTube').style.display = 'inline'
         document.getElementById('dropdownArrowPlatform').style.transform = 'rotate(45deg) translate(-6px,-12px)'
     }
+    let displaySelected = []
+    for (let i in selected) {
+        if (selected[i] === '3Speak')
+            displaySelected.push('3Speak (desktop app only)')
+        else
+            displaySelected.push(selected[i])
+    }
     let joined = ''
-    if (selected.length === 0)
+    if (displaySelected.length === 0)
         joined = 'No platform selected'
-    else if (selected.length === 1)
-        joined = selected[0]
+    else if (displaySelected.length === 1)
+        joined = displaySelected[0]
     else
-        joined = selected.slice(0,-1).join(', ') + ' and ' + selected[selected.length-1]
-    document.getElementById('platformStr').innerText = (selected.length > 0 ? 'Posting to ' : '') + joined
+        joined = displaySelected.slice(0,-1).join(', ') + ' and ' + displaySelected[displaySelected.length-1]
+    document.getElementById('platformStr').innerText = (displaySelected.length > 0 ? 'Posting to ' : '') + joined
 
     if (selected.includes('3Speak')) {
         document.getElementById('hlsencode').checked = true
