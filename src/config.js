@@ -40,4 +40,10 @@ if (defaultConfig.Olisc.enabled) {
     }
 }
 
+// disable skynet until later v3 sub-release
+if (defaultConfig.Skynet.enabled) {
+    console.log('Skynet support is currently disabled until a later v3 sub-release')
+    defaultConfig.Skynet.enabled = false
+}
+
 module.exports = defaultConfig
