@@ -1018,6 +1018,7 @@ function buildJsonMetadataAvalon() {
                 }
             }
         },
+        thumbnailUrl: config.gateway+'/ipfs/'+postparams.imghash,
         dur: postparams.duration,
         title: postparams.title,
         desc: postparams.description,
