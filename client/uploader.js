@@ -433,7 +433,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         axios.post(call,imgFormData,contentType).then(function(response) {
             console.log(response);
             progressbar.style.display = "none";
-            document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + '](https://ipfs.io/ipfs/' + response.data.imghash + ')');
+            document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + ']('+config.gateway+'/ipfs/' + response.data.imghash + ')');
             reenableFieldsImg();
         }).catch(function(err) {
             if (err.response.data.error)
@@ -921,9 +921,9 @@ function postThumbnailByPlatform(network) {
     let pf = pfPostEmbed(network)
     switch (pf) {
         case '3Speak':
-            return '<center>[![](https://ipfs.io/ipfs/'+postparams.imghash+')](https://3speak.tv/watch?v='+usernameByNetwork(network)+'/'+postparams.permlink+')</center><hr>'
+            return '<center>[![]('+config.gateway+'/ipfs/'+postparams.imghash+')](https://3speak.tv/watch?v='+usernameByNetwork(network)+'/'+postparams.permlink+')</center><hr>'
         case 'DTube':
-            return '<center><a href=\'https://d.tube/#!/v/'+usernameByNetwork(network)+'/'+postparams.permlink+'\'><img src=\'https://ipfs.io/ipfs/'+postparams.imghash+'\'></a></center><hr>'
+            return '<center><a href=\'https://d.tube/#!/v/'+usernameByNetwork(network)+'/'+postparams.permlink+'\'><img src=\''+config.gateway+'/ipfs/'+postparams.imghash+'\'></a></center><hr>'
     }
 }
 
@@ -935,7 +935,7 @@ function buildPostBody(network) {
         result += '\n[▶️ 3Speak Dapp](https://3speak.tv/openDapp?uri=hive:'+usernameByNetwork(network)+':'+postparams.permlink+')'
     if (isPlatformSelected['DTube'])
         result += '\n[▶️ DTube](https://d.tube/#!/v/'+usernameByNetwork(network)+'/'+postparams.permlink+')'
-    result += '\n[▶️ IPFS](https://ipfs.io/ipfs/'+postparams.ipfshash+')'
+    result += '\n[▶️ IPFS]('+config.gateway+'/ipfs/'+postparams.ipfshash+')'
     if (postparams.skylink)
         result += '\n[▶️ Skynet](https://siasky.net/'+postparams.skylink+')'
     return result
@@ -1178,7 +1178,7 @@ function updateSubtitle() {
     
     for (let i = 0; i < allSubtitlePrevBtnElems.length; i++) {
         document.getElementById(allSubtitlePrevBtnElems[i].id).onclick = () => {
-            window.open('https://ipfs.io/ipfs/' + subtitleList[i].hash,'name','width=600,height=400')
+            window.open(config.gateway+'/ipfs/' + subtitleList[i].hash,'name','width=600,height=400')
         }
     }
 
