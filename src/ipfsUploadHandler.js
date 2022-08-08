@@ -205,24 +205,23 @@ let uploadOps = {
         })
     },
     uploadChunk: async (username,network,request,response) => {
-        let chunkBuf = Buffer.from(request.body,'utf8')
-        let ipfsAddBufOp = ipfsAPI.add(chunkBuf)
+        if (!request.body || !request.body.content)
+            return response.status(400).send({error: 'missing chunk content'})
+        let chunkBuf = Buffer.from(request.body.content,'utf8')
+        let ipfsAdd = await ipfsAPI.add(chunkBuf)
 
-        for await (const chk of ipfsAddBufOp) {
-            db.recordHash(username,network,'chunks',chk.cid.toString(),chk.size)
-            db.writeHashesData()
-            db.writeHashSizesData()
+        db.recordHash(username,network,'chunks',ipfsAdd.cid.toString(),ipfsAdd.size)
+        db.writeHashesData()
+        db.writeHashSizesData()
 
-            let result = {
-                username: username,
-                network: network,
-                type: 'chunks',
-                hash: chk.cid.toString()
-            }
-            response.send(result)
-            ipsync.emit('upload',result)
-            break
+        let result = {
+            username: username,
+            network: network,
+            type: 'chunks',
+            hash: ipfsAdd.cid.toString()
         }
+        response.send(result)
+        ipsync.emit('upload',result)
     },
     handleTusUpload: (json,user,network,callback) => {
         let filepath = json.Upload.Storage.Path
