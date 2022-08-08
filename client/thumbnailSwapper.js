@@ -24,13 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Menu selection
     let pages = ['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings']
-    document.getElementById('newUploadModeBtn').onclick = () => updateDisplayByIDs(['uploadForm'],pages)
-    document.getElementById('snapSwapModeBtn').onclick = () => updateDisplayByIDs(['thumbnailSwapper'],pages)
-    document.getElementById('yourFilesModeBtn').onclick = () => updateDisplayByIDs(['yourFiles'],pages)
-    document.getElementById('subDetModeBtn').onclick = () => updateDisplayByIDs(['wcinfo'],pages)
-    document.getElementById('refillCrModeBtn').onclick = () => updateDisplayByIDs(['refiller'],pages)
-    document.getElementById('getHelpModeBtn').onclick = () => updateDisplayByIDs(['getHelp'],pages)
-    document.getElementById('settingsModeBtn').onclick = () => updateDisplayByIDs(['settings'],pages)
+    let evts = ['onclick','ontouchstart']
+    for (let e in evts) {
+        document.getElementById('newUploadModeBtn')[evts[e]] = () => updateDisplayByIDs(['uploadForm'],pages)
+        document.getElementById('snapSwapModeBtn')[evts[e]] = () => updateDisplayByIDs(['thumbnailSwapper'],pages)
+        document.getElementById('yourFilesModeBtn')[evts[e]] = () => updateDisplayByIDs(['yourFiles'],pages)
+        document.getElementById('subDetModeBtn')[evts[e]] = () => updateDisplayByIDs(['wcinfo'],pages)
+        document.getElementById('refillCrModeBtn')[evts[e]] = () => updateDisplayByIDs(['refiller'],pages)
+        document.getElementById('getHelpModeBtn')[evts[e]] = () => updateDisplayByIDs(['getHelp'],pages)
+        document.getElementById('settingsModeBtn')[evts[e]] = () => updateDisplayByIDs(['settings'],pages)
+    }
 
     document.getElementById('linkSubmitBtn').onclick = () => {
         let linkInput = document.getElementById('thumbnailSwapLink')
