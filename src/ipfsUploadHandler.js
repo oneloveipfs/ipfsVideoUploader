@@ -64,6 +64,14 @@ const emitToUID = (id,evt,message,updateTs) => {
     }
 }
 
+const remoteEncoderNext = (encoder) => {
+    if (!encoderRegister[encoder]) return
+    encoderRegister[encoder].queue.shift()
+    if (encoderRegister[encoder].queue.length >= 1) {
+        encoderRegister[encoder].socket.emit('job',encoderRegister[encoder].queue[0])
+    }
+}
+
 const ipfsAPI = IPFS.create({ host: 'localhost', port: Config.IPFS_API_PORT, protocol: 'http' })
 const streamUpload = Multer({ dest: defaultDir, limits: { fileSize: 52428800 } }) // 50MB segments
 const imgUpload = Multer({ dest: defaultDir, limits: { fileSize: 7340032 } })
@@ -347,7 +355,8 @@ let uploadOps = {
                             step: ''
                         }
                         encoderRegister[json.Upload.MetaData.encoder].queue.push(remotejob)
-                        encoderRegister[json.Upload.MetaData.encoder].socket.emit('job', remotejob)
+                        if (encoderRegister[json.Upload.MetaData.encoder].queue.length === 1)
+                            encoderRegister[json.Upload.MetaData.encoder].socket.emit('job', remotejob)
                         return
                     }
 
@@ -732,6 +741,22 @@ let uploadOps = {
                         }
                     
                     return socket.emit('error', { method: 'status', error: 'not authenticated or session expired' })
+                })
+
+                socket.on('joberror',(joberror) => {
+                    for (let r in encoderRegister)
+                        if (encoderRegister[r].socket && encoderRegister[r].socket.id === socket.id) {
+                            if (encoderRegister[r].queue.length >= 1 && encoderRegister[r].queue.id === joberror.id) {
+                                emitToUID(joberror.id,'error',joberror.error,false)
+                                remoteEncoderNext(r)
+                            }
+                            return
+                        }
+                    socket.emit('error', { method: 'joberror', error: 'not authenticated or session expired' })
+                })
+
+                socket.on('jobprogress',(jobprogress) => {
+
                 })
 
                 socket.on('disconnect',() => {
