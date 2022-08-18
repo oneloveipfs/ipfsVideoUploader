@@ -72,6 +72,13 @@ const remoteEncoderNext = (encoder) => {
     }
 }
 
+const getEncoderBySocket = (socket) => {
+    for (let r in encoderRegister)
+        if (encoderRegister[r].socket && encoderRegister[r].socket.id === socket.id)
+            return r
+    return null
+}
+
 const ipfsAPI = IPFS.create({ host: 'localhost', port: Config.IPFS_API_PORT, protocol: 'http' })
 const streamUpload = Multer({ dest: defaultDir, limits: { fileSize: 52428800 } }) // 50MB segments
 const imgUpload = Multer({ dest: defaultDir, limits: { fileSize: 7340032 } })
@@ -352,6 +359,8 @@ let uploadOps = {
                             id: json.Upload.ID,
                             username: user,
                             network: network,
+                            createSprite: json.Upload.MetaData.createSprite,
+                            thumbnail: json.Upload.MetaData.thumbnailFname,
                             step: ''
                         }
                         encoderRegister[json.Upload.MetaData.encoder].queue.push(remotejob)
@@ -744,25 +753,40 @@ let uploadOps = {
                 })
 
                 socket.on('joberror',(joberror) => {
-                    for (let r in encoderRegister)
-                        if (encoderRegister[r].socket && encoderRegister[r].socket.id === socket.id) {
-                            if (encoderRegister[r].queue.length >= 1 && encoderRegister[r].queue.id === joberror.id) {
-                                emitToUID(joberror.id,'error',joberror.error,false)
-                                remoteEncoderNext(r)
-                            }
-                            return
-                        }
-                    socket.emit('error', { method: 'joberror', error: 'not authenticated or session expired' })
+                    let r = getEncoderBySocket(socket)
+                    if (!r)
+                        return socket.emit('error', { method: 'joberror', error: 'not authenticated or session expired' })
+                    else if (encoderRegister[r].queue.length >= 1 && encoderRegister[r].queue.id === joberror.id) {
+                        emitToUID(joberror.id,'error',{ error: joberror.error },false)
+                        remoteEncoderNext(r)
+                    } else
+                        return socket.emit('error', { method: 'joberror', error: 'upload id is not in queue' })
+                })
+
+                socket.on('jobbegin',(jobbegin) => {
+                    let r = getEncoderBySocket(socket)
+                    if (!r)
+                        socket.emit('error', { method: 'jobbegin', error: 'not authenticated or session expired' })
+                    else if (encoderRegister[r].queue.length >= 1 && encoderRegister[r].queue.id === jobbegin.id)
+                        emitToUID(jobbegin.id,'begin',jobbegin,true)
+                    else
+                        socket.emit('error', { method: 'jobbegin', error: 'upload id is not in queue' })
                 })
 
                 socket.on('jobprogress',(jobprogress) => {
-
+                    let r = getEncoderBySocket(socket)
+                    if (!r)
+                        socket.emit('error', { method: 'jobprogress', error: 'not authenticated or session expired' })
+                    else if (encoderRegister[r].queue.length >= 1 && encoderRegister[r].queue.id === jobprogress.id)
+                        emitToUID(jobprogress.id,'progress',jobprogress,true)
+                    else
+                        socket.emit('error', { method: 'jobprogress', error: 'upload id is not in queue' })
                 })
 
                 socket.on('disconnect',() => {
-                    for (let r in encoderRegister)
-                        if (encoderRegister[r].socket && encoderRegister[r].socket.id === socket.id)
-                            delete encoderRegister[r]
+                    let r = getEncoderBySocket(socket)
+                    if (r)
+                        delete encoderRegister[r]
                 })
             })
         },
