@@ -360,8 +360,7 @@ let uploadOps = {
                             username: user,
                             network: network,
                             createSprite: json.Upload.MetaData.createSprite,
-                            thumbnail: json.Upload.MetaData.thumbnailFname,
-                            step: ''
+                            thumbnail: json.Upload.MetaData.thumbnailFname
                         }
                         encoderRegister[json.Upload.MetaData.encoder].queue.push(remotejob)
                         if (encoderRegister[json.Upload.MetaData.encoder].queue.length === 1)
@@ -756,7 +755,7 @@ let uploadOps = {
                     let r = getEncoderBySocket(socket)
                     if (!r)
                         return socket.emit('error', { method: 'joberror', error: 'not authenticated or session expired' })
-                    else if (encoderRegister[r].queue.length >= 1 && encoderRegister[r].queue.id === joberror.id) {
+                    else if (encoderRegister[r].queue.length >= 1 && encoderRegister[r].queue[0].id === joberror.id) {
                         emitToUID(joberror.id,'error',{ error: joberror.error },false)
                         remoteEncoderNext(r)
                     } else
@@ -767,20 +766,47 @@ let uploadOps = {
                     let r = getEncoderBySocket(socket)
                     if (!r)
                         socket.emit('error', { method: 'jobbegin', error: 'not authenticated or session expired' })
-                    else if (encoderRegister[r].queue.length >= 1 && encoderRegister[r].queue.id === jobbegin.id)
-                        emitToUID(jobbegin.id,'begin',jobbegin,true)
-                    else
-                        socket.emit('error', { method: 'jobbegin', error: 'upload id is not in queue' })
+                    else if (encoderRegister[r].queue.length >= 1 && encoderRegister[r].queue[0].id === jobbegin.id) {
+                        if (jobbegin.step === 'encode')
+                            if (Array.isArray(typeof jobbegin.outputs) && jobbegin.outputs.length > 0) {
+                                for (let i in jobbegin.outputs)
+                                    if (!Number.isInteger(jobbegin.outputs[i]))
+                                        return socket.emit('error', { method: 'jobbegin', error: 'output #'+i+' is not a valid integer resolution' })
+                                    else if (!hlsBandwidth[jobbegin.outputs[i]])
+                                        return socket.emit('error', { method: 'jobbegin', error: 'output #'+i+' is not a supported resolution' })
+                                emitToUID(jobbegin.id,'begin',jobbegin,true)
+                                encoderRegister[r].outputs = jobbegin.outputs
+                                encoderRegister[r].step = 'encode'
+                            } else
+                                socket.emit('error', { method: 'jobbegin', error: 'outputs must be an array of output resolutions' })
+                        else if (jobbegin.step === 'upload') {
+                            if (!Array.isArray(encoderRegister[r].outputs))
+                                return socket.emit('error', { method: 'jobbegin', error: 'encode step not registered yet' })
+                            encoderRegister[r].step = 'upload'
+
+                            // Prepare folders
+                            fs.mkdirSync(defaultDir+'/'+jobbegin.id)
+                            for (let res in encoderRegister[r].outputs)
+                                fs.mkdirSync(defaultDir+'/'+jobbegin.id+'/'+encoderRegister[r].outputs[res]+'p')
+
+                            // Callback to start uploading
+                            socket.emit('result', { method: 'upload', id: jobbegin.id })
+                        } else if (jobbegin.step === 'fetch')
+                            encoderRegister[r].step = 'fetch'
+                        else
+                            socket.emit('error', { method: 'jobbegin', error: 'invalid step' })
+                    } else
+                        socket.emit('error', { method: 'jobbegin', error: 'upload id is not first in queue' })
                 })
 
                 socket.on('jobprogress',(jobprogress) => {
                     let r = getEncoderBySocket(socket)
                     if (!r)
                         socket.emit('error', { method: 'jobprogress', error: 'not authenticated or session expired' })
-                    else if (encoderRegister[r].queue.length >= 1 && encoderRegister[r].queue.id === jobprogress.id)
+                    else if (encoderRegister[r].queue.length >= 1 && encoderRegister[r].queue[0].id === jobprogress.id)
                         emitToUID(jobprogress.id,'progress',jobprogress,true)
                     else
-                        socket.emit('error', { method: 'jobprogress', error: 'upload id is not in queue' })
+                        socket.emit('error', { method: 'jobprogress', error: 'upload id is not first in queue' })
                 })
 
                 socket.on('disconnect',() => {
