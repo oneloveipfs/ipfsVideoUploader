@@ -19,7 +19,7 @@ fi
 mkdir tusd && cd tusd
 echo "Downloading tusd for macOS..."
 echo "Architecture: ${ARCH}"
-wget -q https://github.com/tus/tusd/releases/download/v1.8.0/tusd_darwin_${ARCH}.zip
+wget -q https://github.com/tus/tusd/releases/download/v1.9.1/tusd_darwin_${ARCH}.zip
 unzip tusd_darwin_${ARCH}.zip
 cd tusd_darwin_${ARCH}
 mv tusd /usr/local/bin
