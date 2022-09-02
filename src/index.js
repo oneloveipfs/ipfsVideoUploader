@@ -171,18 +171,23 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
     switch (request.headers['hook-name']) {
         case "pre-create":
             // Upload type check
-            if(!db.getPossibleTypes().includes(request.body.Upload.MetaData.type)) return response.status(400).send({error: 'Invalid upload type'})
+            if(!db.getPossibleTypes().includes(request.body.Upload.MetaData.type) && request.body.Upload.MetaData.type !== 'hlsencode') return response.status(400).send({error: 'Invalid upload type'})
 
             // Authenticate
-            Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,true,(e,user) => {
+            Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,true,(e,user,network) => {
                 if (e) return response.status(401).send({error: e})
-                if (request.body.Upload.MetaData.encoderUser && request.body.Upload.MetaData.encodingCost) { 
-                    if (Auth.invalidHiveUsername(request.body.Upload.MetaData.encoderUser))
-                        return response.status(401).send({error: 'Invalid encoderUser Hive username'})
-                    else if (!Config.admins.includes(user) && !Config.Encoder.accounts.includes(user))
+                if (request.body.Upload.MetaData.type === 'hlsencode') {
+                    let fullusername = db.toFullUsername(user,network)
+                    if (!Config.admins.includes(fullusername) && !Config.Encoder.accounts.includes(fullusername) && !Config.admins.includes(user) && !Config.Encoder.accounts.includes(user))
                         return response.status(401).send({error: 'Uploads from encoding servers must be an admin or encoder account.'})
-                    else if (request.body.Upload.MetaData.type !== 'hlsencode')
-                        return response.status(401).send({error: 'Uploads from encoding servers must be a hlsencode type.'})
+
+                    // encoder specific fields
+                    if (FileUploader.remoteEncoding(fullusername) !== request.body.Upload.MetaData.encodeID)
+                        return response.status(401).send({error: 'Encoding upload ID currently not first in queue'})
+                    if (isNaN(parseInt(request.body.Upload.MetaData.idx)) || parseInt(request.body.Upload.MetaData.idx) < -1)
+                        return response.status(401).send({error: 'Invalid encoder output file index'})
+                    if (isNaN(parseInt(request.body.Upload.MetaData.output)) && request.body.Upload.MetaData.output !== 'sprite')
+                        return response.status(401).send({error: 'Invalid encoder output'})
                 }
                 return response.status(200).send()
             })
@@ -192,10 +197,7 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
 
             // Get user by access token then process upload
             Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,false,(e,user,network) => {
-                let uploadUser = user
-                if (request.body.Upload.MetaData.encoderUser && request.body.Upload.MetaData.encodingCost)
-                    uploadUser = request.body.Upload.MetaData.encoderUser
-                FileUploader.handleTusUpload(request.body,uploadUser,network,() => {
+                FileUploader.handleTusUpload(request.body,user,network,() => {
                     FileUploader.writeUploadRegister()
                     response.status(200).send()
                 })

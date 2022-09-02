@@ -13,6 +13,7 @@ const Config = require('./config')
 const db = require('./dbManager')
 const Auth = require('./authManager')
 const ProcessingQueue = require('./processingQueue')
+const helpers = require('./encoderHelpers')
 const globSource = IPFS.globSource
 const defaultDir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 
@@ -25,14 +26,6 @@ ffmpeg.setFfmpegPath(Config.Encoder.ffmpegPath ? Config.Encoder.ffmpegPath : She
 ffmpeg.setFfprobePath(Config.Encoder.ffprobePath ? Config.Encoder.ffprobePath : Shell.which('ffprobe').toString())
 
 const encoderQueue = new ProcessingQueue()
-const encoderOptions = [
-    '-hls_time 5',
-    '-hls_list_size 0',
-    '-segment_time 10',
-    '-segment_format mpegts',
-    '-f segment',
-    Config.Encoder.quality
-]
 const supportedEncoders = [
     'libx264',
     'h264_videotoolbox',
@@ -42,15 +35,6 @@ const supportedEncoders = [
     'h264_vaapi',
     'h264_omx'
 ]
-const hlsBandwidth = {
-    4320: 20000000,
-    2160: 6000000,
-    1440: 4000000,
-    1080: 2000000,
-    720: 1256000,
-    480: 680000,
-    240: 340000
-}
 
 let uploadRegister = JSON.parse(fs.readFileSync(defaultDir+'/db/register.json','utf8'))
 let socketRegister = {}
@@ -67,6 +51,8 @@ const emitToUID = (id,evt,message,updateTs) => {
 const remoteEncoderNext = (encoder) => {
     if (!encoderRegister[encoder]) return
     encoderRegister[encoder].queue.shift()
+    delete encoderRegister[encoder].step
+    delete encoderRegister[encoder].outputs
     if (encoderRegister[encoder].queue.length >= 1) {
         encoderRegister[encoder].socket.emit('job',encoderRegister[encoder].queue[0])
     }
@@ -82,18 +68,6 @@ const getEncoderBySocket = (socket) => {
 const ipfsAPI = IPFS.create({ host: 'localhost', port: Config.IPFS_API_PORT, protocol: 'http' })
 const streamUpload = Multer({ dest: defaultDir, limits: { fileSize: 52428800 } }) // 50MB segments
 const imgUpload = Multer({ dest: defaultDir, limits: { fileSize: 7340032 } })
-
-const imgFilenameChars = 'abcdef0123456789'
-const imgFilenameLength = 32
-const isValidImgFname = (filename = '') => {
-    if (filename.length === imgFilenameLength) {
-        for (let c in filename)
-            if (imgFilenameChars.indexOf(filename[c]) === -1)
-                return false
-        return true
-    } else
-        return false
-}
 
 const addFile = async (dir,trickle,skynetpin,callback,onlyHash) => {
     let opts = { trickle: trickle, cidVersion: 0 }
@@ -151,41 +125,6 @@ const addSprite = async (filepath,id) => {
             addFile(defaultDir+'/'+id + '.jpg',true,false,(size,hash) => rs({size: size, hash: hash}))
         })
     })
-}
-
-const createSpriteInContainer = async (filepath,id) => {
-    return new Promise((rs) => Shell.exec(__dirname+'/../scripts/dtube-sprite.sh ' + filepath + ' ' + defaultDir + '/' + id + '/sprite.jpg',() => rs()))
-}
-
-const getFFprobeVideo = (filepath) => {
-    return new Promise((rs,rj) => {
-        ffmpeg.ffprobe(filepath,(e,probe) => {
-            if (e)
-                return rj(e)
-            let width, height, duration, orientation
-            for (s in probe.streams)
-                if (probe.streams[s].codec_type === 'video') {
-                    width = probe.streams[s].width,
-                    height = probe.streams[s].height,
-                    duration = probe.format.duration
-                    if (width > height)
-                        orientation = 1 // horizontal
-                    else
-                        orientation = 2 // square or vertical
-                    break
-                }
-            return rs({ width, height, duration, orientation })
-        })
-    })
-}
-
-const recursiveFileCount = (dir) => {
-    let c = fs.readdirSync(dir).filter((v) => !v.startsWith('.'))
-    let l = c.length
-    for (let f in c)
-        if (fs.lstatSync(dir+'/'+c[f]).isDirectory())
-            l += recursiveFileCount(dir+'/'+c[f])
-    return l
 }
 
 const trimTrailingSlash = (str) => {
@@ -346,8 +285,52 @@ let uploadOps = {
     handleTusUpload: (json,user,network,callback) => {
         let filepath = json.Upload.Storage.Path
         switch (json.Upload.MetaData.type) {
+            case 'hlsencode':
+                // create folders if not exist
+                const workingDir = defaultDir+'/'+json.Upload.MetaData.encodeID
+                if (!fs.existsSync(workingDir))
+                    fs.mkdirSync(workingDir)
+                if (json.Upload.MetaData.output !== 'sprite') {
+                    if (!fs.existsSync(workingDir+'/'+json.Upload.MetaData.output+'p'))
+                        fs.mkdirSync(workingDir+'/'+json.Upload.MetaData.output+'p')
+
+                    // move files from tus dir to created folders
+                    if (parseInt(json.Upload.MetaData.idx) >= 0 && !fs.existsSync(workingDir+'/'+json.Upload.MetaData.output+'p/'+json.Upload.MetaData.idx+'.ts'))
+                        fs.renameSync(filepath,workingDir+'/'+json.Upload.MetaData.output+'p/'+json.Upload.MetaData.idx+'.ts')
+                    else if (parseInt(json.Upload.MetaData.idx) === -1 && !fs.existsSync(workingDir+'/'+json.Upload.MetaData.output+'p/index.m3u8'))
+                        // index m3u8 file
+                        fs.renameSync(filepath,workingDir+'/'+json.Upload.MetaData.output+'p/index.m3u8')
+                    else
+                        // error if duplicate output uploads
+                        if (encoderRegister[db.toFullUsername(user,network)] && encoderRegister[db.toFullUsername(user,network)].socket)
+                            return encoderRegister[db.toFullUsername(user,network)].socket.emit('error',{
+                                method: 'hlsencode',
+                                id: json.Upload.MetaData.encodeID,
+                                error: 'duplicate output upload '+json.Upload.MetaData.output+'p idx '+json.Upload.MetaData.idx
+                            })
+                } else {
+                    if (!fs.existsSync(workingDir+'/sprite.jpg'))
+                        fs.renameSync(filepath,workingDir+'/sprite.jpg')
+                    else
+                        // error if duplicate sprite uploads
+                        if (encoderRegister[db.toFullUsername(user,network)] && encoderRegister[db.toFullUsername(user,network)].socket)
+                            return encoderRegister[db.toFullUsername(user,network)].socket.emit('error',{
+                                method: 'hlsencode',
+                                id: json.Upload.MetaData.encodeID,
+                                error: 'duplicate sprite upload'
+                            })
+                }
+                if (encoderRegister[db.toFullUsername(user,network)] && encoderRegister[db.toFullUsername(user,network)].socket)
+                    return encoderRegister[db.toFullUsername(user,network)].socket.emit('result',{
+                        method: 'hlsencode',
+                        id: json.Upload.MetaData.encodeID,
+                        idx: json.Upload.MetaData.idx,
+                        output: json.Upload.MetaData.output,
+                        success: true
+                    })
+                break
             case 'hls':
-                getFFprobeVideo(filepath).then((d) => {
+                helpers.getFFprobeVideo(filepath).then((d) => {
                     let { width, height, duration, orientation } = d
                     if (!width || !height || !duration || !orientation)
                         return emitToUID(json.Upload.ID,'error',{ error: 'could not retrieve ffprobe info on uploaded video' },false)
@@ -359,6 +342,7 @@ let uploadOps = {
                             id: json.Upload.ID,
                             username: user,
                             network: network,
+                            duration: duration,
                             createSprite: json.Upload.MetaData.createSprite,
                             thumbnail: json.Upload.MetaData.thumbnailFname
                         }
@@ -371,7 +355,7 @@ let uploadOps = {
                     let outputResolutions = []
                     let sedge = Math.min(width,height)
                     for (let q in Config.Encoder.outputs)
-                        if (hlsBandwidth[Config.Encoder.outputs[q]] && sedge >= Config.Encoder.outputs[q])
+                        if (helpers.getHlsBw(Config.Encoder.outputs[q]) && sedge >= Config.Encoder.outputs[q])
                             outputResolutions.push(Config.Encoder.outputs[q])
                     if (outputResolutions.length === 0)
                         outputResolutions.push(Config.Encoder.outputs[Config.Encoder.outputs.length-1])
@@ -383,39 +367,29 @@ let uploadOps = {
                         fs.mkdirSync(defaultDir+'/'+json.Upload.ID+'/'+outputResolutions[r]+'p')
                     
                     // Encoding ops
-                    const ffmpegbase = ffmpeg(filepath)
-                        .videoCodec(Config.Encoder.encoder)
-                        .audioCodec('aac')
-                    const ops = {}
-                    for (let r in outputResolutions) {
-                        let resolution = outputResolutions[r]
-                        ops[resolution] = (cb) =>
-                            ffmpegbase.clone()
-                                .output(defaultDir+'/'+json.Upload.ID+'/'+resolution+'p/%d.ts')
-                                .audioBitrate('256k')
-                                .addOption(encoderOptions)
-                                .addOption('-segment_list',defaultDir+'/'+json.Upload.ID+'/'+resolution+'p/index.m3u8')
-                                .size(orientation === 1 ? '?x'+resolution : resolution+'x?')
-                                .on('progress',(p) => {
-                                    emitToUID(json.Upload.ID,'progress',{
-                                        job: 'encode',
-                                        resolution: resolution,
-                                        frames: p.frames,
-                                        fps: p.currentFps,
-                                        progress: p.percent
-                                    },true)
-                                    console.log('ID '+json.Upload.ID+' - '+resolution+'p --- Frames: '+p.frames+'   FPS: '+p.currentFps+'   Progress: '+p.percent.toFixed(3)+'%')
-                                })
-                                .on('error',(e) => {
-                                    console.error(json.Upload.ID+' - '+resolution+'p --- Error',e)
-                                    emitToUID(json.Upload.ID,'error',{ error: resolution + 'p resolution encoding failed' },false)
-                                    cb(e)
-                                })
-                                .on('end',() => cb(null))
-                                .run()
-                    }
-                    if (json.Upload.MetaData.createSprite)
-                        ops.sprite = (cb) => createSpriteInContainer(filepath,json.Upload.ID).then(() => cb(null))
+                    const ops = helpers.hlsEncode(
+                        json.Upload.ID,
+                        filepath,
+                        orientation,
+                        Config.Encoder.encoder,
+                        Config.Encoder.quality,
+                        outputResolutions,
+                        json.Upload.MetaData.createSprite,
+                        defaultDir+'/'+json.Upload.ID,
+                        (id, resolution, p) => {
+                            emitToUID(id,'progress',{
+                                job: 'encode',
+                                resolution: resolution,
+                                frames: p.frames,
+                                fps: p.currentFps,
+                                progress: p.percent
+                            },true)
+                            console.log('ID '+id+' - '+resolution+'p --- Frames: '+p.frames+'   FPS: '+p.currentFps+'   Progress: '+p.percent.toFixed(3)+'%')
+                        },
+                        (id, resolution, e) => {
+                            console.error(id+' - '+resolution+'p --- Error',e)
+                            emitToUID(id,'error',{ error: resolution + 'p resolution encoding failed' },false)
+                        })
                     encoderQueue.push({ id: json.Upload.ID, f: (s, nextJob) => {
                         s.step = 'encode'
                         s.outputs = outputResolutions
@@ -428,26 +402,13 @@ let uploadOps = {
                             delete s.outputs
                             emitToUID(json.Upload.ID,'begin',s,true)
                             
-                            // Construct master playlist
-                            let masterPlaylist = '#EXTM3U\n#EXT-X-VERSION:3'
-                            for (let r in outputResolutions) {
-                                let rd
-                                try {
-                                    rd = await getFFprobeVideo(defaultDir+'/'+json.Upload.ID+'/'+outputResolutions[r]+'p/0.ts')
-                                } catch {
-                                    emitToUID(json.Upload.ID,'error',{ error: 'could not retrieve ffprobe info on '+outputResolutions[r]+'p encoded video' },false)
-                                    return nextJob()
-                                }
-                                masterPlaylist += '\n#EXT-X-STREAM-INF:BANDWIDTH='+hlsBandwidth[outputResolutions[r]]+',RESOLUTION='+rd.width+'x'+rd.height+'\n'+outputResolutions[r]+'p/index.m3u8'
+                            // Construct master playlist, thumbnail
+                            let masterPlaylist = helpers.createMasterPlaylist(defaultDir+'/'+json.Upload.ID,outputResolutions)
+                            if (!masterPlaylist.success) {
+                                emitToUID(json.Upload.ID,'error',{ error: masterPlaylist.error },false)
+                                return nextJob()
                             }
-                            fs.writeFileSync(defaultDir+'/'+json.Upload.ID+'/default.m3u8',masterPlaylist)
-
-                            // Add thumbnail image file in container
-                            let hasThumbnail = false
-                            if (isValidImgFname(json.Upload.MetaData.thumbnailFname) && fs.existsSync(defaultDir+'/'+json.Upload.MetaData.thumbnailFname)) {
-                                fs.copyFileSync(defaultDir+'/'+json.Upload.MetaData.thumbnailFname,defaultDir+'/'+json.Upload.ID+'/thumbnail.jpg')
-                                hasThumbnail = true
-                            }
+                            let hasThumbnail = helpers.hlsThumbnail(json.Upload.MetaData.thumbnailFname,defaultDir,defaultDir+'/'+json.Upload.ID)
 
                             s.step = 'ipfsadd'
                             emitToUID(json.Upload.ID,'begin',s,true)
@@ -457,7 +418,7 @@ let uploadOps = {
                             let folderhash, spritehash
                             let addProgress = {
                                 progress: 0,
-                                total: recursiveFileCount(defaultDir+'/'+json.Upload.ID) + 1
+                                total: helpers.recursiveFileCount(defaultDir+'/'+json.Upload.ID) + 1
                             }
                             for await (const f of ipfsAPI.addAll(globSource(defaultDir,json.Upload.ID+'/**'),{cidVersion: 0, pin: true})) {
                                 if (f.path.endsWith(json.Upload.ID))
@@ -608,6 +569,13 @@ let uploadOps = {
     writeUploadRegister: () => {
         fs.writeFile(defaultDir+'/db/register.json',JSON.stringify(uploadRegister),() => {})
     },
+    remoteEncoding: (encoder) => {
+        // Get first upload ID from remote encoder queue
+        if (!encoderRegister[encoder] || !Array.isArray(encoderRegister[encoder].queue) || encoderRegister[encoder].queue.length === 0)
+            return ''
+        else
+            return encoderRegister[encoder].queue[0].id
+    },
     IPSync: {
         init: (server) => {
             SocketIO = Socket(server, {
@@ -672,7 +640,7 @@ let uploadOps = {
                         
                         // Type requested does not match registered type
                         // HLS uploads do not transform into other upload types
-                        if (info.type === 'hls')
+                        if (info.type === 'hls' || info.type === 'hlsencode')
                             return socket.emit('error',{ error: 'hls uploads cannot be transformed' })
 
                         // Encoded video hash requested, return only hash
@@ -683,10 +651,7 @@ let uploadOps = {
                         })
 
                         // Or else if "videos" type requested, generate sprites, duration etc
-                        let uploadUser = user
-                        if (request.body.Upload.MetaData.encoderUser && request.body.Upload.MetaData.encodingCost)
-                            uploadUser = request.body.Upload.MetaData.encoderUser
-                        processSingleVideo(info.id,uploadUser,network,(result) => {
+                        processSingleVideo(info.id,user,network,(result) => {
                             socket.emit('result',result)
                         })
                     })
@@ -713,9 +678,9 @@ let uploadOps = {
                     if (typeof info.encoder !== 'string') return socket.emit('error', { method: 'auth', error: 'Encoder must be specified. Valid values: '+supportedEncoders.join(', ') })
                     if (!supportedEncoders.includes(info.encoder)) return socket.emit('error', { method: 'auth', error: 'Invalid encoder' })
                     if (typeof info.quality !== 'string') return socket.emit('error', { method: 'auth', error: 'Quality (string) must be specified' })
-                    if (!Array.isArray(info.outputs)) return socket.emit('error', { method: 'auth', error: 'Qutputs array must be specified. Valid array values: '+Object.keys(hlsBandwidth).join(', ') })
+                    if (!Array.isArray(info.outputs)) return socket.emit('error', { method: 'auth', error: 'Qutputs array must be specified. Valid array values: '+helpers.getHlsQList().join(', ') })
                     for (let o in info.outputs)
-                        if (!hlsBandwidth[info.outputs[o]])
+                        if (!helpers.getHlsBw(info.outputs[o]))
                             return socket.emit('error', { method: 'auth', error: 'Invalid output quality '+info.outputs[o] })
 
                     Auth.authenticate(info.access_token,info.keychain,false,(e,user,network) => {
@@ -735,7 +700,7 @@ let uploadOps = {
                         encoderRegister[fullUsername].quality = info.quality
                         encoderRegister[fullUsername].outputs = info.outputs
 
-                        socket.emit('result', { method: 'auth', success: true })
+                        socket.emit('result', { method: 'auth', success: true, username: fullUsername })
                     })
                 })
 
@@ -762,17 +727,17 @@ let uploadOps = {
                         return socket.emit('error', { method: 'joberror', error: 'upload id is not in queue' })
                 })
 
-                socket.on('jobbegin',(jobbegin) => {
+                socket.on('jobbegin', async (jobbegin) => {
                     let r = getEncoderBySocket(socket)
                     if (!r)
                         socket.emit('error', { method: 'jobbegin', error: 'not authenticated or session expired' })
                     else if (encoderRegister[r].queue.length >= 1 && encoderRegister[r].queue[0].id === jobbegin.id) {
                         if (jobbegin.step === 'encode')
-                            if (Array.isArray(typeof jobbegin.outputs) && jobbegin.outputs.length > 0) {
+                            if (Array.isArray(jobbegin.outputs) && jobbegin.outputs.length > 0) {
                                 for (let i in jobbegin.outputs)
                                     if (!Number.isInteger(jobbegin.outputs[i]))
                                         return socket.emit('error', { method: 'jobbegin', error: 'output #'+i+' is not a valid integer resolution' })
-                                    else if (!hlsBandwidth[jobbegin.outputs[i]])
+                                    else if (!helpers.getHlsBw(jobbegin.outputs[i]))
                                         return socket.emit('error', { method: 'jobbegin', error: 'output #'+i+' is not a supported resolution' })
                                 emitToUID(jobbegin.id,'begin',jobbegin,true)
                                 encoderRegister[r].outputs = jobbegin.outputs
@@ -793,6 +758,57 @@ let uploadOps = {
                             socket.emit('result', { method: 'upload', id: jobbegin.id })
                         } else if (jobbegin.step === 'fetch')
                             encoderRegister[r].step = 'fetch'
+                        else if (jobbegin.step === 'postupload') {
+                            // post processing
+                            emitToUID(jobbegin.id,'begin',{ step: 'container' }, true)
+
+                            // Master playlist, thumbnail
+                            let masterPlaylist = await helpers.createMasterPlaylist(defaultDir+'/'+jobbegin.id,encoderRegister[r].outputs)
+                            if (!masterPlaylist.success) {
+                                emitToUID(jobbegin.id,'error',{ error: masterPlaylist.error },false)
+                                socket.emit('error', { method: 'jobbegin', id: jobbegin.id, error: error })
+                                return remoteEncoderNext(r)
+                            }
+                            let hasThumbnail = helpers.hlsThumbnail(encoderRegister[r].queue[0].thumbnail,defaultDir,defaultDir+'/'+jobbegin.id)
+
+                            // Add container to IPFS
+                            emitToUID(jobbegin.id,'begin',{ step: 'ipfsadd' },true)
+                            let ipfsaddop = await helpers.addHlsToIPFS(ipfsAPI,globSource,defaultDir,jobbegin.id,(addProgress) => {
+                                emitToUID(jobbegin.id,'progress',{
+                                    job: 'ipfsadd',
+                                    progress: addProgress.progress,
+                                    total: addProgress.total
+                                },true)
+                            })
+                            if (ipfsaddop.error) {
+                                emitToUID(jobbegin.id,'error',{ error: ipfsaddop.error },false)
+                                return remoteEncoderNext(r)
+                            }
+
+                            // Record in db and return result
+                            db.recordHash(encoderRegister[r].queue[0].user,encoderRegister[r].queue[0].network,'hls',ipfsaddop.folderhash.cid.toString(),ipfsaddop.folderhash.size)
+                            db.writeHashesData()
+                            db.writeHashSizesData()
+
+                            let result = {
+                                username: encoderRegister[r].queue[0].user,
+                                network: encoderRegister[r].queue[0].network,
+                                type: 'hls',
+                                ipfshash: ipfsaddop.folderhash.cid.toString(),
+                                spritehash: ipfsaddop.spritehash,
+                                size: ipfsaddop.folderhash.size,
+                                duration: encoderRegister[r].queue[0].duration,
+                                hasThumbnail: hasThumbnail,
+                                resolutions: encoderRegister[r].outputs,
+                                encoder: r
+                            }
+                            console.log(result)
+                            emitToUID(jobbegin.id,'result',result,false)
+                            delete socketRegister[jobbegin.id]
+                            uploadRegister[jobbegin.id] = result
+                            ipsync.emit('upload',result)
+                            remoteEncoderNext(r)
+                        }
                         else
                             socket.emit('error', { method: 'jobbegin', error: 'invalid step' })
                     } else
