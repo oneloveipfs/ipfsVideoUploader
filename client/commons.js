@@ -35,6 +35,11 @@ function updateDisplayByIDs(toshow,tohide,type = 'block') {
         document.getElementById(toshow[i]).style.display = type
 }
 
+// enable/disable elements
+function toggleElems(toToggle = [], disable = false) {
+    for (let i in toToggle) document.getElementById(toToggle[i]).disabled = disable
+}
+
 function axiosErrorHandler(e) {
     alert(axiosErrorMessage(e))
 }
@@ -180,6 +185,46 @@ function validateAvalonUsername(u) {
                 return 'character ' + c + ' can only be in the middle'
     }
     return null
+}
+
+function generateMessageToSign (username,network,cb) {
+    // Generate text for user to sign
+    // using latest block id
+    let message = username+':'+config.authIdentifier+':'+network+':'
+    switch (network) {
+        case 'hive':
+            axios.post('https://techcoderx.com',{
+                id: 1,
+                jsonrpc: '2.0',
+                method: 'condenser_api.get_dynamic_global_properties',
+                params: []
+            }).then((r) => {
+                if (r.data && r.data.result) {
+                    message += r.data.result.head_block_number+':'+r.data.result.head_block_id
+                    cb(null,message)
+                } else if (r.data && r.data.error)
+                    cb(r.data.error.message)
+            }).catch(e => cb(e.toString()))
+            break
+        case 'dtc':
+            axios.get('https://api.avalonblocks.com/count').then((r) => {
+                if (r.data && r.data.count) {
+                    message += r.data.count-1
+                    message += ':'
+                    axios.get('https://api.avalonblocks.com/block/'+(r.data.count-1)).then((b) => {
+                        if (b.data && b.data.hash) {
+                            message += b.data.hash
+                            cb(null,message)
+                        }
+                    }).catch(e => cb(e.toString()))
+                }
+            }).catch(e => cb(e.toString()))
+            break
+    }
+}
+
+function generateMessageToSignPromise (username,network) {
+    return new Promise((rs,rj) => generateMessageToSign(username,network,(e,r) => e ? rj(e) : rs(r)))
 }
 
 function hivePaymentClickListener(u,to,amt,currency,memo,p = 'signup') {

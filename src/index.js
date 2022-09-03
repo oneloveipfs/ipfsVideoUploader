@@ -61,7 +61,7 @@ app.get('/login',(request,response) => {
 
     let queryNetwork = request.query.network || 'all'
 
-    if (Config.whitelistEnabled && !request.query.noauth)
+    if (Config.whitelistEnabled)
         if (!Auth.isInWhitelist(request.query.user,queryNetwork))
             return response.status(403).send({error: 'Uploader access denied!'})
 
@@ -468,10 +468,11 @@ app.put('/update_alias',Parser.json(),(req,res) => {
                 return res.status(400).send({error: e})
             }
             return res.send({})
-        } else Auth.decryptMessage(req.body.aliasKey,(decoded) => {
-            if (decoded === false)
-                return res.status(400).send({error: 'Could not decipher alias key'})
-            else if (decoded[2] === 'all')
+        } else Auth.verifyAuthSignature(req.body.aliasKey,(success) => {
+            if (!success)
+                return res.status(400).send({error: 'Failed to verify alias recent signature'})
+            let decoded = req.body.aliasKey.split(':')
+            if (decoded[2] === 'all')
                 // all network type is disabled due to a security issue where only hive keys are verified
                 return res.status(400).send({error: 'network type "all" is disabled'})
             try {

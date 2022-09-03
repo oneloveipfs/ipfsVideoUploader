@@ -203,44 +203,29 @@ function refreshAliasAccs() {
         .catch(() => alert('Deletion success but something went wrong while updating alias list'))
 }
 
-async function avalonAliasAuth(avalonUsername,avalonKey,cb) {
-    let avalonKeyId
-    try {
-        avalonKeyId = await getAvalonKeyId(avalonUsername,avalonKey)
-        if (avalonKeyId === false)
-            return alert('Avalon key is invalid')
-    } catch (e) {
-        return alert('Avalon login error: ' + e)
-    }
-    
-    let loginGetUrl = '/login?noauth=1&user=' + avalonUsername + '&network=dtc'
-    if (avalonKeyId && avalonKeyId !== true) loginGetUrl += '&dtckeyid=' + avalonKeyId
-    axios.get(loginGetUrl).then((response) => {
-        if (response.data.error != null)
-            return alert(response.data.error)
-        javalon.decrypt(avalonKey,response.data.encrypted_memo,(e,decryptedAES) => {
-            if (e)
-                return alert('Avalon decrypt error: ' + e.error)
-            cb(decryptedAES)
-        })
-    }).catch(axiosErrorHandler)
+function avalonAliasAuth(avalonUsername,avalonKey,cb) {
+    generateMessageToSign(avalonUsername,'dtc',(e,message) => {
+        if (e)
+            return alert(e)
+        let signature = hivecryptpro.Signature.avalonCreate(hivecryptpro.sha256(message),avalonKey).customToString()
+        message += ':'+signature
+        cb(message)
+    })
 }
 
 async function hiveAliasAuth(hiveUsername,hiveKey,cb) {
-    let loginUrl = '/login?noauth=1&network=hive&user='+hiveUsername
-    axios.get(loginUrl).then((r) => {
+    generateMessageToSign(hiveUsername,'hive',(e,message) => {
+        if (e)
+            return alert(e)
         if (isElectron()) {
-            let token
-            try {
-                token = hivecrypt.decode(hiveKey,r.data.encrypted_memo).substr(1)
-            } catch {
-                return handleLoginError('Unable to decode access token with Hive posting key')
-            }
-            cb(token)
-        } else hive_keychain.requestVerifyKey(hiveUsername,r.data.encrypted_memo,'Posting',(kr) => {
-            if (kr.data.error != null)
-                return alert(response.data.error)
-            cb(kr.result.substr(1))
+            let signature = hivecryptpro.Signature.create(hivecryptpro.sha256(message),hiveKey).customToString()
+            message += ':'+signature
+            return cb(message)
+        } else hive_keychain.requestSignBuffer(hiveUsername,message,'Posting',(kr) => {
+            if (kr.error)
+                return alert(kr.message)
+            message += ':'+kr.result
+            return cb(message)
         })
-    }).catch(axiosErrorHandler)
+    })
 }

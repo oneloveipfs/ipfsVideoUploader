@@ -86,6 +86,15 @@ function aesDecrypt(data,key) {
     return CryptoJS.AES.decrypt(data,key).toString(CryptoJS.enc.Utf8)
 }
 
+function isCanonicalSignature(signature) {
+    return (
+      !(signature[0] & 0x80) &&
+      !(signature[0] === 0 && !(signature[1] & 0x80)) &&
+      !(signature[32] & 0x80) &&
+      !(signature[32] === 0 && !(signature[33] & 0x80))
+    )
+}
+
 /**
  * ECDSA (secp256k1) public key.
  */
@@ -206,6 +215,24 @@ class Signature {
      */
     static fromString(string) {
         return Signature.fromBuffer(Buffer.from(string, 'hex'))
+    }
+
+    /**
+     * 
+     * @param {UInt8Array} message 32-byte message to sign
+     * @param {String} wif plaintext wif
+     * @returns a new Signature instance
+     */
+     static create(message,wif) {
+        let rv = {}
+        let attempts = 0
+        do {
+            const options = {
+                data: sha256(Buffer.concat([message, Buffer.alloc(1, ++attempts)]))
+            }
+            rv = secp256k1.ecdsaSign(message, PrivateKey.fromString(wif).key, options)
+        } while (!isCanonicalSignature(rv.signature))
+        return new Signature(rv.signature, rv.recid)
     }
 
     /**

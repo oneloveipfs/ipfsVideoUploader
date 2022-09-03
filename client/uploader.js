@@ -409,8 +409,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let imgFormData = new FormData()
         imgFormData.append('image',postImg[0])
-
-        restrictImg();
+        toggleImg(true)
 
         let progressbar = document.getElementById('uploadProgressBack')
         let progressbarInner = document.getElementById('uploadProgressFront')
@@ -434,14 +433,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log(response);
             progressbar.style.display = "none";
             document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + ']('+config.gateway+'/ipfs/' + response.data.imghash + ')');
-            reenableFieldsImg();
+            toggleImg(false)
         }).catch(function(err) {
             if (err.response.data.error)
                 alert('Upload error: ' + err.response.data.error)
             else
                 alert('Upload error: ' + err);
             progressbar.style.display = "none";
-            reenableFieldsImg();
+            toggleImg(false)
         })
     }
 
@@ -470,10 +469,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return alert('Selected language is invalid!')
         if (subtitleFile.length == 0)
             return alert('Please choose a WebVTT subtitle file to upload.')
-        
-        document.getElementById('newLanguageField').disabled = true
-        document.getElementById('chooseSubBtn').disabled = true
-        document.getElementById('uploadSubBtn').disabled = true
+
+        toggleElems(['newLanguageField','chooseSubBtn','uploadSubBtn'],true)
 
         const contentType = {
             headers: {
@@ -495,10 +492,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Reset fields
             document.getElementById('chooseSubBtn').innerHTML = 'Choose subtitle file'
             document.getElementById('newLanguageField').value = ''
-            reenableSubtitleFields()
+            toggleElems(['newLanguageField','chooseSubBtn','uploadSubBtn'],false)
             updateSubtitle()
         }).catch((err) => {
-            reenableSubtitleFields()
+            toggleElems(['newLanguageField','chooseSubBtn','uploadSubBtn'],false)
             if (err.response.data.error) alert(err.response.data.error)
             else alert(err)
         })
@@ -518,7 +515,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             },
             Steem: {
                 method: steem.api.getAccounts,
-                benef: hiveBeneficiaries,
+                benef: steemBeneficiaries,
                 cu: steemUser
             },
             Blurt: {
@@ -692,24 +689,12 @@ function uploadVideo(resolution,next,thumbnailFname = '') {
     })
 }
 
-function restrictImg() {
-    const toDisable = ['postBody','postImgBtn','draftBtn','submitbutton']
-    for (let i = 0; i < toDisable.length; i++) document.getElementById(toDisable[i]).disabled = true
+function toggleImg(disable = false) {
+    toggleElems(['postBody','postImgBtn','draftBtn','submitbutton'],disable)
 }
 
 function reenableFields() {
-    const toEnable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton','newLanguageField','chooseSubBtn','uploadSubBtn','linkSubmitBtn','swapSubmitBtn']
-    for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i]).disabled = false
-}
-
-function reenableFieldsImg() {
-    const toEnable = ['postBody','postImgBtn','draftBtn','submitbutton']
-    for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i]).disabled = false
-}
-
-function reenableSubtitleFields() {
-    const toEnable = ['newLanguageField','chooseSubBtn','uploadSubBtn']
-    for (let i = 0; i < toEnable.length; i++) document.getElementById(toEnable[i]).disabled = false
+    toggleElems(['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton','newLanguageField','chooseSubBtn','uploadSubBtn','linkSubmitBtn','swapSubmitBtn'],false)
 }
 
 function postVideo() {
