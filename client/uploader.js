@@ -224,42 +224,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('tus is not supported')
     }
 
-    // Scheduled uploads date and time picker
-    const oneYear = 31536000000
-    const now = Math.ceil(new Date().getTime() / 300000) * 300000
-    scheduleDatePicker = flatpickr('#scheduleposttime',{
-        enableTime: true,
-        dateFormat: 'F j, Y G:i K',
-        minDate: new Date(now),
-        maxDate: new Date(now+(100*oneYear)),
-        minuteIncrement: 5,
-        onChange: (selectedTime, dateStr, instance) => {
-            let s = new Date(selectedTime[0]).getTime()
-            if (!Number.isInteger(s/300000))
-                scheduleDatePicker.setDate(Math.ceil(s / 300000) * 300000)
-            document.getElementById('scheduledStr').innerText = 'Scheduled to publish at '+new Date(Math.ceil(s / 300000) * 300000).toLocaleString()
-        }
-    })
-
-    document.getElementById('schedulepostswitch').onchange = () => {
-        if (document.getElementById('schedulepostswitch').checked) {
-            updateDisplayByIDs(['schedulepostdetails'],[])
-            if (scheduleDatePicker.selectedDates.length > 0)
-                document.getElementById('scheduledStr').innerText = 'Scheduled to publish at '+new Date(scheduleDatePicker.selectedDates[0]).toLocaleString()
-            else
-                document.getElementById('scheduledStr').innerText = 'Please select a date and time to schedule'
-        } else {
-            updateDisplayByIDs([],['schedulepostdetails'])
-            document.getElementById('scheduledStr').innerText = 'Publishing immediately'
-        }
-    }
-
+    loadOliscDatePicker()
     document.getElementById('languages').innerHTML = langOptions
-
     document.getElementById('tabBasics').onclick = () => {
-        document.getElementById('advanced').style.display = "none"
-        document.getElementById('subtitles').style.display = "none"
-        document.getElementById('basics').style.display = "block"
+        updateDisplayByIDs(['basics'],['subtitles','advanced'])
         document.getElementById('tabAdvanced').style.backgroundColor = "transparent"
         document.getElementById('tabSubtitles').style.backgroundColor = "transparent"
         document.getElementById('tabBasics').style.backgroundColor = "#2196F3"
@@ -267,9 +235,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     document.getElementById('tabAdvanced').onclick = () => {
-        document.getElementById('advanced').style.display = "block"
-        document.getElementById('subtitles').style.display = "none"
-        document.getElementById('basics').style.display = "none"
+        updateDisplayByIDs(['advanced'],['basics','subtitles'])
         document.getElementById('tabAdvanced').style.backgroundColor = "#2196F3"
         document.getElementById('tabSubtitles').style.backgroundColor = "transparent"
         document.getElementById('tabBasics').style.backgroundColor = "transparent"
@@ -277,9 +243,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     document.getElementById('tabSubtitles').onclick = () => {
-        document.getElementById('advanced').style.display = "none"
-        document.getElementById('subtitles').style.display = "block"
-        document.getElementById('basics').style.display = "none"
+        updateDisplayByIDs(['subtitles'],['basics','advanced'])
         document.getElementById('tabAdvanced').style.backgroundColor = "transparent"
         document.getElementById('tabSubtitles').style.backgroundColor = "#2196F3"
         document.getElementById('tabBasics').style.backgroundColor = "transparent"
@@ -325,12 +289,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return alert('Please enter some tags (up to 8) for your video!')
         postparams.tags = tags
 
-        if (document.getElementById('schedulepostswitch').checked) {
-            if (scheduleDatePicker.selectedDates.length === 0)
-                return alert('Please select a date/time to schedule posting')
-            postparams.scheduled = scheduleDatePicker.selectedDates[0].getTime()
-        } else
-            postparams.scheduled = false
+        postparams.scheduled = validateDatePicker()
+        if (sch === -1) return
 
         // Avalon bandwidth check (untested)
         // if (avalonUser && avalonKey && needsBandwidth())
@@ -342,10 +302,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         let formdata = new FormData()
         formdata.append('image',snap[0])
 
-        let progressbar = document.getElementById('uploadProgressBack')
-        let progressbarInner = document.getElementById('uploadProgressFront')
-        progressbar.style.display = "block"
-        progressbarInner.innerHTML = "Uploading thumbnail... (0%)"
+        updateDisplayByIDs(['uploadProgressBack'],[])
+        updateProgressBar(0,'Uploading thumbnail...')
 
         let contentType = {
             headers: {
@@ -370,7 +328,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             if (uploaderResponse.error != null) {
                 reenableFields()
-                progressbar.style.display = "none"
+                updateDisplayByIDs([],['uploadProgressBack'])
                 return alert(uploaderResponse.error)
             }
 
@@ -386,7 +344,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alert(err.response.data.error)
             else
                 alert(err.toString())
-            progressbar.style.display = "none"
+            updateDisplayByIDs([],['uploadProgressBack'])
             reenableFields()
         })
     }
@@ -575,6 +533,7 @@ function uploadVideo(resolution,next,thumbnailFname = '') {
     let fInputElemName
     let resolutionFType
     let progressTxt
+    let lbl = ['source','240','480','720','1080']
     switch (resolution) {
         case -1:
             fInputElemName = 'sourcevideo'
@@ -587,31 +546,18 @@ function uploadVideo(resolution,next,thumbnailFname = '') {
             progressTxt = 'Uploading source video...'
             break
         case 1:
-            fInputElemName = 'video240p'
-            resolutionFType = 'video240'
-            progressTxt = 'Uploading 240p video...'
-            break
         case 2:
-            fInputElemName = 'video480p'
-            resolutionFType = 'video480'
-            progressTxt = 'Uploading 480p video...'
-            break
         case 3:
-            fInputElemName = 'video720p'
-            resolutionFType = 'video720'
-            progressTxt = 'Uploading 720p video...'
-            break
         case 4:
-            fInputElemName = 'video1080p'
-            resolutionFType = 'video1080'
-            progressTxt = 'Uploading 1080p video...'
+            fInputElemName = `video${lbl[resolution]}p`
+            resolutionFType = `video${lbl[resolution]}`
+            progressTxt = `Uploading ${lbl[resolution]}p video...`
             break
         default:
             return next()
     }
 
     let videoToUpload = document.getElementById(fInputElemName).files
-
     if (videoToUpload.length < 1) return uploadVideo(resolution+1,next)
 
     let progressbar = document.getElementById('uploadProgressBack')

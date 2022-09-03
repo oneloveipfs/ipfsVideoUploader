@@ -84,7 +84,7 @@ function loadGrapheneAuthorityStatus(account,network) {
 function gtn(network) {
     switch(network) {
         case 'avalon':
-            return config.avalonSupportPub
+            return config.avalonApp
         case 'hive':
             return config.hivesignerApp
         case 'steem':
@@ -114,11 +114,4 @@ function hasAuthority(account,network,target) {
         default:
             return false
     }
-}
-
-function getAvalonKeyID(account) {
-    for (let i = 0; i < account.keys.length; i++)
-        if (account.keys[i].pub == config.avalonSupportPub)
-            return account.keys[i].id
-    return null
 }

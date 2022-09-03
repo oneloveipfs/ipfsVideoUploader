@@ -130,3 +130,46 @@ function loadEditor() {
     head.appendChild(jsonEditorJs)
     jsonEditorLoaded = true
 }
+
+function loadOliscDatePicker() {
+    // Scheduled uploads date and time picker
+    const oneYear = 31536000000
+    const now = Math.ceil(new Date().getTime() / 300000) * 300000
+    scheduleDatePicker = flatpickr('#scheduleposttime',{
+        enableTime: true,
+        dateFormat: 'F j, Y G:i K',
+        minDate: new Date(now),
+        maxDate: new Date(now+(100*oneYear)),
+        minuteIncrement: 5,
+        onChange: (selectedTime, dateStr, instance) => {
+            let s = new Date(selectedTime[0]).getTime()
+            if (!Number.isInteger(s/300000))
+                scheduleDatePicker.setDate(Math.ceil(s / 300000) * 300000)
+            document.getElementById('scheduledStr').innerText = 'Scheduled to publish at '+new Date(Math.ceil(s / 300000) * 300000).toLocaleString()
+        }
+    })
+
+    document.getElementById('schedulepostswitch').onchange = () => {
+        if (document.getElementById('schedulepostswitch').checked) {
+            updateDisplayByIDs(['schedulepostdetails'],[])
+            if (scheduleDatePicker.selectedDates.length > 0)
+                document.getElementById('scheduledStr').innerText = 'Scheduled to publish at '+new Date(scheduleDatePicker.selectedDates[0]).toLocaleString()
+            else
+                document.getElementById('scheduledStr').innerText = 'Please select a date and time to schedule'
+        } else {
+            updateDisplayByIDs([],['schedulepostdetails'])
+            document.getElementById('scheduledStr').innerText = 'Publishing immediately'
+        }
+    }
+}
+
+function validateDatePicker() {
+    if (document.getElementById('schedulepostswitch').checked) {
+        if (scheduleDatePicker.selectedDates.length === 0) {
+            alert('Please select a date/time to schedule posting')
+            return -1
+        }
+        return scheduleDatePicker.selectedDates[0].getTime()
+    } else
+        return 0
+}
