@@ -7,52 +7,12 @@ function loadAvalonAuthorityStatus(account) {
     if (!hasAuthority(account,'avalon','oneloveipfs')) {
         document.getElementById('avalonAuthorizeBtn').innerText = 'Authorize Avalon'
         document.getElementById('avalonAuthorizeBtn').onclick = () => {
-            if (authorizing) return
-            let tx = {
-                type: 29,
-                data: {
-                    user: config.avalonApp,
-                    id: 'support',
-                    types: [4,28], // COMMENT, COMMENT_EDIT
-                    weight: 1
-                }
-            }
-            let signedtx = javalon.sign(avalonKey,avalonUser,tx)
-            authorizing = true
-            javalon.sendTransaction(signedtx,(e,r) => {
-                authorizing = false
-                if (e && e.error == 'invalid signature')
-                    return alert('The custom key you used to login does not have NEW_KEY permission')
-                else if (e && e.error)
-                    return alert(e.error)
-                else if (e)
-                    return alert(JSON.stringify(e))
-                javalon.getAccount(account.name,(e,newacc) => loadAvalonAuthorityStatus(newacc))
-            })
+            window.open(`https://avalonblocks.com/#/signer/?type=29&user=${config.avalonApp}&id=support&types=[4,28]&weight=1&broadcast=1`)
         }
     } else {
         document.getElementById('avalonAuthorizeBtn').innerText = 'Revoke Avalon'
         document.getElementById('avalonAuthorizeBtn').onclick = () => {
-            if (authorizing) return
-            let tx = {
-                type: 30,
-                data: {
-                    user: config.avalonApp,
-                    id: 'support'
-                }
-            }
-            let signedtx = javalon.sign(avalonKey,avalonUser,tx)
-            authorizing = true
-            javalon.sendTransaction(signedtx,(e,r) => {
-                authorizing = false
-                if (e && e.error == 'invalid signature')
-                    return alert('The custom key you used to login does not have REMOVE_KEY permission')
-                else if (e && e.error)
-                    return alert(e.error)
-                else if (e)
-                    return alert(JSON.stringify(e))
-                javalon.getAccount(account.name,(e,newacc) => loadAvalonAuthorityStatus(newacc))
-            })
+            window.open(`https://avalonblocks.com/#/signer/?type=30&user=${config.avalonApp}&id=support&broadcast=1`)
         }
     }
 
