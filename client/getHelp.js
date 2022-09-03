@@ -4,16 +4,17 @@ const noBlurtWebSignerErr = 'As there is currently no web signer for Blurt that 
 function loadAvalonAuthorityStatus(account) {
     if (!config.enableSupport) return
     updateDisplayByIDs(['avalonAuthorizeBtn'],[])
-    if (!hasAuthority(account,'avalon',config.avalonSupportPub)) {
+    if (!hasAuthority(account,'avalon','oneloveipfs')) {
         document.getElementById('avalonAuthorizeBtn').innerText = 'Authorize Avalon'
         document.getElementById('avalonAuthorizeBtn').onclick = () => {
             if (authorizing) return
             let tx = {
-                type: 10,
+                type: 29,
                 data: {
-                    id: 'OneLoveIPFS support',
-                    pub: config.avalonSupportPub,
-                    types: [4] // COMMENT
+                    user: config.avalonApp,
+                    id: 'support',
+                    types: [4,28], // COMMENT, COMMENT_EDIT
+                    weight: 1
                 }
             }
             let signedtx = javalon.sign(avalonKey,avalonUser,tx)
@@ -34,9 +35,10 @@ function loadAvalonAuthorityStatus(account) {
         document.getElementById('avalonAuthorizeBtn').onclick = () => {
             if (authorizing) return
             let tx = {
-                type: 11,
+                type: 30,
                 data: {
-                    id: getAvalonKeyID(account)
+                    user: config.avalonApp,
+                    id: 'support'
                 }
             }
             let signedtx = javalon.sign(avalonKey,avalonUser,tx)
@@ -137,9 +139,10 @@ function gtn(network) {
 function hasAuthority(account,network,target) {
     switch (network) {
         case 'avalon':
-            for (let i = 0; i < account.keys.length; i++)
-                if (account.keys[i].pub === target && account.keys[i].types.includes(4))
-                    return true
+            if (account.auths)
+                for (let i = 0; i < account.auths.length; i++)
+                    if (account.auths[i].user === target && account.auths[i].id === 'support' && (account.auths[i].types.includes(4) || account.auths[i].types.includes(28)))
+                        return true
             return false
         case 'hive':
         case 'steem':
