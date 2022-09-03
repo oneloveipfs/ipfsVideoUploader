@@ -689,6 +689,8 @@ let uploadOps = {
                         let fullUsername = db.toFullUsername(user,network,false)
                         if (!Config.Encoder.accounts.includes(fullUsername) && !Config.Encoder.accounts.includes(user))
                             return socket.emit('error',{ method: 'auth', error: 'not authorized as encoder' })
+                        else if (encoderRegister[fullUsername] && encoderRegister[fullUsername].socket && encoderRegister[fullUsername].socket.id !== socket.id)
+                            return socket.emit('error', { method: 'auth', error: 'duplicate connections' })
 
                         if (!encoderRegister[fullUsername])
                             encoderRegister[fullUsername] = {
