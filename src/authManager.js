@@ -195,7 +195,7 @@ let auth = {
             split[1] !== Config.ClientConfig.authIdentifier ||
             (split[2] !== 'hive' && split[2] !== 'dtc' && split[2] !== 'avalon') ||
             isNaN(parseInt(split[3])))
-            cb(false)
+            return cb(false,'Invalid auth message format')
         let original = split.slice(0,5).join(':')
         let hash = HivecryptPro.sha256(original)
         switch (split[2]) {
@@ -216,8 +216,8 @@ let auth = {
                     if (r.data && r.data.result && r.data.result.valid)
                         auth.verifyBlockInfo('hive',split[3],split[4],cb)
                     else
-                        cb(false)
-                }).catch(() => cb(false))
+                        cb(false,'Invalid signature')
+                }).catch(() => cb(false,'Failed to verify signature'))
                 break
             case 'dtc':
             case 'avalon':
@@ -229,8 +229,8 @@ let auth = {
                         for (let i in r.data.keys)
                             if (r.data.keys[i].pub === pub && r.data.keys[i].types.includes(4))
                                 return auth.verifyBlockInfo('dtc',split[3],split[4],cb)
-                    return cb(false)
-                }).catch(() => cb(false))
+                    return cb(false,'Invalid signature')
+                }).catch(() => cb(false,'Failed to verify signature'))
                 break
         }
     },
@@ -246,11 +246,11 @@ let auth = {
                     if (r.data && r.data.result && r.data.result.block_id === id)
                         return auth.verifyBlockExpiry(network,number,cb)
                     else
-                        return cb(false)
-                }).catch(() => cb(false))
+                        return cb(false,'Invalid block ID for block')
+                }).catch(() => cb(false,'Could not verify block ID'))
                 break
             case 'dtc':
-                axios.get(Config.Shawp.AvalonAPI+'/block/'+number).then(r => r.data.hash === id ? auth.verifyBlockExpiry(network,number,cb) : cb(false)).catch(() => cb(false))
+                axios.get(Config.Shawp.AvalonAPI+'/block/'+number).then(r => r.data.hash === id ? auth.verifyBlockExpiry(network,number,cb) : cb(false,'Invalid block ID for block')).catch(() => cb(false,'Could not verify block ID'))
                 break
         }
     },
@@ -263,14 +263,19 @@ let auth = {
                     method: 'condenser_api.get_dynamic_global_properties',
                     params: []
                 }).then(r => {
-                    if (r.data && r.data.result)
-                        return cb(r.data.result.head_block_number <= parseInt(number) + Config.ClientConfig.authTimeoutBlocks)
+                    if (r.data && r.data.result && r.data.result.head_block_number <= parseInt(number) + Config.ClientConfig.authTimeoutBlocks)
+                        return cb(true)
                     else
-                        return cb(false)
-                }).catch(() => cb(false))
+                        return cb(false,'Block info specified timed out')
+                }).catch(() => cb(false,'Could not verify block expiry'))
                 break
             case 'dtc':
-                axios.get(Config.Shawp.AvalonAPI+'/count').then(r => cb(r.data.count <= parseInt(number) + Config.ClientConfig.authTimeoutBlocks)).catch(() => cb(false))
+                axios.get(Config.Shawp.AvalonAPI+'/count').then(r => {
+                    if (r.data && r.data.count <= parseInt(number) + Config.ClientConfig.authTimeoutBlocks)
+                        cb(true)
+                    else
+                        cb(false,'Block info specified timed out')
+                }).catch(() => cb(false,'Could not verify block expiry'))
                 break
         }
     },

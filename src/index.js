@@ -468,9 +468,9 @@ app.put('/update_alias',Parser.json(),(req,res) => {
                 return res.status(400).send({error: e})
             }
             return res.send({})
-        } else Auth.verifyAuthSignature(req.body.aliasKey,(success) => {
+        } else Auth.verifyAuthSignature(req.body.aliasKey,(success,error) => {
             if (!success)
-                return res.status(400).send({error: 'Failed to verify alias recent signature'})
+                return res.status(400).send({error: error})
             let decoded = req.body.aliasKey.split(':')
             if (decoded[2] === 'all')
                 // all network type is disabled due to a security issue where only hive keys are verified
