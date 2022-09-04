@@ -41,7 +41,8 @@
             <a id="authButton" class="headerBtn"><p>Log In</p></a>
         </div>
         <div id="head">
-            <a id="authButton2"><p>Log In</p></a>
+            <a class="headBtn" id="authButton2"><p>Log In</p></a>
+            <a class="headBtn" id="apiSelector" onclick="displayPopup('apiSettingsPopup')"><i class="fas fa-server"></i></a>
             <div class="textcontainer">
                 <h1>OneLoveIPFS Uploader</h1>
                 <h3>An alternative way of uploading videos to DTube, a decentralized video platform built on Steem, Hive and Avalon blockchain.</h3>
@@ -141,7 +142,7 @@
         </div>
         <!-- Login Pop Up Window -->
         <div id="loginPopup" class="popup">
-            <div class="popup-content">
+            <div class="popup-content" id="loginPopupContent">
                 <div class="popup-header">
                     <h2>Login</h2>
                 </div>
@@ -255,7 +256,7 @@
             </div>
         </div>
         <div id="signupPopup" class="popup">
-            <div class="popup-content">
+            <div class="popup-content" id="signupPopupContent">
                 <div class="popup-header">
                     <h2>Get started</h2>
                 </div>
@@ -315,6 +316,19 @@
                         <a onclick="document.getElementById('signupcancel').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>
                         <h4>Your order has been cancelled successfully. To create a new order, you may go back and start again.</h4>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div id="apiSettingsPopup" class="popup">
+            <div class="popup-content" id="apiSettingsPopupContent">
+                <div class="popup-header">
+                    <h2>API Settings</h2>
+                </div>
+                <div class="popup-body">
+                    <h3>Hive<select class="meta" id="hiveAPISelection"></select></h3>
+                    <h3>Avalon<select class="meta" id="avalonAPISelection"></select></h3>
+                    <h3>Blurt<select class="meta" id="blurtAPISelection"></select></h3>
+                    <a class="roundedBtn" onclick="saveAPIBtn()">Save</a>
                 </div>
             </div>
         </div>

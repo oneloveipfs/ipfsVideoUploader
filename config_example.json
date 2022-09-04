@@ -57,7 +57,7 @@
     "Shawp": {
         "Enabled": false,
         "DefaultUSDRate": 0.0029,
-        "AvalonAPI": "https://avalon.techcoderx.com",
+        "AvalonAPI": "https://api.avalonblocks.com",
         "HiveAPI": "https://techcoderx.com",
         "DtcReceiver": "oneloveipfs",
         "HiveReceiver": "oneloveipfs"

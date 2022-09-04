@@ -22,6 +22,13 @@ function saveSettings() {
         fillSettings()
         alert('Settings saved successfully')
     }).catch(axiosErrorHandler)
+
+    // blockchain api settings
+    saveAPISelections()
+    hiveOptions.url = getBlockchainAPI('hive')
+    blurtOptions.url = getBlockchainAPI('blurt')
+    hive.api.setOptions(hiveOptions)
+    blurt.api.setOptions(blurtOptions)
 }
 
 function fillSettings() {
@@ -34,6 +41,7 @@ function fillSettings() {
         else
             document.getElementsByTagName('body')[0].classList.remove('darkmode')
     }
+    loadAPISelections()
 }
 
 function fillDescription() {

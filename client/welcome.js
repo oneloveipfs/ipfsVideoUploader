@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let i = updates.length - 1; i >= 0; i--) if (updates[i].payout === 'Pending') {
         let author = updates[i].link.split('/')[4].substr(1)
         let permlink = updates[i].link.split('/')[5]
-        axios.post('https://techcoderx.com',{
+        axios.post(getBlockchainAPI('hive'),{
             id: 1,
             jsonrpc: '2.0',
             method: 'condenser_api.get_content',
@@ -107,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
             updateLogs()
         }).catch((e) => {})
     }
+    loadAPISelections()
     if (isElectron())
         updateDisplayByIDs([],['appIntro'])
 })
@@ -123,4 +124,10 @@ function updateLogs() {
     for (let i = updates.length - 1; i >= 0; i--)
         updatesHTML += '<div class="updatelogitem"><div class="updatelog">Version ' + updates[i].version + '<br>Released ' + updates[i].created + '<br><br><a href="' + updates[i].link + '" target="_blank">' + updates[i].description + '</a><div class="updatepayout">Payout: ' + updates[i].payout + '</div></div></div>'
     document.getElementById('updatesContainer').innerHTML = updatesHTML
+}
+
+function saveAPIBtn() {
+    saveAPISelections()
+    document.getElementById('apiSettingsPopupContent').classList.remove('popup-shown')
+    setTimeout(() => updateDisplayByIDs([],['apiSettingsPopup']),400)
 }

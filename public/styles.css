@@ -127,10 +127,13 @@ hr {
     background-color: rgb(207, 207, 207);
     margin: 5% auto;
     width: 500px;
-    -webkit-animation-name: animatetop;
-    -webkit-animation-duration: 0.4s;
-    animation-name: animatetop;
-    animation-duration: 0.4s;
+    top: -300px;
+    opacity: 0;
+    transition: top 0.4s, opacity 0.4s;
+}
+.popup-content.popup-shown {
+    top: 0px;
+    opacity: 1;
 }
 
 .popup-header {
@@ -162,16 +165,6 @@ hr {
 #hiveauthqr img, #persistenthiveauthqr img {
     margin-left: auto;
     margin-right: auto;
-}
-
-@-webkit-keyframes animatetop {
-    from {top:-300px; opacity:0} 
-    to {top:0; opacity:1}
-}
-
-@keyframes animatetop {
-    from {top: -300px; opacity: 0}
-    to {top: 0; opacity: 1}
 }
 
 .warningbox {
@@ -983,13 +976,11 @@ textarea {
     background-color: #ffffff;
 }
 
-#head #authButton2 {
+#head .headBtn {
     position: absolute;
     top: 20px;
-    right: 40px;
     border: 2px solid #ffffff;
     border-radius: 32px;
-    width: 100px;
     height: 32px;
     padding: 4px 10px;
     text-align: center;
@@ -997,12 +988,28 @@ textarea {
     z-index: 2;
 }
 
-#head #authButton2:hover {
+#head #authButton2 {
+    right: 40px;
+    width: 100px;
+}
+
+#head #apiSelector {
+    right: 180px;
+    width: 40px;
+}
+
+#head #apiSelector i {
+    transform: scale(1.3, 1.3) translate(0px, 4px);
+}
+
+#head #authButton2:hover,
+#head #apiSelector:hover {
     background-color: #ffffff;
     color: rgb(54,57,63);
 }
 
-#head #authButton2 p {
+#head #authButton2 p,
+#head #apiSelector p {
     margin-block-start: 5px;
     margin-block-end: 5px;
 }

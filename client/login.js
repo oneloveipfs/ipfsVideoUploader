@@ -60,18 +60,27 @@ document.addEventListener('DOMContentLoaded', () => {
 window.onclick = (event) => {
     dismissPopup(event,'loginPopup')
     dismissPopup(event,'signupPopup')
+    dismissPopup(event,'apiSettingsPopup')
 }
 
 window.ontouchstart = (event) => {
     dismissPopup(event,'loginPopup')
     dismissPopup(event,'signupPopup')
+    dismissPopup(event,'apiSettingsPopup')
 }
 
 function dismissPopup(event,popupelement) {
     let popup = document.getElementById(popupelement)
+    let popupcontent = document.getElementById(popupelement+'Content')
     if (event.target == popup) {
-        popup.style.display = "none"
+        popupcontent.classList.remove('popup-shown')
+        setTimeout(() => popup.style.display = 'none',400)
     }
+}
+
+function displayPopup(popupelement) {
+    updateDisplayByIDs([popupelement],[])
+    setTimeout(() => document.getElementById(popupelement+'Content').classList.add('popup-shown'),5)
 }
 
 function loginBtnClicked() {
@@ -99,17 +108,21 @@ function loginBtnClicked() {
                 if (storedLogin.blurtUser) persistentLoginText += '<br>Blurt: ' + storedLogin.blurtUser
                 if (storedLogin.avalonUser) persistentLoginText += '<br>Avalon: ' + storedLogin.avalonUser
             } catch {
-                return updateDisplayByIDs(['loginPopup'],[])
+                return displayPopup('loginPopup')
             }
         else
             persistentLoginText = 'Encrypted persistent login found.<br>'
         document.getElementById('persistentLoginText').innerHTML = persistentLoginText
-        updateDisplayByIDs(['persistentform','loginPopup'],['loginform'])
+        updateDisplayByIDs(['persistentform'],['loginform'])
+        displayPopup('loginPopup')
         if (isEncryptedStore('persistentLogin'))
             updateDisplayByIDs(['persistLoginPassword'],[])
         else
             updateDisplayByIDs([],['persistLoginPassword'])
-    } else updateDisplayByIDs(['loginPopup','loginform'],['persistentform'])
+    } else {
+        updateDisplayByIDs(['loginform'],['persistentform'])
+        displayPopup('loginPopup')
+    }
 }
 
 async function proceedLogin() {
@@ -511,7 +524,7 @@ async function avalonLogin() {
         return
     }
 
-    javalon.init({api: 'https://api.avalonblocks.com'})
+    javalon.init({api: getBlockchainAPI('avalon')})
     let avalonKeyId = false
     try {
         avalonKeyId = await getAvalonKeyId(avalonUsername,avalonKey)
@@ -559,8 +572,7 @@ async function blurtLogin() {
 
     if (isElectron()) {
         try {
-            // TODO: Replace API with our own
-            await steemKeyLogin(blurtUsername,blurtKey,'https://rpc.blurt.world','BLT')
+            await steemKeyLogin(blurtUsername,blurtKey,getBlockchainAPI('blurt'),'BLT')
         } catch (e) {
             alert(e.toString())
             proceedAuthBtnDisabled = false

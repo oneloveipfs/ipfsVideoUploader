@@ -2,12 +2,17 @@
 let username
 
 let hiveOptions = {
-    url: 'https://techcoderx.com',
-    useAppbaseApi: true,
-    rebranded_api: true,
+    url: getBlockchainAPI('hive'),
+    useAppbaseApi: true
+}
+
+let blurtOptions = {
+    url: getBlockchainAPI('blurt'),
+    useAppbaseApi: true
 }
 
 hive.api.setOptions(hiveOptions)
+blurt.api.setOptions(blurtOptions)
 
 // Setup subtitles tab
 const allLangCodes = languages.getAllLanguageCode()
@@ -1204,7 +1209,7 @@ async function getCommunitySubs(acc,network) {
     let communities, node
     switch (network) {
         case 'hive':
-            node = 'https://techcoderx.com'
+            node = hiveOptions.url
             break
         case 'steem':
             node = 'https://api.steemit.com'

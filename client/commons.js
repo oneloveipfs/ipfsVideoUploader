@@ -4,6 +4,88 @@ const APP_META = {
     description: 'IPFS hosting service'
 }
 
+const HIVE_API = [
+    'techcoderx.com',
+    'api.hive.blog',
+    'api.openhive.network',
+    'api.deathwing.me',
+    'api.hive.blue',
+    'api.c0ff33a.uk',
+    'api.pharesim.me',
+    'anyx.io',
+    'hived.emre.sh',
+    'hive-api.arcange.eu',
+    'rpc.ausbit.dev'
+]
+
+const AVALON_API = [
+    'api.avalonblocks.com',
+    'avalon.d.tube',
+    'avalon.tibfox.com',
+    'dtube.fso.ovh',
+    'dtube.tekraze.com'
+]
+
+const BLURT_API = [
+    'rpc.blurt.world',
+    'rpc.blurt.live',
+    'rpc.blurtlatam.com',
+    'blurt-rpc.saboin.com',
+    'blurtrpc.actifit.io',
+    'kentzz.blurt.world'
+]
+
+function getBlockchainAPI(network,httpsPrefix = true) {
+    let persist = localStorage.getItem(network+'API')
+    let result = ''
+    switch (network) {
+        case 'hive':
+            if (persist && HIVE_API.includes(persist))
+                result = persist
+            else
+                result = HIVE_API[0]
+            break
+        case 'avalon':
+            if (persist && AVALON_API.includes(persist))
+                result = persist
+            else
+                result = AVALON_API[0]
+            break
+        case 'blurt':
+            if (persist && BLURT_API.includes(persist))
+                result = persist
+            else
+                result = BLURT_API[0]
+            break
+        default:
+            return ''
+    }
+    if (httpsPrefix && !result.startsWith('https://') && !result.startsWith('http://'))
+        result = 'https://'+result
+    return result
+}
+
+function loadAPISelections() {
+    let hiveSelect = document.getElementById('hiveAPISelection')
+    let avalonSelect = document.getElementById('avalonAPISelection')
+    let blurtSelect = document.getElementById('blurtAPISelection')
+    for (let i in HIVE_API)
+        hiveSelect.appendChild(createOption(HIVE_API[i],HIVE_API[i]))
+    for (let i in AVALON_API)
+        avalonSelect.appendChild(createOption(AVALON_API[i],AVALON_API[i]))
+    for (let i in BLURT_API)
+        blurtSelect.appendChild(createOption(BLURT_API[i],BLURT_API[i]))
+    hiveSelect.value = getBlockchainAPI('hive',false)
+    avalonSelect.value = getBlockchainAPI('avalon',false)
+    blurtSelect.value = getBlockchainAPI('blurt',false)
+}
+
+function saveAPISelections() {
+    localStorage.setItem('hiveAPI',document.getElementById('hiveAPISelection').value)
+    localStorage.setItem('avalonAPI',document.getElementById('avalonAPISelection').value)
+    localStorage.setItem('blurtAPI',document.getElementById('blurtAPISelection').value)
+}
+
 function arrContainsInt(arr,value) {
     for (var i = 0; i < arr.length; i++) {
         if (arr[i] === value) return true
@@ -193,7 +275,7 @@ function generateMessageToSign (username,network,cb) {
     let message = username+':'+config.authIdentifier+':'+network+':'
     switch (network) {
         case 'hive':
-            axios.post('https://techcoderx.com',{
+            axios.post(getBlockchainAPI('hive'),{
                 id: 1,
                 jsonrpc: '2.0',
                 method: 'condenser_api.get_dynamic_global_properties',
@@ -207,11 +289,11 @@ function generateMessageToSign (username,network,cb) {
             }).catch(e => cb(e.toString()))
             break
         case 'dtc':
-            axios.get('https://api.avalonblocks.com/count').then((r) => {
+            axios.get(getBlockchainAPI('avalon')+'/count').then((r) => {
                 if (r.data && r.data.count) {
                     message += r.data.count-1
                     message += ':'
-                    axios.get('https://api.avalonblocks.com/block/'+(r.data.count-1)).then((b) => {
+                    axios.get(getBlockchainAPI('avalon')+'/block/'+(r.data.count-1)).then((b) => {
                         if (b.data && b.data.hash) {
                             message += b.data.hash
                             cb(null,message)
@@ -273,6 +355,13 @@ function hivesignerPaymentUrl(to,amount,currency,memo,recurrence,frequency) {
         return 'https://hivesigner.com/sign/recurrentTransfer?to='+to+'&amount='+amount+currency+'&memo='+memo+'&recurrence='+recurrence+'&executions='+frequency
     else
         return 'https://hivesigner.com/sign/transfer?to='+to+'&amount='+amount+currency+'&memo='+memo
+}
+
+function createOption(value, text) {
+    let opt = document.createElement('option')
+    opt.innerText = text
+    opt.value = value
+    return opt
 }
 
 function copyToClipboard(value,tooltiptextcontainer) {
