@@ -199,7 +199,7 @@ async function proceedPersistentLogin() {
     if (window.logins.hiveUser && !window.logins.hiveKey) {
         try {
             let ha = JSON.parse(localStorage.getItem('hiveAuth'))
-            if (ha.username === window.logins.hiveUser && ha.expire > new Date().getTime())
+            if (ha.username === window.logins.hiveUser)
                 persistentHiveAuth = ha
         } catch {}
         if (persistentHiveAuth) {
@@ -240,29 +240,18 @@ async function proceedPersistentLogin() {
             return handleLoginError('Missing both hiveAuth and hiveKey?')
     }
     let network = storedDetails.tokenNetwork
-    if (network === 'avalon')
-        network = 'dtc'
-    axios.get(`/login?network=${network}&user=${storedDetails[storedDetails.tokenNetwork+'User']}`).then((r) => {
-        if (r.data.error != null)
-            return handleLoginError(r.data.error)
-        console.log(storedDetails,r.data)
-        if (storedDetails.tokenNetwork === 'hive') {
-            let t
-            try {
-                t = hivecrypt.decode(storedDetails.hiveKey,r.data.encrypted_memo).substr(1)
-            } catch {
-                return handleLoginError('Unable to decode access token with posting key','hive')
-            }
-            console.log(t)
-            keychainCb(t,'hive',true)
-        } else if (storedDetails.tokenNetwork === 'avalon') {
-            javalon.decrypt(storedDetails.avalonKey,r.data.encrypted_memo,(e,decryptedAES) => {
-                if (e)
-                    return handleLoginError('Avalon decrypt error: ' + e,'avalon')
-                keychainCb(decryptedAES,'avalon',true)
-            })
-        }
-    })
+    try {
+        let msg = await generateMessageToSignPromise(storedDetails[network+'User'],network)
+        let sig
+        if (network === 'hive')
+            sig = hivecryptpro.Signature.create(hivecryptpro.sha256(msg),storedDetails.hiveKey).customToString()
+        else if (network === 'avalon')
+            sig = hivecryptpro.Signature.avalonCreate(hivecryptpro.sha256(msg),storedDetails.avalonKey).customToString()
+        msg += ':'+sig
+        keychainSigCb(msg,network,true)
+    } catch (e) {
+        handleLoginError(e,network)
+    }
 }
 
 function clearPersistentLogin() {
@@ -503,28 +492,28 @@ async function avalonLogin() {
     if (window.proceedAuthBtnDisabled == true) return
     let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
     let avalonKey = document.getElementById('avalonLoginKey').value
+    let msg
 
     document.getElementById('avalonAuthBtn').innerText = 'Logging in...'
     proceedAuthBtnDisabled = true
 
+    try {
+        msg = await generateMessageToSignPromise(avalonUsername,'dtc')
+    } catch (e) {
+        return handleLoginError(e,'avalon')
+    }
+
     if (avalonKcToggled) {
         let signerUsername = document.getElementById('avalonSignerUsername').value
         let signerRole = document.getElementById('avalonSignerRole').value
-        try {
-            let msg = await generateMessageToSignPromise(avalonUsername,'dtc')
-            hive_keychain.requestSignBuffer(signerUsername,msg,signerRole,(signResult) => {
-                if (signResult.error)
-                    return handleLoginError(signResult.error,'avalon')
-                msg += ':'+signResult.result
-                keychainSigCb(msg,'avalon',false,signerRole)
-            })
-        } catch (e) {
-            return handleLoginError(e,'avalon')
-        }
+        hive_keychain.requestSignBuffer(signerUsername,msg,signerRole,(signResult) => {
+            if (signResult.error)
+                return handleLoginError(signResult.error,'avalon')
+            msg += ':'+signResult.result
+            keychainSigCb(msg,'avalon',false,signerRole)
+        })
         return
     }
-
-    javalon.init({api: getBlockchainAPI('avalon')})
     let avalonKeyId = false
     try {
         avalonKeyId = await getAvalonKeyId(avalonUsername,avalonKey)
@@ -541,20 +530,10 @@ async function avalonLogin() {
         // an access token already generated, login is complete
         loginCb('avalon')
     } else {
-        let loginGetUrl = '/login?user=' + avalonUsername + '&network=dtc'
-        if (typeof avalonKeyId === 'string') loginGetUrl += '&dtckeyid=' + avalonKeyId
-        axios.get(loginGetUrl).then((response) => {
-            if (response.data.error != null)
-                return handleLoginError(response.data.error,'avalon')
-            javalon.decrypt(avalonKey,response.data.encrypted_memo,(e,decryptedAES) => {
-                if (e)
-                    return handleLoginError('Avalon decrypt error: ' + e.error,'avalon')
-                keychainCb(decryptedAES,'avalon')
-            })
-        }).catch((e) => {
-            axiosErrorHandler(e)
-            handleLoginError('','avalon')
-        })
+        let sig = hivecryptpro.Signature.avalonCreate(hivecryptpro.sha256(msg),avalonKey).customToString()
+        msg += ':'+sig
+        console.log(msg)
+        keychainSigCb(msg,'avalon',false)
     }
 }
 

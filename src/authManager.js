@@ -193,7 +193,7 @@ let auth = {
         let split = message.split(':')
         if (split.length !== 6 ||
             split[1] !== Config.ClientConfig.authIdentifier ||
-            (split[2] !== 'hive' && split[2] !== 'dtc') ||
+            (split[2] !== 'hive' && split[2] !== 'dtc' && split[2] !== 'avalon') ||
             isNaN(parseInt(split[3])))
             cb(false)
         let original = split.slice(0,5).join(':')
@@ -220,6 +220,7 @@ let auth = {
                 }).catch(() => cb(false))
                 break
             case 'dtc':
+            case 'avalon':
                 axios.get(Config.Shawp.AvalonAPI+'/account/'+split[0]).then((r) => {
                     let pub = HivecryptPro.PublicKey.fromString(HivecryptPro.Signature.fromString(split[5]).recover(hash)).toAvalonString()
                     if (r.data.pub === pub)

@@ -94,34 +94,27 @@ async function Hive() {
 }
 
 async function Avalon() {
-    // Verify Avalon login
+    // Verify Avalon login, returns avalon account object
     let avalonUser = sessionStorage.getItem('avalonUser')
     let avalonKey = sessionStorage.getItem('avalonKey')
     let promoteDisabled = false
+    let avalonAcc
 
     if ((!avalonUser || !avalonKey) && (!avalonKc || !avalonKcUser))
         return
-    else if (avalonUser && (!avalonKc || !avalonKcUser)) {
-        let avalonLoginPromise = new Promise((resolve,reject) => {
-            javalon.init({api: getBlockchainAPI('avalon')})
-            javalon.getAccount(avalonUser,(err,result) => {
-                if (err) return reject(err)
-                let avalonPubKey = javalon.privToPub(avalonKey)
-                if (result.pub === avalonPubKey) return resolve(true)
-                
-                // Login with "Posting key" (recommended)
-                for (let i = 0; i < result.keys.length; i++) {
-                    if (result.keys[i].types.includes(4) && result.keys[i].pub === avalonPubKey) {
-                        if (!result.keys[i].types.includes(13)) promoteDisabled = true
-                        return resolve(true)
-                    }
-                }
-                resolve(false)
-            })
-        })
-        
+    else if (avalonUser && (!avalonKc || !avalonKcUser)) {     
+        let avalonLoginResult = false
         try {
-            let avalonLoginResult = await avalonLoginPromise
+            avalonAcc = await getAvalonAccount(avalonUser)
+            let avalonPubKey = hivecryptpro.PrivateKey.fromAvalonString(avalonKey).createPublic().toAvalonString()
+            if (avalonAcc.pub === avalonPubKey) avalonLoginResult = true
+            for (let i = 0; i < avalonAcc.keys.length; i++) {
+                if (avalonAcc.keys[i].types.includes(4) && avalonAcc.keys[i].pub === avalonPubKey) {
+                    if (!avalonAcc.keys[i].types.includes(13)) promoteDisabled = true
+                    avalonLoginResult = true
+                    break
+                }
+            }
             if (avalonLoginResult != true) {
                 restrict()
                 return alert('Avalon key is invalid! Please login again.')
@@ -135,6 +128,7 @@ async function Avalon() {
     displayLoginMessage()
     if (promoteDisabled) document.getElementById('dtcBurnSection').style.display = 'none'
     document.getElementById('avalonZone').style.display = 'block'
+    return avalonAcc
 }
 
 function displayLoginMessage(errored) {

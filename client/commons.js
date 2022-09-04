@@ -193,18 +193,85 @@ function exchageRate (coin,amount,cb) {
     }).catch((e) => cb(e))
 }
 
-function getAvalonKeyId(avalonUsername,avalonKey) {
-    return new Promise((resolve,reject) => javalon.getAccount(avalonUsername,(err,result) => {
-        if (err) return reject(err)
-        let avalonPubKey = javalon.privToPub(avalonKey)
-        if (result.pub === avalonPubKey) return resolve(true)
+async function getAvalonContent(author,link) {
+    return (await axios.get(getBlockchainAPI('avalon')+'/content/'+author+'/'+link)).data
+}
 
-        // Custom key login (recommended)
-        for (let i = 0; i < result.keys.length; i++)
-            if (arrContainsInt(result.keys[i].types,4) === true && result.keys[i].pub === avalonPubKey)
-                return resolve(result.keys[i].id)
-        resolve(false)
-    }))
+async function getAvalonAccount(username) {
+    return (await axios.get(getBlockchainAPI('avalon')+'/account/'+username)).data
+}
+
+async function getAvalonKeyId(avalonUsername,avalonKey) {
+    let result = await getAvalonAccount(avalonUsername)
+    let avalonPubKey = hivecryptpro.PrivateKey.fromAvalonString(avalonKey).createPublic().toAvalonString()
+    if (result.pub === avalonPubKey) return true
+
+    // Custom key login (recommended)
+    for (let i = 0; i < result.keys.length; i++)
+        if (arrContainsInt(result.keys[i].types,4) === true && result.keys[i].pub === avalonPubKey)
+            return result.keys[i].id
+    return false
+}
+
+// Adopted from https://github.com/skzap/GrowInt/blob/master/index.js
+class GrowInt {
+    constructor(raw, config) {
+        if (!config.min)
+            config.min = Number.MIN_SAFE_INTEGER
+        if (!config.max)
+            config.max = Number.MAX_SAFE_INTEGER
+        this.v = raw.v
+        this.t = raw.t
+        this.config = config
+    }
+
+    grow(time) {
+        if (time < this.t) return
+        if (this.config.growth === 0) return {
+            v: this.v,
+            t: time
+        }
+
+        let tmpValue = this.v
+        tmpValue += (time-this.t)*this.config.growth
+        
+        let newValue = 0
+        let newTime = 0
+        if (this.config.growth > 0) {
+            newValue = Math.floor(tmpValue)
+            newTime = Math.ceil(this.t + ((newValue-this.v)/this.config.growth))
+        } else {
+            newValue = Math.ceil(tmpValue)
+            newTime = Math.floor(this.t + ((newValue-this.v)/this.config.growth))
+        }
+
+        if (newValue > this.config.max)
+            newValue = this.config.max
+
+        if (newValue < this.config.min)
+            newValue = this.config.min
+
+        return {
+            v: newValue,
+            t: newTime
+        }
+    }
+}
+
+// From javalon
+function getAvalonVP(account) {
+    return new GrowInt(account.vt, {growth:account.balance/360000000, max: account.maxVt}).grow(new Date().getTime()).v
+}
+
+function getAvalonBw(account) {
+    return new GrowInt(account.bw, {growth:Math.max(account.baseBwGrowth || 0,account.balance)/36000000, max:64000}).grow(new Date().getTime()).v
+}
+
+async function broadcastAvalonTx(tx) {
+    await axios.post(getBlockchainAPI('avalon')+'/transact',tx,{
+        'Accept': 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+    })
 }
 
 // https://github.com/electron/electron/issues/2288
@@ -289,6 +356,7 @@ function generateMessageToSign (username,network,cb) {
             }).catch(e => cb(e.toString()))
             break
         case 'dtc':
+        case 'avalon':
             axios.get(getBlockchainAPI('avalon')+'/count').then((r) => {
                 if (r.data && r.data.count) {
                     message += r.data.count-1

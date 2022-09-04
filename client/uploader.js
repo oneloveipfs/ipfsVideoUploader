@@ -144,7 +144,7 @@ axios.get('/proxy_server').then((r) => {
 let config;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    await Auth.Avalon()
+    let avalonAcc = await Auth.Avalon()
     username = await Auth.Hive()
     loadSelectPlatforms()
     updateSubtitle()
@@ -182,15 +182,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!avalonUser || (!avalonKey && (!avalonKc || !avalonKcUser))) {
             document.getElementById('tagInfo1').style.display = 'none'
         } else {
-            javalon.getAccount(avalonUser,(err,acc) => {
-                if (err) return
-                document.getElementById('dtcBurnInput').placeholder = 'Available: ' + thousandSeperator(acc.balance / 100) + ' DTUBE'
-                document.getElementById('avalonvwlabel').innerText = 'Avalon vote weight: 1% (~' + thousandSeperator(Math.floor(0.01 * javalon.votingPower(acc))) + ' VP)'
-                window.availableForBurn = acc.balance / 100
-                window.availableAvalonBw = acc.bw
-                window.availableAvalonVP = acc.vt
-                loadAvalonAuthorityStatus(acc)
-            })
+            if (avalonAcc) {
+                document.getElementById('dtcBurnInput').placeholder = 'Available: ' + thousandSeperator(avalonAcc.balance / 100) + ' DTUBE'
+                document.getElementById('avalonvwlabel').innerText = 'Avalon vote weight: 1% (~' + thousandSeperator(Math.floor(0.01 * getAvalonVP(avalonAcc))) + ' VP)'
+                window.availableForBurn = avalonAcc.balance / 100
+                window.availableAvalonBw = avalonAcc.bw
+                window.availableAvalonVP = avalonAcc.vt
+                loadAvalonAuthorityStatus(avalonAcc)
+            }
             if (!hiveDisplayUser) {
                 document.getElementById('tagLbl').innerText = 'Tag:'
                 document.getElementById('tagInfo1').style.display = 'none'
@@ -356,7 +355,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('avalonvw').oninput = () => {
         let avalonVW = document.getElementById('avalonvw').value
-        document.getElementById('avalonvwlabel').innerText = 'Avalon vote weight: ' + avalonVW + '% (~' + thousandSeperator(Math.floor(avalonVW/100 * javalon.votingPower({vt: window.availableAvalonVP, balance: window.availableForBurn * 100}))) + ' VP)'
+        document.getElementById('avalonvwlabel').innerText = 'Avalon vote weight: ' + avalonVW + '% (~' + thousandSeperator(Math.floor(avalonVW/100 * getAvalonVP({vt: window.availableAvalonVP, balance: window.availableForBurn * 100}))) + ' VP)'
         if (avalonVW > 30)
             document.getElementById('avalonhighvwalert').style.display = 'block'
         else
@@ -727,24 +726,17 @@ async function avalonBroadcast() {
     let tag = ''
     if (postparams.tags.length !== 0)
         tag = postparams.tags[0]
-    
-    let avalonGetAccPromise = new Promise((resolve,reject) => {
-        javalon.getAccount(avalonUser,(err,user) => {
-            if (err) return reject(err)
-            resolve(user)
-        })
-    })
 
     let burnAmt = document.getElementById('dtcBurnInput').value ? Math.floor(parseFloat(document.getElementById('dtcBurnInput').value) * 100) : 0
 
     try {
-        let avalonAcc = await avalonGetAccPromise
+        let avalonAcc = await getAvalonAccount(avalonUser)
         let tx = {
             type: 4,
             data: {
                 link: postparams.ipfshash,
                 json: buildJsonMetadataAvalon(),
-                vt: Math.floor(javalon.votingPower(avalonAcc)*(document.getElementById('avalonvw').value)/100),
+                vt: Math.floor(getAvalonVP(avalonAcc)*(document.getElementById('avalonvw').value)/100),
                 tag: tag
             },
             sender: avalonAcc.name,
@@ -758,24 +750,19 @@ async function avalonBroadcast() {
         console.log('Avalon tx',tx)
         if (postparams.scheduled)
             return olisc.new(tx,'avalon',postparams.scheduled).then(() => avalonCb()).catch((e) => avalonCb(axiosErrorMessage(e)))
-        let signedtx
+        let stringifiedRawTx = JSON.stringify(tx)
+        let h = hivecryptpro.sha256(stringifiedRawTx)
+        tx.hash = h.toString('hex')
         if (avalonKc && avalonKcUser) {
-            let stringifiedRawTx = JSON.stringify(tx)
-            tx.hash = hivecryptpro.sha256(stringifiedRawTx).toString('hex')
             let hiveKcSign = await hiveKeychainSignBufferPromize(avalonKcUser,stringifiedRawTx,avalonKc)
             if (hiveKcSign.error)
                 return avalonCb(hiveKcSign.message)
             tx.signature = [hivecryptpro.Signature.fromString(hiveKcSign.result).toAvalonSignature()]
-            signedtx = tx
         } else
-            signedtx = javalon.sign(sessionStorage.getItem('avalonKey'),avalonAcc.name,tx)
+            tx.signature = [hivecryptpro.Signature.avalonCreate(h,sessionStorage.getItem('avalonKey')).toAvalonSignature()]
 
-        javalon.sendRawTransaction(signedtx,(err,result) => {
-            if (err)
-                avalonCb(err.toString())
-            else
-                avalonCb()
-        })
+        await broadcastAvalonTx(tx)
+        avalonCb()
     } catch (e) {
         avalonCb(e.toString())
     }
@@ -1198,7 +1185,7 @@ function estimatedBandwidth() {
 }
 
 function needsBandwidth() {
-    let currentBw = javalon.bandwidth({ bw: window.availableAvalonBw, balance: availableForBurn * 100 })
+    let currentBw = getAvalonBw({ bw: window.availableAvalonBw, balance: availableForBurn * 100 })
     if (currentBw > estimatedBandwidth())
         return false
     else

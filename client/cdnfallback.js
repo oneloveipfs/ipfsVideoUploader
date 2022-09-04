@@ -2,13 +2,13 @@ libs = []
 
 switch (window.location.pathname) {
     case '/':
-        libs = ['axios','javalon','hivesigner']
+        libs = ['axios','hivesigner']
         break
     case '/reviews':
-        libs = ['axios','javalon','hivesigner']
+        libs = ['axios','hivesigner']
         break
     case '/upload':
-        libs = ['axios','javalon','async','io','hivesigner','steem','hive','HtmlSanitizer','tus','moment']
+        libs = ['axios','async','io','hivesigner','steem','hive','HtmlSanitizer','tus','moment']
         break
 }
 

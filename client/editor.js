@@ -108,12 +108,12 @@ function onEditLinkSubmit() {
             editorJsonCheck('blurt')
         })
     else if (linkType === 'dtube')
-        javalon.getContent(authorLinkSplit[0],authorLinkSplit[1],(e,content) => {
-            console.log(e,content)
-            if (e)
-                return alert('Failed to fetch avalon content, see browser console for details')
+        getAvalonContent(authorLinkSplit[0],authorLinkSplit[1]).then((content) => {
             editor.editingPosts.avalon = content
             editorJsonCheck('avalon')
+        }).catch((e) => {
+            console.log(e)
+            return alert('Failed to fetch avalon content, see browser console for details')
         })
 }
 
@@ -216,13 +216,13 @@ function editorJsonCheck(network, isRef = false) {
                     }
                 })
             if (refSplit[0] === 'dtc' && network !== 'avalon')
-                javalon.getContent(refSplit[1],refSplit[2],(e,content) => {
-                    console.log('avalon ref',e,content,refSplit)
+                getAvalonContent(refSplit[1],refSplit[2]).then((content) => {
+                    console.log('avalon ref',content,refSplit)
                     if (!e) {
                         editor.editingPosts.avalon = content
                         editorJsonCheck('avalon',true)
                     }
-                })
+                }).catch((e) => console.log('avalon ref error',e))
             else if (refSplit === 'steem')
                 editor.steemIgnored = true
         }
