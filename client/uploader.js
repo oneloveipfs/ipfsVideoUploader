@@ -1193,17 +1193,9 @@ function needsBandwidth() {
 }
 
 async function getCommunitySubs(acc,network) {
-    let communities, node
-    switch (network) {
-        case 'hive':
-            node = hiveOptions.url
-            break
-        case 'steem':
-            node = 'https://api.steemit.com'
-            break
-    }
+    let communities
     try {
-        communities = await axios.post(node,{
+        communities = await axios.post(getBlockchainAPI(network),{
             jsonrpc: '2.0',
             method: 'bridge.list_all_subscriptions',
             params: { account: acc },

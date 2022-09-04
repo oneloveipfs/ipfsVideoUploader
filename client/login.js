@@ -591,7 +591,7 @@ async function steemLogin() {
 
     if (isElectron()) {
         try {
-            await steemKeyLogin(steemUsername,steemKey)
+            await steemKeyLogin(steemUsername,steemKey,getBlockchainAPI('steem'))
         } catch (e) {
             alert(e.toString())
             proceedAuthBtnDisabled = true
@@ -615,7 +615,7 @@ async function steemLogin() {
     }
 }
 
-function steemKeyLogin(username,wif,api='https://api.steemit.com',prefix='STM') {
+function steemKeyLogin(username,wif,api,prefix='STM') {
     return new Promise((rs,rj) => {
         let steemGetAcc = {
             id: 1,

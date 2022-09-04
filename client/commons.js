@@ -40,22 +40,16 @@ function getBlockchainAPI(network,httpsPrefix = true) {
     let result = ''
     switch (network) {
         case 'hive':
-            if (persist && HIVE_API.includes(persist))
-                result = persist
-            else
-                result = HIVE_API[0]
+            result = (persist && HIVE_API.includes(persist)) ? persist : HIVE_API[0]
             break
         case 'avalon':
-            if (persist && AVALON_API.includes(persist))
-                result = persist
-            else
-                result = AVALON_API[0]
+            result = (persist && AVALON_API.includes(persist)) ? persist : AVALON_API[0]
             break
         case 'blurt':
-            if (persist && BLURT_API.includes(persist))
-                result = persist
-            else
-                result = BLURT_API[0]
+            result = (persist && BLURT_API.includes(persist)) ? persist : BLURT_API[0]
+            break
+        case 'steem':
+            result = 'api.steemit.com'
             break
         default:
             return ''
