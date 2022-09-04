@@ -762,6 +762,8 @@ let uploadOps = {
                             encoderRegister[r].step = 'fetch'
                         else if (jobbegin.step === 'postupload') {
                             // post processing
+                            if (!fs.existsSync(defaultDir+'/'+jobbegin.id))
+                                return socket.emit('error', { method: 'jobbegin', id: jobbegin.id, error: 'container does not exist yet' })
                             emitToUID(jobbegin.id,'begin',{ step: 'container' }, true)
 
                             // Master playlist, thumbnail
