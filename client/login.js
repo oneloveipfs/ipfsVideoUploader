@@ -629,7 +629,7 @@ function steemKeyLogin(username,wif,api,prefix='STM') {
             let acc = r.data.result
             if (acc.length == 0) return rj('Account does not exist')
             try {
-                let pubkey = hive.auth.wifToPublic(wif).toString()
+                let pubkey = hivecryptpro.PrivateKey.fromString(wif).createPublic().toString()
                 if (prefix !== 'STM')
                     pubkey = pubkey.replace('STM',prefix)
                 for (let i = 0; i < acc[0].posting.key_auths.length; i++)
@@ -642,17 +642,17 @@ function steemKeyLogin(username,wif,api,prefix='STM') {
 }
 
 function storeEncrypted(key,value,password) {
-    let pubK = hive.auth.getPrivateKeys('',password,['Posting']).PostingPubkey
+    let pubK = hivecryptpro.PrivateKey.fromPassword('',password,'Posting').createPublic().toString()
     let wif = hivecrypt.randomWif()
-    localStorage.setItem(key,hive.memo.encode(wif,pubK,'#'+value.toString()))
+    localStorage.setItem(key,hivecryptpro.hivecrypt.encode(wif,pubK,'#'+value.toString()))
 }
 
 function retrieveEncrypted(key,password) {
-    let wif = hive.auth.getPrivateKeys('',password,['Posting']).Posting
+    let wif = hivecryptpro.PrivateKey.fromPassword('',password,'Posting').toString()
     let enc = localStorage.getItem(key)
     if (!enc.startsWith('#')) return enc
     try {
-        let result = hive.memo.decode(wif,enc).substr(1)
+        let result = hivecryptpro.hivecrypt.decode(wif,enc).substr(1)
         return result
     } catch {
         return null

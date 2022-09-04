@@ -170,7 +170,20 @@ class PrivateKey {
     static fromAvalonString(wif) {
         return new PrivateKey(bs58.decode(wif))
     }
-    
+
+    /**
+     * Create a PrivateKey instance from master password.
+     * @param {String} name Account name
+     * @param {String} password Password
+     * @param {String} role Account role. Valid: Owner, Active, Posting, Memo.
+     * @returns a new PrivateKey instance
+     */
+    static fromPassword(name, password, role) {
+        let seed = name + role + password
+        let brainKey = seed.trim().split(/[\t\n\v\f\r ]+/).join(' ')
+        return new PrivateKey(sha256(brainKey))
+    }
+
     /**
      * Derive the public key for this private key.
      */
