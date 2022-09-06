@@ -90,31 +90,37 @@ function onEditLinkSubmit() {
         (linkType === 'dtube' && authorLinkSplit[0] !== dtcDisplayUser))
         return alert('Not your video to edit')
 
+    editorFetchContent(linkType, authorLinkSplit[0], authorLinkSplit[1])
+}
+
+function editorFetchContent(linkType, author, link, ref) {
     // fetch
-    if (linkType === 'hive')
-        hive.api.getContent(authorLinkSplit[0],authorLinkSplit[1],(e,content) => {
+    if (linkType === 'hive' || (typeof ref !== 'undefined' && ref !== 'hive'))
+        hive.api.getContent(author, link, (e,content) => {
             console.log(e,content)
             if (e)
                 return alert('Failed to fetch hive post, see browser console for details')
             editor.editingPosts.hive = content
-            editorJsonCheck('hive')
+            editorJsonCheck('hive', typeof ref !== 'undefined')
         })
-    else if (linkType === 'blurt')
-        blurt.api.getContent(authorLinkSplit[0],authorLinkSplit[1],(e,content) => {
+    else if (linkType === 'blurt' || (typeof ref !== 'undefined' && ref !== 'blurt'))
+        blurt.api.getContent(author, link, (e,content) => {
             console.log(e,content)
             if (e)
                 return alert('Failed to fetch blurt post, see browser console for details')
             editor.editingPosts.blurt = content
-            editorJsonCheck('blurt')
+            editorJsonCheck('blurt', typeof ref !== 'undefined')
         })
-    else if (linkType === 'dtube')
-        getAvalonContent(authorLinkSplit[0],authorLinkSplit[1]).then((content) => {
+    else if (linkType === 'dtube' || (linkType === 'dtc' && typeof ref !== 'undefined' && ref !== 'avalon'))
+        getAvalonContent().then(author, link, (content) => {
             editor.editingPosts.avalon = content
-            editorJsonCheck('avalon')
+            editorJsonCheck('avalon', typeof ref !== 'undefined')
         }).catch((e) => {
             console.log(e)
             return alert('Failed to fetch avalon content, see browser console for details')
         })
+    else if (linkType === 'steem' || (typeof ref !== 'undefined' && ref !== 'steem'))
+        editor.steemIgnored = true
 }
 
 // json metadata check up to 1 refs deep
@@ -199,32 +205,7 @@ function editorJsonCheck(network, isRef = false) {
             let refSplit = refs[r].split('/')
             if (refSplit.length !== 3)
                 continue
-            if (refSplit[0] === 'hive' && network !== 'hive')
-                hive.api.getContent(refSplit[1],refSplit[2],(e,content) => {
-                    console.log('hive ref',e,content,refSplit)
-                    if (!e) {
-                        editor.editingPosts.hive = content
-                        editorJsonCheck('hive',true)
-                    }
-                })
-            if (refSplit[0] === 'blurt' && network !== 'blurt')
-                blurt.api.getContent(refSplit[1],refSplit[2],(e,content) => {
-                    console.log('blurt ref',e,content,refSplit)
-                    if (!e) {
-                        editor.editingPosts.blurt = content
-                        editorJsonCheck('blurt',true)
-                    }
-                })
-            if (refSplit[0] === 'dtc' && network !== 'avalon')
-                getAvalonContent(refSplit[1],refSplit[2]).then((content) => {
-                    console.log('avalon ref',content,refSplit)
-                    if (!e) {
-                        editor.editingPosts.avalon = content
-                        editorJsonCheck('avalon',true)
-                    }
-                }).catch((e) => console.log('avalon ref error',e))
-            else if (refSplit === 'steem')
-                editor.steemIgnored = true
+            editorFetchContent(refSplit[0],refSplit[1],refSplit[2],network)
         }
         document.getElementById('editTitle').value = editor.params.title
         document.getElementById('editDescription').value = editor.params.description
