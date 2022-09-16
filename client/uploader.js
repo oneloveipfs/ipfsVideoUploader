@@ -1,19 +1,6 @@
 // Load auth details
 let username
 
-let hiveOptions = {
-    url: getBlockchainAPI('hive'),
-    useAppbaseApi: true
-}
-
-let blurtOptions = {
-    url: getBlockchainAPI('blurt'),
-    useAppbaseApi: true
-}
-
-hive.api.setOptions(hiveOptions)
-blurt.api.setOptions(blurtOptions)
-
 // Setup subtitles tab
 const allLangCodes = languages.getAllLanguageCode()
 let langOptions = ''
@@ -654,6 +641,16 @@ function postVideo() {
     hiveBroadcast()
 }
 
+async function grapheneSignAndBroadcast(network,wif,ops) {
+    let api = getBlockchainAPI(network,true)
+    let tx = new hiveTx.Transaction(hivecryptpro.sha256,null,CHAIN_IDS[network])
+    await tx.create(ops,300,api)
+    let buf = tx.serialize()
+    let sig = hivecryptpro.Signature.create(buf,wif).customToString()
+    tx.appendSignature(sig)
+    return await tx.broadcast(api)
+}
+
 function hiveKeychainSignBufferPromize(user,message,role) {
     return new Promise((rs) => hive_keychain.requestSignBuffer(user,message,role,rs))
 }
@@ -686,7 +683,9 @@ function hiveBroadcast() {
                     hiveCb({error: em})
                 })
         else if (isElectron())
-            hive.broadcast.send({ extensions: [], operations: hiveTx },[sessionStorage.getItem('hiveKey')],(e) => hiveCb({error: e}))
+            grapheneSignAndBroadcast('hive',sessionStorage.getItem('hiveKey'),hiveTx)
+                .then((r) => hiveCb(r))
+                .catch((e) => hiveCb({error: e.toString()}))
         else
             hive_keychain.requestBroadcast(username,hiveTx,'Posting',hiveCb)
     } else {
@@ -771,7 +770,9 @@ function steemBroadcaster() {
         console.log('Steem tx',steemTx)
         document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Steem...'
         if (isElectron())
-            steem.broadcast.send({ extensions: [], operations: steemTx },[sessionStorage.getItem('steemKey')],(e) => steemCb({error: e}))
+            grapheneSignAndBroadcast('steem',sessionStorage.getItem('steemKey'),steemTx)
+                .then((r) => steemCb(r))
+                .catch((e) => steemCb({error: e.toString()}))
         else
             steem_keychain.requestBroadcast(steemUser,steemTx,'Posting',steemCb)
     } else steemCb({})
@@ -792,7 +793,9 @@ function blurtBroadcaster() {
             return olisc.new(blurtTx,'blurt',postparams.scheduled).then(() => blurtCb({})).catch((e) => blurtCb({error: axiosErrorMessage(e)}))
         document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Blurt...'
         if (isElectron())
-            blurt.broadcast.send({ extensions: [], operations: blurtTx },[sessionStorage.getItem('blurtKey')],(e) => blurtCb({error: e}))
+            grapheneSignAndBroadcast('blurt',sessionStorage.getItem('blurtKey'),blurtTx)
+                .then((r) => blurtCb(r))
+                .catch((e) => blurtCb({error: e.toString()}))
         else
             blurt_keychain.requestBroadcast(blurtUser,blurtTx,'Posting',blurtCb)
     } else blurtCb({})

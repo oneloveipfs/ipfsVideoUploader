@@ -25,10 +25,6 @@ function saveSettings() {
 
     // blockchain api settings
     saveAPISelections()
-    hiveOptions.url = getBlockchainAPI('hive')
-    blurtOptions.url = getBlockchainAPI('blurt')
-    hive.api.setOptions(hiveOptions)
-    blurt.api.setOptions(blurtOptions)
 }
 
 function fillSettings() {

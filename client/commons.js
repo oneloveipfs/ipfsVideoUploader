@@ -4,6 +4,12 @@ const APP_META = {
     description: 'IPFS hosting service'
 }
 
+const CHAIN_IDS = {
+    hive: 'beeab0de00000000000000000000000000000000000000000000000000000000',
+    steem: '0000000000000000000000000000000000000000000000000000000000000000',
+    blurt: 'cd8d90f29ae273abec3eaa7731e25934c63eb654d55080caff2ebb7f5df6381f'
+}
+
 const HIVE_API = [
     'techcoderx.com',
     'api.hive.blog',
