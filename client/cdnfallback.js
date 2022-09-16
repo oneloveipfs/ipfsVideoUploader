@@ -8,7 +8,7 @@ switch (window.location.pathname) {
         libs = ['axios','hivesigner']
         break
     case '/upload':
-        libs = ['axios','async','io','hivesigner','steem','hive','HtmlSanitizer','tus','moment']
+        libs = ['axios','async','io','hivesigner','tus','moment']
         break
 }
 
