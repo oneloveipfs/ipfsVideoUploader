@@ -196,11 +196,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        if (steemUser && config.steemloginApp) steem.api.getAccounts([steemUser],(e,acc) => {
-            if (e) return
+        if (steemUser && config.steemloginApp) getGrapheneAccounts('steem',[steemUser]).then((acc) => {
             loadGrapheneAuthorityStatus(acc[0],'steem')
             getCommunitySubs(acc[0].name,'steem')
-        })
+        }).catch(() => {})
         else
             updateDisplayByIDs([],['beneficiaryHeadingSteem','beneficiaryTableListSteem','totalBeneficiariesLabelSteem','steemCommunity'])
 
