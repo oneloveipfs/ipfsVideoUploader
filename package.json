@@ -114,7 +114,7 @@
   "snyk": true,
   "optionalDependencies": {
     "bs58": "^5.0.0",
-    "hivecrypt": "^2.0.5",
+    "hivecrypt": "^2.0.6",
     "secp256k1": "^4.0.3"
   }
 }
