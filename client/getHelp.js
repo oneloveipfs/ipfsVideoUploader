@@ -31,7 +31,7 @@ function loadGrapheneAuthorityStatus(account,network) {
                 hive_keychain.requestAddAccountAuthority(username,config.hivesignerApp,'Posting',1,(result) => {
                     authorizing = false
                     if (!result.error)
-                        hive.api.getAccounts([username],(e,r) => loadGrapheneAuthorityStatus(r[0],'hive'))
+                        getGrapheneAccounts('hive',[username]).then((r) => loadGrapheneAuthorityStatus(r[0],'hive')).catch(() => {})
                     else
                         alert(result.message)
                 })
@@ -42,7 +42,7 @@ function loadGrapheneAuthorityStatus(account,network) {
                 blurt_keychain.requestAddAccountAuthority(blurtUser,config.blurtApp,'Posting',1,(result) => {
                     authorizing = false
                     if (!result.error)
-                        blurt.api.getAccounts([blurtUser],(e,r) => loadGrapheneAuthorityStatus(r[0],'blurt'))
+                        getGrapheneAccounts('blurt',[blurtUser]).then((r) => loadGrapheneAuthorityStatus(r[0],'blurt')).catch(() => {})
                     else
                         alert(result.message)
                 })
@@ -59,7 +59,7 @@ function loadGrapheneAuthorityStatus(account,network) {
                 hive_keychain.requestRemoveAccountAuthority(username,config.hivesignerApp,'Posting',(result) => {
                     authorizing = false
                     if (!result.error)
-                        hive.api.getAccounts([username],(e,r) => loadGrapheneAuthorityStatus(r[0],'hive'))
+                        getGrapheneAccounts('hive',[username]).then((r) => loadGrapheneAuthorityStatus(r[0],'hive')).catch(() => {})
                     else
                         alert(result.message)
                 })
@@ -70,7 +70,7 @@ function loadGrapheneAuthorityStatus(account,network) {
                 blurt_keychain.requestRemoveAccountAuthority(blurtUser,config.blurtApp,'Posting',(result) => {
                     authorizing = false
                     if (!result.error)
-                        blurt.api.getAccounts([blurtUser],(e,r) => loadGrapheneAuthorityStatus(r[0],'blurt'))
+                        getGrapheneAccounts('blurt',[blurtUser]).then((r) => loadGrapheneAuthorityStatus(r[0],'blurt')).catch(() => {})
                     else
                         alert(result.message)
                 })

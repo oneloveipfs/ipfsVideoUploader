@@ -95,31 +95,24 @@ function onEditLinkSubmit() {
 
 function editorFetchContent(linkType, author, link, ref) {
     // fetch
-    if (linkType === 'hive' || (typeof ref !== 'undefined' && ref !== 'hive'))
-        hive.api.getContent(author, link, (e,content) => {
-            console.log(e,content)
-            if (e)
-                return alert('Failed to fetch hive post, see browser console for details')
-            editor.editingPosts.hive = content
-            editorJsonCheck('hive', typeof ref !== 'undefined')
+    if (linkType === 'hive' || linkType === 'blurt')
+        getGrapheneContent(linkType, author, link).then((content) => {
+            console.log(content)
+            editor.editingPosts[linkType] = content
+            editorJsonCheck(linkType, typeof ref !== 'undefined')
+        }).catch((e) => {
+            console.log(e)
+            alert('Failed to fetch '+linkType+' post, see browser console for details')
         })
-    else if (linkType === 'blurt' || (typeof ref !== 'undefined' && ref !== 'blurt'))
-        blurt.api.getContent(author, link, (e,content) => {
-            console.log(e,content)
-            if (e)
-                return alert('Failed to fetch blurt post, see browser console for details')
-            editor.editingPosts.blurt = content
-            editorJsonCheck('blurt', typeof ref !== 'undefined')
-        })
-    else if (linkType === 'dtube' || (linkType === 'dtc' && typeof ref !== 'undefined' && ref !== 'avalon'))
-        getAvalonContent().then(author, link, (content) => {
+    else if (linkType === 'dtube' || linkType === 'dtc')
+        getAvalonContent(author,link).then((content) => {
             editor.editingPosts.avalon = content
             editorJsonCheck('avalon', typeof ref !== 'undefined')
         }).catch((e) => {
             console.log(e)
-            return alert('Failed to fetch avalon content, see browser console for details')
+            alert('Failed to fetch avalon content, see browser console for details')
         })
-    else if (linkType === 'steem' || (typeof ref !== 'undefined' && ref !== 'steem'))
+    else if (linkType === 'steem')
         editor.steemIgnored = true
 }
 

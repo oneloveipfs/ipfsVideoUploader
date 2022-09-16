@@ -205,20 +205,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateDisplayByIDs([],['beneficiaryHeadingSteem','beneficiaryTableListSteem','totalBeneficiariesLabelSteem','steemCommunity'])
 
         if (blurtUser && config.blurtApp)
-            blurt.api.getAccounts([blurtUser],(e,acc) => {
-                if (e) return
-                loadGrapheneAuthorityStatus(acc[0],'blurt')
-            })
+            getGrapheneAccounts('blurt',[blurtUser]).then((acc) => loadGrapheneAuthorityStatus(acc[0],'blurt')).catch(() => {})
         else
             updateDisplayByIDs([],['beneficiaryHeadingBlurt','beneficiaryTableListBlurt','totalBeneficiariesLabelBlurt'])
 
-        hive.api.setOptions(hiveOptions)
-        if (hiveDisplayUser) hive.api.getAccounts([username],(e,acc) => {
-            if (e) return
+        if (hiveDisplayUser) getGrapheneAccounts('hive',[username]).then((acc) => {
             if (acc.length > 0)
                 loadGrapheneAuthorityStatus(acc[0],'hive')
             getCommunitySubs(username,'hive')
-        })
+        }).catch(() => {})
     })
 
     // TODO: Display warning if resumable uploads is unavailable
@@ -471,24 +466,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         let network = document.getElementById('newBeneficiaryNetwork').value
         let nobj = {
             Hive: {
-                method: hive.api.getAccounts,
                 benef: hiveBeneficiaries,
                 cu: hiveDisplayUser
             },
             Steem: {
-                method: steem.api.getAccounts,
                 benef: steemBeneficiaries,
                 cu: steemUser
             },
             Blurt: {
-                method: blurt.api.getAccounts,
                 benef: blurtBeneficiaries,
                 cu: blurtUser
             }
         }
 
-        for (let n in nobj) if ((network === 'All' || network === n) && nobj[n].cu) nobj[n].method([account],(err,result) => {
-            if (err) return alert('Error while validating '+n+' account: ' + err)
+        for (let n in nobj) if ((network === 'All' || network === n) && nobj[n].cu) getGrapheneAccounts(n.toLowerCase(),[account]).then((result) => {
             if (result.length === 0) return alert('Beneficiary account specified doesn\'t exist on '+n)
 
             try {
@@ -496,7 +487,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             } catch (e) {
                 return alert(e)
             }
-        })
+        }).catch((e) => alert('Error while validating '+n+' account: ' + e))
     }
 
     // Drafts

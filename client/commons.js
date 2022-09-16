@@ -187,6 +187,27 @@ function exchageRate (coin,amount,cb) {
     }).catch((e) => cb(e))
 }
 
+async function appbaseCall(network,method = '',params = []) {
+    let acc = await axios.post(getBlockchainAPI(network),{
+        id: 1,
+        jsonrpc: '2.0',
+        method: method,
+        params: params
+    })
+    if (acc.data && acc.data.result)
+        return acc.data.result
+    else
+        throw acc.data.error
+}
+
+function getGrapheneAccounts(network,usernames = []) {
+    return appbaseCall(network, 'condenser_api.get_accounts', [usernames])
+}
+
+function getGrapheneContent(network,author,link) {
+    return appbaseCall(network, 'condenser_api.get_content', [author, link])
+}
+
 async function getAvalonContent(author,link) {
     return (await axios.get(getBlockchainAPI('avalon')+'/content/'+author+'/'+link)).data
 }
