@@ -74,7 +74,7 @@ function dismissPopup(event,popupelement) {
     let popupcontent = document.getElementById(popupelement+'Content')
     if (event.target == popup) {
         popupcontent.classList.remove('popup-shown')
-        setTimeout(() => popup.style.display = 'none',400)
+        setTimeout(() => popup.style.display = 'none',300)
     }
 }
 
