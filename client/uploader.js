@@ -275,7 +275,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         postparams.tags = tags
 
         postparams.scheduled = validateDatePicker()
-        if (sch === -1) return
+        if (postparams.scheduled === -1) return
 
         // Avalon bandwidth check (untested)
         // if (avalonUser && avalonKey && needsBandwidth())
