@@ -274,7 +274,7 @@ function updateEncoderDisplay() {
 
 function postpublish() {
     if (isPlatformSelected['3Speak']) {
-        document.getElementById('postpublishwatch3Speak').setAttribute('href','https://3speak.tv/openDapp?uri=hive:'+usernameByNetwork('hive')+':'+postparams.permlink)
+        document.getElementById('postpublishwatch3Speak').onclick = () => window.open('https://3speak.tv/openDapp?uri=hive:'+usernameByNetwork('hive')+':'+postparams.permlink)
         document.getElementById('postpublishembed3Speak').onclick = () => copyToClipboard(pfPlayerEmbed('3Speak'),'postpublishembedtt3Speak')
     }
     if (isPlatformSelected['DTube']) {
@@ -284,7 +284,7 @@ function postpublish() {
             du = username
             dp = postparams.permlink
         }
-        document.getElementById('postpublishwatchDTube').setAttribute('href','https://d.tube/#!/v/'+du+'/'+dp)
+        document.getElementById('postpublishwatchDTube').onclick = () => window.open('https://d.tube/#!/v/'+du+'/'+dp)
         document.getElementById('postpublishembedDTube').onclick = () => copyToClipboard(pfPlayerEmbed('DTube'),'postpublishembedttDTube')
     }
 }
