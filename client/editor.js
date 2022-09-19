@@ -90,6 +90,10 @@ function onEditLinkSubmit() {
         (linkType === 'dtube' && authorLinkSplit[0] !== dtcDisplayUser))
         return alert('Not your video to edit')
 
+    editor.params = {}
+    editor.editingPlatforms = []
+    editor.editingPosts = {}
+
     editorFetchContent(linkType, authorLinkSplit[0], authorLinkSplit[1])
 }
 
@@ -98,6 +102,7 @@ function editorFetchContent(linkType, author, link, ref) {
     if (linkType === 'hive' || linkType === 'blurt')
         getGrapheneContent(linkType, author, link).then((content) => {
             console.log(content)
+            if (!content || !content.author || !content.permlink) return
             editor.editingPosts[linkType] = content
             editorJsonCheck(linkType, typeof ref !== 'undefined')
         }).catch((e) => {
@@ -215,6 +220,8 @@ function editorJsonCheck(network, isRef = false) {
         updateDisplayByIDs(['linkResult'],['metaEditIntro'])
     } else
         editor.refs.push(network)
+
+    document.getElementById('editPlatforms').innerText = 'Editing on '+ (editor.editingPlatforms.length === 1 ? editor.editingPlatforms[0] : editor.editingPlatforms.slice(0,-1).join(', ') + ' and ' + editor.editingPlatforms[editor.editingPlatforms.length-1])
 }
 
 function chooseReplacementThumbnail() {
