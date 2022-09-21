@@ -199,6 +199,7 @@
             <div id="metaEditIntro">
                 <h4>Edit your video title, description, tags and thumbnails with our editing tool. Useful for cross-posted videos as the editing tool of one platform may break the video metadata of the same video posted to other platforms.</h4>
                 <h4>NOTE: This editing tool is optimised for videos posted with OneLoveIPFS. If your video was posted through another uploader, it may be better to use the editing features on their respective frontends.</h4>
+                <h4>This will edit the JSON metadata of the posts and will not edit the article body, which can be done on generic frontends that does not modify the JSON metadata.</h4>
                 <input type="text" class="meta" placeholder="Paste URL here (supported: dtube links, 3speak app uri, hive/blurt frontends)" id="thumbnailSwapLink">
                 <a class="roundedBtn" id="linkSubmitBtn" onclick="onEditLinkSubmit()">Submit Link</a>
             </div>
@@ -206,7 +207,7 @@
                 <a onclick="updateDisplayByIDs(['metaEditIntro'],['linkResult'])"><< Back</a>
                 <div id="metaEditThumbnail">
                     <div class="metaEditThumbItm metaEditThumb">
-                        <img id="metaEditOldImg" src="https://ipfs.io/ipfs/QmR87Zd5LNbXqKX3ncDnKXDuDZgWTvQtnDKjptzX1xBpd5">
+                        <img id="metaEditOldImg">
                         <a class="metaEditOverlay" onclick="chooseReplacementThumbnail()">
                             <p>Replace Thumbnail</p>
                             <input type="file" accept="image/*" id="metaEditImg" style="display: none" onchange="selectReplacementThumbnail()">
