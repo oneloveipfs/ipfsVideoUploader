@@ -199,6 +199,7 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
             Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,false,(e,user,network) => {
                 FileUploader.handleTusUpload(request.body,user,network,() => {
                     FileUploader.writeUploadRegister()
+                    FileUploader.pruneTusPartialUploads(request.body.Upload.PartialUploads)
                     response.status(200).send()
                 })
             })

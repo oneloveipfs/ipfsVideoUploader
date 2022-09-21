@@ -566,6 +566,12 @@ let uploadOps = {
             },user,network,cb)
         })
     },
+    pruneTusPartialUploads: (PartialUploads = []) => {
+        for (let i in PartialUploads) {
+            fs.unlinkSync(Config.tusdUploadDir+'/'+PartialUploads[i])
+            fs.unlinkSync(Config.tusdUploadDir+'/'+PartialUploads[i]+'.info')
+        }
+    },
     writeUploadRegister: () => {
         fs.writeFile(defaultDir+'/db/register.json',JSON.stringify(uploadRegister),() => {})
     },
