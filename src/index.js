@@ -165,17 +165,23 @@ app.post('/uploadChunk',Parser.json({ verify: rawBodySaver }),Parser.urlencoded(
 })
 
 app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.urlencoded({ verify: rawBodySaver, extended: true }),Parser.raw({ verify: rawBodySaver, type: '*/*' }),(request,response) => {
-    if (request.body.Upload.IsPartial)
-        return response.status(200).send()
-    // console.log(request.headers['hook-name'],request.body.Upload)
-    switch (request.headers['hook-name']) {
-        case "pre-create":
-            // Upload type check
-            if(!db.getPossibleTypes().includes(request.body.Upload.MetaData.type) && request.body.Upload.MetaData.type !== 'hlsencode') return response.status(400).send({error: 'Invalid upload type'})
+    if (!request.body || !request.body.HTTPRequest || !request.body.HTTPRequest.Header)
+        return response.status(400).send({ error: 'Bad request' })
+    else if (!Array.isArray(request.body.HTTPRequest.Header.Authorization) || request.body.HTTPRequest.Header.Authorization.length === 0)
+        return response.status(400).send({ error: 'Missing auth headers' })
+    let authHeader = request.body.HTTPRequest.Header.Authorization[0].split(' ')
+    if (authHeader.length < 2 || authHeader[0] !== 'Bearer')
+        return response.status(400).send({ error: 'Auth header must be a bearer' })
+    Auth.authenticateTus(authHeader[1],true,(e,user,network) => {
+        if (e) return response.status(401).send({error: e})
+        if (request.body.Upload.IsPartial)
+            return response.status(200).send()
 
-            // Authenticate
-            Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,true,(e,user,network) => {
-                if (e) return response.status(401).send({error: e})
+        switch (request.headers['hook-name']) {
+            case "pre-create":
+                // Upload type check
+                if(!db.getPossibleTypes().includes(request.body.Upload.MetaData.type) && request.body.Upload.MetaData.type !== 'hlsencode') return response.status(400).send({error: 'Invalid upload type'})
+
                 if (request.body.Upload.MetaData.type === 'hlsencode') {
                     let fullusername = db.toFullUsername(user,network)
                     if (!Config.admins.includes(fullusername) && !Config.Encoder.accounts.includes(fullusername) && !Config.admins.includes(user) && !Config.Encoder.accounts.includes(user))
@@ -190,24 +196,22 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
                         return response.status(401).send({error: 'Invalid encoder output'})
                 }
                 return response.status(200).send()
-            })
-            break
-        case "post-finish":
-            request.socket.setTimeout(0)
+            case "post-finish":
+                request.socket.setTimeout(0)
 
-            // Get user by access token then process upload
-            Auth.authenticate(request.body.Upload.MetaData.access_token,request.body.Upload.MetaData.keychain,false,(e,user,network) => {
+                // Get user by access token then process upload
                 FileUploader.handleTusUpload(request.body,user,network,() => {
                     FileUploader.writeUploadRegister()
                     FileUploader.pruneTusPartialUploads(request.body.Upload.PartialUploads)
                     response.status(200).send()
                 })
-            })
             break
-        default:
-            response.status(200).send()
-            break
-    }
+            default:
+                response.status(200).send()
+                break
+        }
+    })
+    // console.log(request.headers['hook-name'],request.body.Upload)
 })
 
 app.get('/usage',(request,response) => {

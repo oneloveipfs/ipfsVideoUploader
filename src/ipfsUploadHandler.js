@@ -567,6 +567,7 @@ let uploadOps = {
         })
     },
     pruneTusPartialUploads: (PartialUploads = []) => {
+        if (!PartialUploads) return
         for (let i in PartialUploads) {
             fs.unlinkSync(Config.tusdUploadDir+'/'+PartialUploads[i])
             fs.unlinkSync(Config.tusdUploadDir+'/'+PartialUploads[i]+'.info')

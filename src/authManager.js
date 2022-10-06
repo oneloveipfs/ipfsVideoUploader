@@ -178,6 +178,23 @@ let auth = {
             })
         }
     },
+    authenticateTus: (bearer,needscredits,cb) => {
+        let parts = bearer.split('.')
+        let kc = null
+        if (parts.length < 2)
+            return cb('Invalid auth token bearer format')
+        try {
+            let part1 = JSON.parse(Buffer.from(parts[0],'base64').toString('utf-8'))
+            if (part1.keychain === 'true' || part1.keychain === true)
+                kc = 'true'
+            else
+                kc = 'false'
+        } catch {
+            return cb('Could not parse first part of bearer')
+        }
+        parts.shift()
+        auth.authenticate(parts.join('.'),kc,needscredits,cb)
+    },
     decryptMessage: (message,cb) => {
         let decrypted
         try {

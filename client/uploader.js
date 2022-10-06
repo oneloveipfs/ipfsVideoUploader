@@ -575,9 +575,10 @@ function uploadVideo(resolution,next,thumbnailFname = '') {
         endpoint: config.tusdEndpoint,
         retryDelays: [0,3000,5000,10000,20000],
         parallelUploads: parseInt(usersettings.uplThreads) || 10,
+        headers: {
+            'Authorization': 'Bearer '+window.btoa(JSON.stringify({keychain: Auth.iskeychain === 'true'})).replace(/={1,2}$/, '')+'.'+Auth.token,
+        },
         metadata: {
-            access_token: Auth.token,
-            keychain: Auth.iskeychain,
             type: resolutionFType,
             thumbnailFname: thumbnailFname,
             createSprite: isPlatformSelected['DTube'] ? 'true' : '',
@@ -585,6 +586,15 @@ function uploadVideo(resolution,next,thumbnailFname = '') {
         },
         onError: (e) => {
             console.log('tus error',e)
+            try {
+                let errorres = JSON.parse(e.originalResponse._xhr.responseText)
+                if (errorres.error)
+                    alert(errorres.error)
+                else
+                    alert(e.originalResponse._xhr.responseText)
+            } catch {
+                alert('Unknown Tus error')
+            }
         },
         onProgress: (bu,bt) => {
             let progressPercent = Math.round((bu / bt) * 100)
