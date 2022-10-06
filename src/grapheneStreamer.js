@@ -42,7 +42,7 @@ module.exports = class {
 
     fetchBlocks(cb) {
         if (this.stopped) return
-        if (this.headBlock === 0 || this.headBlock === this.parsedBlock) {
+        if (this.headBlock === 0 || this.headBlock >= this.parsedBlock) {
             // console.log('skipping round',this.headBlock,this.parsedBlock)
             return setTimeout(() => this.fetchBlocks(cb),3000)
         }
@@ -96,7 +96,7 @@ module.exports = class {
         if (this.network !== 'hive')
             return
         
-        if (this.headBlock === 0 || this.headBlock === this.parsedBlockVops)
+        if (this.headBlock === 0 || this.headBlock >= this.parsedBlockVops)
             return setTimeout(() => this.fetchVops(filter,cb),3000)
 
         if (typeof filter !== 'number')
