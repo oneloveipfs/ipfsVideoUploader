@@ -123,6 +123,13 @@ async function Avalon() {
             restrict()
             return alert('Avalon auth error: ' + e.toString())
         }
+    } else if (avalonUser && avalonKc && avalonKcUser) {
+        try {
+            avalonAcc = await getAvalonAccount(avalonUser)
+        } catch (e) {
+            restrict()
+            return alert('Failed to retrieve Avalon account: '+e.toString())
+        }
     }
     dtcDisplayUser = avalonUser
     displayLoginMessage()
