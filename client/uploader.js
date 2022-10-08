@@ -145,6 +145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('disabledText').innerText = config.disabledMessage
             document.getElementById('disabledImg').src = 'public/memes/' + config.disabledMeme
             updateDisplayByIDs(['disabledPage'],['uploadForm','modeBtn'])
+            return
         }
 
         // Beneficiaries description text
@@ -167,7 +168,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Hide Avalon first curated tag info if not logged in with Avalon
         if (!avalonUser || (!avalonKey && (!avalonKc || !avalonKcUser))) {
-            document.getElementById('tagInfo1').style.display = 'none'
+            updateDisplayByIDs([],['tagInfo1'])
         } else {
             if (avalonAcc) {
                 document.getElementById('dtcBurnInput').placeholder = 'Available: ' + thousandSeperator(avalonAcc.balance / 100) + ' DTUBE'
@@ -179,30 +180,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             if (!hiveDisplayUser) {
                 document.getElementById('tagLbl').innerText = 'Tag:'
-                document.getElementById('tagInfo1').style.display = 'none'
+                updateDisplayByIDs([],['tagInfo1'])
             }
         }
 
-        if (steemUser && config.steemloginApp) getGrapheneAccounts('steem',[steemUser]).then((acc) => {
-            loadGrapheneAuthorityStatus(acc[0],'steem')
-            getCommunitySubs(acc[0].name,'steem')
-        }).catch(() => {})
-        else
-            updateDisplayByIDs([],['beneficiaryHeadingSteem','beneficiaryTableListSteem','totalBeneficiariesLabelSteem','steemCommunity'])
-
-        if (blurtUser && config.blurtApp)
-            getGrapheneAccounts('blurt',[blurtUser]).then((acc) => {
-                loadGrapheneAuthorityStatus(acc[0],'blurt')
-                getCommunitySubs(blurtUser,'blurt')
-            }).catch(() => {})
-        else
-            updateDisplayByIDs([],['beneficiaryHeadingBlurt','beneficiaryTableListBlurt','totalBeneficiariesLabelBlurt','blurtCommunity'])
-
-        if (hiveDisplayUser) getGrapheneAccounts('hive',[username]).then((acc) => {
-            if (acc.length > 0)
-                loadGrapheneAuthorityStatus(acc[0],'hive')
-            getCommunitySubs(username,'hive')
-        }).catch(() => {})
+        for (let g in grapheneNetworks)
+            if (usernameByNetwork(grapheneNetworks[g]))
+                getGrapheneAccounts(grapheneNetworks[g],[usernameByNetwork(grapheneNetworks[g])]).then((acc) => {
+                    loadGrapheneAuthorityStatus(acc[0],grapheneNetworks[g])
+                    getCommunitySubs(acc[0].name,grapheneNetworks[g])
+                }).catch(() => {})
+            else
+                updateDisplayByIDs([],['beneficiaryHeading'+capitalizeFirstLetter(grapheneNetworks[g]),'beneficiaryTableList'+capitalizeFirstLetter(grapheneNetworks[g]),'totalBeneficiariesLabel'+capitalizeFirstLetter(grapheneNetworks[g]),grapheneNetworks[g]+'Community'])
     })
 
     // TODO: Display warning if resumable uploads is unavailable
@@ -214,30 +203,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     loadOliscDatePicker()
     document.getElementById('languages').innerHTML = langOptions
-    document.getElementById('tabBasics').onclick = () => {
-        updateDisplayByIDs(['basics'],['subtitles','advanced'])
-        document.getElementById('tabAdvanced').style.backgroundColor = "transparent"
-        document.getElementById('tabSubtitles').style.backgroundColor = "transparent"
-        document.getElementById('tabBasics').style.backgroundColor = "#2196F3"
-        return true
-    }
-
-    document.getElementById('tabAdvanced').onclick = () => {
-        updateDisplayByIDs(['advanced'],['basics','subtitles'])
-        document.getElementById('tabAdvanced').style.backgroundColor = "#2196F3"
-        document.getElementById('tabSubtitles').style.backgroundColor = "transparent"
-        document.getElementById('tabBasics').style.backgroundColor = "transparent"
-        return true
-    }
-
-    document.getElementById('tabSubtitles').onclick = () => {
-        updateDisplayByIDs(['subtitles'],['basics','advanced'])
-        document.getElementById('tabAdvanced').style.backgroundColor = "transparent"
-        document.getElementById('tabSubtitles').style.backgroundColor = "#2196F3"
-        document.getElementById('tabBasics').style.backgroundColor = "transparent"
-        return true
-    }
-
     document.getElementById('tags').onchange = () => document.getElementById('tags').value = document.getElementById('tags').value.toLowerCase()
 
     document.getElementById('submitbutton').onclick = () => {
@@ -353,10 +318,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         imgFormData.append('image',postImg[0])
         toggleImg(true)
 
-        let progressbar = document.getElementById('uploadProgressBack')
-        let progressbarInner = document.getElementById('uploadProgressFront')
-        progressbar.style.display = "block";
-        progressbarInner.innerHTML = "Uploading... (0%)";
+        updateDisplayByIDs(['uploadProgressBack'],[])
+        document.getElementById('uploadProgressFront').innerHTML = "Uploading... (0%)";
 
         let contentType = {
             headers: {
@@ -373,7 +336,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             call += '&scauth=true'
         axios.post(call,imgFormData,contentType).then(function(response) {
             console.log(response);
-            progressbar.style.display = "none";
+            updateDisplayByIDs([],['uploadProgressBack'])
             document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + ']('+config.gateway+'/ipfs/' + response.data.imghash + ')');
             toggleImg(false)
         }).catch(function(err) {
@@ -381,7 +344,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alert('Upload error: ' + err.response.data.error)
             else
                 alert('Upload error: ' + err);
-            progressbar.style.display = "none";
+            updateDisplayByIDs([],['uploadProgressBack'])
             toggleImg(false)
         })
     }
@@ -450,25 +413,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         let percentage = Math.floor(document.getElementById('newBeneficiaryPercent').value * 100)
         let network = document.getElementById('newBeneficiaryNetwork').value
         let nobj = {
-            Hive: {
-                benef: hiveBeneficiaries,
-                cu: hiveDisplayUser
-            },
-            Steem: {
-                benef: steemBeneficiaries,
-                cu: steemUser
-            },
-            Blurt: {
-                benef: blurtBeneficiaries,
-                cu: blurtUser
-            }
+            Hive: hiveBeneficiaries,
+            Steem: steemBeneficiaries,
+            Blurt: blurtBeneficiaries
         }
 
-        for (let n in nobj) if ((network === 'All' || network === n) && nobj[n].cu) getGrapheneAccounts(n.toLowerCase(),[account]).then((result) => {
+        for (let n in nobj) if (network === 'All' || network === n) getGrapheneAccounts(n.toLowerCase(),[account]).then((result) => {
             if (result.length === 0) return alert('Beneficiary account specified doesn\'t exist on '+n)
 
             try {
-                nobj[n].benef.addAccount(account,percentage)
+                nobj[n].addAccount(account,percentage)
             } catch (e) {
                 return alert(e)
             }
@@ -494,6 +448,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 })
 
+function updateTab(tab) {
+    const tabNames = ['basics','subtitles','advanced']
+    updateDisplayByIDs([tab],tabNames)
+    for (let i in tabNames)
+        document.getElementById('tab'+capitalizeFirstLetter(tabNames[i])).style.backgroundColor = "transparent"
+    document.getElementById('tab'+capitalizeFirstLetter(tab)).style.backgroundColor = "#2196F3"
+}
+
 function sourceVideoSelect() {
     // Retrieve video duration from fake audio player
     let selected = document.getElementById('sourcevideo').files
@@ -510,9 +472,7 @@ function sourceVideoSelect() {
 }
 
 function uploadVideo(resolution,next,thumbnailFname = '') {
-    let fInputElemName
-    let resolutionFType
-    let progressTxt
+    let fInputElemName, resolutionFType, progressTxt
     let lbl = ['source','240','480','720','1080']
     switch (resolution) {
         case -1:
@@ -540,9 +500,8 @@ function uploadVideo(resolution,next,thumbnailFname = '') {
     let videoToUpload = document.getElementById(fInputElemName).files
     if (videoToUpload.length < 1) return uploadVideo(resolution+1,next)
 
-    let progressbar = document.getElementById('uploadProgressBack')
+    updateDisplayByIDs(['uploadProgressBack'],[])
     let progressbarInner = document.getElementById('uploadProgressFront')
-    progressbar.style.display = 'block'
 
     if (config.uploadFromFs && isElectron()) {
         progressbarInner.innerText = 'Submitting upload...'
@@ -639,7 +598,7 @@ function postVideo() {
     let respectiveField = ['ipfs240hash','ipfs480hash','ipfs720hash','ipfs1080hash']
 
     for (let i = 0; i < encodedVidInputs.length; i++)
-        if (document.getElementById(encodedVidInputs[i]).files.length != 0) requiredFields.push(respectiveField[i])
+        if (document.getElementById(encodedVidInputs[i]).files.length > 0) requiredFields.push(respectiveField[i])
 
     for (let j = 0; j < requiredFields.length; j++)
         if (!postparams[requiredFields[j]]) return console.log('missing hash, not proceeding with broadcast')

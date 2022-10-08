@@ -70,9 +70,9 @@
         </div>
         <div id="uploadForm">
             <div id="tab">
-                <a class="tabs" id="tabBasics">Basics</a>
-                <a class="tabs" id="tabSubtitles">Subtitles</a>
-                <a class="tabs" id="tabAdvanced">Advanced</a>
+                <a class="tabs" id="tabBasics" onclick="updateTab('basics')">Basics</a>
+                <a class="tabs" id="tabSubtitles" onclick="updateTab('subtitles')">Subtitles</a>
+                <a class="tabs" id="tabAdvanced" onclick="updateTab('advanced')">Advanced</a>
             </div>
             <div id="basics"> <!-- Basics tab -->
                 <h3>Upload a video (mp4 file accepted): <input type="file" accept="video/mp4" name="VideoUpload" id="sourcevideo" onchange="sourceVideoSelect()"></h3>

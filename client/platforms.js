@@ -20,6 +20,8 @@ const isPlatformSelected = {
     'DTube': false
 }
 
+const grapheneNetworks = ['hive','steem','blurt']
+
 document.addEventListener('DOMContentLoaded', () => {
     let pages = ['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings','scheduledPublishes','postpublish']
     let evts = ['onclick','ontouchstart']
