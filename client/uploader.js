@@ -191,9 +191,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             updateDisplayByIDs([],['beneficiaryHeadingSteem','beneficiaryTableListSteem','totalBeneficiariesLabelSteem','steemCommunity'])
 
         if (blurtUser && config.blurtApp)
-            getGrapheneAccounts('blurt',[blurtUser]).then((acc) => loadGrapheneAuthorityStatus(acc[0],'blurt')).catch(() => {})
+            getGrapheneAccounts('blurt',[blurtUser]).then((acc) => {
+                loadGrapheneAuthorityStatus(acc[0],'blurt')
+                getCommunitySubs(blurtUser,'blurt')
+            }).catch(() => {})
         else
-            updateDisplayByIDs([],['beneficiaryHeadingBlurt','beneficiaryTableListBlurt','totalBeneficiariesLabelBlurt'])
+            updateDisplayByIDs([],['beneficiaryHeadingBlurt','beneficiaryTableListBlurt','totalBeneficiariesLabelBlurt','blurtCommunity'])
 
         if (hiveDisplayUser) getGrapheneAccounts('hive',[username]).then((acc) => {
             if (acc.length > 0)
@@ -276,10 +279,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         postparams.scheduled = validateDatePicker()
         if (postparams.scheduled === -1) return
-
-        // Avalon bandwidth check (untested)
-        // if (avalonUser && avalonKey && needsBandwidth())
-        //     return alert('You need approximately ' + needsBandwidth() + ' additional bytes in your Avalon account to post this video.')
 
         // Auth.restrict()
 
@@ -1004,7 +1003,6 @@ function generateRefs(network) {
 function generatePost(network) {
     // Power up all rewards or not
     let rewardPercent = postparams.powerup ? 0 : 10000
-    let hmcExclude = false
 
     // Sort beneficiary list in ascending order
     let sortedBeneficiary = []
@@ -1012,10 +1010,8 @@ function generatePost(network) {
         sortedBeneficiary = hiveBeneficiaries.sort()
     else if (network === 'steem')
         sortedBeneficiary = steemBeneficiaries.sort()
-    else if (network === 'blurt') {
+    else if (network === 'blurt')
         sortedBeneficiary = blurtBeneficiaries.sort()
-        hmcExclude = true
-    }
     let user = usernameByNetwork(network)
 
     let commentOptions = [
@@ -1039,8 +1035,8 @@ function generatePost(network) {
     let operations = [
         [ 'comment', {
                 parent_author: '',
-                parent_permlink: !hmcExclude ? document.getElementById(network+'CommunitySelect').value : postparams.tags[0],
-                category: !hmcExclude ? document.getElementById(network+'CommunitySelect').value : '',
+                parent_permlink: document.getElementById(network+'CommunitySelect').value,
+                category: document.getElementById(network+'CommunitySelect').value,
                 author: user,
                 permlink: postparams.permlink,
                 title: postparams.title,
@@ -1135,66 +1131,6 @@ function clearDraft() {
     localStorage.setItem('DraftSkynetUpload','false')
 }
 
-function estimatedBandwidth() {
-    let bytes = 710 // base tx size including signatures
-
-    // skynet uploads require more bytes for additional skylinks
-    let skylinkBytes = 0
-    if (document.getElementById('skynetupload').checked)
-        skylinkBytes = 70
-
-    // additional encoded versions require +55 bytes/res
-    let encodedVidInputs = ['video240p','video480p','video720p','video1080p']
-    for (let i = 0; i < encodedVidInputs.length; i++) {
-        if (document.getElementById(encodedVidInputs[i]).files.length != 0) {
-            bytes += 55
-            if (skylinkBytes > 0) skylinkBytes += 55
-        }
-    }
-
-    bytes += skylinkBytes
-
-    // see which networks we are broadcasting to, assuming we are logged in with Avalon to be relevent
-    let hasHive = hiveDisplayUser ? true : false
-    let hasSteem = steemUser ? true : false
-
-    bytes += avalonUser.length // base + username length
-
-    // tags
-    let tag = document.getElementById('tags').value.split(' ')
-    bytes += 2 * (tag[0].length)
-
-    // refs
-    if (hasHive)
-        bytes += 16 + username.length
-    if (hasSteem)
-        bytes += 17 + steemUser.length
-    if (hasHive && hasSteem)
-        bytes += 1
-
-    // other video metadata (e.g. duration, title, description)
-    bytes += 11 // duration
-    bytes += document.getElementById('title').value.length
-    bytes += document.getElementById('description').value.length
-
-    // vp and burn
-    bytes += 10 // estimated 10 digit VP to be safe
-
-    let burnAmt = document.getElementById('dtcBurnInput').value ? Math.floor(parseFloat(document.getElementById('dtcBurnInput').value) * 100) : 0
-    if (burnAmt != 0)
-        bytes += burnAmt.toString().length + 8
-
-    return bytes
-}
-
-function needsBandwidth() {
-    let currentBw = getAvalonBw({ bw: window.availableAvalonBw, balance: availableForBurn * 100 })
-    if (currentBw > estimatedBandwidth())
-        return false
-    else
-        return estimatedBandwidth() - currentBw
-}
-
 async function getCommunitySubs(acc,network) {
     let communities
     try {
@@ -1206,7 +1142,7 @@ async function getCommunitySubs(acc,network) {
         })
     } catch { return }
     let selection = document.getElementById(network+'CommunitySelect')
-    for (let i = 0; i < communities.data.result.length; i++) if (communities.data.result[i][0] !== 'hive-134220') {
+    for (let i = 0; i < communities.data.result.length; i++) if (communities.data.result[i][0] !== getDefaultCommunity(network)) {
         let newoption = document.createElement('option')
         newoption.text = communities.data.result[i][1] + ' (' + communities.data.result[i][0] + ')'
         newoption.value = communities.data.result[i][0]
@@ -1215,4 +1151,11 @@ async function getCommunitySubs(acc,network) {
     let savedCommunity = localStorage.getItem('Draft' + capitalizeFirstLetter(network) + 'Community')
     if (savedCommunity)
         document.getElementById(network+'CommunitySelect').value = savedCommunity
+}
+
+function getDefaultCommunity(network) {
+    if (network === 'blurt')
+        return 'blurt-134220'
+    else
+        return 'hive-134220'
 }

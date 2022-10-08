@@ -737,10 +737,8 @@ textarea {
     font-weight: normal;
 }
 
-#hiveCommunity h3,
-#hiveCommunity h5,
-#steemCommunity h3,
-#steemCommunity h5 {
+.hivemindCommunity h3,
+.hivemindCommunity h5 {
     margin-block-start: 0.25em;
     margin-block-end: 0.5em;
 }
