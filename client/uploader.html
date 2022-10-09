@@ -234,6 +234,10 @@
                 <h4 id="editPlatforms">Editing on</h4>
                 <input class="styledButton" type="submit" value="Submit!" id="swapSubmitBtn" onclick="onEditSubmit()"><br>
             </div>
+            <div id="metaEditSuccess" style="display: none;">
+                <h4>Video metadata edited successfully.</h4>
+                <a class="styledButton styledButtonSmall" type="button" id="metaEditBackBtn2" style="width: 150px;" onclick="updateDisplayByIDs(['metaEditIntro'],['metaEditSuccess'])">Edit another video</a>
+            </div>
         </div>
         <div id="yourFiles">
             <h2>Your files</h2>

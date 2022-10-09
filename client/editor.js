@@ -201,6 +201,14 @@ async function finalizeEdit(newThumbnailHash) {
         if (!success)
             return
     }
+    editor = {
+        editingPosts: {},
+        editingPlatforms: [],
+        steemIgnored: false,
+        refs: [],
+        params: {}
+    }
+    updateDisplayByIDs(['metaEditSuccess'],['linkResult'])
 }
 
 function editorBroadcastPromise(fx) {
