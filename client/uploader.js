@@ -624,14 +624,15 @@ function hiveKeychainSignBufferPromize(user,message,role) {
 }
 
 // Series broadcast
-function hiveBroadcast() {
-    let hiveTx = generatePost('hive')
+function hiveBroadcast(hiveTx = null, serial = true) {
+    if (!hiveTx)
+        hiveTx = generatePost('hive')
     console.log('Hive tx',hiveTx)
     if (!hiveDisplayUser || supportedPlatforms.hive.filter((p) => isPlatformSelected[p]).length === 0 || config.noBroadcast)
-        return hiveCb({})
+        return hiveCb({},serial)
 
-    if (postparams.scheduled)
-        return olisc.new(hiveTx,'hive',postparams.scheduled).then(() => hiveCb({})).catch((e) => hiveCb({error: axiosErrorMessage(e)}))
+    if (serial && postparams.scheduled)
+        return olisc.new(hiveTx,'hive',postparams.scheduled).then(() => hiveCb({},serial)).catch((e) => hiveCb({error: axiosErrorMessage(e)},serial))
 
     document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Hive...'
 
@@ -639,7 +640,7 @@ function hiveBroadcast() {
         // Broadcast with Keychain
         if (hiveAuthLogin)
             hiveauth.broadcast(hiveAuthLogin,'posting',hiveTx,() => document.getElementById('uploadProgressFront').innerText = 'Approve Hive transaction in HiveAuth PKSA')
-                .then(() => hiveCb({}))
+                .then(() => hiveCb({},serial))
                 .catch((e) => {
                     let em = ''
                     if (e.toString() === 'Error: expired')
@@ -648,14 +649,14 @@ function hiveBroadcast() {
                         em = 'HiveAuth broadcast request rejected'
                     else if (e.cmd === 'sign_err')
                         em = e.error
-                    hiveCb({error: em})
+                    hiveCb({error: em},serial)
                 })
         else if (isElectron())
             grapheneSignAndBroadcast('hive',sessionStorage.getItem('hiveKey'),hiveTx)
-                .then((r) => hiveCb(r))
-                .catch((e) => hiveCb({error: e.toString()}))
+                .then((r) => hiveCb(r,serial))
+                .catch((e) => hiveCb({error: e.toString()},serial))
         else
-            hive_keychain.requestBroadcast(username,hiveTx,'Posting',hiveCb)
+            hive_keychain.requestBroadcast(username,hiveTx,'Posting',(r) => hiveCb(r,serial))
     } else {
         let hiveapi = new hivesigner.Client({ 
             accessToken: Auth.token,
@@ -663,20 +664,27 @@ function hiveBroadcast() {
             callbackURL: window.location.origin + '/upload',
             scope: ['comment','comment_options']
         })
-        hiveapi.broadcast(hiveTx,(err) => hiveCb({error: err.error_description}))
+        hiveapi.broadcast(hiveTx,(err) => hiveCb({error: err.error_description},serial))
     }
 }
 
-function hiveCb(r) {
-    if (r.error)
-        return bcError('Hive broadcast',r.error.toString())
+function hiveCb(r,serial) {
+    if (r.error) {
+        bcError('Hive broadcast',r.error.toString())
+        if (typeof serial === 'function')
+            serial(false)
+        return
+    }
 
-    avalonBroadcast()
+    if (typeof serial === 'boolean' && serial === true)
+        avalonBroadcast()
+    else if (typeof serial === 'function')
+        serial(true)
 }
 
-async function avalonBroadcast() {
+async function avalonBroadcast(tx = null, serial = true) {
     if (!dtcDisplayUser || supportedPlatforms.avalon.filter((p) => isPlatformSelected[p]).length === 0 || config.noBroadcast)
-        return avalonCb()
+        return avalonCb(null,serial)
 
     if (!postparams.scheduled)
         document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Avalon...'
@@ -687,93 +695,117 @@ async function avalonBroadcast() {
     let burnAmt = document.getElementById('dtcBurnInput').value ? Math.floor(parseFloat(document.getElementById('dtcBurnInput').value) * 100) : 0
 
     try {
-        let avalonAcc = await getAvalonAccount(avalonUser)
-        let tx = {
-            type: 4,
-            data: {
-                link: postparams.ipfshash,
-                json: buildJsonMetadataAvalon(),
-                vt: Math.floor(getAvalonVP(avalonAcc)*(document.getElementById('avalonvw').value)/100),
-                tag: tag
-            },
-            sender: avalonAcc.name,
-            ts: new Date().getTime()
-        }
+        if (!tx) {
+            let avalonAcc = await getAvalonAccount(avalonUser)
+            tx = {
+                type: 4,
+                data: {
+                    link: postparams.ipfshash,
+                    json: buildJsonMetadataAvalon(),
+                    vt: Math.floor(getAvalonVP(avalonAcc)*(document.getElementById('avalonvw').value)/100),
+                    tag: tag
+                },
+                sender: avalonAcc.name,
+                ts: new Date().getTime()
+            }
 
-        if (burnAmt > 0) {
-            tx.type = 13
-            tx.data.burn = burnAmt
+            if (burnAmt > 0) {
+                tx.type = 13
+                tx.data.burn = burnAmt
+            }
         }
         console.log('Avalon tx',tx)
-        if (postparams.scheduled)
-            return olisc.new(tx,'avalon',postparams.scheduled).then(() => avalonCb()).catch((e) => avalonCb(axiosErrorMessage(e)))
+        if (serial && postparams.scheduled)
+            return olisc.new(tx,'avalon',postparams.scheduled).then(() => avalonCb(null,serial)).catch((e) => avalonCb(axiosErrorMessage(e),serial))
         let stringifiedRawTx = JSON.stringify(tx)
         let h = hivecryptpro.sha256(stringifiedRawTx)
         tx.hash = h.toString('hex')
         if (avalonKc && avalonKcUser) {
             let hiveKcSign = await hiveKeychainSignBufferPromize(avalonKcUser,stringifiedRawTx,avalonKc)
             if (hiveKcSign.error)
-                return avalonCb(hiveKcSign.message)
+                return avalonCb(hiveKcSign.message,serial)
             tx.signature = [hivecryptpro.Signature.fromString(hiveKcSign.result).toAvalonSignature()]
         } else
             tx.signature = [hivecryptpro.Signature.avalonCreate(h,sessionStorage.getItem('avalonKey')).toAvalonSignature()]
 
         await broadcastAvalonTx(tx)
-        avalonCb()
+        avalonCb(null,serial)
     } catch (e) {
-        avalonCb(e.toString())
+        avalonCb(e.toString(),serial)
     }
 }
 
-function avalonCb(e) {
-    if (e)
-        return bcError('Avalon broadcast',e)
+function avalonCb(e,serial) {
+    if (e) {
+        bcError('Avalon broadcast',e)
+        if (typeof serial === 'function')
+            serial(false)
+        return
+    }
 
-    steemBroadcaster()
+    if (typeof serial === 'boolean' && serial === true)
+        steemBroadcaster()
+    else if (typeof serial === 'function')
+        serial(true)
 }
 
-function steemBroadcaster() {
+function steemBroadcaster(serial = true) {
     if (steemUser && supportedPlatforms.steem.filter((p) => isPlatformSelected[p]).length > 0 && !config.noBroadcast) {
         let steemTx = generatePost('steem')
         console.log('Steem tx',steemTx)
         document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Steem...'
         if (isElectron())
             grapheneSignAndBroadcast('steem',sessionStorage.getItem('steemKey'),steemTx)
-                .then((r) => steemCb(r))
-                .catch((e) => steemCb({error: e.toString()}))
+                .then((r) => steemCb(r,serial))
+                .catch((e) => steemCb({error: e.toString()},serial))
         else
-            steem_keychain.requestBroadcast(steemUser,steemTx,'Posting',steemCb)
-    } else steemCb({})
+            steem_keychain.requestBroadcast(steemUser,steemTx,'Posting',(r) => steemCb(r,serial))
+    } else steemCb({},serial)
 }
 
-function steemCb(r) {
-    if (r.error)
-        return bcError('Steem broadcast',r.error.toString())
-    
-    blurtBroadcaster()
+function steemCb(r,serial) {
+    if (r.error) {
+        bcError('Steem broadcast',r.error.toString())
+        if (typeof serial === 'function')
+            serial(false)
+        return
+    }
+
+    if (typeof serial === 'boolean' && serial === true)
+        blurtBroadcaster()
+    else if (typeof serial === 'function')
+        serial(true)
 }
 
-function blurtBroadcaster() {
+function blurtBroadcaster(blurtTx = null, serial = true) {
     if (blurtUser && supportedPlatforms.blurt.filter((p) => isPlatformSelected[p]).length > 0 && !config.noBroadcast) {
-        let blurtTx = generatePost('blurt')
+        if (!blurtTx)
+            blurtTx = generatePost('blurt')
         console.log('Blurt tx',blurtTx)
         if (postparams.scheduled)
-            return olisc.new(blurtTx,'blurt',postparams.scheduled).then(() => blurtCb({})).catch((e) => blurtCb({error: axiosErrorMessage(e)}))
+            return olisc.new(blurtTx,'blurt',postparams.scheduled).then(() => blurtCb({},serial)).catch((e) => blurtCb({error: axiosErrorMessage(e)},serial))
         document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Blurt...'
         if (isElectron())
             grapheneSignAndBroadcast('blurt',sessionStorage.getItem('blurtKey'),blurtTx)
-                .then((r) => blurtCb(r))
-                .catch((e) => blurtCb({error: e.toString()}))
+                .then((r) => blurtCb(r,serial))
+                .catch((e) => blurtCb({error: e.toString()},serial))
         else
-            blurt_keychain.requestBroadcast(blurtUser,blurtTx,'Posting',blurtCb)
-    } else blurtCb({})
+            blurt_keychain.requestBroadcast(blurtUser,blurtTx,'Posting',(r) => blurtCb(r,serial))
+    } else blurtCb({},serial)
 }
 
-function blurtCb(r) {
-    if (r.error)
-        return bcError('Blurt broadcast',r.error.toString())
-    
-    bcFinish()
+function blurtCb(r,serial) {
+    if (r.error) {
+        bcError('Blurt broadcast',r.error.toString())
+        if (typeof serial === 'function')
+            serial(false)
+        return
+    }
+
+    if (typeof serial === 'boolean' && serial === true)
+        bcFinish()
+    else if (typeof serial === 'function')
+        serial(true)
 }
 
 function bcError(tool,e) {
@@ -877,9 +909,21 @@ function buildJsonMetadata(network) {
             filesize: postparams.size,
             lang: 'en', // todo add lang field
             firstUpload: false,
+            video_v2: 'https://ipfs-3speak.b-cdn.net/ipfs/'+postparams.ipfshash+'/default.m3u8', // from mobile app, not sure what is this for
             ipfs: postparams.ipfshash+'/default.m3u8',
             ipfsThumbnail: postparams.imghash
         }
+        jsonMeta.sourceMap = [
+            ...(postparams.hasThumbnail ? [{
+                type: 'thumbnail',
+                url: 'ipfs://'+postparams.ipfshash+'/thumbnail.jpg'
+            }] : []),
+            {
+                type: 'video',
+                url: 'ipfs://'+postparams.ipfshash+'/default.m3u8',
+                format: 'm3u8'
+            }
+        ]
         jsonMeta.video.content = {
             description: postparams.description,
             tags: postparams.tags

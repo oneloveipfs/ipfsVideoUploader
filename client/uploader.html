@@ -231,8 +231,8 @@
                 <h3>Description: <br>
                 <textarea id="editDescription" name="description"></textarea><a style="font-size: 15px;" onclick="fillDescription()">Insert from template</a><a style="font-size: 15px; margin-left: 15px;" onclick="updateDisplayByIDs(['settings'],['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings'])">Edit template</a></h3>
                 <h3 id="editTagsField"><div>Tags (seperated by space):</div><input type="text" id="editTags" name="tags" class="meta"></h3>
-                <h3 id="editPlatforms">Editing on</h3>
-                <input class="styledButton" type="submit" value="Submit!" id="swapSubmitBtn"><br>
+                <h4 id="editPlatforms">Editing on</h4>
+                <input class="styledButton" type="submit" value="Submit!" id="swapSubmitBtn" onclick="onEditSubmit()"><br>
             </div>
         </div>
         <div id="yourFiles">

@@ -97,6 +97,169 @@ function onEditLinkSubmit() {
     editorFetchContent(linkType, authorLinkSplit[0], authorLinkSplit[1])
 }
 
+function onEditSubmit() {
+    let newTitle = document.getElementById('editTitle').value
+    let newDesc = document.getElementById('editDescription').value
+    let newTags = document.getElementById('editTags').value
+    let newThumbnail = document.getElementById('metaEditImg').files
+
+    if (newTitle.length > 256)
+        return alert('New title is too long!')
+
+    if (/^[a-z0-9- _]*$/.test(newTags) == false)
+        return alert('Invalid new tags!')
+
+    let tags = newTags.split(' ')
+    if ((Object.keys(editor.editingPosts).length > 1 || !editor.editingPosts.avalon) && tags.length > 8)
+        return alert('Please do not use more than 8 tags!')
+
+    if (newThumbnail.length > 0) {
+        let formdata = new FormData()
+        formdata.append('image',newThumbnail[0])
+        updateDisplayByIDs(['uploadProgressBack'],[])
+        updateProgressBar(0,'Uploading thumbnail...')
+
+        let contentType = {
+            headers: {
+                "content-type": "multipart/form-data"
+            },
+            onUploadProgress: function (progressEvent) {
+                console.log(progressEvent)
+
+                let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+                updateProgressBar(progressPercent,'Uploading thumbnail...')
+            }
+        }
+        let call = '/uploadImage?type=thumbnails&access_token=' + Auth.token
+        if (Auth.iskeychain !== 'true')
+            call += '&scauth=true'
+        axios.post(call,formdata,contentType).then((res) => {
+            if (!res.data || !res.data.imghash)
+                return alert('Could not obtain new thumbnail hash from upload')
+            finalizeEdit(res.data.imghash)
+        }).catch((err) => {
+            if (err.response && err.response.data && err.response.data.error)
+                alert(err.response.data.error)
+            else
+                alert(err.toString())
+            updateDisplayByIDs([],['uploadProgressBack'])
+        })
+    } else
+        finalizeEdit()
+}
+
+async function finalizeEdit(newThumbnailHash) {
+    let newTitle = document.getElementById('editTitle').value
+    let newDesc = document.getElementById('editDescription').value
+    let newTags = document.getElementById('editTags').value
+    updateDisplayByIDs(['uploadProgressBack'],[])
+    updateProgressBar(progressPercent,'Finalizing edits...')
+
+    for (let n in editor.editingPosts)
+        try {
+            if (n === 'hive' || n === 'blurt')
+                editor.editingPlatforms[n].title = newTitle
+            if (n === 'hive')
+                editorFinalize3Speak(newTitle,newDesc,newTags,newThumbnailHash)
+            editorFinalizeDTube(n,newTitle,newDesc,newTags,newThumbnailHash)
+        } catch (e) {
+            alert('Failed to update json metadata with new values. See logs for details.')
+            console.log(e)
+            return
+        }
+
+    for (let n in editor.editingPosts) {
+        let success = false
+        if (n === 'hive' || n === 'blurt') {
+            let tx = [
+                ['comment', {
+                    parent_author: editor.editingPosts[n].parent_author,
+                    parent_permlink: editor.editingPosts[n].parent_permlink,
+                    author: editor.editingPosts[n].author,
+                    permlink: editor.editingPosts[n].permlink,
+                    title: editor.editingPosts[n].title,
+                    body: editor.editingPosts[n].body,
+                    json_metadata: editor.editingPosts[n].json_metadata,
+                }]
+            ]
+            if (n === 'hive')
+                success = await editorBroadcastPromise((cb) => hiveBroadcast(tx,cb))
+            else if (n === 'blurt')
+                success = await editorBroadcastPromise((cb) => blurtBroadcaster(tx,cb))
+        } else if (n === 'avalon') {
+            success = await editorBroadcastPromise((cb) => avalonBroadcast({
+                type: 28,
+                data: {
+                    link: editor.editingPosts[n].link,
+                    json: editor.editingPosts[n].json
+                },
+                sender: editor.editingPosts[n].author,
+                ts: new Date().getTime()
+            },cb))
+        }
+        if (!success)
+            return
+    }
+}
+
+function editorBroadcastPromise(fx) {
+    return new Promise((rs) => fx((r) => rs(r)))
+}
+
+function editorFinalizeDTube(network,newTitle,newDesc,newTags,newThumbnailHash) {
+    if (!editor.editingPlatforms.includes('DTube')) return
+    if (!editor.editingPosts[network]) return
+    if (!allowedPlatformNetworks['DTube'].includes(network)) return
+    let tags = newTags.split(' ')
+    let json = {}
+
+    switch (network) {
+        case 'hive':
+        case 'blurt':
+            json = JSON.parse(editor.editingPlatforms[network].json_metadata)
+            if (newThumbnailHash) {
+                json.video.files.ipfs.img[118] = newThumbnailHash
+                json.video.files.ipfs.img[360] = newThumbnailHash
+                json.video.thumbnailUrl = config.gateway+'/ipfs/'+newThumbnailHash
+            }
+            json.video.title = newTitle
+            json.video.desc = newDesc
+            json.video.tag = tags[0]
+            json.tags = tags
+            editor.editingPlatforms[network].json_metadata = JSON.stringify(json)
+            break
+        case 'avalon':
+            json = editor.editingPosts.avalon.json
+            if (newThumbnailHash) {
+                json.files.ipfs.img[118] = newThumbnailHash
+                json.files.ipfs.img[360] = newThumbnailHash
+                json.thumbnailUrl = config.gateway+'/ipfs/'+newThumbnailHash
+            }
+            json.title = newTitle
+            json.desc = newDesc
+            editor.editingPosts.avalon.json = json
+            break
+    }
+}
+
+function editorFinalize3Speak(newTitle,newDesc,newTags,newThumbnailHash) {
+    if (!editor.editingPlatforms.includes('3Speak')) return
+    if (!editor.editingPosts.hive) return
+    let tags = newTags.split(' ')
+    let json = JSON.parse(editor.editingPlatforms.hive.json_metadata)
+    if (newThumbnailHash) {
+        json.video.info.ipfsThumbnail = newThumbnailHash
+        for (let s in json.sourceMap)
+            if (json.sourceMap[s].type === 'thumbnail')
+                json.sourceMap[s].url = 'ipfs://'+newThumbnailHash
+    }
+    json.video.info.title = newTitle
+    json.video.content.description = newDesc
+    json.video.content.tags = tags
+    json.tags = tags
+    editor.editingPlatforms.hive.json_metadata = JSON.stringify(json)
+}
+
 function editorFetchContent(linkType, author, link, ref) {
     // fetch
     if (linkType === 'hive' || linkType === 'blurt')
