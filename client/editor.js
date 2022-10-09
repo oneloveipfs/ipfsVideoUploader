@@ -3,6 +3,7 @@ const hiveFrontends = [
     'https://hive.blog',
     'https://peakd.com',
     'https://ecency.com',
+    'https://hive.ausbit.dev',
     'https://hiveblocks.com'
 ]
 
@@ -153,12 +154,12 @@ async function finalizeEdit(newThumbnailHash) {
     let newDesc = document.getElementById('editDescription').value
     let newTags = document.getElementById('editTags').value
     updateDisplayByIDs(['uploadProgressBack'],[])
-    updateProgressBar(progressPercent,'Finalizing edits...')
+    updateProgressBar(100,'Finalizing edits...')
 
     for (let n in editor.editingPosts)
         try {
             if (n === 'hive' || n === 'blurt')
-                editor.editingPlatforms[n].title = newTitle
+                editor.editingPosts[n].title = newTitle
             if (n === 'hive')
                 editorFinalize3Speak(newTitle,newDesc,newTags,newThumbnailHash)
             editorFinalizeDTube(n,newTitle,newDesc,newTags,newThumbnailHash)
@@ -216,7 +217,7 @@ function editorFinalizeDTube(network,newTitle,newDesc,newTags,newThumbnailHash) 
     switch (network) {
         case 'hive':
         case 'blurt':
-            json = JSON.parse(editor.editingPlatforms[network].json_metadata)
+            json = JSON.parse(editor.editingPosts[network].json_metadata)
             if (newThumbnailHash) {
                 json.video.files.ipfs.img[118] = newThumbnailHash
                 json.video.files.ipfs.img[360] = newThumbnailHash
@@ -226,7 +227,7 @@ function editorFinalizeDTube(network,newTitle,newDesc,newTags,newThumbnailHash) 
             json.video.desc = newDesc
             json.video.tag = tags[0]
             json.tags = tags
-            editor.editingPlatforms[network].json_metadata = JSON.stringify(json)
+            editor.editingPosts[network].json_metadata = JSON.stringify(json)
             break
         case 'avalon':
             json = editor.editingPosts.avalon.json
@@ -246,7 +247,7 @@ function editorFinalize3Speak(newTitle,newDesc,newTags,newThumbnailHash) {
     if (!editor.editingPlatforms.includes('3Speak')) return
     if (!editor.editingPosts.hive) return
     let tags = newTags.split(' ')
-    let json = JSON.parse(editor.editingPlatforms.hive.json_metadata)
+    let json = JSON.parse(editor.editingPosts.hive.json_metadata)
     if (newThumbnailHash) {
         json.video.info.ipfsThumbnail = newThumbnailHash
         for (let s in json.sourceMap)
@@ -257,7 +258,7 @@ function editorFinalize3Speak(newTitle,newDesc,newTags,newThumbnailHash) {
     json.video.content.description = newDesc
     json.video.content.tags = tags
     json.tags = tags
-    editor.editingPlatforms.hive.json_metadata = JSON.stringify(json)
+    editor.editingPosts.hive.json_metadata = JSON.stringify(json)
 }
 
 function editorFetchContent(linkType, author, link, ref) {
