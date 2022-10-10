@@ -166,6 +166,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (config.olisc)
             updateDisplayByIDs(['schedulepost','scheduledStr'],[])
 
+        if (isPlatformSelected.DTube && config.skynetEnabled)
+            updateDisplayByIDs(['skynetswitch'],[])
+
         // Hide Avalon first curated tag info if not logged in with Avalon
         if (!avalonUser || (!avalonKey && (!avalonKc || !avalonKcUser))) {
             updateDisplayByIDs([],['tagInfo1'])

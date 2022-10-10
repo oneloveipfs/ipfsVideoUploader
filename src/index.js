@@ -326,6 +326,7 @@ app.get('/config',(req,res) => {
             apiNamespace: Config.Olisc.apiNamespace,
             runInterval: Config.Olisc.runInterval
         }
+    configRes.skynetEnabled = Config.Skynet.enabled
     res.send(configRes)
 })
 

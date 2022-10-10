@@ -48,7 +48,8 @@
         "enabled": false,
         "portalUrl": "http://localhost:9980",
         "portalUploadPath": "/skynet/skyfile",
-        "portalFileFieldname": "file"
+        "portalFileFieldname": "file",
+        "apiKey": ""
     },
 
     "tusdUploadDir": "/Users/techcoderx/tusfiles",

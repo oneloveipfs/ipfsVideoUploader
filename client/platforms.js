@@ -220,6 +220,12 @@ function updateDisplayPlatforms() {
         document.getElementById('hlsencode').disabled = false
         document.getElementById('hlsencodetext').innerText = '  Encode video to HLS'
     }
+    if (selected.includes('DTube') && config && config.skynetEnabled)
+        updateDisplayByIDs(['skynetswitch'],[])
+    else {
+        document.getElementById('skynetupload').checked = false
+        updateDisplayByIDs([],['skynetswitch'])
+    }
     if (selected.length < 2)
         updateDisplayByIDs([],['postpublishsharetgpf'])
     else

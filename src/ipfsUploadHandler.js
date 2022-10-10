@@ -108,7 +108,8 @@ const skynetAdd = (path,opts) => {
         axios.post(url, formData, { 
             headers: { 
                 'User-Agent': 'Sia-Agent', 
-                'content-type': formData.getHeaders()['content-type'] 
+                'content-type': formData.getHeaders()['content-type'],
+                'Skynet-Api-Key': Config.Skynet.apiKey
             },
             maxContentLength: 99999999999,
             maxBodyLength: 99999999999
