@@ -46,7 +46,7 @@
                 <h3>An alternative way of uploading videos to DTube, a decentralized video platform built on Steem, Hive and Avalon blockchain.</h3>
                 <h3 id="homepagePriceLbl">$/GB/month</h3>
                 <table id="buttons"><tr>
-                    <td><a id="signupButton" class="styledButton" onclick="updateDisplayByIDs(['signupPopup'],[])">Sign Up</a></td>
+                    <td><a id="signupButton" class="styledButton" onclick="displayPopup('signupPopup')">Sign Up</a></td>
                 </tr></table>
                 <div class="scrollarrow">
                     <a onclick="window.scroll(0,window.innerHeight - 50)">
@@ -274,6 +274,7 @@
                             <option>DTUBE</option>
                             <option>HIVE</option>
                             <option>HBD</option>
+                            <option>BLURT</option>
                         </select></h4>
                         <a class="roundedBtn" id="getPaymentBtns" onclick="getPaymentInfo()">Get payment info</a>
                         <h5 class="redeemVoucherNavBtn"><a onclick="document.getElementById('signupstart').style.display = 'none'; document.getElementById('signupredeem').style.display = 'block';">Redeem a voucher</a></h5>
@@ -297,6 +298,7 @@
                         </div><br>
                         <a class="roundedBtn" id="HiveKeychainBtn">Pay with Hive Keychain</a>
                         <a class="roundedBtn" id="HiveSignerBtn" target="_blank" rel="noreferrer">Pay with HiveSigner</a>
+                        <a class="roundedBtn" id="BlurtKeychainBtn">Pay with Blurt Keychain</a>
                         <a class="roundedBtn" id="DTubeChannelBtn" target="_blank" rel="noreferrer">Pay on d.tube</a>
                         <h6 id="nativeDisclaimer">Disclaimer: The amount quoted above may differ than the actual price in your selected coin. Due to price fluctuations, you may receive more or less GBdays after refilling your account. Alternatively, you may refill your account from your DTube/Hive wallet by sending any amount to @oneloveipfs with the memo shown above.</h6>
                     </div>

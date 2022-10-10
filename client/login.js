@@ -266,7 +266,7 @@ function getPaymentInfo() {
     let receipient = document.getElementById('receiverUsername').value
     let paymentMethod = document.getElementById('pymtMtd').value
     let creditsToBuy = parseFloat(document.getElementById('gbdaysInput').value)
-    let nativePymtProcessors = ['DTUBE','HIVE','HBD']
+    let nativePymtProcessors = ['DTUBE','HIVE','HBD','BLURT']
     if (selectedNetwork === 'none') return alert('Please select a network for your account.')
 
     // Validate usernames
@@ -296,13 +296,16 @@ function getPaymentInfo() {
 
         switch (paymentMethod) {
             case 'DTUBE':
-                updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'])
+                updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment','BlurtKeychainBtn'])
                 document.getElementById('DTubeChannelBtn').onclick = () => window.open('https://d.tube/#!/c/' + shawpconfig.DtcReceiver)
                 document.getElementById('DTubeChannelBtn').href = 'https://d.tube/#!/c/' + shawpconfig.DtcReceiver
                 break
             case 'HIVE':
             case 'HBD':
                 hivePaymentClickListener(receipient,shawpconfig.HiveReceiver,amt,paymentMethod,memo,'signup')
+                break
+            case 'BLURT':
+                blurtPaymentClickListener(receipient,shawpconfig.BlurtReceiver,amt,paymentMethod,memo,'signup')
                 break
             default:
                 break

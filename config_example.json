@@ -59,8 +59,10 @@
         "DefaultUSDRate": 0.0029,
         "AvalonAPI": "https://api.avalonblocks.com",
         "HiveAPI": "https://techcoderx.com",
+        "BlurtAPI": "https://blurtdev.techcoderx.com",
         "DtcReceiver": "oneloveipfs",
-        "HiveReceiver": "oneloveipfs"
+        "HiveReceiver": "oneloveipfs",
+        "BlurtReceiver": "oneloveipfs"
     },
 
     "Olisc": {

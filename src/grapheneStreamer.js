@@ -42,7 +42,7 @@ module.exports = class {
 
     fetchBlocks(cb) {
         if (this.stopped) return
-        if (this.headBlock === 0 || this.headBlock >= this.parsedBlock) {
+        if (this.headBlock === 0 || this.headBlock <= this.parsedBlock) {
             // console.log('skipping round',this.headBlock,this.parsedBlock)
             return setTimeout(() => this.fetchBlocks(cb),3000)
         }

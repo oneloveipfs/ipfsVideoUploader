@@ -281,7 +281,7 @@ hr {
     margin-bottom: 0px;
 }
 
-#HiveKeychainBtn, #HiveSignerBtn, #DTubeChannelBtn {
+#HiveKeychainBtn, #HiveSignerBtn, #DTubeChannelBtn, #BlurtKeychainBtn {
     display: none;
     margin-block-end: 0.5em;
 }

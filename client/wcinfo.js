@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (creditsToBuy <= 0) return alert('Purchase quantity must not be less than or equals to zero.')
         document.getElementById('refillSubmitBtn').value = 'Loading...'
         document.getElementById('refillSubmitBtn').disabled = true
-        let nativePymtProcessors = ['DTUBE','HIVE','HBD']
+        let nativePymtProcessors = ['DTUBE','HIVE','HBD','BLURT']
         if (nativePymtProcessors.includes(paymentMethod)) exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
             document.getElementById('refillSubmitBtn').value = 'Refill'
             document.getElementById('refillSubmitBtn').disabled = false
@@ -107,13 +107,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             switch (paymentMethod) {
                 case 'DTUBE':
-                    updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'])
+                    updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment','BlurtKeychainBtn'])
                     document.getElementById('DTubeChannelBtn').onclick = () => window.open('https://d.tube/#!/c/' + shawpconfig.DtcReceiver)
                     document.getElementById('DTubeChannelBtn').href = 'https://d.tube/#!/c/' + shawpconfig.DtcReceiver
                     break
                 case 'HIVE':
                 case 'HBD':
                     hivePaymentClickListener(username,shawpconfig.HiveReceiver,amt,paymentMethod,memo,'refill')
+                    break
+                case 'BLURT':
+                    blurtPaymentClickListener(username,shawpconfig.BlurtReceiver,amt,paymentMethod,memo,'refill')
                     break
                 default:
                     break

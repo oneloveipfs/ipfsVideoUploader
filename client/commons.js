@@ -33,6 +33,7 @@ const AVALON_API = [
 ]
 
 const BLURT_API = [
+    'blurtdev.techcoderx.com',
     'rpc.blurt.world',
     'rpc.blurt.live',
     'rpc.blurtlatam.com',
@@ -184,6 +185,9 @@ function exchageRate (coin,amount,cb) {
             break
         case 'HBD':
             coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/hive_dollar?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
+            break
+        case 'BLURT':
+            coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/blurt?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
             break
         default:
             break
@@ -399,7 +403,7 @@ function generateMessageToSignPromise (username,network) {
 }
 
 function hivePaymentClickListener(u,to,amt,currency,memo,p = 'signup') {
-    updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'],['DTubeChannelBtn','dtcInstruction'])
+    updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'],['DTubeChannelBtn','dtcInstruction','BlurtKeychainBtn'])
     document.getElementById('HiveKeychainBtn').onclick = () => {
         if (document.getElementById('hiveRecPaymentCheckbox').checked) {
             let recurrence = parseInt(document.getElementById('hiveRecPaymentRecurrence').value)
@@ -427,6 +431,17 @@ function hivePaymentClickListener(u,to,amt,currency,memo,p = 'signup') {
                 return alert(repeatPymtValidation)
         }
         window.open(hivesignerPaymentUrl(to,amt,currency,memo,recurrence,frequency))
+    }
+}
+
+function blurtPaymentClickListener(u,to,amt,currency,memo,p = 'signup') {
+    updateDisplayByIDs(['BlurtKeychainBtn'],['DTubeChannelBtn','dtcInstruction','HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'])
+    document.getElementById('BlurtKeychainBtn').onclick = () => {
+        blurt_keychain.requestTransfer(u,to,amt.toString(),memo,currency,(e) => {
+            console.log(e)
+            if (e.error) return alert(e.message)
+            updateDisplayByIDs([p+'cb'],[p+'pay'])
+        })
     }
 }
 

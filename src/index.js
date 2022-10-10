@@ -341,7 +341,8 @@ app.get('/shawp_head_blocks',(req,res) => {
     if (!Config.Shawp.Enabled) return res.status(404).end()
     res.send({
         avalon: Shawp.avalonStreamer.headBlock,
-        hive: Shawp.hiveStreamer.headBlock
+        hive: Shawp.hiveStreamer.headBlock,
+        blurt: Shawp.blurtStreamer.headBlock
     })
 })
 

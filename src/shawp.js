@@ -16,6 +16,7 @@ let RefillHistory = JSON.parse(fs.readFileSync(dbDir+'/shawpRefills.json'))
 let ConsumeHistory = JSON.parse(fs.readFileSync(dbDir+'/shawpConsumes.json'))
 
 let hiveStreamer = new GrapheneStreamer(Config.Shawp.HiveAPI || 'https://techcoderx.com',true,'hive')
+let blurtStreamer = new GrapheneStreamer(Config.Shawp.BlurtAPI || 'https://blurtdev.techcoderx.com',true,'blurt')
 let avalonStreamer = new AvalonStreamer(Config.Shawp.AvalonAPI,true)
 
 let Shawp = {
@@ -32,6 +33,13 @@ let Shawp = {
             let virtualop = vop
             if (virtualop.op.type === 'fill_recurrent_transfer_operation' && virtualop.op.value.to === Config.Shawp.HiveReceiver)
                 Shawp.ProcessHiveTx(virtualop.op.value,'vop'+virtualop.block)
+        })
+
+        if (Config.Shawp.BlurtReceiver) blurtStreamer.streamTransactions((tx) => {
+            let transaction = tx
+            for (let op in transaction.operations)
+                if (transaction.operations[op][0] === 'transfer' && transaction.operations[op][1].to === Config.Shawp.BlurtReceiver)
+                    Shawp.ProcessBlurtTx(transaction.operations[op][1],transaction.transaction_id)
         })
 
         if (Config.Shawp.DtcReceiver) {
@@ -101,29 +109,37 @@ let Shawp = {
             let amt = parseFloat(tx.amount.replace(' HIVE',''))
             Shawp.ExchangeRate(Shawp.coins.Hive,amt,(e,usd) => {
                 if (e) return console.log(e)
-                let receiver = tx.from
-                let memo = tx.memo.toLowerCase().trim()
-                let parsedDetails = Shawp.ValidatePayment(receiver,memo)
-                if (parsedDetails.length !== 2) return
-                Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Hive,txid,new Date().getTime(),tx.amount,usd)
-                Shawp.WriteRefillHistory()
-                Shawp.WriteUserDB()
-                console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
+                Shawp.ProcessRefill(tx,txid,Shawp.methods.Hive,usd)
             })
         } else if (tx.amount.endsWith('HBD')) {
             let amt = parseFloat(tx.amount.replace(' HBD',''))
             Shawp.ExchangeRate(Shawp.coins.HiveDollars,amt,(e,usd) => {
                 if (e) return console.log(e)
-                let receiver = tx.from
-                let memo = tx.memo.toLowerCase().trim()
-                let parsedDetails = Shawp.ValidatePayment(receiver,memo)
-                if (parsedDetails.length !== 2) return
-                Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],Shawp.methods.Hive,txid,new Date().getTime(),tx.amount,usd)
-                Shawp.WriteRefillHistory()
-                Shawp.WriteUserDB()
-                console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
+                Shawp.ProcessRefill(tx,txid,Shawp.methods.Hive,usd)
             })
         }
+    },
+    ProcessBlurtTx: (tx,txid) => {
+        console.log(tx,txid)
+        if (typeof tx.amount === 'object')
+            tx.amount = Shawp.NaiToStringBlurt(tx.amount)
+        if (tx.amount.endsWith('BLURT')) {
+            let amt = parseFloat(tx.amount.replace(' BLURT',''))
+            Shawp.ExchangeRate(Shawp.coins.BLURT,amt,(e,usd) => {
+                if (e) return console.log(e)
+                Shawp.ProcessRefill(tx,txid,Shawp.methods.Blurt,usd)
+            })
+        }
+    },
+    ProcessRefill: (tx, txid, method, usd) => {
+        let receiver = tx.from
+        let memo = tx.memo.toLowerCase().trim()
+        let parsedDetails = Shawp.ValidatePayment(receiver,memo)
+        if (parsedDetails.length !== 2) return
+        Shawp.Refill(tx.from,parsedDetails[0],parsedDetails[1],method,txid,new Date().getTime(),tx.amount,usd)
+        Shawp.WriteRefillHistory()
+        Shawp.WriteUserDB()
+        console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
     },
     NaiToString: (nai) => {
         let result = (parseInt(nai.amount) / Math.pow(10,nai.precision)).toString() + ' '
@@ -131,6 +147,14 @@ let Shawp = {
             result += 'HIVE'
         else if (nai.nai === '@@000000013')
             result += 'HBD'
+        return result
+    },
+    NaiToStringBlurt: (nai) => {
+        let result = (parseInt(nai.amount) / Math.pow(10,nai.precision)).toString() + ' '
+        if (nai.nai === '@@000000021')
+            result += 'BLURT'
+        else
+            result += 'UNKNOWN'
         return result
     },
     ValidatePayment: (receiver,memo) => {
@@ -198,6 +222,9 @@ let Shawp = {
             case 3:
             case 4:
                 return cb({ error: 'STEEM/SBD is deprecated' })
+            case 11:
+                coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/blurt?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
+                break
             default:
                 return cb({ error: 'invalid coin' })
         }
@@ -300,7 +327,10 @@ let Shawp = {
         LTC: 7,
         BCH: 8,
         DAI: 9,
-        USDC: 10
+        USDC: 10,
+
+        // Blurt
+        BLURT: 11
     },
     methods: {
         DTUBE: 0,
@@ -309,9 +339,11 @@ let Shawp = {
         Coupon: 3, // through promo/wc orders
         Referral: 4, // not sure
         System: 5,
-        Coinbase: 6 // to be replaced
+        Coinbase: 6, // to be replaced
+        Blurt: 7 // added in v3
     },
     hiveStreamer,
+    blurtStreamer,
     avalonStreamer
 }
 
