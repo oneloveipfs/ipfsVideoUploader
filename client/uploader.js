@@ -272,8 +272,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         let call = '/uploadImage?type=thumbnails&access_token=' + Auth.token
         if (Auth.iskeychain !== 'true')
             call += '&scauth=true'
-        if (document.getElementById('hlsencode').checked)
-            call += '&onlyhash=true'
         axios.post(call,formdata,contentType).then(function(response) {
             let uploaderResponse = response.data
             console.log(uploaderResponse)
@@ -510,7 +508,7 @@ function uploadVideo(resolution,next,thumbnailFname = '') {
         progressbarInner.innerText = 'Submitting upload...'
         return axios.post('/uploadVideoFs'+geturl,{
             type: resolutionFType,
-            thumbnailFname: thumbnailFname,
+            createSprite: isPlatformSelected['DTube'] ? 'true' : '',
             skynet: document.getElementById('skynetupload').checked ? 'true' : 'false',
             filepath: videoToUpload[0].path
         }).then(result => {
@@ -541,7 +539,6 @@ function uploadVideo(resolution,next,thumbnailFname = '') {
         },
         metadata: {
             type: resolutionFType,
-            thumbnailFname: thumbnailFname,
             createSprite: isPlatformSelected['DTube'] ? 'true' : '',
             skynet: document.getElementById('skynetupload').checked ? 'true' : 'false'
         },
@@ -882,7 +879,7 @@ function buildJsonMetadata(network) {
         jsonMeta.sourceMap = [
             ...(postparams.hasThumbnail ? [{
                 type: 'thumbnail',
-                url: 'ipfs://'+postparams.ipfshash+'/thumbnail.jpg'
+                url: 'ipfs://'+postparams.imghash
             }] : []),
             {
                 type: 'video',
@@ -919,7 +916,7 @@ function buildJsonMetadata(network) {
         jsonMeta.sourceMap = [
             ...(postparams.hasThumbnail ? [{
                 type: 'thumbnail',
-                url: 'ipfs://'+postparams.ipfshash+'/thumbnail.jpg'
+                url: 'ipfs://'+postparams.imghash
             }] : []),
             {
                 type: 'video',
