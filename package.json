@@ -23,7 +23,7 @@
     "build-installer": "electron-builder",
     "build-hivecryptpro": "browserify -e src/hivecryptPro.js -p tinyify -o lib/hivecryptpro.min.js",
     "install-olisc": "npm i https://github.com/oneloveipfs/olisc --save-optional",
-    "dep-prune": "npm un @snyk/protect async body-parser bs58 crypto-js form-data fluent-ffmpeg hivecrypt hivesigner ipfs-http-client javalon jsonwebtoken mime-types multer node-schedule node-webvtt secp256k1 shelljs socket.io"
+    "dep-prune": "npm un @snyk/protect async body-parser bs58 crypto-js form-data fluent-ffmpeg hivecrypt hivesigner ipfs-http-client jsonwebtoken mime-types multer node-schedule node-webvtt secp256k1 shelljs socket.io"
   },
   "build": {
     "appId": "com.oneloveipfs.uploader",
@@ -94,7 +94,6 @@
     "hivesigner": "^3.2.8",
     "http-proxy": "^1.18.1",
     "ipfs-http-client": "^56.0.3",
-    "javalon": "^1.0.36",
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.5-lts.1",
     "node-schedule": "^2.1.0",

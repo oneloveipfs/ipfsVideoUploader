@@ -1,5 +1,4 @@
 const axios = require('axios')
-const Avalon = require('javalon')
 const HiveSigner = require('hivesigner')
 const JWT = require('jsonwebtoken')
 const Crypto = require('crypto-js')
@@ -9,8 +8,6 @@ const Config = require('./config')
 const Shawp = require('./shawp')
 const HivecryptPro = require('./hivecryptPro')
 const dir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
-
-Avalon.init({api: Config.Shawp.AvalonAPI})
 
 // If whitelist file doesn't exist create it
 if (!fs.existsSync(dir+'/whitelist.txt'))
@@ -37,8 +34,7 @@ let auth = {
         return {
             wifMessage: HivecryptPro.hivecryptrandomWif(),
             AESKey: HivecryptPro.hivecryptrandomWif().substr(3,32),
-            JWTKey: HivecryptPro.hivecryptrandomWif().substr(3,32),
-            avalonKeypair: Avalon.keypair()
+            JWTKey: HivecryptPro.hivecryptrandomWif().substr(3,32)
         }
     },
     watch: () => {
@@ -83,14 +79,8 @@ let auth = {
         let message = username + ':'+Config.ClientConfig.authIdentifier+':dtc'
         if (auth.isInWhitelist(username,null)) message = username + ':'+Config.ClientConfig.authIdentifier+':all'
         let encrypted_message = Crypto.AES.encrypt(message,Keys.AESKey).toString()
-        let avalonGetAccPromise = new Promise((resolve,reject) => {
-            Avalon.getAccount(username,(e,acc) => {
-                if (e) return reject(e)
-                resolve(acc)
-            })
-        })
         try {
-            let avalonAcc = await avalonGetAccPromise
+            let avalonAcc = (await axios.get(Config.Shawp.AvalonAPI+'/account/'+username)).data
             let pubKey
             if (keyid || keyid === '') {
                 // Custom key
@@ -101,11 +91,9 @@ let auth = {
                     return cb({error: 'Custom key identifier not found'})
             } else
                 pubKey = avalonAcc.pub // Master key
-            
-            Avalon.encrypt(pubKey,encrypted_message,Keys.avalonKeypair.priv,(err,encrypted) => {
-                if (err) return cb(err)
-                cb(null,encrypted)
-            })
+
+            let encrypted = HivecryptPro.hivecrypt.encode(Keys.wifMessage,HivecryptPro.PublicKey.fromAvalonString(pubKey).toString(),'#' + encrypted_message)
+            cb(null,encrypted)
         } catch (e) {
             cb(e)
         }

@@ -16,12 +16,11 @@ describe('Auth',() => {
         })
     })
 
-    it('generateEncryptedMemoAvalon should return a string containing 4 sections',function(done) {
+    it('generateEncryptedMemoAvalon should return a string that also starts with a #',function(done) {
         this.timeout(0)
         Auth.generateEncryptedMemoAvalon(user,null,(err,result) => {
-            let splitMessage = result.split('_')
             assert.typeOf(result,'string')
-            assert.equal(splitMessage.length,4)
+            assert.equal(result.charAt(0),'#')
             done()
         })
     })
