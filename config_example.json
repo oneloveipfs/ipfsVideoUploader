@@ -17,7 +17,8 @@
         "quality": "-crf 18",
         "ffmpegPath": "",
         "ffprobePath": "",
-        "outputs": [2160,1440,1080,720,480]
+        "outputs": [2160,1440,1080,720,480],
+        "maxSizeMb": 0
     },
 
     "ClientConfig": {

@@ -35,6 +35,7 @@ const supportedEncoders = [
     'h264_vaapi',
     'h264_omx'
 ]
+const MB = 1048576
 
 let uploadRegister = JSON.parse(fs.readFileSync(defaultDir+'/db/register.json','utf8'))
 let socketRegister = {}
@@ -346,6 +347,8 @@ let uploadOps = {
                     if (json.Upload.MetaData.encoder) {
                         if (!encoderRegister[json.Upload.MetaData.encoder])
                             return emitToUID(json.Upload.ID,'error',{ error: 'Encoder is not online' })
+                        if (json.Upload.Size > encoderRegister[json.Upload.MetaData.encoder].maxSize)
+                            return emitToUID(json.Upload.ID,'error',{ error: 'Uploaded file exceeds max size allowed by chosen encoder' })
                         let remotejob = {
                             id: json.Upload.ID,
                             username: user,
@@ -359,6 +362,11 @@ let uploadOps = {
                             encoderRegister[json.Upload.MetaData.encoder].socket.emit('job', remotejob)
                         return
                     }
+
+                    if (Config.Encoder.outputs.length === 0)
+                        return emitToUID(json.Upload.ID,'error',{ error: 'Server encoder is disabled' })
+                    else if (Config.Encoder.maxSizeMb && json.Upload.Size > Config.Encoder.maxSizeMb*MB)
+                        return emitToUID(json.Upload.ID,'error',{ error: 'Uploaded file exceeds max size allowed by server encoder' })
 
                     let outputResolutions = []
                     let sedge = Math.min(width,height)
@@ -697,6 +705,7 @@ let uploadOps = {
                     for (let o in info.outputs)
                         if (!helpers.getHlsBw(info.outputs[o]))
                             return socket.emit('error', { method: 'auth', error: 'Invalid output quality '+info.outputs[o] })
+                    if (!Number.isInteger(info.maxSize) || info.maxSize < MB) return socket.emit('error', { method: 'auth', error: 'Invalid max size' })
 
                     Auth.authenticate(info.access_token,info.keychain,false,(e,user,network) => {
                         if (e) return socket.emit('error', { method: 'auth', error: e })
@@ -716,6 +725,7 @@ let uploadOps = {
                         encoderRegister[fullUsername].encoder = info.encoder
                         encoderRegister[fullUsername].quality = info.quality
                         encoderRegister[fullUsername].outputs = info.outputs
+                        encoderRegister[fullUsername].maxSize = info.maxSize
 
                         socket.emit('result', { method: 'auth', success: true, username: fullUsername })
                     })
