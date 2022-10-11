@@ -429,7 +429,7 @@ async function hiveAuthLogin() {
 }
 
 function keychainCb(encrypted_message,network,persistence) {
-    axios.post('/logincb',encrypted_message,{ headers: { 'content-type': 'text/plain' }}).then((cbResponse) => {
+    axios.post('/logincb',encrypted_message,{ headers: { 'Content-Type': 'text/plain' }}).then((cbResponse) => {
         if (cbResponse.data.error != null) {
             alert(cbResponse.data.error)
         } else {
@@ -445,7 +445,7 @@ function keychainCb(encrypted_message,network,persistence) {
 }
 
 function keychainSigCb(message,network,persistence,role = 'Posting') {
-    axios.post('/loginsig',message,{ headers: { 'content-type': 'text/plain' }}).then((cbResponse) => {
+    axios.post('/loginsig',message,{ headers: { 'Content-Type': 'text/plain' }}).then((cbResponse) => {
         if (cbResponse.data.error != null) {
             alert(cbResponse.data.error)
         } else {

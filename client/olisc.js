@@ -19,7 +19,7 @@ let olisc = {
         if (verb !== 'delete')
             return (await axios[verb]('/olisc'+method+geturl,json)).data
         else
-            return (await axios[verb]('/olisc'+method+geturl,{ data: json, headers: { 'content-type': 'application/json' }})).data
+            return (await axios[verb]('/olisc'+method+geturl,{ data: json, headers: { 'Content-Type': 'application/json' }})).data
     }
 }
 

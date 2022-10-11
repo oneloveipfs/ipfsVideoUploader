@@ -259,7 +259,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let contentType = {
             headers: {
-                "content-type": "multipart/form-data"
+                "Content-Type": "multipart/form-data"
             },
             onUploadProgress: function (progressEvent) {
                 console.log(progressEvent)
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         let contentType = {
             headers: {
-                "content-type": "multipart/form-data"
+                "Content-Type": "multipart/form-data"
             },
             onUploadProgress: function (progressEvent) {
                 let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
@@ -380,7 +380,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const contentType = {
             headers: {
-                "content-type": "text/plain"
+                "Content-Type": "text/plain"
             }
         }
 

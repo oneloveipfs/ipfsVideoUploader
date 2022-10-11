@@ -122,7 +122,7 @@ function onEditSubmit() {
 
         let contentType = {
             headers: {
-                "content-type": "multipart/form-data"
+                "Content-Type": "multipart/form-data"
             },
             onUploadProgress: function (progressEvent) {
                 console.log(progressEvent)
