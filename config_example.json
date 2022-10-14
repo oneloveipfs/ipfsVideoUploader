@@ -18,6 +18,7 @@
         "ffmpegPath": "",
         "ffprobePath": "",
         "outputs": [2160,1440,1080,720,480],
+        "threads": 0,
         "maxSizeMb": 0
     },
 

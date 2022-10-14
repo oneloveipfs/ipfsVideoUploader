@@ -392,6 +392,7 @@ let uploadOps = {
                         outputResolutions,
                         json.Upload.MetaData.createSprite,
                         defaultDir+'/'+json.Upload.ID,
+                        Config.Encoder.threads,
                         (id, resolution, p) => {
                             emitToUID(id,'progress',{
                                 job: 'encode',

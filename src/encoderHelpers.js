@@ -55,7 +55,7 @@ let helpers = {
     createSpriteInContainer: (filepath, destDir) => {
         return new Promise((rs) => Shell.exec(__dirname+'/../scripts/dtube-sprite.sh ' + filepath + ' ' + destDir+'/sprite.jpg',() => rs()))
     },
-    hlsEncode: (id, filepath, orientation, encoder, quality, outputResolutions, createSprite, destDir, onProgress, onError) => {
+    hlsEncode: (id, filepath, orientation, encoder, quality, outputResolutions, createSprite, destDir, threads, onProgress, onError) => {
         const ffmpegbase = ffmpeg(filepath)
             .videoCodec(encoder)
             .audioCodec('aac')
@@ -68,6 +68,7 @@ let helpers = {
                     .audioBitrate('256k')
                     .addOption(encoderOptions)
                     .addOption(quality)
+                    .addOption('-threads '+threads)
                     .addOption('-segment_list',destDir+'/'+resolution+'p/index.m3u8')
                     .size(orientation === 1 ? '?x'+resolution : resolution+'x?')
                     .on('progress',(p) => {
