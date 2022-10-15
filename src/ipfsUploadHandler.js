@@ -349,15 +349,7 @@ let uploadOps = {
                             return emitToUID(json.Upload.ID,'error',{ error: 'Encoder is not online' })
                         if (json.Upload.Size > encoderRegister[json.Upload.MetaData.encoder].maxSize)
                             return emitToUID(json.Upload.ID,'error',{ error: 'Uploaded file exceeds max size allowed by chosen encoder' })
-                        let remotejob = {
-                            id: json.Upload.ID,
-                            username: user,
-                            network: network,
-                            duration: duration,
-                            createSprite: json.Upload.MetaData.createSprite,
-                            thumbnail: json.Upload.MetaData.thumbnailFname
-                        }
-                        encoderRegister[json.Upload.MetaData.encoder].queue.push(remotejob)
+                        uploadOps.remoteEncoderPushJob(json.Upload.MetaData.encoder,json.Upload.ID,user,network,duration,json.Upload.MetaData.createSprite,json.Upload.MetaData.thumbnailFname)
                         if (encoderRegister[json.Upload.MetaData.encoder].queue.length === 1)
                             encoderRegister[json.Upload.MetaData.encoder].socket.emit('job', remotejob)
                         return
@@ -600,6 +592,32 @@ let uploadOps = {
         else
             return encoderRegister[encoder].queue[0].id
     },
+    remoteEncoderStatus: () => {
+        return Object.fromEntries(Object.keys(encoderRegister).map(key => [key, {
+            lastAuth: encoderRegister[key].lastAuth,
+            encoder: encoderRegister[key].encoder,
+            quality: encoderRegister[key].quality,
+            outputs: encoderRegister[key].outputs,
+            maxSize: encoderRegister[key].maxSize,
+            queue: encoderRegister[key].queue.map(q => q.id),
+            processing: uploadOps.remoteEncoding(key)
+        }]))
+    },
+    remoteEncoderRegister: (encoderName,socket,encoder,quality,outputs,maxSize) => {
+        if (!encoderRegister[encoderName])
+            encoderRegister[encoderName] = {
+                queue: []
+            }
+        encoderRegister[encoderName].socket = socket
+        encoderRegister[encoderName].lastAuth = new Date().getTime()
+        encoderRegister[encoderName].encoder = encoder
+        encoderRegister[encoderName].quality = quality
+        encoderRegister[encoderName].outputs = outputs
+        encoderRegister[encoderName].maxSize = maxSize
+    },
+    remoteEncoderPushJob: (encoderName, id, username, network, duration, createSprite, thumbnailFname) => {
+        encoderRegister[encoderName].queue.push({id,username,network,duration,createSprite,thumbnailFname})
+    },
     IPSync: {
         init: (server) => {
             SocketIO = Socket(server, {
@@ -717,16 +735,7 @@ let uploadOps = {
                         else if (encoderRegister[fullUsername] && encoderRegister[fullUsername].socket && encoderRegister[fullUsername].socket.id !== socket.id)
                             return socket.emit('error', { method: 'auth', error: 'duplicate connections' })
 
-                        if (!encoderRegister[fullUsername])
-                            encoderRegister[fullUsername] = {
-                                queue: []
-                            }
-                        encoderRegister[fullUsername].socket = socket
-                        encoderRegister[fullUsername].lastAuth = new Date().getTime()
-                        encoderRegister[fullUsername].encoder = info.encoder
-                        encoderRegister[fullUsername].quality = info.quality
-                        encoderRegister[fullUsername].outputs = info.outputs
-                        encoderRegister[fullUsername].maxSize = info.maxSize
+                        uploadOps.remoteEncoderRegister(fullUsername,socket,info.encoder,info.quality,info.outputs,info.maxSize)
 
                         socket.emit('result', { method: 'auth', success: true, username: fullUsername })
                     })
