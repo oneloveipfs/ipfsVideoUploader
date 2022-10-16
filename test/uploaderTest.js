@@ -30,6 +30,7 @@ describe('Uploader',() => {
         assert.strictEqual(encoders[hiveEncoder].quality,'-crf 18')
         assert.deepStrictEqual(encoders[hiveEncoder].outputs,[1080,720,480])
         assert.strictEqual(encoders[hiveEncoder].maxSize,1024*1024*1024)
+        assert.isFalse(encoders[hiveEncoder].active)
         assert.isArray(encoders[hiveEncoder].queue)
         assert.isString(encoders[hiveEncoder].processing)
         done()

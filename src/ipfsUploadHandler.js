@@ -599,6 +599,7 @@ let uploadOps = {
             quality: encoderRegister[key].quality,
             outputs: encoderRegister[key].outputs,
             maxSize: encoderRegister[key].maxSize,
+            active: encoderRegister[key].socket ? true : false,
             queue: encoderRegister[key].queue.map(q => q.id),
             processing: uploadOps.remoteEncoding(key)
         }]))
@@ -866,8 +867,8 @@ let uploadOps = {
 
                 socket.on('disconnect',() => {
                     let r = getEncoderBySocket(socket)
-                    if (r)
-                        delete encoderRegister[r]
+                    if (r && encoderRegister[r].socket)
+                        delete encoderRegister[r].socket
                 })
             })
         },
