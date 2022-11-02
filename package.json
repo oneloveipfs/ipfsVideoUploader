@@ -83,7 +83,7 @@
     "about-window": "^1.15.2",
     "async": "^3.2.4",
     "axios": "^1.1.2",
-    "body-parser": "^1.20.0",
+    "body-parser": "^1.20.1",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
     "deepmerge": "^4.2.2",
