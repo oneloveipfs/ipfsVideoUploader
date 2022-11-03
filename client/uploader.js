@@ -533,7 +533,7 @@ function uploadVideo(resolution,next,thumbnailFname = '') {
     let videoUpload = new tus.Upload(videoToUpload[0], {
         endpoint: config.tusdEndpoint,
         retryDelays: [0,3000,5000,10000,20000],
-        parallelUploads: parseInt(usersettings.uplThreads) || 10,
+        parallelUploads: getMobileOperatingSystem() === 'iOS' ? 1 : (parseInt(usersettings.uplThreads) || 10),
         headers: {
             'Authorization': 'Bearer '+window.btoa(JSON.stringify({keychain: Auth.iskeychain === 'true'})).replace(/={1,2}$/, '')+'.'+Auth.token,
         },
