@@ -284,7 +284,7 @@ let uploadOps = {
         ipsync.emit('upload',result)
     },
     encoderQueue,
-    handleTusUpload: (json,user,network,callback) => {
+    handleTusUpload: async (json,user,network,callback) => {
         let filepath = json.Upload.Storage.Path
         switch (json.Upload.MetaData.type) {
             case 'hlsencode':
@@ -483,6 +483,14 @@ let uploadOps = {
                 })
                 break
             case 'videos':
+                try {
+                    await helpers.getFFprobeVideo(filepath)
+                } catch (e) {
+                    if (socketRegister[json.Upload.ID] && socketRegister[json.Upload.ID].socket) socketRegister[json.Upload.ID].socket.emit('error',{error: 'Failed to parse video'})
+                    delete socketRegister[json.Upload.ID]
+                    callback()
+                    return
+                }
                 let ipfsops = {
                     videohash: (cb) => {
                         addFile(filepath,true,Config.Skynet.enabled && json.Upload.MetaData.skynet == 'true',(size,hash,skylink) => cb(null,{ipfshash: hash, skylink: skylink, size: size}))
@@ -529,6 +537,14 @@ let uploadOps = {
             case 'video480':
             case 'video720':
             case 'video1080':
+                try {
+                    await helpers.getFFprobeVideo(filepath)
+                } catch (e) {
+                    if (socketRegister[json.Upload.ID] && socketRegister[json.Upload.ID].socket) socketRegister[json.Upload.ID].socket.emit('error',{error: 'Failed to parse video'})
+                    delete socketRegister[json.Upload.ID]
+                    callback()
+                    return
+                }
                 addFile(filepath,true,Config.Skynet.enabled && json.Upload.MetaData.skynet == 'true',(size,hash,skylink) => {
                     db.recordHash(user,network,json.Upload.MetaData.type,hash,json.Upload.Size)
                     db.writeHashesData()
@@ -578,8 +594,10 @@ let uploadOps = {
     pruneTusPartialUploads: (PartialUploads = []) => {
         if (!PartialUploads) return
         for (let i in PartialUploads) {
-            fs.unlinkSync(Config.tusdUploadDir+'/'+PartialUploads[i])
-            fs.unlinkSync(Config.tusdUploadDir+'/'+PartialUploads[i]+'.info')
+            if (fs.existsSync(Config.tusdUploadDir+'/'+PartialUploads[i]))
+                fs.unlinkSync(Config.tusdUploadDir+'/'+PartialUploads[i])
+            if (fs.existsSync(Config.tusdUploadDir+'/'+PartialUploads[i]+'.info'))
+                fs.unlinkSync(Config.tusdUploadDir+'/'+PartialUploads[i]+'.info')
         }
     },
     writeUploadRegister: () => {
