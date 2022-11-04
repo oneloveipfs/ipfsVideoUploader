@@ -227,7 +227,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         postparams.scheduled = validateDatePicker()
         if (postparams.scheduled === -1) return
 
-        // Auth.restrict()
+        if (isPlatformSelected['3Speak'])
+            return displayPopup('spkUploadPopup')
 
         // Upload thumbnail
         let formdata = new FormData()

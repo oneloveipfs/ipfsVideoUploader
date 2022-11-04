@@ -44,6 +44,7 @@ window.ontouchstart = windowClick
 function windowClick(event) {
     closeMenu(event)
     dismissPopup(event,'refillPopup')
+    dismissPopup(event,'spkUploadPopup')
     let target = event.target
     if (target.tagName.toLowerCase() === 'svg')
         target = target.parentElement

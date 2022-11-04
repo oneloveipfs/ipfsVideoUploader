@@ -152,6 +152,20 @@ function displayPopup(popupelement) {
     setTimeout(() => document.getElementById(popupelement+'Content').classList.add('popup-shown'),5)
 }
 
+function dismissPopup(event,popupelement) {
+    let popup = document.getElementById(popupelement)
+    let popupcontent = document.getElementById(popupelement+'Content')
+    if (event.target == popup) {
+        popupcontent.classList.remove('popup-shown')
+        setTimeout(() => popup.style.display = 'none',300)
+    }
+}
+
+function dismissPopupAction(popupelement) {
+    document.getElementById(popupelement+'Content').classList.remove('popup-shown')
+    setTimeout(() => updateDisplayByIDs([],[popupelement]),300)
+}
+
 // enable/disable elements
 function toggleElems(toToggle = [], disable = false) {
     for (let i in toToggle) document.getElementById(toToggle[i]).disabled = disable

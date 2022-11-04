@@ -107,6 +107,9 @@ a {
     cursor: pointer;
 }
 
+a:visited { color: #000000; }
+.darkmode a:visited { color: #ffffff; }
+
 hr {
     border: 0;
     height: 0;
@@ -173,6 +176,34 @@ br {
     padding-bottom: 20px;
 }
 
+.popup-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.popup-actions input {
+    flex: 1;
+    text-align: center;
+    padding: 10px 0px;
+    font-size: 25px;
+    cursor: pointer;
+    border: 1px solid;
+    transition-duration: 0.2s;
+    font-family: 'Roboto';
+}
+
+.popup-actions input:hover {
+    background-color: #555555;
+    color: #ffffff;
+}
+.popup-actions input:disabled { cursor: not-allowed; }
+.darkmode .popup-actions input:disabled { background-color: transparent; }
+
+#spkUploadPopup .popup-content {
+    width: 90%;
+}
 #loginPopup .popup-body h3 { text-align: center; }
 #loginPopup .popup-body .logininfo { 
     margin: 5px 0px;
@@ -1462,6 +1493,10 @@ input:checked + .slider.slidersmall:before {
         width: 85%;
     }
 
+    #spkUploadPopup .popup-content {
+        width: 92%;
+    }
+
     #linkResult {
         width: 100%;
     }
@@ -1491,7 +1526,8 @@ input:checked + .slider.slidersmall:before {
 }
 
 @media screen and (max-width: 500px) {
-    .popup-content {
+    .popup-content,
+    #spkUploadPopup .popup-content {
         width: 100%;
     }
 

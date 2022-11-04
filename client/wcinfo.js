@@ -126,13 +126,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 })
 
-function dismissPopup(event,popupelement) {
-    let popup = document.getElementById(popupelement)
-    if (event.target == popup) {
-        popup.style.display = "none"
-    }
-}
-
 function populateRefillHistory(rfh,view) {
     let refillHistoryHtml = ''
     for (let i = 0; i < rfh.length; i++)

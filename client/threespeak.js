@@ -6,3 +6,7 @@ const THREESPEAK_FEES = {
 }
 
 const THREESPEAK_ENCODER_FEE = 100
+
+function spkNoticeCheckboxChanged() {
+    document.getElementById('spkNoticeContinueBtn').disabled = !document.getElementById('spkUploadAgreeNotice').checked || !document.getElementById('spkUploadAgreeTerms').checked
+}

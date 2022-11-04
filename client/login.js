@@ -69,15 +69,6 @@ window.ontouchstart = (event) => {
     dismissPopup(event,'apiSettingsPopup')
 }
 
-function dismissPopup(event,popupelement) {
-    let popup = document.getElementById(popupelement)
-    let popupcontent = document.getElementById(popupelement+'Content')
-    if (event.target == popup) {
-        popupcontent.classList.remove('popup-shown')
-        setTimeout(() => popup.style.display = 'none',300)
-    }
-}
-
 function loginBtnClicked() {
     // Show popup window of login options
     if (isElectron() && localStorage.getItem('persistentLogin') !== null) {

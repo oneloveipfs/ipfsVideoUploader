@@ -128,6 +128,5 @@ function updateLogs() {
 
 function saveAPIBtn() {
     saveAPISelections()
-    document.getElementById('apiSettingsPopupContent').classList.remove('popup-shown')
-    setTimeout(() => updateDisplayByIDs([],['apiSettingsPopup']),300)
+    dismissPopupAction('apiSettingsPopup')
 }
