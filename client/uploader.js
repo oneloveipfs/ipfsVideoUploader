@@ -181,13 +181,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 updateDisplayByIDs([],['beneficiaryHeading'+capitalizeFirstLetter(grapheneNetworks[g]),'beneficiaryTableList'+capitalizeFirstLetter(grapheneNetworks[g]),'totalBeneficiariesLabel'+capitalizeFirstLetter(grapheneNetworks[g]),grapheneNetworks[g]+'Community'])
     })
 
-    // TODO: Display warning if resumable uploads is unavailable
-    if (tus.isSupported) {
-        console.log('tus is supported')
-    } else {
-        console.log('tus is not supported')
-    }
-
+    if (!tus.isSupported)
+        updateDisplayByIDs(['tusnotsupported'],[])
     loadOliscDatePicker()
     document.getElementById('languages').innerHTML = langOptions
     document.getElementById('tags').onchange = () => document.getElementById('tags').value = document.getElementById('tags').value.toLowerCase()
@@ -427,7 +422,7 @@ function uploadThumbnail(type,imgFormData,successCb,errorCb) {
     })
 }
 
-function uploadVideo(resolution,next,thumbnailFname = '') {
+function uploadVideo(resolution,next) {
     let fInputElemName, resolutionFType, progressTxt
     let lbl = ['source','240','480','720','1080']
     switch (resolution) {

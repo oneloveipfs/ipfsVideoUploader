@@ -198,7 +198,7 @@ br {
     font-size: 16px;
 }
 
-#refillnotify, #needsrefillnotify {
+#refillnotify, #needsrefillnotify, #tusnotsupported {
     margin-top: 15px;
     display: none;
 }
