@@ -78,11 +78,6 @@ function dismissPopup(event,popupelement) {
     }
 }
 
-function displayPopup(popupelement) {
-    updateDisplayByIDs([popupelement],[])
-    setTimeout(() => document.getElementById(popupelement+'Content').classList.add('popup-shown'),5)
-}
-
 function loginBtnClicked() {
     // Show popup window of login options
     if (isElectron() && localStorage.getItem('persistentLogin') !== null) {

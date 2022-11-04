@@ -139,6 +139,11 @@ function updateDisplayByIDs(toshow,tohide,type = 'block') {
         document.getElementById(toshow[i]).style.display = type
 }
 
+function displayPopup(popupelement) {
+    updateDisplayByIDs([popupelement],[])
+    setTimeout(() => document.getElementById(popupelement+'Content').classList.add('popup-shown'),5)
+}
+
 // enable/disable elements
 function toggleElems(toToggle = [], disable = false) {
     for (let i in toToggle) document.getElementById(toToggle[i]).disabled = disable

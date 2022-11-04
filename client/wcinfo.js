@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 default:
                     break
             }
-            updateDisplayByIDs(['refillPopup'],[])
+            displayPopup('refillPopup')
         })
     }
 })
