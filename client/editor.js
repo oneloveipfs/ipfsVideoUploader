@@ -373,7 +373,7 @@ function editorJsonCheck(network, isRef = false) {
     } else
         editor.refs.push(network)
 
-    document.getElementById('editPlatforms').innerText = 'Editing on '+ (editor.editingPlatforms.length === 1 ? editor.editingPlatforms[0] : editor.editingPlatforms.slice(0,-1).join(', ') + ' and ' + editor.editingPlatforms[editor.editingPlatforms.length-1])
+    document.getElementById('editPlatforms').innerText = 'Editing on '+ listWords(editor.editingPlatforms)
 }
 
 function chooseReplacementThumbnail() {

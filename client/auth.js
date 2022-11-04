@@ -155,10 +155,7 @@ function displayLoginMessage(errored) {
             displayAccs.push(blurtUser + ' on Blurt')
         if (dtcDisplayUser)
             displayAccs.push(dtcDisplayUser + ' on Avalon')
-        if (displayAccs.length === 1)
-            message += displayAccs[0]
-        else
-            message += displayAccs.slice(0,-1).join(', ') + ' and ' + displayAccs[displayAccs.length-1]
+        message += listWords(displayAccs)
         document.getElementById('loggedInUser').innerHTML = HtmlSanitizer.SanitizeHtml(message)
     }
 }

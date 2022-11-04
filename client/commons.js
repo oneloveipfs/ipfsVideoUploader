@@ -97,6 +97,14 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function listWords(arr = []) {
+    if (arr.length === 0)
+        return ''
+    else if (arr.length === 1)
+        return arr[0]
+    return arr.slice(0,-1).join(', ')+' and '+arr[arr.length-1]
+}
+
 function toReadableNetwork(network) {
     switch (network) {
         case 'hive':

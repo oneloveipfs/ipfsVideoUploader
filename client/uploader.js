@@ -145,19 +145,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // Beneficiaries description text
-        let beneficiariesGrapheneList = []
-        if (hiveDisplayUser) beneficiariesGrapheneList.push('HIVE')
-        if (steemUser) beneficiariesGrapheneList.push('STEEM')
-        if (blurtUser) beneficiariesGrapheneList.push('BLURT')
-        let beneficiariesGrapheneListText = ''
-        if (beneficiariesGrapheneList.length > 2)
-            beneficiariesGrapheneListText += beneficiariesGrapheneList.slice(0,-1).join(', ') + ' or ' + beneficiariesGrapheneList[beneficiariesGrapheneList.length-1]
-        else
-            beneficiariesGrapheneListText = beneficiariesGrapheneList.join(' or ')
-        let beneficiariesDescText = 'Add some accounts here to automatically receive a portion of your '+beneficiariesGrapheneListText+' post rewards.'
-        if (avalonUser)
-            beneficiariesDescText += ' Avalon beneficiaries are set in blockchain config such that @dtube receives 10% of DTUBE curation rewards.'
-        document.getElementById('beneficiariesDesc').innerText = beneficiariesDescText
+        document.getElementById('beneficiariesDesc').innerText = Beneficiaries.describe()
 
         if (config.olisc)
             updateDisplayByIDs(['schedulepost','scheduledStr'],[])
