@@ -192,21 +192,14 @@ function updateDisplayPlatforms() {
         document.getElementById('platformLogoDTube').style.display = 'inline'
         document.getElementById('dropdownArrowPlatform').style.transform = 'rotate(45deg) translate(-6px,-12px)'
     }
-    let displaySelected = []
-    for (let i in selected) {
-        if (selected[i] === '3Speak')
-            displaySelected.push('3Speak (desktop app only)')
-        else
-            displaySelected.push(selected[i])
-    }
     let joined = ''
-    if (displaySelected.length === 0)
+    if (selected.length === 0)
         joined = 'No platform selected'
-    else if (displaySelected.length === 1)
-        joined = displaySelected[0]
+    else if (selected.length === 1)
+        joined = selected[0]
     else
-        joined = displaySelected.slice(0,-1).join(', ') + ' and ' + displaySelected[displaySelected.length-1]
-    document.getElementById('platformStr').innerText = (displaySelected.length > 0 ? 'Posting to ' : '') + joined
+        joined = selected.slice(0,-1).join(', ') + ' and ' + selected[selected.length-1]
+    document.getElementById('platformStr').innerText = (selected.length > 0 ? 'Posting to ' : '') + joined
 
     if (selected.includes('3Speak')) {
         document.getElementById('hlsencode').checked = true
@@ -217,9 +210,18 @@ function updateDisplayPlatforms() {
             updateDisplayByIDs([],['tabSubtitles'])
         else
             document.getElementById('tabSubtitles').style.display = 'initial'
+        // custom permlinks are unsupported
+        document.getElementById('customPermlink').disabled = true
+        document.getElementById('customPermlinkField').classList.add('tooltip')
+        document.getElementById('customPermlinkField').classList.add('tooltippm')
+        updateDisplayByIDs(['customPermlink3Speak'],[])
     } else {
         document.getElementById('hlsencode').disabled = false
         document.getElementById('hlsencodetext').innerText = '  Encode video to HLS'
+        document.getElementById('customPermlink').disabled = false
+        document.getElementById('customPermlinkField').classList.remove('tooltip')
+        document.getElementById('customPermlinkField').classList.remove('tooltippm')
+        updateDisplayByIDs([],['customPermlink3Speak'])
     }
     if (selected.includes('DTube') && config && config.skynetEnabled)
         updateDisplayByIDs(['skynetswitch'],[])
@@ -250,8 +252,7 @@ function pfSelect(p) {
 function pfPostEmbed(network) {
     switch (network) {
         case 'hive':
-            // using dtube player whenever possible until 3speak embeds are fixed
-            if (isPlatformSelected['3Speak'] && !isPlatformSelected.DTube)
+            if (isPlatformSelected['3Speak'])
                 return '3Speak'
             else
                 return 'DTube'
@@ -267,7 +268,6 @@ function pfPlayerEmbed(pf) {
     let av = usernameByNetwork('avalon')
     switch (pf) {
         case '3Speak':
-            // TODO: 3Speak embeds for videos published through desktop app
             return '<iframe src="https://3speak.tv/embed?v='+usernameByNetwork('hive')+'/'+postparams.permlink+'&autoplay=false" frameborder="0" allowfullscreen></iframe>'
         case 'DTube':
             return '<iframe src="https://emb.d.tube/#!/'+(av?av:username)+'/'+(av?postparams.ipfshash:postparams.permlink)+'" frameborder="0" allowfullscreen></iframe>'

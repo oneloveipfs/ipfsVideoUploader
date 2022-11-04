@@ -158,6 +158,7 @@ function saveDraft() {
     localStorage.setItem('Draft_'+pm,JSON.stringify(newDraftObj))
     document.getElementById('editingDraftMsg').innerText = 'Editing draft: '+pm+', last saved: '+new Date(newDraftObj.lastTs).toLocaleString()
     updateDisplayByIDs(['editingDraft'],[])
+    listDrafts()
 }
 
 function leaveDraft() {

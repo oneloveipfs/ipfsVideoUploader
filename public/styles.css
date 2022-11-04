@@ -83,6 +83,10 @@ body.darkmode {
 .darkmode input[type="file"] {
     background-color: transparent;
 }
+.darkmode input:disabled {
+    background-color: rgb(60, 62, 64);
+    cursor: not-allowed;
+}
 select {
     background: url(data:image/svg+xml;base64,PHN2ZyBpZD0iTGF5ZXJfMSIgZGF0YS1uYW1lPSJMYXllciAxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0Ljk1IDEwIj48ZGVmcz48c3R5bGU+LmNscy0ye2ZpbGw6IzQ0NDt9PC9zdHlsZT48L2RlZnM+PHRpdGxlPmFycm93czwvdGl0bGU+PHBvbHlnb24gY2xhc3M9ImNscy0yIiBwb2ludHM9IjEuNDEgNC42NyAyLjQ4IDMuMTggMy41NCA0LjY3IDEuNDEgNC42NyIvPjxwb2x5Z29uIGNsYXNzPSJjbHMtMiIgcG9pbnRzPSIzLjU0IDUuMzMgMi40OCA2LjgyIDEuNDEgNS4zMyAzLjU0IDUuMzMiLz48L3N2Zz4=) no-repeat 100% 50%;
     appearance: none;
@@ -303,7 +307,11 @@ br {
     position: relative;
     display: inline-block;
 }
-  
+
+.tooltip.tooltippm {
+    display: block;
+}
+
 .tooltip .tooltiptext {
     visibility: hidden;
     width: 140px;
@@ -320,6 +328,13 @@ br {
     opacity: 0;
     transition: opacity 0.3s;
     font-family: 'Roboto';
+}
+
+.tooltiptext.tooltippm {
+    width: 500px;
+    left: 25%;
+    bottom: 100%;
+    font-size: 18px;
 }
 
 .tooltip .tooltipshare {
@@ -1430,6 +1445,12 @@ input:checked + .slider.slidersmall:before {
 
     .subListDel a {
         font-size: 11px;
+    }
+
+    .tooltiptext.tooltippm {
+        font-size: 15px;
+        width: 75%;
+        left: 30%;
     }
 
     .tabs {
