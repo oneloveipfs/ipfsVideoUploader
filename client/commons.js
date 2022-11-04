@@ -501,6 +501,21 @@ function hivesignerPaymentUrl(to,amount,currency,memo,recurrence,frequency) {
         return 'https://hivesigner.com/sign/transfer?to='+to+'&amount='+amount+currency+'&memo='+memo
 }
 
+function loadRemoteCSS(url) {
+    let css = document.createElement('link')
+    css.setAttribute('rel','stylesheet')
+    css.setAttribute('type','text/css')
+    css.setAttribute('href',url)
+    document.getElementsByTagName('head')[0].appendChild(css)
+}
+
+function loadRemoteJavaScript(url) {
+    let javascript = document.createElement('script')
+    javascript.setAttribute('type','text/javascript')
+    javascript.setAttribute('src',url)
+    document.getElementsByTagName('head')[0].appendChild(javascript)
+}
+
 function createOption(value, text) {
     let opt = document.createElement('option')
     opt.innerText = text
