@@ -120,31 +120,11 @@ function onEditSubmit() {
         updateDisplayByIDs(['uploadProgressBack'],[])
         updateProgressBar(0,'Uploading thumbnail...')
 
-        let contentType = {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            },
-            onUploadProgress: function (progressEvent) {
-                console.log(progressEvent)
-
-                let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
-                updateProgressBar(progressPercent,'Uploading thumbnail...')
-            }
-        }
-        let call = '/uploadImage?type=thumbnails&access_token=' + Auth.token
-        if (Auth.iskeychain !== 'true')
-            call += '&scauth=true'
-        axios.post(call,formdata,contentType).then((res) => {
+        uploadThumbnail('thumbnails',formdata,() => {
             if (!res.data || !res.data.imghash)
                 return alert('Could not obtain new thumbnail hash from upload')
             finalizeEdit(res.data.imghash)
-        }).catch((err) => {
-            if (err.response && err.response.data && err.response.data.error)
-                alert(err.response.data.error)
-            else
-                alert(err.toString())
-            updateDisplayByIDs([],['uploadProgressBack'])
-        })
+        },() => updateDisplayByIDs([],['uploadProgressBack']))
     } else
         finalizeEdit()
 }

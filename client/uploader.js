@@ -253,22 +253,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateDisplayByIDs(['uploadProgressBack'],[])
         updateProgressBar(0,'Uploading thumbnail...')
 
-        let contentType = {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            },
-            onUploadProgress: function (progressEvent) {
-                console.log(progressEvent)
-
-                let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
-                updateProgressBar(progressPercent,'Uploading thumbnail...')
-            }
-        }
-
-        let call = '/uploadImage?type=thumbnails&access_token=' + Auth.token
-        if (Auth.iskeychain !== 'true')
-            call += '&scauth=true'
-        axios.post(call,formdata,contentType).then(function(response) {
+        uploadThumbnail('thumbnails',formdata,(response) => {
             let uploaderResponse = response.data
             console.log(uploaderResponse)
 
@@ -285,11 +270,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 uploadVideo(-1,() => console.log('begin encode'),uploaderResponse.fsname)
             else
                 uploadVideo(0,() => console.log('all videos uploaded successfully'))
-        }).catch((err) => {
-            if (err.response && err.response.data && err.response.data.error)
-                alert(err.response.data.error)
-            else
-                alert(err.toString())
+        },() => {
             updateDisplayByIDs([],['uploadProgressBack'])
             reenableFields()
         })
@@ -316,31 +297,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         toggleImg(true)
 
         updateDisplayByIDs(['uploadProgressBack'],[])
-        document.getElementById('uploadProgressFront').innerHTML = "Uploading... (0%)";
+        document.getElementById('uploadProgressFront').innerHTML = "Uploading... (0%)"
 
-        let contentType = {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            },
-            onUploadProgress: function (progressEvent) {
-                let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
-                updateProgressBar(progressPercent);
-            }
-        }
-
-        let call = '/uploadImage?type=images&access_token=' + Auth.token
-        if (Auth.iskeychain !== 'true')
-            call += '&scauth=true'
-        axios.post(call,imgFormData,contentType).then(function(response) {
-            console.log(response);
+        uploadThumbnail('images',imgFormData,(response) => {
             updateDisplayByIDs([],['uploadProgressBack'])
             document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + ']('+config.gateway+'/ipfs/' + response.data.imghash + ')');
             toggleImg(false)
-        }).catch(function(err) {
-            if (err.response.data.error)
-                alert('Upload error: ' + err.response.data.error)
-            else
-                alert('Upload error: ' + err);
+        },() => {
             updateDisplayByIDs([],['uploadProgressBack'])
             toggleImg(false)
         })
@@ -448,6 +411,32 @@ function sourceVideoSelect() {
     audioObj.addEventListener('canplaythrough',(evt) => postparams.duration = evt.currentTarget.duration)
     let videoObjUrl = URL.createObjectURL(selected[0])
     audioObj.src = videoObjUrl
+}
+
+function uploadThumbnail(type,imgFormData,successCb,errorCb) {
+    let contentType = {
+        headers: {
+            "Content-Type": "multipart/form-data"
+        },
+        onUploadProgress: function (progressEvent) {
+            let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
+            updateProgressBar(progressPercent);
+        }
+    }
+
+    let call = '/uploadImage?type='+type+'&access_token='+Auth.token
+    if (Auth.iskeychain !== 'true')
+        call += '&scauth=true'
+    axios.post(call,imgFormData,contentType).then(function(response) {
+        console.log(response)
+        successCb(response)
+    }).catch(function(err) {
+        if (err.response.data.error)
+            alert('Upload error: ' + err.response.data.error)
+        else
+            alert('Upload error: ' + err);
+        errorCb()
+    })
 }
 
 function uploadVideo(resolution,next,thumbnailFname = '') {
@@ -1113,9 +1102,6 @@ async function getCommunitySubs(acc,network) {
         newoption.value = communities.data.result[i][0]
         selection.appendChild(newoption)
     }
-    let savedCommunity = localStorage.getItem('Draft' + capitalizeFirstLetter(network) + 'Community')
-    if (savedCommunity)
-        document.getElementById(network+'CommunitySelect').value = savedCommunity
 }
 
 function getDefaultCommunity(network) {
