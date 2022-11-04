@@ -25,6 +25,7 @@
         <script src="client/languages.js"></script>
         <script src="client/beneficiaries.js"></script>
         <script src="client/olisc.js"></script>
+        <script src="client/draft.js"></script>
         <script src="client/uploader.js"></script>
         <script src="client/editor.js"></script>
         <script src="client/yourfiles.js"></script>
@@ -57,6 +58,7 @@
                     <a id="getHelpModeBtn">Get Help</a>
                     <a id="settingsModeBtn">User Settings</a>
                     <a id="oliscModeBtn">Scheduled Publishes</a>
+                    <a id="draftModeBtn">Drafts</a>
                 </div>
             </div>
         </div>
@@ -67,7 +69,12 @@
             <h3 id="disabledText"></h3>
             <img id="disabledImg" alt="will be right back" style="width: 100%;">
         </div>
-        <div id="uploadForm">
+        <div class="uploadpage" id="uploadForm" style="display: block;">
+            <div id="editingDraft" class="curvedbox" style="display: none; margin-bottom: 20px;">
+                <h4 id="editingDraftMsg" style="display: inline-block;">Currently editing draft: Last saved:</h4>
+                <a class="styledButton styledButtonSmall" style="width: 70px; display: inline-block;" onclick="leaveDraft()">Leave</a>
+                <a class="styledButton styledButtonSmall" style="width: 110px; display: inline-block;" onclick="saveDraft(); leaveDraft()">Save & Leave</a>
+            </div>
             <div id="tab">
                 <a class="tabs" id="tabBasics" onclick="updateTab('basics')">Basics</a>
                 <a class="tabs" id="tabSubtitles" onclick="updateTab('subtitles')">Subtitles</a>
@@ -76,8 +83,8 @@
             <div id="basics"> <!-- Basics tab -->
                 <h3>Upload a video (mp4 file accepted): <input type="file" accept="video/mp4,video/quicktime" name="VideoUpload" id="sourcevideo" onchange="sourceVideoSelect()"></h3>
                 <h3>Upload a thumbnail (4MB maximum): <input type="file" accept="image/jpeg,image/png,image/gif" name="SnapUpload" id="snapfile"></h3>
-                <h3>Title: <br><input type="text" id="title" name="title" class="meta"></h3>
-                <h3>Description: <br>
+                <h3>Title: <input type="text" id="title" name="title" class="meta"></h3>
+                <h3>Description: 
                 <textarea id="description" name="description"></textarea><a style="font-size: 15px;" onclick="fillDescription()">Insert from template</a><a style="font-size: 15px; margin-left: 15px;" onclick="updateDisplayByIDs(['settings'],['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings'])">Edit template</a></h3>
                 <h3><div id="tagLbl">Tags (seperated by space):</div><input type="text" id="tags" name="tags" class="meta"></h3>
                 <h5 id="tagInfo1">The first tag (out of 8 tags) that you have chosen will be the first curated tag on your Avalon post.</h5>
@@ -123,10 +130,10 @@
                     <br>
                     <h3 style="margin-block-start: 0.25em;">Upload user encoded videos</h3>
                     <h5>You may choose to upload a lower resolution version of your source video that you have selected in the "Basics" tab, so that your video will be playable in lower resolutions for viewers who have poor internet connection.<br><br>Do not choose the same video file you have selected in the "Basics" tab!</h5>
-                    <h4>240p video: <input type="file" accept="video/mp4" name="Video240Upload" id="video240p"></h4>
-                    <h4>480p video: <input type="file" accept="video/mp4" name="Video480Upload" id="video480p"></h4>
-                    <h4>720p video: <input type="file" accept="video/mp4" name="Video720Upload" id="video720p"></h4>
-                    <h4>1080p video: <input type="file" accept="video/mp4" name="Video1080Upload" id="video1080p"></h4>
+                    <h4>240p video: <input type="file" accept="video/mp4" name="Video240Upload" id="video240p"></h4><br>
+                    <h4>480p video: <input type="file" accept="video/mp4" name="Video480Upload" id="video480p"></h4><br>
+                    <h4>720p video: <input type="file" accept="video/mp4" name="Video720Upload" id="video720p"></h4><br>
+                    <h4>1080p video: <input type="file" accept="video/mp4" name="Video1080Upload" id="video1080p"></h4><br>
                     <div id="skynetswitch" style="display: none;">
                         <label class="switch">
                             <input type="checkbox" name="skynetupload" id="skynetupload">
@@ -135,14 +142,14 @@
                     </div>
                 </div>
                 <div class="grapheneSettings">
-                    <h3>Custom Permlink: <br><input type="text" id="customPermlink" name="customPermlink" class="meta"></h3>
-                    <h3>Article Body: <br>
+                    <h3>Custom Permlink: <input type="text" id="customPermlink" name="customPermlink" class="meta"></h3>
+                    <h3 style="margin-block-end: 0.25em;">Article Body: 
                     <textarea id="postBody" name="postBody"></textarea></h3>
                     <input type="file" accept="image/*" id="postImg" style="display: none">
                     <a onclick="document.getElementById('postImg').click()" id="postImgBtn" class="roundedBtn">Upload an image for article body</a>
-                    <h5>Maximum file size for image: 4MB</h5>
-                    <h3>Beneficiaries</h3>
-                    <h5 id="beneficiariesDesc"></h5>
+                    <h5 style="margin-block-start: 0.5em;">Maximum file size for image: 4MB</h5>
+                    <h3 style="margin-block-end: 0.5em;">Beneficiaries</h3>
+                    <h5 style="margin-block-start: 0.25em;" id="beneficiariesDesc"></h5>
                     <input type="text" id="newBeneficiaryUser" name="newBeneficiaryUser" class="meta" placeholder="New beneficiary username">
                     <input type="number" id="newBeneficiaryPercent" name="newBeneficiaryPercent" class="meta" placeholder="%" min="0.01" max="98" step="0.01">
                     <select class="meta" id="newBeneficiaryNetwork">
@@ -154,13 +161,13 @@
                     <a class="styledButton styledButtonSmall" id="appendBeneficiaryBtn">+</a><br><br>
                     <h3 id="beneficiaryHeadingHive">Hive beneficiaries</h3>
                     <table class="beneficiaryTableList" id="beneficiaryTableListHive"></table>
-                    <h4 class="totalBeneficiariesLabel" id="totalBeneficiariesLabelHive">Total Hive beneficiaries: 0%</h4>
+                    <h4 class="totalBeneficiariesLabel" id="totalBeneficiariesLabelHive">Total Hive beneficiaries: 0%<br></h4>
                     <h3 id="beneficiaryHeadingSteem">Steem beneficiaries</h3>
                     <table class="beneficiaryTableList" id="beneficiaryTableListSteem"></table>
-                    <h4 class="totalBeneficiariesLabel" id="totalBeneficiariesLabelSteem">Total Steem beneficiaries: 0%</h4>
+                    <h4 class="totalBeneficiariesLabel" id="totalBeneficiariesLabelSteem">Total Steem beneficiaries: 0%<br></h4>
                     <h3 id="beneficiaryHeadingBlurt">Blurt beneficiaries</h3>
                     <table class="beneficiaryTableList" id="beneficiaryTableListBlurt"></table>
-                    <h4 class="totalBeneficiariesLabel" id="totalBeneficiariesLabelBlurt">Total Blurt beneficiaries: 0%</h4>
+                    <h4 class="totalBeneficiariesLabel" id="totalBeneficiariesLabelBlurt">Total Blurt beneficiaries: 0%<br></h4>
                     <div class="hivemindCommunity" id="hiveCommunity">
                         <h3>Hive Community</h3>
                         <h5>Pick a Hivemind powered community on Hive to post your video to. The default is One Love Community (hive-134220).</h5>
@@ -189,23 +196,23 @@
             </div>
             <div id="uploadActions">
                 <input class="styledButton" type="submit" value="Upload!" id="submitbutton">
-                <input class="styledButton styledButtonSmall" type="button" value="Save draft" id="draftBtn" style="width: 95px;">
-            </div>
-            <h4 id="loggedInUser">Detecting login...</h4>
-            <h4 id="platformStr">Loading platforms...</h4>
-            <h4 id="scheduledStr">Publishing immediately</h4>
+                <input class="styledButton styledButtonSmall" type="button" value="Save draft" id="draftBtn" style="width: 95px;" onclick="saveDraft()">
+            </div><br>
+            <h4 id="loggedInUser">Detecting login...</h4><br>
+            <h4 id="platformStr">Loading platforms...</h4><br>
+            <h4 id="scheduledStr">Publishing immediately</h4><br>
             <div class="progressBack" id="uploadProgressBack">
                 <div class="progressFront" id="uploadProgressFront">Uploading... (0%)</div>
             </div>
             <div id="encodeProgress"></div>
         </div>
-        <div id="thumbnailSwapper">
+        <div class="uploadpage" id="thumbnailSwapper">
             <div class="warningbox" id="thumbnailSwapNoAvalon">As you are not logged in with Avalon, the post on Avalon will not be updated. Therefore, only the Hive post will be updated with the new thumbnail.</div>
             <h2>Metadata Edit</h2>
             <div id="metaEditIntro">
-                <h4>Edit your video title, description, tags and thumbnails with our editing tool. Useful for cross-posted videos as the editing tool of one platform may break the video metadata of the same video posted to other platforms.</h4>
-                <h4>NOTE: This editing tool is optimised for videos posted with OneLoveIPFS. If your video was posted through another uploader, it may be better to use the editing features on their respective frontends.</h4>
-                <h4>This will edit the JSON metadata of the posts and will not edit the article body, which can be done on generic frontends that does not modify the JSON metadata.</h4>
+                <h4>Edit your video title, description, tags and thumbnails with our editing tool. Useful for cross-posted videos as the editing tool of one platform may break the video metadata of the same video posted to other platforms.</h4><br>
+                <h4>NOTE: This editing tool is optimised for videos posted with OneLoveIPFS. If your video was posted through another uploader, it may be better to use the editing features on their respective frontends.</h4><br>
+                <h4>This will edit the JSON metadata of the posts and will not edit the article body, which can be done on generic frontends that does not modify the JSON metadata.</h4><br>
                 <input type="text" class="meta" placeholder="Paste URL here (supported: dtube links, 3speak app uri, hive/blurt frontends)" id="thumbnailSwapLink">
                 <a class="roundedBtn" id="linkSubmitBtn" onclick="onEditLinkSubmit()">Submit Link</a>
             </div>
@@ -240,9 +247,9 @@
                 <a class="styledButton styledButtonSmall" type="button" id="metaEditBackBtn2" style="width: 150px;" onclick="updateDisplayByIDs(['metaEditIntro'],['metaEditSuccess'])">Edit another video</a>
             </div>
         </div>
-        <div id="yourFiles">
+        <div class="uploadpage" id="yourFiles">
             <h2>Your files</h2>
-            <h4>Here you may find the list of files pinned on our service and its file sizes. Click on each hash to preview them.</h4>
+            <h4>Here you may find the list of files pinned on our service and its file sizes. Click on each hash to preview them.</h4><br>
             <h4>Filter by type: <select class="meta" onchange="handleTypeSelection(this)">
                 <option>Source video</option>
                 <option>240p video</option>
@@ -254,15 +261,15 @@
                 <option>Sprites</option>
                 <option>Subtitles</option>
                 <option>Images</option>
-            </select></h4>
+            </select></h4><br>
             <h4 id="yourFilesTotalSize">Total Size: 0 KB</h4>
             <table style="width: 100%;">
                 <thead><tr><td>Hash</td><td>File Size</td></tr></thead>
                 <tbody id="hashesTbody"></tbody>
             </table>
         </div>
-        <div id="wcinfo"><h3>Loading account data...</h3></div> <!-- User info page (e.g. rate, quota available etc.) -->
-        <div id="refiller"> <!-- Hosting credits refill page -->
+        <div class="uploadpage" id="wcinfo"><h3>Loading account data...</h3></div> <!-- User info page (e.g. rate, quota available etc.) -->
+        <div class="uploadpage" id="refiller"> <!-- Hosting credits refill page -->
             <h2>Refill credits</h2>
             <input type="number" min="1" class="meta" placeholder="GBdays to refill" id="gbdaysInput">
             <h4 style="margin-block-end: 0.25em;">GBdays autofiller:</h4>
@@ -335,10 +342,9 @@
                 </div>
             </div>
         </div>
-        <div id="getHelp">
+        <div class="uploadpage" id="getHelp">
             <h2>Need help with DTube or OneLoveIPFS?</h2>
-            <h4>Please contact techcoderx#7481 on Discord if you have any issues with uploading or posting your video to the blockchain.</h4>
-            <h4>You may also join the OneLoveIPFS Discord server by clicking <a href="https://discord.gg/ZWj5NqaBeF" target="_blank">here</a>.</h4>
+            <h4>Please contact techcoderx#7481 on Discord if you have any issues with uploading or posting your video to the blockchain. You may also join the OneLoveIPFS Discord server by clicking <a href="https://discord.gg/ZWj5NqaBeF" target="_blank">here</a>.</h4>
             <h3>Authorize posting authority</h3>
             <h4>To deliver the best uploading experience possible, we may need you to delegate your ability to post so that we can post your video on your behalf in case of issues. Click the buttons below to authorize. You may revoke the permissions at any time.</h4>
             <div class="authorizeBtn"><a class="styledButton" id="avalonAuthorizeBtn">Authorize Avalon</a></div><br>
@@ -346,7 +352,7 @@
             <div class="authorizeBtn"><a class="styledButton" id="steemAuthorizeBtn">Authorize Steem</a></div>
             <div class="authorizeBtn"><a class="styledButton" id="blurtAuthorizeBtn">Authorize Blurt</a></div>
         </div>
-        <div id="settings">
+        <div class="uploadpage" id="settings">
             <h2>User Settings</h2>
             <h3 style="margin-block-end: 0.25em;">Upload thread count (max 50): <br>
             <input type="number" id="settingsUplThreads" name="settingsUplThreads" class="meta" placeholder="Default: 10" min="1" max="40" step="1"></h3>
@@ -363,10 +369,10 @@
             <input type="button" class="styledButton" id="settingSaveBtn" value="Save" onclick="saveSettings()">
             <input type="button" class="styledButton" id="settingResetBtn" value="Reset" onclick="fillSettings()">
         </div>
-        <div id="scheduledPublishes">
+        <div class="uploadpage" id="scheduledPublishes">
             <div id="scheduledList">
                 <h2>Scheduled Publishes</h2>
-                <h4>View operations that have been scheduled through our Olisc API.</h4>
+                <h4>View operations that have been scheduled through our Olisc API.</h4><br>
                 <h4>Filter by status: <select class="meta" style="width: 100px;" onchange="handleOliscFilterSelection(this)" id="oliscStatusSelection">
                     <option>Select...</option>
                     <option>Pending</option>
@@ -389,7 +395,15 @@
                 <input class="styledButton" type="submit" value="Delete" id="oliscDeleteBtn">
             </div>
         </div>
-        <div id="postpublish">
+        <div class="uploadpage" id="draftList">
+            <h2>Saved Drafts</h2>
+            <h4 id="draftEmpty" style="display: none;"><i>There are currently no saved drafts.</i></h4>
+            <table style="width: 100%;" id="draftTable">
+                <thead><tr><td>Draft ID</td><td>Created</td><td>Last Saved</td><td></td><td></td></tr></thead>
+                <tbody id="draftListTbody"></tbody>
+            </table>
+        </div>
+        <div class="uploadpage" id="postpublish">
             <h4>Video published to platforms and chains successfully. Some things to do next...</h4>
             <!-- Watch Video on DTube, 3Speak etc... -->
             <h3>Watch Video</h3>

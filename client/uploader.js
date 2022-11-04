@@ -12,11 +12,6 @@ for(let i = 0; i < allLangCodes.length; i++) {
 }
 
 let subtitleList = []
-try {
-    let savedSubtitles = JSON.parse(localStorage.getItem('OneLoveSubtitles'))
-    if (savedSubtitles)
-        subtitleList = savedSubtitles
-} catch {}
 
 // Beneficiaries
 let hiveBeneficiaries = new Beneficiaries('Hive')
@@ -133,8 +128,9 @@ let config;
 document.addEventListener('DOMContentLoaded', async () => {
     let avalonAcc = await Auth.Avalon()
     username = await Auth.Hive()
+    convertDraft()
+    listDrafts()
     loadSelectPlatforms()
-    updateSubtitle()
     // Get configuration, then load accounts and authorities
     axios.get('/config').then((result) => {
         config = result.data
@@ -428,24 +424,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return alert(e)
             }
         }).catch((e) => alert('Error while validating '+n+' account: ' + e))
-    }
-
-    // Drafts
-    document.getElementById('draftBtn').onclick = () => {
-        localStorage.setItem('OneLoveTitle',document.getElementById('title').value)
-        localStorage.setItem('OneLoveDescription',document.getElementById('description').value)
-        localStorage.setItem('OneLoveTags',document.getElementById('tags').value)
-        localStorage.setItem('OneLovePostBody',document.getElementById('postBody').value)
-        localStorage.setItem('OneLoveSubtitles',JSON.stringify(subtitleList))
-        localStorage.setItem('DraftGraphenePermlink',document.getElementById('customPermlink').value)
-        localStorage.setItem('DraftSteemBeneficiaries',JSON.stringify(steemBeneficiaries.accounts))
-        localStorage.setItem('DraftHiveBeneficiaries',JSON.stringify(hiveBeneficiaries.accounts))
-        localStorage.setItem('DraftBlurtBeneficiaries',JSON.stringify(blurtBeneficiaries.accounts))
-        localStorage.setItem('DraftSteemCommunity',document.getElementById('steemCommunitySelect').value)
-        localStorage.setItem('DraftHiveCommunity',document.getElementById('hiveCommunitySelect').value)
-        localStorage.setItem('DraftPowerUp',document.getElementById('powerup').checked)
-        localStorage.setItem('DraftSkynetUpload',document.getElementById('skynetupload').checked)
-        alert('Metadata saved as draft!')
     }
 })
 
@@ -1118,7 +1096,7 @@ function updateSubtitle() {
     }
 }
 
-function clearDraft() {
+function clearOldDraft() {
     localStorage.setItem('OneLoveTitle','')
     localStorage.setItem('OneLoveDescription','')
     localStorage.setItem('OneLoveTags','')

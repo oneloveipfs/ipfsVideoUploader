@@ -4,13 +4,13 @@ function loadPins(type) {
     if (!avalonUser || !hiveDisplayUser)
         call += '&network='+window.currentnetwork
     axios.get(call).then(res => {
-        let htmlResult = ''
+        let renderer = new TbodyRenderer()
         let totalSize = 0
         for (let i = 0; i < res.data.length; i++) {
-            htmlResult += '<tr><td><a target="_blank" rel="noreferrer" href="https://video.oneloveipfs.com/ipfs/' + res.data[i].cid + '">' + res.data[i].cid + '</a></td><td>' + abbrevateFilesize(res.data[i].size) + '</td></tr>'
+            renderer.appendRow('<a target="_blank" rel="noreferrer" href="https://video.oneloveipfs.com/ipfs/'+res.data[i].cid+'">'+res.data[i].cid+'</a>',abbrevateFilesize(res.data[i].size))
             totalSize += res.data[i].size
         }
-        document.getElementById('hashesTbody').innerHTML = htmlResult
+        document.getElementById('hashesTbody').innerHTML = renderer.renderRow()
         document.getElementById('yourFilesTotalSize').innerText = 'Total Size: ' + abbrevateFilesize(totalSize)
     }).catch(e => console.log(e))
 }

@@ -110,6 +110,27 @@ function toReadableNetwork(network) {
     }
 }
 
+class TbodyRenderer {
+    constructor() {
+        this.rows = []
+    }
+
+    appendRow() {
+        this.rows.push(Object.values(arguments))
+    }
+
+    renderRow() {
+        let result = ''
+        for (let i in this.rows) {
+            result += '<tr>'
+            for (let j in this.rows[i])
+                result += '<td>'+this.rows[i][j]+'</td>'
+            result += '</tr>'
+        }
+        return result
+    }
+}
+
 function updateDisplayByIDs(toshow,tohide,type = 'block') {
     for (let i = 0; i < tohide.length; i++)
         document.getElementById(tohide[i]).style.display = 'none'

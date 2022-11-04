@@ -23,7 +23,7 @@ const isPlatformSelected = {
 const grapheneNetworks = ['hive','steem','blurt']
 
 document.addEventListener('DOMContentLoaded', () => {
-    let pages = ['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings','scheduledPublishes','postpublish']
+    let pages = ['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings','scheduledPublishes','postpublish','draftList']
     let evts = ['onclick','ontouchstart']
     for (let e in evts) {
         document.getElementById('newUploadModeBtn')[evts[e]] = () => updateDisplayByIDs(['uploadForm'],pages)
@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('getHelpModeBtn')[evts[e]] = () => updateDisplayByIDs(['getHelp'],pages)
         document.getElementById('settingsModeBtn')[evts[e]] = () => updateDisplayByIDs(['settings'],pages)
         document.getElementById('oliscModeBtn')[evts[e]] = () => updateDisplayByIDs(['scheduledPublishes'],pages)
+        document.getElementById('draftModeBtn')[evts[e]] = () => updateDisplayByIDs(['draftList'],pages)
     }
 })
 

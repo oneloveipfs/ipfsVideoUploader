@@ -110,6 +110,18 @@ hr {
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
+h4 {
+    margin-block-start: 0.25em;
+    margin-block-end: 0.25em;
+}
+
+br {
+    margin: 20px 0;
+    display: block;
+    line-height: 20px;
+    content: " ";
+}
+
 /* Pop up window */
 .popup {
     display: none;
@@ -332,7 +344,7 @@ hr {
     opacity: 1;
 }
 
-#uploadForm, #thumbnailSwapper, #yourFiles, #wcinfo, #refillnotify, #refiller, #getHelp, #needsrefillnotify, #disabledPage, #settings, #scheduledPublishes, #postpublish {
+.uploadpage {
     margin-left: auto;
     margin-right: auto;
     width: 700px;
@@ -834,7 +846,7 @@ textarea {
     padding-left: 5px;
 }
 
-#yourFiles, #wcinfo, #refiller, #getHelp, #settings, #scheduledPublishes, #postpublish {
+.uploadpage {
     display: none;
 }
 
@@ -845,18 +857,19 @@ textarea {
 #yourFiles table tr td:nth-child(2),
 #refillHistoryTbl tbody tr td:nth-child(1),
 #refillHistoryTbl tbody tr td:nth-child(2) { text-align: right; }
-#yourFiles table thead tr td, #refillHistoryTbl thead tr td, #aliasList thead tr td, #scheduledPublishes thead tr td { font-size: 23px; }
-#yourFiles table tbody tr td, #refillHistoryTbl tbody tr td, #aliasList tbody tr td, #scheduledPublishes tbody tr td { font-size: 16px; }
+#yourFiles table thead tr td, #refillHistoryTbl thead tr td, #aliasList thead tr td, #scheduledPublishes thead tr td, #draftList thead tr td { font-size: 23px; }
+#yourFiles table tbody tr td, #refillHistoryTbl tbody tr td, #aliasList tbody tr td, #scheduledPublishes tbody tr td, #draftList tbody tr td { font-size: 16px; }
 #yourFiles a { color: #000000; }
 #yourFiles a:visited { color: #000000; }
 #yourFiles a:hover { color: #000000; }
 #yourFiles a:active { color: #000000; }
 #yourFiles select { width: 150px; }
-#refillHistoryTbl, #yourFiles table, #aliasList, #scheduledPublishes table { border-collapse: collapse; }
+#refillHistoryTbl, #yourFiles table, #aliasList, #scheduledPublishes table, #draftList table { border-collapse: collapse; }
 #refillHistoryTbl, #refillHistoryTbl tr, #refillHistoryTbl td,
 #yourFiles table, #yourFiles table tr, #yourFiles table td,
 #aliasList, #aliasList tr, #aliasList td,
-#scheduledPublishes tr, #scheduledPublishes td { border: 1px solid black; }
+#scheduledPublishes tr, #scheduledPublishes td,
+#draftList tr, #draftList td { border: 1px solid black; }
 #newAliasUser, #newAliasKey { width: 95%; }
 #newAliasNet { width: 100%; }
 #newAlias td:nth-child(5) { width: 32px; }
@@ -871,7 +884,9 @@ textarea {
 .darkmode #aliasList, .darkmode #aliasList tr, .darkmode #aliasList td,
 .darkmode #scheduledPublishes table,
 .darkmode #scheduledPublishes tr,
-.darkmode #scheduledPublishes td { border: 1px solid #ffffff; }
+.darkmode #scheduledPublishes td,
+.darkmode #draftList tr,
+.darkmode #draftList td { border: 1px solid #ffffff; }
 
 #wcinfo h4 {
     font-size: 17px;
@@ -1382,7 +1397,7 @@ input:checked + .slider.slidersmall:before {
         font-size: 15px;
     }
 
-    #uploadForm, #thumbnailSwapper, #yourFiles, #wcinfo, #refillnotify, #refiller, #getHelp, #needsrefillnotify, #disabledPage, #settings, #postpublish {
+    .uploadpage {
         margin-left: 15px;
         margin-right: 25px;
         width: auto;

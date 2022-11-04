@@ -50,18 +50,17 @@ function handleOliscFilterSelection(selected) {
 async function loadOliscList(status) {
     loadEditor()
     let list = await olisc.list({status})
-    let result = ''
+    let renderer = new TbodyRenderer()
     oliscLoaded = {}
     for (let i in list) {
-        result += '<tr><td>'+list[i]._id+'</td><td>'+list[i].operationNetwork+'</td><td>'
-        if (list[i].operationNetwork === 'avalon')
-            result += 'Type '+list[i].operation.type
-        else
-            result += joinGrapheneOps(list[i].operation)
-        result += '</td><td><a onclick="viewOliscOp(\''+list[i]._id+'\')">View</a></td>'
+        renderer.appendRow(
+            list[i]._id,
+            list[i].operationNetwork,
+            list[i].operationNetwork === 'avalon'? ('Type '+list[i].operation.type) : joinGrapheneOps(list[i].operation),
+            '<a onclick="viewOliscOp(\''+list[i]._id+'\')">View</a>')
         oliscLoaded[list[i]._id] = list[i]
     }
-    document.getElementById('oliscTbody').innerHTML = result
+    document.getElementById('oliscTbody').innerHTML = renderer.renderRow()
 }
 
 function joinGrapheneOps(operations) {

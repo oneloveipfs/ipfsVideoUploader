@@ -42,7 +42,6 @@ async function Hive() {
                         } catch {}
                     }
                     displayLoginMessage()
-                    retrieveDraft()
                     resolve(authResponse.data.user)
                 }
             }).catch((error) => {
@@ -77,9 +76,6 @@ async function Hive() {
                         alert('Uploader access denied!')
                         return resolve(res.account.name)
                     }
-
-                    // Retrieve metadata from draft if any
-                    retrieveDraft()
                     resolve(res.account.name)
                 }).catch((error) => {
                     alert('Authentication error: ' + error)
@@ -170,47 +166,6 @@ function displayLoginMessage(errored) {
 function restrict() {
     const toDisable = ['sourcevideo','snapfile','title','description','tags','powerup','postBody','postImgBtn','draftBtn','submitbutton','newLanguageField','chooseSubBtn','uploadSubBtn','linkSubmitBtn','swapSubmitBtn']
     for (let i = 0; i < toDisable.length; i++) document.getElementById(toDisable[i]).disabled = true
-}
-
-function retrieveDraft() {
-    let savedTitle = localStorage.getItem('OneLoveTitle')
-    let savedDescription = localStorage.getItem('OneLoveDescription')
-    let savedTags = localStorage.getItem('OneLoveTags')
-    let savedPostBody = localStorage.getItem('OneLovePostBody')
-    let savedGraphenePermlink = localStorage.getItem('DraftGraphenePermlink')
-    let savedSteemBenefs = localStorage.getItem('DraftSteemBeneficiaries')
-    let savedHiveBenefs = localStorage.getItem('DraftHiveBeneficiaries')
-    let savedPowerUp = localStorage.getItem('DraftPowerUp')
-    let savedSkynetUpload = localStorage.getItem('DraftSkynetUpload')
-
-    if (savedTitle)
-        document.getElementById('title').value = savedTitle
-    if (savedDescription)
-        document.getElementById('description').value = savedDescription
-    if (savedTags)
-        document.getElementById('tags').value = savedTags
-    if (savedPostBody)
-        document.getElementById('postBody').value = savedPostBody
-    if (savedGraphenePermlink)
-        document.getElementById('customPermlink').value = savedGraphenePermlink
-    if (savedSteemBenefs) {
-        try {
-            let savedSteemBenefsArr = JSON.parse(savedSteemBenefs)
-            for (let b in savedSteemBenefsArr)
-                steemBeneficiaries.addAccount(savedSteemBenefsArr[b].account,savedSteemBenefsArr[b].weight)
-        } catch {}
-    }
-    if (savedHiveBenefs) {
-        try {
-            let savedHiveBenefsArr = JSON.parse(savedHiveBenefs)
-            for (let b in savedHiveBenefsArr)
-                hiveBeneficiaries.addAccount(savedHiveBenefsArr[b].account,savedHiveBenefsArr[b].weight)
-        } catch {}
-    }
-    if (savedPowerUp && savedPowerUp === 'true')
-        document.getElementById('powerup').checked = true
-    if (savedSkynetUpload && savedSkynetUpload === 'true')
-        document.getElementById('skynetupload').checked = true
 }
 
 function usernameByNetwork(network) {
