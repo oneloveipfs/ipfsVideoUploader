@@ -1096,22 +1096,6 @@ function updateSubtitle() {
     }
 }
 
-function clearOldDraft() {
-    localStorage.setItem('OneLoveTitle','')
-    localStorage.setItem('OneLoveDescription','')
-    localStorage.setItem('OneLoveTags','')
-    localStorage.setItem('OneLovePostBody','')
-    localStorage.setItem('OneLoveSubtitles','')
-    localStorage.setItem('DraftGraphenePermlink','')
-    localStorage.setItem('DraftSteemBeneficiaries','[]')
-    localStorage.setItem('DraftHiveBeneficiaries','[]')
-    localStorage.setItem('DraftBlurtBeneficiaries','[]')
-    localStorage.setItem('DraftSteemCommunity','')
-    localStorage.setItem('DraftHiveCommunity','')
-    localStorage.setItem('DraftPowerUp','false')
-    localStorage.setItem('DraftSkynetUpload','false')
-}
-
 async function getCommunitySubs(acc,network) {
     let communities
     try {
