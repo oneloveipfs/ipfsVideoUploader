@@ -192,6 +192,7 @@ br {
     border: 1px solid;
     transition-duration: 0.2s;
     font-family: 'Roboto';
+    background-color: transparent;
 }
 
 .popup-actions input:hover {

@@ -106,9 +106,9 @@ app.post('/logincb',(request,response) => {
 
 app.post('/loginsig',(request,response) => {
     // Signature based auth
-    Auth.verifyAuthSignature(request.body,(valid) => {
+    Auth.verifyAuthSignature(request.body,(valid,error) => {
         if (!valid)
-            return response.status(400).send({error: 'Could not verify signature and/or recent block info'})
+            return response.status(400).send({error: 'Could not verify signature and/or recent block info: '+error})
         let split = request.body.split(':')
         if (Config.whitelistEnabled && !Auth.isInWhitelist(split[0],split[2]))
             return response.status(403).send({error: 'Uploader access denied'})

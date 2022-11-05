@@ -151,14 +151,14 @@
                             <h4 class="logininfo">Select Networks</h4>
                             <h5 class="logindesc">An access token that is required for uploader authentication will be generated for these networks.</h5>
                             <table class="loginnetworks">
-                                <tr onclick="if (!window.logins.hiveUser) updateDisplayByIDs(['loginformhive'],['loginformmain'])">
+                                <tr onclick="loginNetworkBtn('hive')">
                                     <td>
                                         <h4>Hive</h4>
                                         <h5>Posts to 3Speak/DTube</h5>
                                     </td>
                                     <td id="loginnetworkhive">></td>
                                 </tr>
-                                <tr onclick="if (!window.logins.avalonUser) updateDisplayByIDs(['loginformavalon'],['loginformmain'])">
+                                <tr onclick="loginNetworkBtn('avalon')">
                                     <td>
                                         <h4>Avalon</h4>
                                         <h5>Posts to DTube</h5>
@@ -171,14 +171,14 @@
                             <h4 class="logininfo">Additional Networks</h4>
                             <h5 class="logindesc">Access tokens are not generated for these networks. Authentication with at least one of the select networks above are required.</h5>
                             <table class="loginnetworks">
-                                <tr onclick="if (!window.logins.blurtUser) updateDisplayByIDs(['loginformblurt'],['loginformmain'])">
+                                <tr onclick="loginNetworkBtn('blurt')">
                                     <td>
                                         <h4>Blurt</h4>
                                         <h5>Posts to DTube</h5>
                                     </td>
                                     <td id="loginnetworkblurt">></td>
                                 </tr>
-                                <tr onclick="if (!window.logins.steemUser) updateDisplayByIDs(['loginformsteem'],['loginformmain'])">
+                                <tr onclick="loginNetworkBtn('steem')">
                                     <td>
                                         <h4>Steem (deprecated)</h4>
                                         <h5>Posts to DTube</h5>
@@ -189,28 +189,22 @@
                             <div class="rememberme"><label class="switch">
                                 <input type="checkbox" name="rememberme" id="rememberme" onchange="updateRememberMeState()" checked>
                                 <span class="slider round"></span>
-                                </label><h4 class="remembermelabel"> Remember Me</h4><br><br>
+                                </label><h3 class="remembermelabel"> Remember Me</h3><br>
                                 <input type="password" placeholder="Encrypt private keys with password (optional)" autocorrect="off" autocapitalize="off" spellcheck="false" class="loginFields" id="persistPassword">
                             </div>
-                            <a class="roundedBtn" id="proceedAuthBtn" onclick="proceedLogin()">Proceed</a>
                         </div>
                         <div id="loginformhive">
-                            <a onclick="updateDisplayByIDs(['loginformmain'],['loginformhive'])"><< Back</a><br><br>
+                            <a onclick="loginBackBtn()"><< Back</a><br><br>
                             <input type="text" placeholder="HIVE Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="hiveLoginUsername" class="loginFields">
                             <input type="password" placeholder="HIVE Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="hiveLoginKey" class="loginFields">
-                            <a class="roundedBtn kcAuth" id="hiveAuthBtn" onclick="hiveLogin()">Login with Keychain</a>
-                            <h3 class="loginor">OR</h3>
-                            <a class="roundedBtn" id="hasAuthBtn" onclick="hiveAuthLogin()">Login with HiveAuth</a>
-                            <h3 class="loginor sclogin">OR</h3>
-                            <a class="roundedBtn sclogin" id="altAuthBtn" onclick="hivesignerLogin()">Login with HiveSigner</a>
                         </div>
                         <div id="loginformhiveauth">
-                            <a onclick="updateDisplayByIDs(['loginformhive'],['loginformhiveauth'])"><< Back</a><br>
+                            <a onclick="updateDisplayByIDs(['loginformhive'],['loginformhiveauth']); updateDisplayByIDs(['loginformhive-actions'],[],'flex')"><< Back</a><br>
                             <h4>Scan the QR code below using a compatible HiveAuth PKSA to continue.</h4>
                             <div id="hiveauthqr"></div>
                         </div>
                         <div id="loginformavalon">
-                            <a onclick="updateDisplayByIDs(['loginformmain'],['loginformavalon'])"><< Back</a><br><br>
+                            <a onclick="loginBackBtn()"><< Back</a><br><br>
                             <input type="text" placeholder="AVALON Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginUsername" class="loginFields">
                             <input type="password" placeholder="AVALON Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="avalonLoginKey" class="loginFields">
                             <!-- Avalon with Keychain Signer -->
@@ -220,36 +214,51 @@
                                 <option>Active</option>
                                 <option>Memo</option>
                             </select>
-                            <a class="roundedBtn" id="avalonAuthBtn" onclick="avalonLogin()">Login</a>
-                            <h3 class="loginor" id="avalonKcAuthOr">OR</h3>
-                            <a class="roundedBtn" id="avalonKcAuthBtn" onclick="avalonKcToggle()">Login with Hive Keychain</a>
                         </div>
                         <div id="loginformblurt">
-                            <a onclick="updateDisplayByIDs(['loginformmain'],['loginformblurt'])"><< Back</a><br><br>
+                            <a onclick="loginBackBtn()"><< Back</a><br><br>
                             <input type="text" placeholder="BLURT Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="blurtLoginUsername" class="loginFields">
                             <input type="password" placeholder="BLURT Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="blurtLoginKey" class="loginFields">
-                            <a class="roundedBtn kcAuth" id="blurtAuthBtn" onclick="blurtLogin()">Login with Keychain</a>
                         </div>
                         <div id="loginformsteem">
-                            <a onclick="updateDisplayByIDs(['loginformmain'],['loginformsteem'])"><< Back</a><br><br>
-                            <div class="warningbox">Please note that Steem has been deprecated in OneLoveIPFS and may be removed in the future. We reserve the right not to resolve any posting issues associated with Steem, therefore please be cautious if you choose to proceed.</div>
-                            <a class="roundedBtn" id="steemProceedAnyway" onclick="updateDisplayByIDs(['actualSteemLoginForm'],['steemProceedAnyway'])">I understand the above, proceed anyway</a>
+                            <a onclick="loginBackBtn()"><< Back</a><br><br>
+                            <div class="warningbox">Please note that Steem has been deprecated in OneLoveIPFS and will be removed in v3.1. We will not resolve any posting issues associated with Steem, therefore please be cautious if you choose to proceed.</div>
                             <div id="actualSteemLoginForm" style="display: none;">
-                            <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="steemLoginUsername" class="loginFields">
-                            <input type="password" placeholder="STEEM Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="steemLoginKey" class="loginFields">
-                            <a class="roundedBtn kcAuth" id="steemAuthBtn" onclick="steemLogin()">Login with Keychain</a></div>
+                                <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="steemLoginUsername" class="loginFields">
+                                <input type="password" placeholder="STEEM Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="steemLoginKey" class="loginFields">
+                            </div>
                         </div>
                     </div>
                     <div id="persistentform">
-                        <h4 id="persistentLoginText"></h4>
+                        <div id="persistentLoginText"></div>
                         <input type="password" placeholder="Enter password" autocorrect="off" autocapitalize="off" spellcheck="false" class="loginFields" id="persistLoginPassword">
-                        <a class="roundedBtn" id="clearPersistAuthBtn" onclick="clearPersistentLogin()">Clear login</a><br><br>
-                        <a class="roundedBtn" id="proceedPersistAuthBtn" onclick="proceedPersistentLogin()">Proceed</a>
-                        <div id="persistenthiveauth">
+                        <div id="persistenthiveauth"><br>
                             <h4>If this message does not disappear within 5 seconds, scan the QR code below using a compatible HiveAuth PKSA to continue.</h4>
                             <div id="persistenthiveauthqr"></div>
                         </div>
                     </div>
+                </div>
+                <div class="popup-actions" id="loginformmain-actions">
+                    <input type="button" value="Proceed" id="proceedAuthBtn" onclick="proceedLogin()">
+                </div>
+                <div class="popup-actions" id="loginformhive-actions" style="display: none;">
+                    <input type="button" class="sclogin" value="HiveSigner" onclick="hivesignerLogin()">
+                    <input type="button" value="HiveAuth" onclick="hiveAuthLogin()">
+                    <input type="button" class="kcAuth" value="Keychain" onclick="hiveLogin()">
+                </div>
+                <div class="popup-actions" id="loginformavalon-actions" style="display: none;">
+                    <input type="button" id="avalonKcAuthBtn" value="Keychain" onclick="avalonKcToggle()">
+                    <input type="button" id="avalonAuthBtn" value="Login" onclick="avalonLogin()">
+                </div>
+                <div class="popup-actions" id="loginformblurt-actions" style="display: none;">
+                    <input type="button" class="kcAuth" id="blurtAuthBtn" value="Keychain" onclick="blurtLogin()">
+                </div>
+                <div class="popup-actions" id="loginformsteem-actions" style="display: none;">
+                    <input type="button" id="steemAuthBtn" value="Proceed Anyway" onclick="if (document.getElementById('steemAuthBtn').value !== 'Proceed Anyway') steemLogin(); else {updateDisplayByIDs(['actualSteemLoginForm'],[]); updateDisplayByIDs(['loginformsteem-actions'],[],'flex'); document.getElementById('steemAuthBtn').value = 'Login'}">
+                </div>
+                <div class="popup-actions" id="persistentform-actions" style="display: none;">
+                    <input type="button" id="clearPersistAuthBtn" value="Clear Login" onclick="clearPersistentLogin()">
+                    <input type="button" id="proceedPersistAuthBtn" value="Proceed" onclick="proceedPersistentLogin()">
                 </div>
             </div>
         </div>
@@ -328,7 +337,9 @@
                     <h3>Hive<select class="meta" id="hiveAPISelection"></select></h3>
                     <h3>Avalon<select class="meta" id="avalonAPISelection"></select></h3>
                     <h3>Blurt<select class="meta" id="blurtAPISelection"></select></h3>
-                    <a class="roundedBtn" onclick="saveAPIBtn()">Save</a>
+                </div>
+                <div class="popup-actions">
+                    <input type="button" value="Save" onclick="saveAPIBtn()">
                 </div>
             </div>
         </div>

@@ -171,6 +171,10 @@ function toggleElems(toToggle = [], disable = false) {
     for (let i in toToggle) document.getElementById(toToggle[i]).disabled = disable
 }
 
+function togglePopupActions(popupActionGroupId, disable = false) {
+    Array.from(document.getElementById(popupActionGroupId).children).forEach((val) => val.disabled = disable)
+}
+
 function axiosErrorHandler(e) {
     alert(axiosErrorMessage(e))
 }

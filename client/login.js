@@ -22,8 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         let tochange = document.getElementsByClassName('kcAuth')
         for (let i = 0; i < tochange.length; i++)
-            tochange[i].innerText = 'Login'
-        updateDisplayByIDs([],['avalonKcAuthOr','avalonKcAuthBtn'])
+            tochange[i].value = 'Login'
+        updateDisplayByIDs([],['avalonKcAuthBtn'])
     }
 
     axios.get('/config').then((result) => {
@@ -50,9 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 paymentOptions[i].disabled = true
         }
     })
-
-    window.keychainLoginBtn = document.getElementById('proceedAuthBtn')
-    window.proceedAuthBtnDisabled = document.getElementById('proceedAuthBtn').disabled
     document.getElementById('authButton').onclick = loginBtnClicked
     document.getElementById('authButton2').onclick = loginBtnClicked
 })
@@ -89,17 +86,18 @@ function loginBtnClicked() {
                     (storedLogin.hiveUser && !storedLogin.hiveKey && !persistentHiveAuth) || 
                     (storedLogin.steemUser && !storedLogin.steemKey) ||
                     (storedLogin.blurtUser && !storedLogin.blurtKey)) throw 'invalid keys'
-                if (storedLogin.hiveUser) persistentLoginText += '<br>Hive: ' + storedLogin.hiveUser + (persistentHiveAuth ? ' (HiveAuth)' : '')
-                if (storedLogin.steemUser) persistentLoginText += '<br>Steem: ' + storedLogin.steemUser
-                if (storedLogin.blurtUser) persistentLoginText += '<br>Blurt: ' + storedLogin.blurtUser
-                if (storedLogin.avalonUser) persistentLoginText += '<br>Avalon: ' + storedLogin.avalonUser
+                if (storedLogin.hiveUser) persistentLoginText += '<h4>Hive: ' + storedLogin.hiveUser + (persistentHiveAuth ? ' (HiveAuth)' : '')+'</h4>'
+                if (storedLogin.steemUser) persistentLoginText += '<h4>Steem: ' + storedLogin.steemUser+'</h4>'
+                if (storedLogin.blurtUser) persistentLoginText += '<h4>Blurt: ' + storedLogin.blurtUser+'</h4>'
+                if (storedLogin.avalonUser) persistentLoginText += '<h4>Avalon: ' + storedLogin.avalonUser+'</h4>'
             } catch {
                 return displayPopup('loginPopup')
             }
         else
             persistentLoginText = 'Encrypted persistent login found.<br>'
         document.getElementById('persistentLoginText').innerHTML = persistentLoginText
-        updateDisplayByIDs(['persistentform'],['loginform'])
+        updateDisplayByIDs(['persistentform'],['loginform','loginformmain-actions'])
+        updateDisplayByIDs(['persistentform-actions'],[],'flex')
         displayPopup('loginPopup')
         if (isEncryptedStore('persistentLogin'))
             updateDisplayByIDs(['persistLoginPassword'],[])
@@ -126,16 +124,28 @@ async function proceedLogin() {
     window.location.href = cbUrl
 }
 
+function loginBackBtn() {
+    updateDisplayByIDs(['loginformmain'],['loginformhive','loginformhive-actions','loginformavalon','loginformavalon-actions','loginformsteem','loginformsteem-actions','loginformblurt','loginformblurt-actions'])
+    updateDisplayByIDs(['loginformmain-actions'],[],'flex')
+}
+
+function loginNetworkBtn(network) {
+    if (!window.logins[network+'User']) {
+        updateDisplayByIDs(['loginform'+network],['loginformmain','loginformmain-actions'])
+        updateDisplayByIDs(['loginform'+network+'-actions'],[],'flex')
+    }
+}
+
 function avalonKcToggle() {
-    if (document.getElementById('avalonKcAuthBtn').innerText === 'Login with Hive Keychain') {
+    if (!avalonKcToggled) {
         if (!window.hive_keychain)
             return alert('Hive Keychain is not installed')
         updateDisplayByIDs(['avalonSignerUsername','avalonSignerRole'],['avalonLoginKey'])
-        document.getElementById('avalonKcAuthBtn').innerText = 'Login with Plaintext Key'
+        document.getElementById('avalonKcAuthBtn').value = 'Plaintext'
         avalonKcToggled = true
     } else {
         updateDisplayByIDs(['avalonLoginKey'],['avalonSignerUsername','avalonSignerRole'])
-        document.getElementById('avalonKcAuthBtn').innerText = 'Login with Hive Keychain'
+        document.getElementById('avalonKcAuthBtn').value = 'Keychain'
         avalonKcToggled = false
     }
 }
@@ -163,8 +173,7 @@ async function hivesignerLogin() {
 async function proceedPersistentLogin() {
     let dec = retrieveEncrypted('persistentLogin',document.getElementById('persistLoginPassword').value)
     if (dec === null) return alert('Invalid password')
-    if (proceedAuthBtnDisabled) return
-    proceedAuthBtnDisabled = true
+    togglePopupActions('persistentform-actions',true)
     document.getElementById('proceedPersistAuthBtn').innerText = 'Logging In...'
     let storedDetails, persistentHiveAuth
     try {
@@ -323,7 +332,6 @@ function signupNetworkSelect() {
 }
 
 function hiveLogin() {
-    if (window.proceedAuthBtnDisabled == true) return
     let hiveUsername = document.getElementById('hiveLoginUsername').value.toLowerCase().replace('@','')
     let hiveKey = document.getElementById('hiveLoginKey').value
 
@@ -331,8 +339,7 @@ function hiveLogin() {
     if (!window.hive_keychain && !isElectron()) return alert('Hive Keychain is not installed')
     if (!hiveKey && isElectron()) return alert('Posting key is required')
 
-    document.getElementById('hiveAuthBtn').innerText = 'Logging in...'
-    proceedAuthBtnDisabled = true
+    togglePopupActions('loginformhive-actions',true)
 
     let loginUrl = '/login?network=hive&user='+hiveUsername
     axios.get(loginUrl).then((response) => {
@@ -397,8 +404,8 @@ async function hiveAuthLogin() {
             host: HAS_SERVER
         }
         document.getElementById('hiveauthqr').innerHTML = ''
-        new QRCode(document.getElementById('hiveauthqr'),'has://auth_req/'+btoa(JSON.stringify(payload)))
-        updateDisplayByIDs(['loginformhiveauth'],['loginformhive'])
+        new QRCode(document.getElementById('hiveauthqr'),'has://auth_req/'+window.btoa(JSON.stringify(payload)))
+        updateDisplayByIDs(['loginformhiveauth'],['loginformhive','loginformhive-actions'])
     }).then((res) => {
         sessionStorage.setItem('hiveUser',hiveUsername)
         localStorage.setItem('hiveAuth',JSON.stringify(window.logins.hiveAuth))
@@ -411,6 +418,7 @@ async function hiveAuthLogin() {
         else if (e.cmd === 'auth_err')
             alert(e.error)
         updateDisplayByIDs(['loginformhive'],['loginformhiveauth'])
+        updateDisplayByIDs(['loginformhive-actions'],[],'flex')
     })
 }
 
@@ -427,7 +435,7 @@ function keychainCb(encrypted_message,network,persistence) {
             handleLoginError(err.response.data.error,network)
         else
             handleLoginError(err,network)
-    }).finally(() => window.proceedAuthBtnDisabled = false)
+    }).finally(() => togglePopupActions('loginform'+network+'-actions',false))
 }
 
 function keychainSigCb(message,network,persistence,role = 'Posting') {
@@ -443,7 +451,7 @@ function keychainSigCb(message,network,persistence,role = 'Posting') {
             handleLoginError(err.response.data.error,network)
         else
             handleLoginError(err,network)
-    }).finally(() => window.proceedAuthBtnDisabled = false)
+    }).finally(() => togglePopupActions('loginform'+network+'-actions',false))
 }
 
 function keychainPostCall(token,network,persistence,role) {
@@ -471,20 +479,19 @@ function loginCb(network,token,oauth2,role) {
         window.logins.avalonHiveKeychainUser = document.getElementById('avalonSignerUsername').value
         sessionStorage.setItem('avalonUser',window.logins.avalonUser)
     }
-    window.proceedAuthBtnDisabled = false
-    updateDisplayByIDs(['loginformmain'],['loginform'+network,'loginformhiveauth'])
+    togglePopupActions('loginform'+network+'-actions',false)
+    updateDisplayByIDs(['loginformmain'],['loginform'+network,'loginform'+network+'-actions','loginformhiveauth'])
+    updateDisplayByIDs(['loginformmain-actions'],[],'flex')
     document.getElementById('loginnetwork'+network).innerHTML = '<h5 id="loginnetwork'+network+'username"></h5>'
     document.getElementById('loginnetwork'+network+'username').innerText = window.logins[network+'User']
 }
 
 async function avalonLogin() {
-    if (window.proceedAuthBtnDisabled == true) return
     let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
     let avalonKey = document.getElementById('avalonLoginKey').value
     let msg
 
-    document.getElementById('avalonAuthBtn').innerText = 'Logging in...'
-    proceedAuthBtnDisabled = true
+    togglePopupActions('loginformavalon-actions',true)
 
     try {
         msg = await generateMessageToSignPromise(avalonUsername,'dtc')
@@ -527,7 +534,6 @@ async function avalonLogin() {
 }
 
 async function blurtLogin() {
-    if (window.proceedAuthBtnDisabled == true) return
     let blurtUsername = document.getElementById('blurtLoginUsername').value.toLowerCase().replace('@','')
     let blurtKey = document.getElementById('blurtLoginKey').value
 
@@ -535,16 +541,14 @@ async function blurtLogin() {
     if (!window.blurt_keychain && !isElectron()) return alert('Blurt Keychain is not installed')
     if (!blurtKey && isElectron()) return alert('Posting key is required')
 
-    document.getElementById('blurtAuthBtn').innerText = 'Logging in...'
-    proceedAuthBtnDisabled = true
+    togglePopupActions('loginformblurt-actions',true)
 
     if (isElectron()) {
         try {
             await steemKeyLogin(blurtUsername,blurtKey,getBlockchainAPI('blurt'),'BLT')
         } catch (e) {
             alert(e.toString())
-            proceedAuthBtnDisabled = false
-            document.getElementById('blurtAuthBtn').innerText = 'Login'
+            togglePopupActions('loginformblurt-actions',false)
             return
         }
         sessionStorage.setItem('blurtUser',blurtUsername)
@@ -556,8 +560,7 @@ async function blurtLogin() {
                 loginCb('blurt')
             else {
                 alert('Blurt Keychain login error: ' + blurtLoginRes.message)
-                proceedAuthBtnDisabled = false
-                document.getElementById('blurtAuthBtn').innerText = 'Login'
+                togglePopupActions('loginformblurt-actions',false)
                 return
             }
         })
@@ -567,7 +570,6 @@ async function blurtLogin() {
 // NOTE: I really want to remove Steem from OneLoveIPFS entirely, however
 // there are people who still post there so limited support will have to stay unfortunately :\
 async function steemLogin() {
-    if (window.proceedAuthBtnDisabled == true) return
     let steemUsername = document.getElementById('steemLoginUsername').value.toLowerCase().replace('@','')
     let steemKey = document.getElementById('steemLoginKey').value
 
@@ -575,16 +577,14 @@ async function steemLogin() {
     if (!window.steem_keychain && !isElectron()) return alert('Blurt Keychain is not installed')
     if (!steemKey && isElectron()) return alert('Posting key is required')
 
-    document.getElementById('steemAuthBtn').innerText = 'Logging in...'
-    proceedAuthBtnDisabled = true
+    togglePopupActions('loginformsteem-actions',true)
 
     if (isElectron()) {
         try {
             await steemKeyLogin(steemUsername,steemKey,getBlockchainAPI('steem'))
         } catch (e) {
             alert(e.toString())
-            proceedAuthBtnDisabled = true
-            document.getElementById('steemAuthBtn').innerText = 'Login'
+            togglePopupActions('loginformsteem-actions',false)
             return
         }
         sessionStorage.setItem('steemUser',steemUsername)
@@ -596,8 +596,7 @@ async function steemLogin() {
                 loginCb('steem')
             else {
                 alert('Steem Keychain login error: ' + steemLoginRes.message)
-                proceedAuthBtnDisabled = false
-                document.getElementById('steemAuthBtn').innerText = 'Login'
+                togglePopupActions('loginformsteem-actions',false)
                 return
             }
         })
@@ -665,10 +664,8 @@ function storeLogins() {
 }
 
 function handleLoginError(msg,network) {
-    if (network)
-        document.getElementById(network+'AuthBtn').innerText = 'Login'
-    document.getElementById('proceedPersistAuthBtn').innerText = 'Proceed'
-    proceedAuthBtnDisabled = false
+    togglePopupActions('loginform'+network+'-actions',false)
+    togglePopupActions('persistentform-actions',false)
     if (msg) alert(msg)
 }
 
