@@ -189,7 +189,9 @@ br {
     padding: 10px 0px;
     font-size: 25px;
     cursor: pointer;
-    border: 1px solid;
+    border-top: 1px solid;
+    border-left: 0.5px solid;
+    border-right: 0.5px solid;
     transition-duration: 0.2s;
     font-family: 'Roboto';
     background-color: transparent;
