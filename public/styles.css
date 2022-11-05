@@ -700,9 +700,9 @@ textarea {
     padding-right: 5px;
 }
 
-.subListDel {
-    width: 100px;
-}
+.subListDel { width: 100px; }
+.subPrevBtn { width: 150px; }
+.subDelBtn { width: 80px; }
 
 #logoBanner {
     height: 35px;
@@ -1155,6 +1155,10 @@ textarea {
     text-align: center;
     border-radius: 5px;
 }
+.styledButtonFullWidth {
+    width: 100%;
+    margin: 0;
+}
 .darkmode .styledButton {
     border: 2px solid #ffffff;
     color: #ffffff;
@@ -1482,6 +1486,9 @@ input:checked + .slider.slidersmall:before {
         font-size: 11px;
     }
 
+    .subPrevBtn { width: 110px; }
+    .subDelBtn { width: 70px; }
+
     .tooltiptext.tooltippm {
         font-size: 15px;
         width: 75%;
@@ -1594,6 +1601,8 @@ input:checked + .slider.slidersmall:before {
     }
 
     #yourFiles table tr td:nth-child(1) { max-width: 160px; }
+    .subPrevBtn { width: 95px; }
+    .subDelBtn { width: 55px; }
 }
 
 * {

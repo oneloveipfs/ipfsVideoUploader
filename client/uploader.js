@@ -1045,8 +1045,8 @@ function updateSubtitle() {
     for (let i = 0; i < subtitleList.length; i++) {
         subTableHtml += '<tr>'
         subTableHtml += '<td class="subListLang">' + languages.getLanguageInfo(subtitleList[i].lang).name + '</td>'
-        subTableHtml += '<td class="subListPrev"><a class="roundedBtn subPrevBtn" id="subPrevBtn' + i + '">Preview subtitle</a></td>'
-        subTableHtml += '<td class="subListDel"><a class="roundedBtn subDelBtn" id="subDelBtn' + i + '">Remove</a></td>'
+        subTableHtml += '<td class="subListPrev"><a class="styledButton styledButtonSmall subPrevBtn" id="subPrevBtn' + i + '">Preview subtitle</a></td>'
+        subTableHtml += '<td class="subListDel"><a class="styledButton styledButtonSmall subDelBtn" id="subDelBtn' + i + '">Remove</a></td>'
         subTableHtml += '</tr>'
     }
     subtitleTableList.innerHTML = subTableHtml

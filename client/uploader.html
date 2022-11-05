@@ -151,7 +151,7 @@
                     <h3 style="margin-block-end: 0.25em;">Article Body: 
                     <textarea id="postBody" name="postBody"></textarea></h3>
                     <input type="file" accept="image/*" id="postImg" style="display: none">
-                    <a onclick="document.getElementById('postImg').click()" id="postImgBtn" class="roundedBtn">Upload an image for article body</a>
+                    <a onclick="document.getElementById('postImg').click()" id="postImgBtn" class="styledButton styledButtonSmall styledButtonFullWidth">Upload an image for article body</a>
                     <h5 style="margin-block-start: 0.5em;">Maximum file size for image: 4MB</h5>
                     <h3 style="margin-block-end: 0.5em;">Beneficiaries</h3>
                     <h5 style="margin-block-start: 0.25em;" id="beneficiariesDesc"></h5>
@@ -242,7 +242,7 @@
                 <h4>NOTE: This editing tool is optimised for videos posted with OneLoveIPFS. If your video was posted through another uploader, it may be better to use the editing features on their respective frontends.</h4><br>
                 <h4>This will edit the JSON metadata of the posts and will not edit the article body, which can be done on generic frontends that does not modify the JSON metadata.</h4><br>
                 <input type="text" class="meta" placeholder="Paste URL here (supported: dtube links, 3speak app uri, hive/blurt frontends)" id="thumbnailSwapLink">
-                <a class="roundedBtn" id="linkSubmitBtn" onclick="onEditLinkSubmit()">Submit Link</a>
+                <a class="styledButton styledButtonSmall styledButtonFullWidth" id="linkSubmitBtn" onclick="onEditLinkSubmit()">Submit Link</a>
             </div>
             <div id="linkResult" style="display: none;">
                 <a onclick="updateDisplayByIDs(['metaEditIntro'],['linkResult'])"><< Back</a>

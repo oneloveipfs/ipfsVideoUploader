@@ -65,7 +65,7 @@ class Beneficiaries {
         for (let i = 0; i < this.accounts.length; i++) {
             beneficiaryListHtml += '<tr>'
             beneficiaryListHtml += '<td class="beneficiaryAccLabel">' + this.accounts[i].account + ' (' + this.accounts[i].weight / 100 + '%)</td>'
-            beneficiaryListHtml += '<td><a class="roundedBtn beneficiaryDelBtn beneficiaryDelBtn' + this.getNetwork() + '" id="beneficiaryDelBtn'+this.getNetwork()+'_'+this.accounts[i].account+'">Remove</a></td>'
+            beneficiaryListHtml += '<td><a class="styledButton styledButtonSmall beneficiaryDelBtn beneficiaryDelBtn' + this.getNetwork() + '" id="beneficiaryDelBtn'+this.getNetwork()+'_'+this.accounts[i].account+'">Remove</a></td>'
             beneficiaryListHtml += '</tr>'
         }
         beneficiaryTableList.innerHTML = beneficiaryListHtml
