@@ -326,16 +326,12 @@ br {
 #dtcInstruction a:hover, #signupcbmsg a:hover { color: #000000; }
 #dtcInstruction a:active, #signupcbmsg a:active { color: #000000; }
 
-#hiveRecPayment, #hiveRecPaymentFields { display: none; }
+#hiveRecPayment, #hiveRecPaymentFields,
+#HiveKeychainBtn, #HiveSignerBtn, #DTubeChannelBtn, #BlurtKeychainBtn { display: none; }
 #hiveRecPaymentRecurrence { width: 200px; }
 #hiveRecPaymentFrequency { width: 100px; }
 #hiveRecPaymentRecurrence, #hiveRecPaymentFrequency {
     margin-bottom: 0px;
-}
-
-#HiveKeychainBtn, #HiveSignerBtn, #DTubeChannelBtn, #BlurtKeychainBtn {
-    display: none;
-    margin-block-end: 0.5em;
 }
 
 .tooltip {
@@ -432,52 +428,6 @@ br {
 
 #tagInfo1 {
     margin-block-start: -1em;
-}
-
-.roundedBtn {
-	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
-	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
-	box-shadow:inset 0px 1px 0px 0px #ffffff;
-	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ffffff), color-stop(1, #f6f6f6));
-	background:-moz-linear-gradient(top, #ffffff 5%, #f6f6f6 100%);
-	background:-webkit-linear-gradient(top, #ffffff 5%, #f6f6f6 100%);
-	background:-o-linear-gradient(top, #ffffff 5%, #f6f6f6 100%);
-	background:-ms-linear-gradient(top, #ffffff 5%, #f6f6f6 100%);
-	background:linear-gradient(to bottom, #ffffff 5%, #f6f6f6 100%);
-	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#f6f6f6',GradientType=0);
-	background-color:#ffffff;
-	-moz-border-radius:17px;
-	-webkit-border-radius:17px;
-	border-radius:17px;
-	border:1px solid #dcdcdc;
-	display:inline-block;
-	cursor:pointer;
-	color:#666666;
-	font-size:16px;
-	font-weight:bold;
-    padding-top: 7px;
-    padding-bottom: 7px;
-    width: calc(100% - 2px);
-    margin-left: auto;
-    margin-right: auto;
-	text-decoration:none;
-    text-shadow:0px 1px 0px #ffffff;
-    text-align: center;
-}
-.roundedBtn:hover {
-	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #f6f6f6), color-stop(1, #ffffff));
-	background:-moz-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
-	background:-webkit-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
-	background:-o-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
-	background:-ms-linear-gradient(top, #f6f6f6 5%, #ffffff 100%);
-	background:linear-gradient(to bottom, #f6f6f6 5%, #ffffff 100%);
-	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#f6f6f6', endColorstr='#ffffff',GradientType=0);
-	background-color:#f6f6f6;
-}
-
-.roundedBtn:active {
-	position:relative;
-	top:1px;
 }
 
 .tick-mark {

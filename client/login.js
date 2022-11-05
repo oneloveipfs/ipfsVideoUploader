@@ -306,7 +306,8 @@ function getPaymentInfo() {
                 break
         }
 
-        updateDisplayByIDs(['signuppay'],['signupstart'])
+        updateDisplayByIDs(['signuppay'],['signupstart','pymtstart-actions'])
+        updateDisplayByIDs(['pymtpay-actions'],[],'flex')
     })
 }
 

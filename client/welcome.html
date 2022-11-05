@@ -285,11 +285,10 @@
                             <option>HBD</option>
                             <option>BLURT</option>
                         </select></h4>
-                        <a class="roundedBtn" id="getPaymentBtns" onclick="getPaymentInfo()">Get payment info</a>
-                        <h5 class="redeemVoucherNavBtn"><a onclick="document.getElementById('signupstart').style.display = 'none'; document.getElementById('signupredeem').style.display = 'block';">Redeem a voucher</a></h5>
+                        <!-- <h5 class="redeemVoucherNavBtn"><a onclick="document.getElementById('signupstart').style.display = 'none'; document.getElementById('signupredeem').style.display = 'block';">Redeem a voucher</a></h5> -->
                     </div>
                     <div id="signuppay" style="display: none;">
-                        <a onclick="document.getElementById('signuppay').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>
+                        <a onclick="updateDisplayByIDs(['signupstart'],['signuppay','pymtpay-actions']); updateDisplayByIDs(['pymtstart-actions'],[],'flex');"><< Back</a><br><br>
                         <h4 id="dtcInstruction">To continue, make a DTUBE transfer with the details below. Memo required is <u>clearly underlined</u>, if any. DTUBE payments take approximately 42 seconds (14 blocks) to process. Once complete, you may login and begin uploading videos to our service.<br><br>If you have any issues, please contact the OneLoveIPFS team on <u><a href="https://discord.gg/ZWj5NqaBeF" target="_blank">Discord</a></u>.<br><br></h4>
                         <h4 id="receiverAccConfirm"></h4>
                         <h4 id="gbdaysconfirm">Credits: 0 GBdays</h4>
@@ -305,17 +304,13 @@
                                 <input type="number" placeholder="Frequency" id="hiveRecPaymentFrequency" class="loginFields" min="2">
                             </div>
                         </div><br>
-                        <a class="roundedBtn" id="HiveKeychainBtn">Pay with Hive Keychain</a>
-                        <a class="roundedBtn" id="HiveSignerBtn" target="_blank" rel="noreferrer">Pay with HiveSigner</a>
-                        <a class="roundedBtn" id="BlurtKeychainBtn">Pay with Blurt Keychain</a>
-                        <a class="roundedBtn" id="DTubeChannelBtn" target="_blank" rel="noreferrer">Pay on d.tube</a>
                         <h6 id="nativeDisclaimer">Disclaimer: The amount quoted above may differ than the actual price in your selected coin. Due to price fluctuations, you may receive more or less GBdays after refilling your account. Alternatively, you may refill your account from your DTube/Hive wallet by sending any amount to @oneloveipfs with the memo shown above.</h6>
                     </div>
                     <div id="signupredeem" style="display: none;">
                         <a onclick="document.getElementById('signupredeem').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>
                         <input type="text" placeholder="HIVE Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="redeemerUsername" class="loginFields">
                         <input type="text" placeholder="Voucher Code" autocomplete="off" autocorrent="off" autocapitalize="off" spellcheck="false" id="voucherCode" class="loginFields">
-                        <a class="roundedBtn" id="redeemVoucherBtn" onclick="redeemVoucher()">Redeem</a>
+                        <a class="styledButton styledButtonSmall styledButtonFullWidth" id="redeemVoucherBtn" onclick="redeemVoucher()">Redeem</a>
                     </div>
                     <div id="signupcb" style="display: none;">
                         <a onclick="document.getElementById('signupcb').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>
@@ -325,6 +320,15 @@
                         <a onclick="document.getElementById('signupcancel').style.display = 'none'; document.getElementById('signupstart').style.display = 'block';"><< Back</a><br><br>
                         <h4>Your order has been cancelled successfully. To create a new order, you may go back and start again.</h4>
                     </div>
+                </div>
+                <div class="popup-actions" id="pymtstart-actions">
+                    <input type="button" id="getPaymentBtns" value="Get Payment Info" onclick="getPaymentInfo()">
+                </div>
+                <div class="popup-actions" id="pymtpay-actions" style="display: none;">
+                    <input type="button" id="HiveSignerBtn" target="_blank" rel="noreferrer" value="HiveSigner">
+                    <input type="button" id="HiveKeychainBtn" value="Hive Keychain">
+                    <input type="button" id="BlurtKeychainBtn" value="Blurt Keychain">
+                    <input type="button" id="DTubeChannelBtn" target="_blank" rel="noreferrer" value="Pay on d.tube">
                 </div>
             </div>
         </div>
