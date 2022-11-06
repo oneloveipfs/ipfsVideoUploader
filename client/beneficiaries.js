@@ -96,15 +96,15 @@ class Beneficiaries {
     getSortedAccounts() {
         let result = JSON.parse(JSON.stringify(this.accounts))
         if (this.threespeak) {
-            let required = Object.keys(THREESPEAK_FEES)
+            let required = Object.keys(SPK_FEES)
             if (this.threespeakEncoder && !required.includes(this.threespeakEncoder))
                 required.push(this.threespeakEncoder)
             for (let i in result) {
                 let idx = required.indexOf(result[i].account)
                 if (idx > -1) {
-                    let finalFee = THREESPEAK_FEES[required[idx]]
+                    let finalFee = SPK_FEES[required[idx]]
                     if (result[i].account === this.threespeakEncoder)
-                        finalFee += THREESPEAK_ENCODER_FEE
+                        finalFee += SPK_ENCODER_FEE
                     result[i].weight = Math.max(result[i].weight, finalFee)
                     required.splice(idx,1)
                 }
@@ -113,12 +113,12 @@ class Beneficiaries {
                 if (required[i] === this.threespeakEncoder)
                     result.push({
                         account: required[i],
-                        weight: THREESPEAK_ENCODER_FEE + (THREESPEAK_FEES[required[i]] || 0)
+                        weight: SPK_ENCODER_FEE + (SPK_FEES[required[i]] || 0)
                     })
                 else
                     result.push({
                         account: required[i],
-                        weight: THREESPEAK_FEES[required[i]]
+                        weight: SPK_FEES[required[i]]
                     })
             }
         }

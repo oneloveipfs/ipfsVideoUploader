@@ -252,7 +252,8 @@ async function proceedPersistentLogin() {
 function clearPersistentLogin() {
     localStorage.setItem('persistentLogin',null)
     window.logins = {}
-    updateDisplayByIDs(['loginform'],['persistentform'])
+    updateDisplayByIDs(['loginform'],['persistentform','persistentform-actions'])
+    updateDisplayByIDs(['loginformmain-actions'])
 }
 
 function getPaymentInfo() {

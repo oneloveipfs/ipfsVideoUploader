@@ -205,7 +205,7 @@ br {
 .popup-actions input:disabled { cursor: not-allowed; }
 .darkmode .popup-actions input:disabled { background-color: transparent; }
 
-#spkUploadPopup .popup-content {
+#spkPopup .popup-content {
     width: 90%;
 }
 #loginPopup .popup-body h3 { text-align: center; }
@@ -1454,7 +1454,7 @@ input:checked + .slider.slidersmall:before {
         width: 85%;
     }
 
-    #spkUploadPopup .popup-content {
+    #spkPopup .popup-content {
         width: 92%;
     }
 
@@ -1488,7 +1488,7 @@ input:checked + .slider.slidersmall:before {
 
 @media screen and (max-width: 500px) {
     .popup-content,
-    #spkUploadPopup .popup-content {
+    #spkPopup .popup-content {
         width: 100%;
     }
 
