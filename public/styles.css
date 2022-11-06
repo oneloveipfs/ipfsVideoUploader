@@ -107,8 +107,8 @@ a {
     cursor: pointer;
 }
 
-a:visited { color: #000000; }
-.darkmode a:visited { color: #ffffff; }
+a:visited, a:hover, a:active { color: #000000; }
+.darkmode a, .darkmode a:visited, .darkmode a:hover, .darkmode a:active { color: #ffffff; }
 
 hr {
     border: 0;

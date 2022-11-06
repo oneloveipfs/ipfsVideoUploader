@@ -213,23 +213,32 @@
             <div id="spkPopup" class="popup">
                 <div class="popup-content" id="spkPopupContent">
                     <div class="popup-header">
-                        <h2>Important Notice</h2>
+                        <h2 id="spkPopupHeader">Important Notice</h2>
                     </div>
                     <div class="popup-body">
-                        <p>Before proceeding with your 3Speak video upload, it is important to communicate a few things:</p>
-                        <ol>
-                            <li>Instead of using the tusd upload endpoint operated by OneLoveIPFS, we are required to use the official APIs operated by 3Speak core team.</li>
-                            <li>An 11.5% fee will be levied on HIVE post rewards for all 3Speak video uploads. This fee is imposed by 3Speak team, OneLoveIPFS does not have control over it.</li>
-                            <li>Due to the mandatory outsourcing of video storage and encoding, these files will only consume up to 25% of GBDays that would otherwise be consumed if the same file was pinned normally on our IPFS nodes. In an event of file unavailability on 3Speak's IPFS storage servers for longer than 24 hours, these files may consume the full GBDays amount.</li>
-                            <li>OneLoveIPFS is not responsible for any issues arising from the use of 3Speak APIs, including but not limited to file uploads, quality of video encoding outputs, video playability or censorship (of any kind) on 3Speak.</li>
-                            <li>Getting the resulting files pinned on our IPFS nodes may take longer than usual as we need to fetch them from 3Speak's IPFS nodes which are subject to availability.</li>
-                        </ol>
-                        <div><input type="checkbox" name="spkUploadAgreeNotice" id="spkUploadAgreeNotice" onchange="spkNoticeCheckboxChanged()"><span>I have read and understood the above notice.</span></div>
-                        <div><input type="checkbox" name="spkUploadAgreeTerms" id="spkUploadAgreeTerms" onchange="spkNoticeCheckboxChanged()"><span>By authenticating to the 3Speak API, I have read and understood <a href="https://threespeakvideo.b-cdn.net/static/terms_of_service.pdf" target="_blank">3Speak's terms of service.</a></span></div>
+                        <div id="spknotice">
+                            <p>Before proceeding with your 3Speak video upload, it is important to communicate a few things:</p>
+                            <ol>
+                                <li>Instead of using the tusd upload endpoint operated by OneLoveIPFS, we are required to use the official APIs operated by 3Speak core team.</li>
+                                <li>An 11.5% fee will be levied on HIVE post rewards for all 3Speak video uploads. This fee is imposed by 3Speak team, OneLoveIPFS does not have control over it.</li>
+                                <li>Due to the mandatory outsourcing of video storage and encoding, these files will only consume up to 25% of GBDays that would otherwise be consumed if the same file was pinned normally on our IPFS nodes. In an event of file unavailability on 3Speak's IPFS storage servers for longer than 24 hours, these files may consume the full GBDays amount.</li>
+                                <li>OneLoveIPFS is not responsible for any issues arising from the use of 3Speak APIs, including but not limited to file uploads, quality of video encoding outputs, video playability or censorship (of any kind) on 3Speak.</li>
+                                <li>Getting the resulting files pinned on our IPFS nodes may take longer than usual as we need to fetch them from 3Speak's IPFS nodes which are subject to availability.</li>
+                            </ol>
+                            <div><input type="checkbox" name="spkUploadAgreeNotice" id="spkUploadAgreeNotice" onchange="spkNoticeCheckboxChanged()"><span>I have read and understood the above notice.</span></div>
+                            <div><input type="checkbox" name="spkUploadAgreeTerms" id="spkUploadAgreeTerms" onchange="spkNoticeCheckboxChanged()"><span>By authenticating to the 3Speak API, I have read and understood <a href="https://threespeakvideo.b-cdn.net/static/terms_of_service.pdf" target="_blank">3Speak's terms of service.</a></span></div>
+                        </div>
+                        <div id="spkauth" style="display: none;">
+                            <p>Obtain your 3Speak access token and browser cookie by clicking the Authenticate button below.</p>
+                        </div>
                     </div>
-                    <div class="popup-actions">
-                        <input type="button" value="Cancel" onclick="dismissPopupAction('spkUploadPopup')">
-                        <input type="button" value="Continue" id="spkNoticeContinueBtn" disabled>
+                    <div class="popup-actions" id="spknotice-actions">
+                        <input type="button" value="Cancel" onclick="dismissPopupAction('spkPopup')">
+                        <input type="button" value="Continue" id="spkNoticeContinueBtn" onclick="spkNoticeContinue()" disabled>
+                    </div>
+                    <div class="popup-actions" id="spkauth-actions" style="display: none;">
+                        <input type="button" value="Cancel" onclick="dismissPopupAction('spkPopup')">
+                        <input type="button" value="Authenticate" id="spkAuthenticateBtn" onclick="spkGetAccessToken()">
                     </div>
                 </div>
             </div>

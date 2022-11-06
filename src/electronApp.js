@@ -1,6 +1,7 @@
 const axios = require('axios')
 const { app, shell, ipcMain, dialog, BrowserWindow, Notification, Menu } = require('electron')
 const aboutWindow = require('about-window').default
+const spk = require('./spk')
 const config = require('./config')
 const package = require('../package.json')
 const isMac = process.platform === 'darwin'
@@ -184,6 +185,8 @@ app.on('activate', () => {
 })
 
 ipcMain.on('open_browser_window',(evt,arg) => shell.openExternal(arg))
+ipcMain.on('spk_auth', async (evt,arg) => evt.sender.send('spk_auth_result', await spk.auth(arg)))
+ipcMain.on('spk_cookie', async (evt,arg) => evt.sender.send('spk_cookie_result', await spk.cookie(arg.user, arg.token)))
 
 // Update check
 axios.get('https://uploader.oneloveipfs.com/latest_build').then((build) => {
