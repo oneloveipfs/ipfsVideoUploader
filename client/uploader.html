@@ -73,10 +73,10 @@
             <img id="disabledImg" alt="will be right back" style="width: 100%;">
         </div>
         <div class="uploadpage" id="uploadForm" style="display: block;">
-            <div id="editingDraft" class="curvedbox" style="display: none; margin-bottom: 20px;">
-                <h4 id="editingDraftMsg" style="display: inline-block;">Currently editing draft: Last saved:</h4>
-                <a class="styledButton styledButtonSmall" style="width: 70px; display: inline-block;" onclick="leaveDraft()">Leave</a>
-                <a class="styledButton styledButtonSmall" style="width: 110px; display: inline-block;" onclick="saveDraft(); leaveDraft()">Save & Leave</a>
+            <div id="editingDraft" class="curvedbox">
+                <h4 id="editingDraftMsg">Editing draft: Last saved:</h4>
+                <a class="styledButton styledButtonSmall" onclick="leaveDraft()">Leave</a>
+                <a class="styledButton styledButtonSmall" onclick="saveDraft(); leaveDraft()">Save & Leave</a>
             </div>
             <div id="tab">
                 <a class="tabs" id="tabBasics" onclick="updateTab('basics')">Basics</a>
@@ -84,8 +84,8 @@
                 <a class="tabs" id="tabAdvanced" onclick="updateTab('advanced')">Advanced</a>
             </div>
             <div id="basics"> <!-- Basics tab -->
-                <h3>Upload a video (mp4 file accepted): <input type="file" accept="video/mp4,video/quicktime" name="VideoUpload" id="sourcevideo" onchange="sourceVideoSelect()"></h3>
-                <h3>Upload a thumbnail (4MB maximum): <input type="file" accept="image/jpeg,image/png,image/gif" name="SnapUpload" id="snapfile"></h3>
+                <h3 class="fileUploadField">Upload a video (mp4 file accepted): <input type="file" accept="video/mp4,video/quicktime" name="VideoUpload" id="sourcevideo" onchange="sourceVideoSelect()"></h3>
+                <h3 class="fileUploadField">Upload a thumbnail (4MB maximum): <input type="file" accept="image/jpeg,image/png,image/gif" name="SnapUpload" id="snapfile"></h3>
                 <h3>Title: <input type="text" id="title" name="title" class="meta"></h3>
                 <h3>Description: 
                 <textarea id="description" name="description"></textarea><a style="font-size: 15px;" onclick="fillDescription()">Insert from template</a><a style="font-size: 15px; margin-left: 15px;" onclick="updateDisplayByIDs(['settings'],['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings'])">Edit template</a></h3>
@@ -447,7 +447,7 @@
             <h2>3Speak uploads</h2>
             <a class="styledButton styledButtonSmall" id="spkUploadListAuth" onclick="displayPopup('spkListPopup')">Authenticate with 3speak.tv</a>
             <table style="width: 100%;" id="spkUploadListTable">
-                <thead><tr><td>Permlink</td><td>Created</td><td>Status</td><td></td></tr></thead>
+                <thead><tr><td>Permlink</td><td>Created</td><td>Status</td><td>Action</td></tr></thead>
                 <tbody id="spkUploadListTbody"></tbody>
             </table>
             <div id="spkListPopup" class="popup">

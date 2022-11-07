@@ -16,9 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!isElectron()) {
         updateDisplayByIDs([],['hiveLoginKey','blurtLoginKey','steemLoginKey'])
-        let tohide = document.getElementsByClassName('rememberme')
-        for (let i = 0; i < tohide.length; i++)
-            tohide[i].style.display = "none"
+        setDisplayByClass('rememberme')
     } else {
         let tochange = document.getElementsByClassName('kcAuth')
         for (let i = 0; i < tochange.length; i++)
@@ -29,11 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
     axios.get('/config').then((result) => {
         config = result.data
 
-        if (!config.hivesignerEnabled || isElectron()) {
-            let tohide = document.getElementsByClassName("sclogin")
-            for (let i = 0; i < tohide.length; i++)
-                tohide[i].style.display = "none"
-        }
+        if (!config.hivesignerEnabled || isElectron())
+            setDisplayByClass('sclogin')
     })
 
     axios.get('/shawp_config').then((result) => {

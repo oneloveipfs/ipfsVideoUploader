@@ -54,11 +54,6 @@ class Beneficiaries {
         this.maxWeight = 10000
     }
 
-    set3SpeakEncoder(encoder = '') {
-        if (!this.threespeak) throw 'call enable3Speak() first'
-        this.threespeakEncoder = encoder
-    }
-
     updateBeneficiaries() {
         let beneficiaryTableList = document.getElementById('beneficiaryTableList'+this.getNetwork())
         let beneficiaryListHtml = ''
@@ -93,35 +88,29 @@ class Beneficiaries {
         return comp
     }
 
-    getSortedAccounts() {
+    spkGetSortedAccounts(spkBeneficiaryObject) {
         let result = JSON.parse(JSON.stringify(this.accounts))
-        if (this.threespeak) {
-            let required = Object.keys(SPK_FEES)
-            if (this.threespeakEncoder && !required.includes(this.threespeakEncoder))
-                required.push(this.threespeakEncoder)
-            for (let i in result) {
-                let idx = required.indexOf(result[i].account)
-                if (idx > -1) {
-                    let finalFee = SPK_FEES[required[idx]]
-                    if (result[i].account === this.threespeakEncoder)
-                        finalFee += SPK_ENCODER_FEE
-                    result[i].weight = Math.max(result[i].weight, finalFee)
-                    required.splice(idx,1)
-                }
-            }
-            for (let i in required) {
-                if (required[i] === this.threespeakEncoder)
-                    result.push({
-                        account: required[i],
-                        weight: SPK_ENCODER_FEE + (SPK_FEES[required[i]] || 0)
-                    })
-                else
-                    result.push({
-                        account: required[i],
-                        weight: SPK_FEES[required[i]]
-                    })
+        if (typeof spkBeneficiaryObject === 'string')
+            spkBeneficiaryObject = JSON.parse(spkBeneficiaryObject)
+        let required = Object.keys(SPK_FEES)
+        let sboKv = {}
+        for (let i in spkBeneficiaryObject) {
+            sboKv[spkBeneficiaryObject[i].account] = spkBeneficiaryObject[i].weight
+            required.push(spkBeneficiaryObject[i].account)
+        }
+        for (let i in result) {
+            let idx = required.indexOf(result[i].account)
+            if (idx > -1) {
+                let finalFee = SPK_FEES[required[idx]] || sboKv[required[idx]]
+                result[i].weight = Math.max(result[i].weight, finalFee)
+                required.splice(idx,1)
             }
         }
+        for (let i in required)
+            result.push({
+                account: required[i],
+                weight: SPK_FEES[required[i]] || sboKv[required[i]]
+            })
         return result.sort(this.beneficiarySorter)
     }
 

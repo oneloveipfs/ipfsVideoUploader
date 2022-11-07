@@ -1,12 +1,11 @@
-// Mandatory fees imposed by 3Speak team
+// Mandatory fees imposed by 3Speak team + mobile/encoder
 const SPK_FEES = {
     'spk.beneficiary': 850,
-    threespeakleader: 100,
-    sagarkothari88: 100
+    'threespeakleader': 100
 }
 
-const SPK_ENCODER_FEE = 100
 const SPK_AUTH_EXPIRY = 7*86400*1000
+let spkUploadList = []
 
 function spkNoticeCheckboxChanged() {
     document.getElementById('spkNoticeContinueBtn').disabled = !document.getElementById('spkUploadAgreeNotice').checked || !document.getElementById('spkUploadAgreeTerms').checked
@@ -149,19 +148,55 @@ function spkListUploads(cookie) {
     let channel = new BroadcastChannel('spk_list_uploads_result')
     channel.onmessage = evt => {
         channel.close()
+        console.log(evt.data)
         if (evt.data.uploads) {
-            let uploadList = new TbodyRenderer()
+            spkUploadList = evt.data.uploads
+            let spkULTbody = new TbodyRenderer()
             for (let i in evt.data.uploads)
-                uploadList.appendRow(
+                spkULTbody.appendRow(
                     HtmlSanitizer.SanitizeHtml(evt.data.uploads[i].permlink),
                     new Date(evt.data.uploads[i].created).toLocaleString(),
-                    evt.data.uploads[i].status,
-                    `<a class="styledButton styledButtonSmall">View</a>`
+                    spkReadableStatus(HtmlSanitizer.SanitizeHtml(evt.data.uploads[i].status)),
+                    spkUploadViewBtn(evt.data.uploads[i],i)
                 )
             updateDisplayByIDs(['spkUploadListTable'],[],'table')
-            document.getElementById('spkUploadListTbody').innerHTML = uploadList.renderRow()
+            document.getElementById('spkUploadListTbody').innerHTML = spkULTbody.renderRow()
+            updateAnchorsElectron()
         }
     }
+}
+
+function spkReadableStatus(status = '') {
+    if (status === 'publish_manual')
+        return 'ready to publish'
+    else
+        return status.replace(/_/g,' ')
+}
+
+function spkUploadViewBtn(uploadObj,idx) {
+    if (uploadObj.status === 'published')
+        return `<a class="styledButton styledButtonSmall" href="https://3speak.tv/watch?v=${uploadObj.owner}/${uploadObj.permlink}" target="_blank">View</a>`
+    else if (uploadObj.status === 'publish_manual')
+        return `<a class="styledButton styledButtonSmall" onclick="spkLoadMetadataPostUpload('${uploadObj.permlink}',${idx})">View</a>`
+    else
+        return ''
+}
+
+function spkLoadMetadataPostUpload(pm,idx) {
+    let draft = retrieveDraft(pm)
+    if (!draft) {
+        sessionStorage.setItem('editingDraft',pm)
+        document.getElementById('newUploadModeBtn').onclick()
+        document.getElementById('editingDraftMsg').innerText = 'Finalizing 3Speak upload metadata: '+pm+', last saved: never'
+        document.getElementById('title').value = spkUploadList[idx].title
+        document.getElementById('description').value = spkUploadList[idx].description
+        updateDisplayByIDs(['editingDraft'],[])
+    }
+    document.getElementById('editingDraftMsg').innerText = document.getElementById('editingDraftMsg').innerText.replace('Editing draft','Finalizing 3Speak upload metadata')
+    document.getElementById('submitbutton').value = 'Submit'
+    setDisplayByClass('fileUploadField')
+    postparams.spkFields = spkUploadList[idx]
+    sessionStorage.setItem('editingMode',3)
 }
 
 function spkError(error, group) {

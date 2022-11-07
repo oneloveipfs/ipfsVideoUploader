@@ -123,6 +123,7 @@ function retrieveDraft(pm) {
     document.getElementById('newUploadModeBtn').onclick()
     document.getElementById('editingDraftMsg').innerText = 'Editing draft: '+pm+', last saved: '+new Date(draftObj.lastTs).toLocaleString()
     updateDisplayByIDs(['editingDraft'],[])
+    return true
 }
 
 function saveDraft() {
@@ -158,12 +159,24 @@ function saveDraft() {
         document.getElementById('customPermlink').value = pm
     sessionStorage.setItem('editingDraft',pm)
     localStorage.setItem('Draft_'+pm,JSON.stringify(newDraftObj))
-    document.getElementById('editingDraftMsg').innerText = 'Editing draft: '+pm+', last saved: '+new Date(newDraftObj.lastTs).toLocaleString()
+    document.getElementById('editingDraftMsg').innerText = editingModeToDesc()+': '+pm+', last saved: '+new Date(newDraftObj.lastTs).toLocaleString()
     updateDisplayByIDs(['editingDraft'],[])
     listDrafts()
 }
 
 function leaveDraft() {
     sessionStorage.removeItem('editingDraft')
+    sessionStorage.removeItem('editingMode')
     updateDisplayByIDs([],['editingDraft'])
+    setDisplayByClass('fileUploadField','block')
+    document.getElementById('submitbutton').value = 'Upload!'
+}
+
+function editingModeToDesc() {
+    switch (sessionStorage.getItem('editingMode')) {
+        case '3':
+            return 'Finalizing 3Speak upload metadata'
+        default:
+            return 'Editing draft'
+    }
 }

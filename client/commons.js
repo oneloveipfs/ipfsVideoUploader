@@ -151,6 +151,12 @@ function updateDisplayByIDs(toshow,tohide,type = 'block') {
         document.getElementById(toshow[i]).style.display = type
 }
 
+function setDisplayByClass(toSet, display = 'none') {
+    let elems = document.getElementsByClassName(toSet)
+    for (let i = 0; i < elems.length; i++)
+        elems[i].style.display = display
+}
+
 function displayPopup(popupelement) {
     updateDisplayByIDs([popupelement],[])
     setTimeout(() => document.getElementById(popupelement+'Content').classList.add('popup-shown'),5)
@@ -573,9 +579,8 @@ function openBrowserWindowElectron(url) {
     window.postMessage({ action: 'open_browser_window', data: url })
 }
 
-if (isElectron()) {
-    window.open = openBrowserWindowElectron
-    document.addEventListener('DOMContentLoaded',() => {
+function updateAnchorsElectron() {
+    if (isElectron()) {
         let anchors = document.getElementsByTagName('a')
         for (let i in anchors)
             if (typeof anchors[i].href === 'string' &&
@@ -588,5 +593,10 @@ if (isElectron()) {
                     openBrowserWindowElectron(urlToOpen)
                 }
             }
-    })
+    }
+}
+
+if (isElectron()) {
+    window.open = openBrowserWindowElectron
+    document.addEventListener('DOMContentLoaded',() => updateAnchorsElectron())
 }

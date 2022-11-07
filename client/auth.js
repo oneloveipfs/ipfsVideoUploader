@@ -30,9 +30,7 @@ async function Hive() {
                     window.currentnetwork = authResponse.data.network // network used for access token
                     hiveDisplayUser = sessionStorage.getItem('hiveUser')
                     if (!hiveDisplayUser && !steemUser && !blurtUser) {
-                        let grapheneSettings = document.getElementsByClassName('grapheneSettings')
-                        for (let i = 0; i < grapheneSettings.length; i++)
-                            grapheneSettings[i].style.display = 'none'
+                        setDisplayByClass('grapheneSettings')
                     } else {
                         // HiveAuth login
                         try {
