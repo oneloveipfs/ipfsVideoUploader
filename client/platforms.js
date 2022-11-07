@@ -280,7 +280,7 @@ function updateEncoderDisplay() {
 
 function postpublish() {
     if (isPlatformSelected['3Speak']) {
-        document.getElementById('postpublishwatch3Speak').onclick = () => window.open('https://3speak.tv/openDapp?uri=hive:'+usernameByNetwork('hive')+':'+postparams.permlink)
+        document.getElementById('postpublishwatch3Speak').onclick = () => window.open('https://3speak.tv/watch?v='+usernameByNetwork('hive')+'/'+postparams.permlink)
         document.getElementById('postpublishembed3Speak').onclick = () => copyToClipboard(pfPlayerEmbed('3Speak'),'postpublishembedtt3Speak')
     }
     if (isPlatformSelected['DTube']) {
@@ -309,7 +309,7 @@ function postpublishshare(dest) {
             tgurl = 'https://d.tube/#!/v/'+(av ? av : username)+'/'+(av ? postparams.ipfshash : postparams.permlink)
             break
         case '3Speak':
-            tgurl = 'https://3speak.tv/openDapp?uri=hive:'+usernameByNetwork('hive')+':'+postparams.permlink
+            tgurl = 'https://3speak.tv/watch?v='+usernameByNetwork('hive')+'/'+postparams.permlink
             break
     }
     tgurl = encodeURIComponent(tgurl)

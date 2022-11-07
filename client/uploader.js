@@ -96,20 +96,12 @@ axios.get('/proxy_server').then((r) => {
                     postparams.duration = existingDuration
                 break
             case 'video240':
-                postparams.ipfs240hash = r.hash
-                if (r.skylink) postparams.skylink240 = r.skylink
-                break
             case 'video480':
-                postparams.ipfs480hash = r.hash
-                if (r.skylink) postparams.skylink480 = r.skylink
-                break
             case 'video720':
-                postparams.ipfs720hash = r.hash
-                if (r.skylink) postparams.skylink720 = r.skylink
-                break
             case 'video1080':
-                postparams.ipfs1080hash = r.hash
-                if (r.skylink) postparams.skylink1080 = r.skylink
+                let resolution = r.type.replace('video','')
+                postparams['ipfs'+resolution+'hash'] = r.hash
+                if (r.skylink) postparams['skylink'+resolution] = r.skylink
                 break
             case 'hls':
                 postparams = Object.assign(postparams,r)
@@ -213,8 +205,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return alert('Invalid tags!')
 
         let tags = tag.split(' ')
-        if (tags.length > 8)
-            return alert('Please do not use more than 8 tags!')
+        if (tags.length > 10)
+            return alert('Please do not use more than 10 tags!')
 
         // Check for empty fields
         if (sourceVideo.length == 0)
@@ -228,7 +220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         postparams.title = title
 
         if (tag.length == 0)
-            return alert('Please enter some tags (up to 8) for your video!')
+            return alert('Please enter some tags (up to 10) for your video!')
         postparams.tags = tags
 
         postparams.scheduled = validateDatePicker()
@@ -809,7 +801,7 @@ function buildPostBody(network) {
     result += postparams.postBody ? postparams.postBody : postparams.description
     result += '\n\n<hr>\n'
     if (isPlatformSelected['3Speak'])
-        result += '\n[▶️ 3Speak Dapp](https://3speak.tv/openDapp?uri=hive:'+usernameByNetwork(network)+':'+postparams.permlink+')'
+        result += '\n[▶️ 3Speak](https://3speak.tv/watch?v='+usernameByNetwork(network)+'/'+postparams.permlink+')'
     if (isPlatformSelected['DTube'])
         result += '\n[▶️ DTube](https://d.tube/#!/v/'+usernameByNetwork(network)+'/'+postparams.permlink+')'
     result += '\n[▶️ IPFS]('+config.gateway+'/ipfs/'+postparams.ipfshash+')'
