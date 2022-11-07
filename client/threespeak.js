@@ -17,20 +17,20 @@ function spkNoticeContinue() {
     document.getElementById('spkPopupHeader').innerText = '3Speak Auth'
 }
 
-function spkGetAccessToken() {
+function spkGetAccessToken(cb) {
     togglePopupActions('spkauth-actions',true)
     if (isElectron()) {
         window.postMessage({ action: 'spk_auth', data: usernameByNetwork('hive') })
         let channel = new BroadcastChannel('spk_auth_result')
         channel.onmessage = (evt) => {
-            spkAuthResult(evt.data)
+            spkAuthResult(evt.data,cb)
             channel.close()
         }
     } else
         spkError('Usage of 3Speak API is only available in desktop app','spkauth-actions')
 }
 
-function spkAuthResult(result) {
+function spkAuthResult(result,cb) {
     if (result.error)
         return spkError(result.error, 'spkauth-actions')
     if (hiveAuthLogin) {
@@ -42,37 +42,33 @@ function spkAuthResult(result) {
         } catch {
             return spkError('Failed to decode memo with posting key', 'spkauth-actions')
         }
-        spkRequestCookie(t)
+        spkRequestCookie(t,cb)
     } else if (window.hive_keychain)
         hive_keychain.requestVerifyKey(usernameByNetwork('hive'),result.memo,'Posting',kr => {
             if (kr.error)
                 return spkError(kr.message, 'spkauth-actions')
-            spkRequestCookie(kr.result)
+            spkRequestCookie(kr.result,cb)
         })
     else
         return spkError('Could not determine hive login', 'spkauth-actions')
 }
 
-function spkRequestCookie(token) {
+function spkRequestCookie(token,cb) {
     if (isElectron()) {
         window.postMessage({ action: 'spk_cookie', data: { user: usernameByNetwork('hive'), token: token } })
         let channel = new BroadcastChannel('spk_cookie_result')
         channel.onmessage = (evt) => {
-            spkCookieResult(evt.data)
+            console.log(cookie)
+            if (cookie.error)
+                return spkError(cookie.error, 'spkauth-actions')
+            document.cookie = cookie.cookie
+            togglePopupActions('spkauth-actions',false)
+            dismissPopupAction('spkPopup')
             channel.close()
+            cb(cookie.cookie)
         }
     } else
         spkError('Usage of 3Speak API is only available in desktop app','spkauth-actions')
-}
-
-function spkCookieResult(cookie) {
-    console.log(cookie)
-    if (cookie.error)
-        return spkError(cookie.error, 'spkauth-actions')
-    document.cookie = cookie.cookie
-    togglePopupActions('spkauth-actions',false)
-    dismissPopupAction('spkPopup')
-    spkUpload(cookie.cookie)
 }
 
 function spkUpload(cookie) {
