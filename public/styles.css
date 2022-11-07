@@ -499,6 +499,7 @@ br {
 }
 
 .dropdown-content a:hover { background-color: #ddd }
+.darkmode .dropdown-content a:hover { color: black; }
 
 .curvedbox {
     width: 97.5%;
@@ -1065,7 +1066,7 @@ textarea {
     transition-duration: 0.2s;
 }
 
-.headerBtn:hover {
+.headerBtn:hover, .darkmode .headerBtn:hover {
     color: rgb(54,57,63);
     background-color: #ffffff;
 }
