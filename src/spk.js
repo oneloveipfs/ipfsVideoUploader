@@ -74,7 +74,9 @@ const spk = {
         .then(r => cb(null,r))
         .catch(e => cb(e.toString()))
     },
-    updateInfo: async (cookie, id, title, desc, tags, nsfw = false, lang = 'en', powerup = false, community = 'hive-134220') => {
+    updateInfo: async (cookie, id, title, desc, tags, nsfw = false) => {
+        if (Array.isArray(tags))
+            tags = tags.join(',')
         let r 
         try {
             r = (await axios.post(SPK_API_URL+'/mobile/api/update_info',{
@@ -82,10 +84,7 @@ const spk = {
                 title: title,
                 description: desc,
                 tags: tags,
-                isNsfwContent: nsfw,
-                lang: lang,
-                rewardPowerup: powerup,
-                community: community
+                isNsfwContent: nsfw
             }, { headers: {
                 'Cookie': cookie,
                 'Content-Type': 'application/json'

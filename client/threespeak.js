@@ -199,7 +199,7 @@ function spkLoadMetadataPostUpload(pm,idx) {
     sessionStorage.setItem('editingMode',3)
 }
 
-function spkUpdateDraft(cookie, idx, title, desc, tags, nsfw, lang, powerup, community) {
+function spkUpdateDraft(cookie, idx, title, desc, tags, nsfw) {
     window.postMessage({
         action: 'spk_update_info',
         data: {
@@ -208,10 +208,7 @@ function spkUpdateDraft(cookie, idx, title, desc, tags, nsfw, lang, powerup, com
             title: title,
             desc: desc,
             tags: tags,
-            nsfw: false,
-            lang: 'en',
-            powerup: powerup,
-            community: community
+            nsfw: nsfw
         }
     })
     let channel = new BroadcastChannel('spk_update_info_result')

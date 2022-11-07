@@ -188,7 +188,7 @@ ipcMain.on('open_browser_window',(evt,arg) => shell.openExternal(arg))
 ipcMain.on('spk_auth', async (evt,arg) => evt.sender.send('spk_auth_result', await spk.auth(arg)))
 ipcMain.on('spk_cookie', async (evt,arg) => evt.sender.send('spk_cookie_result', await spk.cookie(arg.user, arg.token)))
 ipcMain.on('spk_list_uploads', async (evt,arg) => evt.sender.send('spk_list_uploads_result', await spk.listUploads(arg)))
-ipcMain.on('spk_update_info', async (evt,arg) => evt.sender.send('spk_update_info_result', await spk.updateInfo(arg.cookie,arg.id,arg.title,arg.desc,arg.tags,arg.nsfw,arg.lang,arg.powerup,arg.community)))
+ipcMain.on('spk_update_info', async (evt,arg) => evt.sender.send('spk_update_info_result', await spk.updateInfo(arg.cookie,arg.id,arg.title,arg.desc,arg.tags,arg.nsfw)))
 ipcMain.on('spk_upload', (evt,arg) => {
     spk.upload(
         arg.cookie,
