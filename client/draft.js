@@ -144,6 +144,8 @@ function saveDraft() {
         createdTs: new Date().getTime(),
         lastTs: new Date().getTime()
     }
+    if (postparams.spkUpload)
+        newDraftObj.spkUpload = postparams.spkUpload
     let previousDraft = localStorage.getItem('Draft_'+sessionStorage.getItem('editingDraft'))
     try {
         previousDraft = JSON.parse(previousDraft)

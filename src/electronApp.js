@@ -187,6 +187,26 @@ app.on('activate', () => {
 ipcMain.on('open_browser_window',(evt,arg) => shell.openExternal(arg))
 ipcMain.on('spk_auth', async (evt,arg) => evt.sender.send('spk_auth_result', await spk.auth(arg)))
 ipcMain.on('spk_cookie', async (evt,arg) => evt.sender.send('spk_cookie_result', await spk.cookie(arg.user, arg.token)))
+ipcMain.on('spk_upload', (evt,arg) => {
+    spk.upload(
+        arg.cookie,
+        arg.videoPath,
+        (e) => evt.sender.send('spk_video_upload_error', spk.tusError(e)),
+        (bu,bt) => evt.sender.send('spk_video_upload_progress', Math.round((bu / bt) * 100)),
+        (vid) => spk.upload(
+            arg.cookie,
+            arg.thumbnailPath,
+            (e) => evt.sender.send('spk_thumbnail_upload_error', spk.tusError(e)),
+            (bu,bt) => evt.sender.send('spk_thumbnail_upload_progress', Math.round((bu / bt) * 100)),
+            (tid) => spk.finalizeUpload(arg.cookie,arg.user,vid,tid,arg.videoFname,arg.size,arg.duration,(e,r) => {
+                if (e || !r.data)
+                    evt.sender.send('spk_upload_error',e)
+                else
+                    evt.sender.send('spk_upload_result',r.data)
+            })
+        )
+    )
+})
 
 // Update check
 axios.get('https://uploader.oneloveipfs.com/latest_build').then((build) => {

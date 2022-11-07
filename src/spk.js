@@ -1,6 +1,9 @@
 // Helper file for communicating with 3Speak APIs
+const fs = require('fs')
 const axios = require('axios')
+const tus = require('tus-js-client')
 const SPK_API_URL = 'https://studio.3speak.tv'
+const SPK_UPLOAD_URL = 'https://uploads.3speak.tv/files'
 
 const spk = {
     auth: async (username) => {
@@ -23,6 +26,54 @@ const spk = {
             return { cookie: r.headers['set-cookie'] }
         } catch (e) {
             return { error: e.toString() }
+        }
+    },
+    upload: (cookie, path, onError, onProgress, cb) => {
+        let upload = new tus.Upload(fs.createReadStream(path), {
+            endpoint: SPK_UPLOAD_URL,
+            retryDelays: [0,3000,5000,10000,20000],
+            parallelUploads: 10,
+            headers: {
+                Cookie: cookie
+            },
+            onError: onError,
+            onProgress: onProgress,
+            onSuccess: () => {
+                let url = upload.url.toString().split('/')
+                cb(url[url.length - 1])
+            }
+        })
+        upload.findPreviousUploads().then(p => {
+            if (p.length > 0)
+                upload.resumeFromPreviousUpload(p[0])
+            upload.start()
+        })
+    },
+    finalizeUpload: (cookie, hiveUser, videoId, thumbnailId, videoFname, size, duration, cb) => {
+        axios.post(SPK_API_URL+'/mobile/api/upload_info',{
+            filename: videoId,
+            oFilename: videoFname,
+            size: size,
+            duration: duration,
+            thumbnail: thumbnailId,
+            owner: hiveUser
+        }, { headers: {
+            'Cookie': cookie,
+            'Content-Type': 'application/json'
+        }})
+        .then(r => cb(null,r))
+        .catch(e => cb(e.toString()))
+    },
+    tusError: (e) => {
+        console.log('tus error',e)
+        try {
+            let errorres = JSON.parse(e.originalResponse._xhr.responseText)
+            if (errorres.error)
+                return errorres.error
+            else
+                return e.originalResponse._xhr.responseText
+        } catch {
+            return 'Unknown Tus error'
         }
     }
 }

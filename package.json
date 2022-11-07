@@ -17,9 +17,6 @@
     "prepare": "npm run snyk-protect",
     "devapp": "electron src/electronApp.js",
     "prepapp": "node scripts/electronPrep.js",
-    "buildapp-macos": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2022 TechCoderX' --asar --platform darwin --icon public/macos_icon.icns",
-    "buildapp-windows": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2022 TechCoderX' --asar --platform=win32 --version-string.FileDescription 'OneLoveIPFS Uploader' --version-string.ProductName OneLoveIPFS --icon public/win32_icon.ico",
-    "buildapp-linux": "electron-packager . OneLoveIPFS --overwrite --app-copyright 'Copyright (C) 2022 TechCoderX' --asar --platform linux",
     "build-installer": "electron-builder",
     "build-hivecryptpro": "browserify -e src/hivecryptPro.js -p tinyify -o lib/hivecryptpro.min.js",
     "install-olisc": "npm i https://github.com/oneloveipfs/olisc --save-optional",
@@ -99,14 +96,14 @@
     "node-schedule": "^2.1.0",
     "node-webvtt": "^1.9.4",
     "shelljs": "^0.8.5",
-    "socket.io": "^4.5.3"
+    "socket.io": "^4.5.3",
+    "tus-js-client": "^3.0.1"
   },
   "devDependencies": {
     "browserify": "^17.0.0",
     "chai": "^4.3.4",
     "electron": "^20.1.1",
     "electron-builder": "^23.3.3",
-    "electron-packager": "^16.0.0",
     "mocha": "^9.1.3",
     "tinyify": "^3.0.0"
   },
