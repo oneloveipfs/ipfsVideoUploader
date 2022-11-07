@@ -162,6 +162,8 @@ function saveDraft() {
     document.getElementById('editingDraftMsg').innerText = editingModeToDesc()+': '+pm+', last saved: '+new Date(newDraftObj.lastTs).toLocaleString()
     updateDisplayByIDs(['editingDraft'],[])
     listDrafts()
+    if (parseInt(sessionStorage.getItem('editingMode')) === 3 && typeof postparams.spkIdx === 'number' && spkUploadList.length > 0)
+        spkUpdateDraft(spkGetSavedCookie(),postparams.spkIdx,newDraftObj.title,newDraftObj.desc,newDraftObj.tags.split(' '),false,'en',newDraftObj.powerup,newDraftObj.hiveCommunity)
 }
 
 function leaveDraft() {
@@ -170,6 +172,7 @@ function leaveDraft() {
     updateDisplayByIDs([],['editingDraft'])
     setDisplayByClass('fileUploadField','block')
     document.getElementById('submitbutton').value = 'Upload!'
+    delete postparams.spkIdx
 }
 
 function editingModeToDesc() {

@@ -74,6 +74,30 @@ const spk = {
         .then(r => cb(null,r))
         .catch(e => cb(e.toString()))
     },
+    updateInfo: async (cookie, id, title, desc, tags, nsfw = false, lang = 'en', powerup = false, community = 'hive-134220') => {
+        let r 
+        try {
+            r = (await axios.post(SPK_API_URL+'/mobile/api/update_info',{
+                videoId: id,
+                title: title,
+                description: desc,
+                tags: tags,
+                isNsfwContent: nsfw,
+                lang: lang,
+                rewardPowerup: powerup,
+                community: community
+            }, { headers: {
+                'Cookie': cookie,
+                'Content-Type': 'application/json'
+            }})).data
+        } catch (e) {
+            if (e.response && e.response.data)
+                return e.response.data
+            else
+                return {error: e.toString()}
+        }
+        return r
+    },
     tusError: (e) => {
         console.log('tus error',e)
         try {

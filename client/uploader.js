@@ -234,6 +234,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         postparams.scheduled = validateDatePicker()
         if (postparams.scheduled === -1) return
 
+        if (parseInt(sessionStorage.getItem('editingMode')) === 3 && postparams.spkIdx && spkUploadList.length > 0)
+            return spkUpdateDraft(spkGetSavedCookie(),postparams.spkIdx,postparams.title,postparams.description,postparams.tags,false,'en',postparams.powerup,document.getElementById('hiveCommunitySelect').value)
+
         if (isPlatformSelected['3Speak'] && usernameByNetwork('hive'))
             return displayPopup('spkPopup')
 

@@ -195,8 +195,30 @@ function spkLoadMetadataPostUpload(pm,idx) {
     document.getElementById('editingDraftMsg').innerText = document.getElementById('editingDraftMsg').innerText.replace('Editing draft','Finalizing 3Speak upload metadata')
     document.getElementById('submitbutton').value = 'Submit'
     setDisplayByClass('fileUploadField')
-    postparams.spkFields = spkUploadList[idx]
+    postparams.spkIdx = idx
     sessionStorage.setItem('editingMode',3)
+}
+
+function spkUpdateDraft(cookie, idx, title, desc, tags, nsfw, lang, powerup, community) {
+    window.postMessage({
+        action: 'spk_update_info',
+        data: {
+            cookie: cookie,
+            id: spkUploadList[idx]._id,
+            title: title,
+            desc: desc,
+            tags: tags,
+            nsfw: false,
+            lang: 'en',
+            powerup: powerup,
+            community: community
+        }
+    })
+    let channel = new BroadcastChannel('spk_update_info_result')
+    channel.onmessage = (evt) => {
+        channel.close()
+        console.log(evt.data)
+    }
 }
 
 function spkError(error, group) {
