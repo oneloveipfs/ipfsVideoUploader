@@ -87,8 +87,6 @@ function gtn(network) {
             return config.avalonApp
         case 'hive':
             return config.hivesignerApp
-        case 'steem':
-            return config.steemloginApp
         case 'blurt':
             return config.blurtApp
         default:
@@ -105,7 +103,6 @@ function hasAuthority(account,network,target) {
                         return true
             return false
         case 'hive':
-        case 'steem':
         case 'blurt':
             for (let i = 0; i < account.posting.account_auths.length; i++)
                 if (account.posting.account_auths[i][0] === target)

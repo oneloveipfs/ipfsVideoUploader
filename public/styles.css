@@ -923,11 +923,11 @@ textarea {
     width: fit-content;
 }
 
-#avalonAuthorizeBtn, #hiveAuthorizeBtn, #steemAuthorizeBtn, #blurtAuthorizeBtn {
+#avalonAuthorizeBtn, #hiveAuthorizeBtn, #blurtAuthorizeBtn {
     display: none;
 }
 
-.darkmode #avalonAuthorizeBtn, .darkmode #hiveAuthorizeBtn, .darkmode #steemAuthorizeBtn {
+.darkmode #avalonAuthorizeBtn, .darkmode #hiveAuthorizeBtn {
     color: #ffffff;
 }
 

@@ -28,7 +28,6 @@
         "gateway": "https://video.oneloveipfs.com",
         "hivesignerEnabled": true,
         "hivesignerApp": "ipfsuploader.app",
-        "steemloginApp": "ipfsuploader.app",
         "blurtApp": "ipfsuploader.app",
         "avalonApp": "oneloveipfs",
         "tusdEndpoint": "http://localhost:1080/files",

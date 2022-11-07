@@ -571,6 +571,7 @@ async function blurtLogin() {
 
 // NOTE: I really want to remove Steem from OneLoveIPFS entirely, however
 // there are people who still post there so limited support will have to stay unfortunately :\
+// TODO: Deprecate in v3.1
 async function steemLogin() {
     let steemUsername = document.getElementById('steemLoginUsername').value.toLowerCase().replace('@','')
     let steemKey = document.getElementById('steemLoginKey').value

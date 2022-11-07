@@ -38,7 +38,6 @@ For more info, see [Encoder.md](https://github.com/oneloveipfs/ipfsVideoUploader
 * `gateway`: IPFS gateway domain to use as default gateway overwrite on DTube embed player.
 * `hivesignerEnabled`: Set to true to enable HiveSigner authentication.
 * `hivesignerApp`: Specify the app name of your HiveSigner application, this is also the Hive username for collecting posting authorities.
-* `steemloginApp`: Specify the Steem username for collecting posting authorities.
 * `avalonSupportPub`: Specify an Avalon public key that users should add for resolving broadcasting issues manually if needed.
 * `tusdEndpoint`: tusd HTTP endpoint for resumable file uploads.
 * `enableSupport`: Set to true to enable users to authorize their ability to post to the usernames above (or Avalon public key above) in the interface.
