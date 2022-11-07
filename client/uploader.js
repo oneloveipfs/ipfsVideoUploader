@@ -186,6 +186,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     loadOliscDatePicker()
     document.getElementById('languages').innerHTML = langOptions
     document.getElementById('tags').onchange = () => document.getElementById('tags').value = document.getElementById('tags').value.toLowerCase()
+    if (isElectron() && usernameByNetwork('hive')) {
+        updateDisplayByIDs(['spkModeBtn'],[])
+        if (spkGetSavedCookie()) {
+            updateDisplayByIDs([],['spkUploadListAuth'])
+            spkListUploads(spkGetSavedCookie())
+        }
+    }
 
     document.getElementById('submitbutton').onclick = () => {
         // Validate data entered

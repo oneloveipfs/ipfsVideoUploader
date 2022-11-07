@@ -87,6 +87,10 @@ function saveAPISelections() {
     localStorage.setItem('blurtAPI',document.getElementById('blurtAPISelection').value)
 }
 
+function getCookie(name) {
+    return document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)')?.pop() || ''
+}
+
 function arrContainsInt(arr,value) {
     for (var i = 0; i < arr.length; i++) {
         if (arr[i] === value) return true

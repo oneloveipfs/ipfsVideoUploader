@@ -60,6 +60,7 @@
                     <a id="settingsModeBtn">User Settings</a>
                     <a id="oliscModeBtn">Scheduled Publishes</a>
                     <a id="draftModeBtn">Drafts</a>
+                    <a id="spkModeBtn" style="display: none;">3Speak Uploads</a>
                 </div>
             </div>
         </div>
@@ -441,6 +442,28 @@
                 <thead><tr><td>Draft ID</td><td>Created</td><td>Last Saved</td><td></td><td></td></tr></thead>
                 <tbody id="draftListTbody"></tbody>
             </table>
+        </div>
+        <div class="uploadpage" id="spkUploads">
+            <h2>3Speak uploads</h2>
+            <a class="styledButton styledButtonSmall" id="spkUploadListAuth" onclick="displayPopup('spkListPopup')">Authenticate with 3speak.tv</a>
+            <table style="width: 100%;" id="spkUploadListTable">
+                <thead><tr><td>Permlink</td><td>Created</td><td>Status</td><td></td></tr></thead>
+                <tbody id="spkUploadListTbody"></tbody>
+            </table>
+            <div id="spkListPopup" class="popup">
+                <div class="popup-content" id="spkListPopupContent">
+                    <div class="popup-header">
+                        <h2>Notice</h2>
+                    </div>
+                    <div class="popup-body">
+                        <p>We use necessary cookies to authenticate to your 3Speak.tv account. By clicking "Authenticate", you consent to our use of third party cookies from 3speak.tv.</p>
+                    </div>
+                    <div class="popup-actions">
+                        <input type="button" value="Reject" onclick="dismissPopupAction('spkListPopup')">
+                        <input type="button" value="Authenticate" id="spkAuthenticateBtn" onclick="spkGetAccessToken(() => {})">
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="uploadpage" id="postpublish">
             <h4>Video published to platforms and chains successfully. Some things to do next...</h4>

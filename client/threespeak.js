@@ -6,20 +6,30 @@ const SPK_FEES = {
 }
 
 const SPK_ENCODER_FEE = 100
+const SPK_AUTH_EXPIRY = 7*86400*1000
 
 function spkNoticeCheckboxChanged() {
     document.getElementById('spkNoticeContinueBtn').disabled = !document.getElementById('spkUploadAgreeNotice').checked || !document.getElementById('spkUploadAgreeTerms').checked
 }
 
 function spkNoticeContinue() {
-    updateDisplayByIDs(['spkauth'],['spknotice','spknotice-actions'])
-    updateDisplayByIDs(['spkauth-actions'],[],'flex')
-    document.getElementById('spkPopupHeader').innerText = '3Speak Auth'
+    let savedCookie = spkGetSavedCookie()
+    if (!savedCookie) {
+        updateDisplayByIDs(['spkauth'],['spknotice','spknotice-actions'])
+        updateDisplayByIDs(['spkauth-actions'],[],'flex')
+        document.getElementById('spkPopupHeader').innerText = '3Speak Auth'
+    } else {
+        dismissPopupAction('spkPopup')
+        spkUpload(savedCookie)
+    }
 }
 
 function spkGetAccessToken(cb) {
     togglePopupActions('spkauth-actions',true)
     if (isElectron()) {
+        let savedCookie = spkGetSavedCookie()
+        if (savedCookie)
+            return cb(savedCookie)
         window.postMessage({ action: 'spk_auth', data: usernameByNetwork('hive') })
         let channel = new BroadcastChannel('spk_auth_result')
         channel.onmessage = (evt) => {
@@ -58,17 +68,33 @@ function spkRequestCookie(token,cb) {
         window.postMessage({ action: 'spk_cookie', data: { user: usernameByNetwork('hive'), token: token } })
         let channel = new BroadcastChannel('spk_cookie_result')
         channel.onmessage = (evt) => {
+            let cookie = evt.data
             console.log(cookie)
             if (cookie.error)
                 return spkError(cookie.error, 'spkauth-actions')
             document.cookie = cookie.cookie
+            localStorage.setItem('spkLastAuth',new Date().getTime())
+            localStorage.setItem('spkLastUser',usernameByNetwork('hive'))
             togglePopupActions('spkauth-actions',false)
             dismissPopupAction('spkPopup')
+            dismissPopupAction('spkListPopup')
+            updateDisplayByIDs([],['spkUploadListAuth'])
             channel.close()
+            spkListUploads(cookie.cookie)
             cb(cookie.cookie)
         }
     } else
         spkError('Usage of 3Speak API is only available in desktop app','spkauth-actions')
+}
+
+function spkGetSavedCookie() {
+    // assuming 3speak.tv cookies last way longer than 7d
+    if (getCookie('connect.sid') && localStorage.getItem('spkLastUser') === usernameByNetwork('hive') && parseInt(localStorage.getItem('spkLastAuth'))+SPK_AUTH_EXPIRY > new Date().getTime())
+        return 'connect.sid='+getCookie('connect.sid')
+}
+
+function spkDeleteSavedCookie() {
+    document.cookie = 'connect.sid=; Expires=Thu, 01 Jan 1970 00:00:00 GMT'
 }
 
 function spkUpload(cookie) {
@@ -114,6 +140,26 @@ function spkUpload(cookie) {
             document.getElementById('customPermlink').value = evt.data.permlink
             postparams.spkUpload = evt.data._id
             saveDraft()
+        }
+    }
+}
+
+function spkListUploads(cookie) {
+    window.postMessage({ action: 'spk_list_uploads', data: cookie })
+    let channel = new BroadcastChannel('spk_list_uploads_result')
+    channel.onmessage = evt => {
+        channel.close()
+        if (evt.data.uploads) {
+            let uploadList = new TbodyRenderer()
+            for (let i in evt.data.uploads)
+                uploadList.appendRow(
+                    HtmlSanitizer.SanitizeHtml(evt.data.uploads[i].permlink),
+                    new Date(evt.data.uploads[i].created).toLocaleString(),
+                    evt.data.uploads[i].status,
+                    `<a class="styledButton styledButtonSmall">View</a>`
+                )
+            updateDisplayByIDs(['spkUploadListTable'],[],'table')
+            document.getElementById('spkUploadListTbody').innerHTML = uploadList.renderRow()
         }
     }
 }

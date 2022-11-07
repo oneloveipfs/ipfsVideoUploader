@@ -23,7 +23,7 @@ const isPlatformSelected = {
 const grapheneNetworks = ['hive','steem','blurt']
 
 document.addEventListener('DOMContentLoaded', () => {
-    let pages = ['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings','scheduledPublishes','postpublish','draftList']
+    let pages = ['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings','scheduledPublishes','postpublish','draftList','spkUploads']
     let evts = ['onclick','ontouchstart']
     for (let e in evts) {
         document.getElementById('newUploadModeBtn')[evts[e]] = () => updateDisplayByIDs(['uploadForm'],pages)
@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('settingsModeBtn')[evts[e]] = () => updateDisplayByIDs(['settings'],pages)
         document.getElementById('oliscModeBtn')[evts[e]] = () => updateDisplayByIDs(['scheduledPublishes'],pages)
         document.getElementById('draftModeBtn')[evts[e]] = () => updateDisplayByIDs(['draftList'],pages)
+        document.getElementById('spkModeBtn')[evts[e]] = () => updateDisplayByIDs(['spkUploads'],pages)
     }
 })
 
@@ -45,6 +46,7 @@ function windowClick(event) {
     closeMenu(event)
     dismissPopup(event,'refillPopup')
     dismissPopup(event,'spkPopup')
+    dismissPopup(event,'spkListPopup')
     let target = event.target
     if (target.tagName.toLowerCase() === 'svg')
         target = target.parentElement

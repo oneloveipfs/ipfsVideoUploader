@@ -28,6 +28,16 @@ const spk = {
             return { error: e.toString() }
         }
     },
+    listUploads: async (cookie) => {
+        try {
+            let r = await axios.get(SPK_API_URL+'/mobile/api/my-videos',{ headers: { Cookie: cookie }})
+            if (!Array.isArray(r.data) || (r.data && r.data.error))
+                return { error: r.data.error }
+            return { uploads: r.data }
+        } catch (e) {
+            return { error: e.toString() }
+        }
+    },
     upload: (cookie, path, onError, onProgress, cb) => {
         let upload = new tus.Upload(fs.createReadStream(path), {
             endpoint: SPK_UPLOAD_URL,

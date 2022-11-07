@@ -54,13 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('authButton2').onclick = loginBtnClicked
 })
 
-window.onclick = (event) => {
-    dismissPopup(event,'loginPopup')
-    dismissPopup(event,'signupPopup')
-    dismissPopup(event,'apiSettingsPopup')
-}
+window.onclick = windowClick
+window.ontouchstart = windowClick
 
-window.ontouchstart = (event) => {
+function windowClick(event) {
     dismissPopup(event,'loginPopup')
     dismissPopup(event,'signupPopup')
     dismissPopup(event,'apiSettingsPopup')
@@ -571,7 +568,7 @@ async function blurtLogin() {
 
 // NOTE: I really want to remove Steem from OneLoveIPFS entirely, however
 // there are people who still post there so limited support will have to stay unfortunately :\
-// TODO: Deprecate in v3.1
+// TODO: Remove in v3.1
 async function steemLogin() {
     let steemUsername = document.getElementById('steemLoginUsername').value.toLowerCase().replace('@','')
     let steemKey = document.getElementById('steemLoginKey').value
