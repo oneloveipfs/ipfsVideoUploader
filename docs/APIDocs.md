@@ -149,28 +149,6 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 }
 ```
 
-#### To upload video from filesystem directly
-*ClientConfig.uploadFromFs* must be set to `true` in configuration to enable direct filesystem uploads.
-```
-/uploadVideoFs?access_token=AUTH_TOKEN
-```
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
-* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
-* Content type: application/json
-* Example content JSON:
-```
-{
-    type: 'videos',
-    filepath: /path/to/video.mp4
-}
-```
-* Example response:
-```
-{
-    id: "emlz0hq0pe5meqr"
-}
-```
-
 # PUT API
 
 #### To update user settings:

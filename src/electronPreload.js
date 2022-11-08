@@ -24,4 +24,6 @@ process.once('loaded',() => {
     passToRenderer('spk_list_uploads_result')
     passToRenderer('spk_update_info_result')
     passToRenderer('spk_finalize_publish_result')
+    passToRenderer('fs_upload_error')
+    passToRenderer('fs_upload_result')
 })

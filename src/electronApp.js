@@ -1,6 +1,8 @@
 const axios = require('axios')
 const { app, shell, ipcMain, dialog, BrowserWindow, Notification, Menu } = require('electron')
 const aboutWindow = require('about-window').default
+const fs = require('fs')
+const fileUploader = require('./ipfsUploadHandler')
 const spk = require('./spk')
 const config = require('./config')
 const package = require('../package.json')
@@ -209,6 +211,17 @@ ipcMain.on('spk_upload', (evt,arg) => {
             })
         )
     )
+})
+
+// Submit upload directly from filesystem
+ipcMain.on('fs_upload', async (evt,arg) => {
+    if (!fs.existsSync(arg.filepath))
+        return evt.sender.send('fs_upload_error',{error: 'File not found in filesystem'})
+    if (config.enforceIPFSOnline && await fileUploader.isIPFSOnline() === false)
+        return evt.sender.send('fs_upload_error',{error: 'IPFS daemon is offline'})
+    let randomID = fileUploader.IPSync.randomID()
+    fileUploader.uploadFromFs(arg.type,arg.filepath,randomID,arg.user,arg.network,arg.skynet,() => fileUploader.writeUploadRegister())
+    evt.sender.send('fs_upload_result',{id: randomID})
 })
 
 // Update check

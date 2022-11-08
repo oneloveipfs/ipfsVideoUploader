@@ -470,15 +470,27 @@ function uploadVideo(resolution,next) {
 
     if (config.uploadFromFs && isElectron()) {
         progressbarInner.innerText = 'Submitting upload...'
-        return axios.post('/uploadVideoFs'+geturl,{
-            type: resolutionFType,
-            createSprite: isPlatformSelected['DTube'] ? 'true' : '',
-            skynet: document.getElementById('skynetupload').checked ? 'true' : 'false',
-            filepath: videoToUpload[0].path
-        }).then(result => {
-            progressbarInner.innerHTML = "Processing video..."
+        window.postMessage({
+            action: 'fs_upload',
+            data: {
+                user: username,
+                network: currentnetwork,
+                type: resolutionFType,
+                skynet: document.getElementById('skynetupload').checked ? 'true' : 'false',
+                filepath: videoToUpload[0].path
+            }
+        })
+        let errorChannel = new BroadcastChannel('fs_upload_error')
+        errorChannel.onmessage = evt => {
+            errorChannel.close()
+            alert(evt.data.error)
+        }
+        let resultChannel = new BroadcastChannel('fs_upload_result')
+        resultChannel.onmessage = evt => {
+            resultChannel.close()
+            progressbarInner.innerHTML = 'Processing video...'
             uplStat.emit('registerid',{
-                id: result.data.id,
+                id: evt.data.id,
                 type: resolutionFType,
                 access_token: Auth.token,
                 keychain: Auth.iskeychain
@@ -487,10 +499,8 @@ function uploadVideo(resolution,next) {
                 uploadVideo(resolution+1,next)
             else
                 next()
-        }).catch(e => {
-            console.log(e)
-            alert('Error occured while submitting file')
-        })
+        }
+        return
     }
     progressbarInner.innerHTML = 'Uploading... (0%)'
 
@@ -854,7 +864,7 @@ function buildJsonMetadata(network) {
             lang: 'en', // todo add lang field
             firstUpload: spkUploadList[postparams.spkIdx].firstUpload,
             video_v2: spkUploadList[postparams.spkIdx].video_v2,
-            ipfs: spkUploadList[postparams.spkIdx].filename,
+            ipfs: spkUploadList[postparams.spkIdx].filename.replace('ipfs://',''),
             sourceMap: [
                 { type: 'thumbnail', url: spkUploadList[postparams.spkIdx].thumbUrl },
                 { type: 'video', url: spkUploadList[postparams.spkIdx].video_v2, format: 'm3u8' }
