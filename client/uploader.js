@@ -188,6 +188,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('submitbutton').onclick = () => {
         // Validate data entered
+        let spkFinalizing = parseInt(sessionStorage.getItem('editingMode')) === 3 && postparams.spkIdx && spkUploadList.length > 0
         postparams.postBody = document.getElementById('postBody').value
         postparams.description = document.getElementById('description').value
         postparams.powerup = document.getElementById('powerup').checked
@@ -209,10 +210,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             return alert('Please do not use more than 10 tags!')
 
         // Check for empty fields
-        if (sourceVideo.length == 0)
+        if (!spkFinalizing && sourceVideo.length == 0)
             return alert('Please upload a video!')
 
-        if (snap.length == 0)
+        if (!spkFinalizing && snap.length == 0)
             return alert('Please upload a thumbnail for your video!')
 
         if (title.length == 0)
@@ -226,8 +227,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         postparams.scheduled = validateDatePicker()
         if (postparams.scheduled === -1) return
 
-        if (parseInt(sessionStorage.getItem('editingMode')) === 3 && postparams.spkIdx && spkUploadList.length > 0)
-            return spkUpdateDraft(spkGetSavedCookie(),postparams.spkIdx,postparams.title,postparams.description,postparams.tags,false)
+        if (spkFinalizing) {
+            postparams.permlink = spkUploadList[postparams.spkIdx].permlink
+            postparams.imghash = spkUploadList[postparams.spkIdx].thumbnail.replace('ipfs://','')
+            postparams.ipfshash = spkUploadList[postparams.spkIdx].filename.replace('ipfs://','')
+            postparams.size = spkUploadList[postparams.spkIdx].size
+            postparams.duration = spkUploadList[postparams.spkIdx].duration
+            spkUpdateDraft(spkGetSavedCookie(),postparams.spkIdx,postparams.title,postparams.description,postparams.tags,false,(newIdx) => {
+                postparams.spkIdx = newIdx
+                postVideo()
+            })
+            return
+        }
 
         if (isPlatformSelected['3Speak'] && usernameByNetwork('hive'))
             return displayPopup('spkPopup')
@@ -772,7 +783,8 @@ function bcFinish() {
     document.getElementById('uploadProgressFront').innerHTML = 'All done'
     if (!postparams.scheduled) {
         postpublish()
-        updateDisplayByIDs(['postpublish'],['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','settings','scheduledPublishes'])
+        if (!config.noBroadcast)
+            updateDisplayByIDs(['postpublish'],['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','settings','scheduledPublishes'])
     }
 }
 
@@ -824,59 +836,27 @@ function buildJsonMetadata(network) {
         jsonMeta.video.refs = generateRefs(network)
     }
 
-    if (isPlatformSelected['3Speak'] && allowedPlatformNetworks['3Speak'].includes(network)) {
-        // Desktop app format
-        /*
-        jsonMeta.title = postparams.title
-        jsonMeta.description = postparams.description
-        jsonMeta.sourceMap = [
-            ...(postparams.hasThumbnail ? [{
-                type: 'thumbnail',
-                url: 'ipfs://'+postparams.imghash
-            }] : []),
-            {
-                type: 'video',
-                url: 'ipfs://'+postparams.ipfshash+'/default.m3u8',
-                format: 'm3u8'
-            }
-        ]
-        jsonMeta.image = ['https://ipfs-3speak.b-cdn.net/ipfs/'+postparams.imghash]
-        jsonMeta.filesize = postparams.size
-        jsonMeta.created = new Date().toISOString()
-        jsonMeta.type = '3speak/video'
-        jsonMeta.video.duration = postparams.duration
-        jsonMeta.video.info = {
-            author: usernameByNetwork(network),
-            permlink: postparams.permlink
-        }
-        */
+    if (!isNaN(parseInt(postparams.spkIdx)) && spkUploadList.length > parseInt(postparams.spkIdx)) {
         // 3speak.tv format
         jsonMeta.type = '3speak/video'
         jsonMeta.image = ['https://ipfs-3speak.b-cdn.net/ipfs/'+postparams.imghash]
         jsonMeta.video.info = {
             author: usernameByNetwork(network),
-            permlink: postparams.permlink,
+            permlink: spkUploadList[postparams.spkIdx].permlink,
             platform: '3speak',
             title: postparams.title,
             duration: postparams.duration,
             filesize: postparams.size,
+            file: spkUploadList[postparams.spkIdx].originalFilename,
             lang: 'en', // todo add lang field
-            firstUpload: false,
-            video_v2: 'https://ipfs-3speak.b-cdn.net/ipfs/'+postparams.ipfshash+'/default.m3u8', // from mobile app, not sure what is this for
-            ipfs: postparams.ipfshash+'/default.m3u8',
-            ipfsThumbnail: postparams.imghash
+            firstUpload: spkUploadList[postparams.spkIdx].firstUpload,
+            video_v2: spkUploadList[postparams.spkIdx].video_v2,
+            ipfs: spkUploadList[postparams.spkIdx].filename,
+            sourceMap: [
+                { type: 'thumbnail', url: spkUploadList[postparams.spkIdx].thumbUrl },
+                { type: 'video', url: spkUploadList[postparams.spkIdx].video_v2, format: 'm3u8' }
+            ]
         }
-        jsonMeta.sourceMap = [
-            ...(postparams.hasThumbnail ? [{
-                type: 'thumbnail',
-                url: 'ipfs://'+postparams.imghash
-            }] : []),
-            {
-                type: 'video',
-                url: 'ipfs://'+postparams.ipfshash+'/default.m3u8',
-                format: 'm3u8'
-            }
-        ]
         jsonMeta.video.content = {
             description: postparams.description,
             tags: postparams.tags
@@ -959,12 +939,16 @@ function generateRefs(network) {
 function generatePost(network) {
     // Power up all rewards or not
     let rewardPercent = postparams.powerup ? 0 : 10000
+    let spkPosting = !isNaN(parseInt(postparams.spkIdx)) && spkUploadList.length > parseInt(postparams.spkIdx)
 
     // Sort beneficiary list in ascending order
     let sortedBeneficiary = []
-    if (network === 'hive')
-        sortedBeneficiary = hiveBeneficiaries.sort()
-    else if (network === 'steem')
+    if (network === 'hive') {
+        if (spkPosting)
+            sortedBeneficiary = hiveBeneficiaries.spkGetSortedAccounts(spkUploadList[postparams.spkIdx].beneficiaries)
+        else
+            sortedBeneficiary = hiveBeneficiaries.sort()
+    } else if (network === 'steem')
         sortedBeneficiary = steemBeneficiaries.sort()
     else if (network === 'blurt')
         sortedBeneficiary = blurtBeneficiaries.sort()
@@ -1015,7 +999,7 @@ function generatePost(network) {
         }
     }
 
-    if (isPlatformSelected['3Speak'] && allowedPlatformNetworks['3Speak'].includes(network))
+    if (spkPosting)
         operations.push(['custom_json', {
             required_auths: [],
             required_posting_auths: [user],

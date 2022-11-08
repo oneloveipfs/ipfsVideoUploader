@@ -143,7 +143,7 @@ function spkUpload(cookie) {
     }
 }
 
-function spkListUploads(cookie) {
+function spkListUploads(cookie, cb) {
     window.postMessage({ action: 'spk_list_uploads', data: cookie })
     let channel = new BroadcastChannel('spk_list_uploads_result')
     channel.onmessage = evt => {
@@ -163,6 +163,8 @@ function spkListUploads(cookie) {
             document.getElementById('spkUploadListTbody').innerHTML = spkULTbody.renderRow()
             updateAnchorsElectron()
         }
+        if (typeof cb === 'function')
+            cb()
     }
 }
 
@@ -199,7 +201,7 @@ function spkLoadMetadataPostUpload(pm,idx) {
     sessionStorage.setItem('editingMode',3)
 }
 
-function spkUpdateDraft(cookie, idx, title, desc, tags, nsfw) {
+function spkUpdateDraft(cookie, idx, title, desc, tags, nsfw, cb) {
     window.postMessage({
         action: 'spk_update_info',
         data: {
@@ -215,7 +217,21 @@ function spkUpdateDraft(cookie, idx, title, desc, tags, nsfw) {
     channel.onmessage = (evt) => {
         channel.close()
         console.log(evt.data)
+        spkRefreshList(cookie, idx, (newIdx) => {
+            if(typeof cb === 'function')
+                cb(newIdx,evt.data)
+        })
     }
+}
+
+function spkRefreshList(cookie, currentIdx, cb) {
+    let oldId = spkUploadList[currentIdx]._id
+    spkListUploads(cookie, () => {
+        if (currentIdx)
+            for (let i in spkUploadList)
+                if (spkUploadList[i]._id === oldId)
+                    return cb(i)
+    })
 }
 
 function spkError(error, group) {
