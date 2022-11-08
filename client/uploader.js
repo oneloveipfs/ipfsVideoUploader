@@ -1070,20 +1070,11 @@ function updateSubtitle() {
 async function getCommunitySubs(acc,network) {
     let communities
     try {
-        communities = await axios.post(getBlockchainAPI(network),{
-            jsonrpc: '2.0',
-            method: 'bridge.list_all_subscriptions',
-            params: { account: acc },
-            id: 1
-        })
+        communities = await appbaseCall(network,'bridge.list_all_subscriptions',{ account: acc })
     } catch { return }
     let selection = document.getElementById(network+'CommunitySelect')
-    for (let i = 0; i < communities.data.result.length; i++) if (communities.data.result[i][0] !== getDefaultCommunity(network)) {
-        let newoption = document.createElement('option')
-        newoption.text = communities.data.result[i][1] + ' (' + communities.data.result[i][0] + ')'
-        newoption.value = communities.data.result[i][0]
-        selection.appendChild(newoption)
-    }
+    for (let i = 0; i < communities.length; i++) if (communities[i][0] !== getDefaultCommunity(network))
+        selection.appendChild(createOption(communities[i][0],communities[i][1] + ' (' + communities[i][0] + ')'))
 }
 
 function getDefaultCommunity(network) {

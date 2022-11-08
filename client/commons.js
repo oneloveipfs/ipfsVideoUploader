@@ -448,17 +448,9 @@ function generateMessageToSign (username,network,cb) {
     let message = username+':'+config.authIdentifier+':'+network+':'
     switch (network) {
         case 'hive':
-            axios.post(getBlockchainAPI('hive'),{
-                id: 1,
-                jsonrpc: '2.0',
-                method: 'condenser_api.get_dynamic_global_properties',
-                params: []
-            }).then((r) => {
-                if (r.data && r.data.result) {
-                    message += r.data.result.head_block_number+':'+r.data.result.head_block_id
-                    cb(null,message)
-                } else if (r.data && r.data.error)
-                    cb(r.data.error.message)
+            appbaseCall(network,'condenser_api.get_dynamic_global_properties',[]).then(dgp => {
+                message += dgp.head_block_number+':'+dgp.head_block_id
+                cb(null,message)
             }).catch(e => cb(e.toString()))
             break
         case 'dtc':

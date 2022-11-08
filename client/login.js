@@ -539,7 +539,9 @@ async function blurtLogin() {
 
     if (isElectron()) {
         try {
-            await steemKeyLogin(blurtUsername,blurtKey,getBlockchainAPI('blurt'),'BLT')
+            let login = await steemKeyLogin('blurt',blurtUsername,blurtKey,'BLT')
+            if (typeof login === 'string')
+                throw login
         } catch (e) {
             alert(e.toString())
             togglePopupActions('loginformblurt-actions',false)
@@ -576,7 +578,9 @@ async function steemLogin() {
 
     if (isElectron()) {
         try {
-            await steemKeyLogin(steemUsername,steemKey,getBlockchainAPI('steem'))
+            let login = await steemKeyLogin('steem',steemUsername,steemKey)
+            if (typeof login === 'string')
+                throw login
         } catch (e) {
             alert(e.toString())
             togglePopupActions('loginformsteem-actions',false)
@@ -598,30 +602,22 @@ async function steemLogin() {
     }
 }
 
-function steemKeyLogin(username,wif,api,prefix='STM') {
-    return new Promise((rs,rj) => {
-        let steemGetAcc = {
-            id: 1,
-            jsonrpc: '2.0',
-            method: 'condenser_api.get_accounts',
-            params: [[username]]
-        }
-        axios.post(api,steemGetAcc).then((r) => {
-            if (r.data.error)
-                return rj(r.data.error.message)
-            let acc = r.data.result
-            if (acc.length == 0) return rj('Account does not exist')
-            try {
-                let pubkey = hivecryptpro.PrivateKey.fromString(wif).createPublic().toString()
-                if (prefix !== 'STM')
-                    pubkey = pubkey.replace('STM',prefix)
-                for (let i = 0; i < acc[0].posting.key_auths.length; i++)
-                    if (acc[0].posting.key_auths[i][0].toString() === pubkey.toString())
-                        return rs(true)
-                rj('Invalid username or posting key')
-            } catch (err) { return rj('Invalid username or posting key') }
-        }).catch(() => rj('Failed to fetch account'))
-    })
+async function steemKeyLogin(network,username,wif,prefix='STM') {
+    try {
+        let acc = await getGrapheneAccounts(network,[username])
+        if (acc.length == 0) return 'Account does not exist'
+        try {
+            let pubkey = hivecryptpro.PrivateKey.fromString(wif).createPublic().toString()
+            if (prefix !== 'STM')
+                pubkey = pubkey.replace('STM',prefix)
+            for (let i = 0; i < acc[0].posting.key_auths.length; i++)
+                if (acc[0].posting.key_auths[i][0].toString() === pubkey.toString())
+                    return true
+            return 'Invalid username or posting key'
+        } catch (err) { return 'Invalid username or posting key' }
+    } catch {
+        return 'Failed to fetch account'
+    }
 }
 
 function storeEncrypted(key,value,password) {

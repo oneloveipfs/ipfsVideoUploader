@@ -96,16 +96,11 @@ document.addEventListener('DOMContentLoaded', () => {
     for (let i = updates.length - 1; i >= 0; i--) if (updates[i].payout === 'Pending') {
         let author = updates[i].link.split('/')[4].substr(1)
         let permlink = updates[i].link.split('/')[5]
-        axios.post(getBlockchainAPI('hive'),{
-            id: 1,
-            jsonrpc: '2.0',
-            method: 'condenser_api.get_content',
-            params: [author,permlink]
-        }).then((ct) => {
-            let totalpayout = parseFloat(ct.data.result.curator_payout_value.replace(' HBD','')) + parseFloat(ct.data.result.total_payout_value.replace(' HBD','')) + parseFloat(ct.data.result.pending_payout_value.replace(' HBD',''))
+        getGrapheneContent('hive',author,permlink).then(ct => {
+            let totalpayout = parseFloat(ct.curator_payout_value.replace(' HBD','')) + parseFloat(ct.total_payout_value.replace(' HBD','')) + parseFloat(ct.pending_payout_value.replace(' HBD',''))
             updates[i].payout = "$" + Math.round(totalpayout*100)/100
             updateLogs()
-        }).catch((e) => {})
+        }).catch(() => {})
     }
     loadAPISelections()
     if (isElectron())
