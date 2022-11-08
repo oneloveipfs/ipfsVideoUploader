@@ -99,6 +99,8 @@ function spkDeleteSavedCookie() {
 function spkUpload(cookie) {
     saveDraft()
     if (isElectron()) {
+        updateDisplayByIDs(['uploadProgressBack'],[])
+        updateProgressBar(0,'Uploading video...')
         let v = document.getElementById('sourcevideo').files[0]
         let vpathsplit = v.path.split('/')
         window.postMessage({
@@ -115,25 +117,26 @@ function spkUpload(cookie) {
         })
         let videoProgress = new BroadcastChannel('spk_video_upload_progress')
         let thumbnailProgress = new BroadcastChannel('spk_thumbnail_upload_progress')
-        videoProgress.onmessage = evt => console.log('Video progress',evt.data)
-        thumbnailProgress.onmessage = evt => console.log('Thumbnail progress',evt.data)
-
         let videoError = new BroadcastChannel('spk_video_upload_error')
         let thumbnailError = new BroadcastChannel('spk_video_thumbnail_error')
         let uploadError = new BroadcastChannel('spk_upload_error')
-        videoError.onmessage = evt => console.log('Video error',evt.data)
-        thumbnailError.onmessage = evt => console.log('Thumbnail error',evt.data)
-        uploadError.onmessage = evt => console.log('Upload error',evt.data)
-
         let uploadResult = new BroadcastChannel('spk_upload_result')
-        uploadResult.onmessage = evt => {
-            console.log('Upload result',evt.data)
+        let closeChannels = () => {
             videoProgress.close()
             thumbnailProgress.close()
             videoError.close()
             thumbnailError.close()
             uploadError.close()
             uploadResult.close()
+        }
+        videoProgress.onmessage = evt => updateProgressBar(evt.data,'Uploading video...')
+        thumbnailProgress.onmessage = evt => updateProgressBar(evt.data,'Uploading thumbnail...')
+        videoError.onmessage = evt => spkUploadError('Video',evt.data,closeChannels)
+        thumbnailError.onmessage = evt => spkUploadError('Thumbnail',evt.data,closeChannels)
+        uploadError.onmessage = evt => spkUploadError('',evt.data,closeChannels)
+        uploadResult.onmessage = evt => {
+            console.log('Upload result',evt.data)
+            closeChannels()
 
             // set permlink to one provided by 3speak and save
             document.getElementById('customPermlink').value = evt.data.permlink
@@ -141,6 +144,12 @@ function spkUpload(cookie) {
             saveDraft()
         }
     }
+}
+
+function spkUploadError(type,msg,cb) {
+    alert((type?type+' ':'')+'upload error: '+msg)
+    updateDisplayByIDs([],['uploadProgressBack'])
+    cb()
 }
 
 function spkListUploads(cookie, cb) {
