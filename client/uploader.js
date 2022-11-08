@@ -640,6 +640,9 @@ function hiveCb(r,serial) {
         return
     }
 
+    if (spkPosting())
+        spkFinalizePublish(spkGetSavedCookie(),postparams.spkIdx)
+
     if (typeof serial === 'boolean' && serial === true)
         avalonBroadcast()
     else if (typeof serial === 'function')
@@ -836,7 +839,7 @@ function buildJsonMetadata(network) {
         jsonMeta.video.refs = generateRefs(network)
     }
 
-    if (!isNaN(parseInt(postparams.spkIdx)) && spkUploadList.length > parseInt(postparams.spkIdx)) {
+    if (spkPosting()) {
         // 3speak.tv format
         jsonMeta.type = '3speak/video'
         jsonMeta.image = ['https://ipfs-3speak.b-cdn.net/ipfs/'+postparams.imghash]
@@ -939,12 +942,11 @@ function generateRefs(network) {
 function generatePost(network) {
     // Power up all rewards or not
     let rewardPercent = postparams.powerup ? 0 : 10000
-    let spkPosting = !isNaN(parseInt(postparams.spkIdx)) && spkUploadList.length > parseInt(postparams.spkIdx)
 
     // Sort beneficiary list in ascending order
     let sortedBeneficiary = []
     if (network === 'hive') {
-        if (spkPosting)
+        if (spkPosting())
             sortedBeneficiary = hiveBeneficiaries.spkGetSortedAccounts(spkUploadList[postparams.spkIdx].beneficiaries)
         else
             sortedBeneficiary = hiveBeneficiaries.sort()
@@ -999,7 +1001,7 @@ function generatePost(network) {
         }
     }
 
-    if (spkPosting)
+    if (spkPosting())
         operations.push(['custom_json', {
             required_auths: [],
             required_posting_auths: [user],

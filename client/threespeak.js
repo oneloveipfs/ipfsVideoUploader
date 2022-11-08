@@ -234,6 +234,29 @@ function spkRefreshList(cookie, currentIdx, cb) {
     })
 }
 
+function spkPosting() {
+    return !isNaN(parseInt(postparams.spkIdx)) && spkUploadList.length > parseInt(postparams.spkIdx)
+}
+
+function spkFinalizePublish(cookie, idx, cb) {
+    window.postMessage({
+        action: 'spk_finalize_publish',
+        data: {
+            cookie: cookie,
+            id: spkUploadList[idx]._id
+        }
+    })
+    let channel = new BroadcastChannel('spk_finalize_publish_result')
+    channel.onmessage = (evt) => {
+        channel.close()
+        console.log(evt.data)
+        spkRefreshList(cookie, idx, (newIdx) => {
+            if(typeof cb === 'function')
+                cb(newIdx,evt.data)
+        })
+    }
+}
+
 function spkError(error, group) {
     alert(error)
     if (group)

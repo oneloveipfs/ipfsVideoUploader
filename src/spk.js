@@ -97,6 +97,21 @@ const spk = {
         }
         return r
     },
+    finalizePublish: async (cookie, id) => {
+        let r 
+        try {
+            r = (await axios.post(SPK_API_URL+'/mobile/api/my-videos/iPublished',{ videoId: id }, { headers: {
+                'Cookie': cookie,
+                'Content-Type': 'application/json'
+            }})).data
+        } catch (e) {
+            if (e.response && e.response.data)
+                return e.response.data
+            else
+                return {error: e.toString()}
+        }
+        return r
+    },
     tusError: (e) => {
         console.log('tus error',e)
         try {
