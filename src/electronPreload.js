@@ -4,7 +4,6 @@ const passToRenderer = (evtName) => {
     ipcRenderer.on(evtName, (evt, result) => {
         let channel = new BroadcastChannel(evtName)
         channel.postMessage(result)
-        channel.close()
     })
 }
 
