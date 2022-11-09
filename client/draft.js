@@ -83,6 +83,8 @@ function retrieveDraft(pm) {
     let draftObj = {}
     try {
         draftObj = JSON.parse(localStorage.getItem('Draft_'+pm))
+        if (!draftObj)
+            return false
     } catch {
         return false
     }
