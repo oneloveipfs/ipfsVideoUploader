@@ -111,8 +111,8 @@ function onEditSubmit() {
         return alert('Invalid new tags!')
 
     let tags = newTags.split(' ')
-    if ((Object.keys(editor.editingPosts).length > 1 || !editor.editingPosts.avalon) && tags.length > 8)
-        return alert('Please do not use more than 8 tags!')
+    if ((Object.keys(editor.editingPosts).length > 1 || !editor.editingPosts.avalon) && tags.length > 10)
+        return alert('Please do not use more than 10 tags!')
 
     if (newThumbnail.length > 0) {
         let formdata = new FormData()
@@ -236,12 +236,10 @@ function editorFinalize3Speak(newTitle,newDesc,newTags,newThumbnailHash) {
     if (!editor.editingPosts.hive) return
     let tags = newTags.split(' ')
     let json = JSON.parse(editor.editingPosts.hive.json_metadata)
-    if (newThumbnailHash) {
-        json.video.info.ipfsThumbnail = newThumbnailHash
-        for (let s in json.sourceMap)
-            if (json.sourceMap[s].type === 'thumbnail')
-                json.sourceMap[s].url = 'ipfs://'+newThumbnailHash
-    }
+    if (newThumbnailHash)
+        for (let s in json.video.info.sourceMap)
+            if (json.video.info.sourceMap[s].type === 'thumbnail')
+                json.video.info.sourceMap[s].url = 'ipfs://'+newThumbnailHash
     json.video.info.title = newTitle
     json.video.content.description = newDesc
     json.video.content.tags = tags
@@ -289,31 +287,25 @@ function editorJsonCheck(network, isRef = false) {
         json = editor.editingPosts[network].json
     console.log(network,json)
 
-    // support 3speak edits posted using oneloveipfs or desktop app only,
-    // NOT 3speak.tv until we get to publish there without @threespeak posting auth
     if (network === 'hive' &&
         json.type === '3speak/video' &&
         Array.isArray(json.tags) &&
         json.video && json.video.info &&
-        (Array.isArray(json.sourceMap) || (json.video.content && json.video.info.platform === '3speak')) &&
+        Array.isArray(json.video.info.sourceMap) &&
+        json.video.content && json.video.info.platform === '3speak' &&
         json.video.info.author === editor.editingPosts[network].author &&
         json.video.info.permlink === editor.editingPosts[network].permlink &&
         !editor.editingPlatforms.includes('3Speak')) {
         editor.editingPlatforms.push('3Speak')
         if (!isRef) {
-            // not sure which one
-            editor.params.title = json.title || json.video.info.title
-            editor.params.description = json.description || json.video.content.description
+            editor.params.title = json.video.info.title
+            editor.params.description = json.video.content.description
             editor.params.tags = json.tags
-            if (Array.isArray(json.sourceMap))
-                for (let s in json.sourceMap) {
-                    if (json.sourceMap[s].type === 'thumbnail') {
-                        editor.params.imghash = json.sourceMap[s].url.replace('ipfs://','')
-                        break
-                    }
+            for (let s in json.sourceMap) {
+                if (json.sourceMap[s].type === 'thumbnail') {
+                    editor.params.imghash = json.sourceMap[s].url.replace('ipfs://','').replace('https://ipfs-3speak.b-cdn.net/ipfs/','')
+                    break
                 }
-            else {
-                editor.params.imghash = json.video.info.ipfsThumbnail
             }
         }
     }
