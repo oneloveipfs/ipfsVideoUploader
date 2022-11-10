@@ -642,7 +642,7 @@ function hiveBroadcast(hiveTx = null, serial = true) {
     }
 }
 
-function hiveCb(r,serial) {
+async function hiveCb(r,serial) {
     if (r.error) {
         bcError('Hive broadcast',r.error.toString())
         if (typeof serial === 'function')
@@ -650,8 +650,10 @@ function hiveCb(r,serial) {
         return
     }
 
-    if (spkPosting())
-        spkFinalizePublish(spkGetSavedCookie(),postparams.spkIdx)
+    if (spkPosting()) {
+        document.getElementById('uploadProgressFront').innerHTML = 'Finalizing 3Speak upload...'
+        await spkFinalizePublishPromise(spkGetSavedCookie(),postparams.spkIdx)
+    }
 
     if (typeof serial === 'boolean' && serial === true)
         avalonBroadcast()

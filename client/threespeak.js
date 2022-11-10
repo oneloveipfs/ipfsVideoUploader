@@ -266,6 +266,10 @@ function spkFinalizePublish(cookie, idx, cb) {
     }
 }
 
+function spkFinalizePublishPromise(cookie, idx) {
+    return new Promise((rs) => spkFinalizePublish(cookie,idx,rs))
+}
+
 function spkError(error, group) {
     alert(error)
     if (group)
