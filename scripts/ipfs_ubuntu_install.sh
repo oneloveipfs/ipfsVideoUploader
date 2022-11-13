@@ -8,15 +8,15 @@ fi
 
 VERSION=$1
 if [ "$VERSION" = "" ]; then
-    VERSION="0.12.2"
+    VERSION="0.16.0"
 fi
 
 echo "Downloading ipfs v${VERSION} for Ubuntu..."
-wget -q "https://github.com/ipfs/go-ipfs/releases/download/v${VERSION}/go-ipfs_v${VERSION}_linux-amd64.tar.gz"
-tar -xvf go-ipfs_v${VERSION}_linux-amd64.tar.gz
-cd go-ipfs
+wget -q "https://github.com/ipfs/kubo/releases/download/v${VERSION}/kubo_v${VERSION}_linux-amd64.tar.gz"
+tar -xvf kubo_v${VERSION}_linux-amd64.tar.gz
+cd kubo
 ./install.sh
 cd ..
-rm -r go-ipfs
-rm go-ipfs_v${VERSION}_linux-amd64.tar.gz
+rm -r kubo
+rm kubo_v${VERSION}_linux-amd64.tar.gz
 echo "ipfs installed successfully!"
