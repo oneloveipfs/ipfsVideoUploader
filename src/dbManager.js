@@ -17,13 +17,13 @@ const setupDb = (db) => {
     }
 }
 setupDb('userinfo')
-setupDb('hashsizes')
+setupDb('hashInfo')
 setupDb('hashes')
 setupDb('skylinks')
 
 // Cache JSON data into variables
 let userInfo = JSON.parse(fs.readFileSync(dbDir+'/userinfo.json','utf8'))
-let hashSizes = JSON.parse(fs.readFileSync(dbDir+'/hashsizes.json','utf8'))
+let hashInfo = JSON.parse(fs.readFileSync(dbDir+'/hashInfo.json','utf8'))
 let hashes = JSON.parse(fs.readFileSync(dbDir+'/hashes.json','utf8'))
 let skylinks = JSON.parse(fs.readFileSync(dbDir+'/skylinks.json','utf8'))
 
@@ -104,7 +104,10 @@ let db = {
         
         // Record size of file
         if (size > 0)
-            hashSizes[hash] = size
+            hashInfo[hash] = {
+                size: size,
+                ts: new Date().getTime()
+            }
 
         return isNewHash
     },
@@ -126,8 +129,8 @@ let db = {
         for (hashtype in userHashes) {
             result[hashtype] = 0
             for (h in userHashes[hashtype]) {
-                if (typeof hashSizes[userHashes[hashtype][h]] == 'number')
-                    result[hashtype] += hashSizes[userHashes[hashtype][h]]
+                if (hashInfo[userHashes[hashtype][h]] && typeof hashInfo[userHashes[hashType][h]].size === 'number')
+                    result[hashtype] += hashInfo[userHashes[hashtype][h]].size
             }
         }
         return result
@@ -210,8 +213,8 @@ let db = {
         
         cb(skylinksToReturn)
     },
-    getSizeByHash: (hash) => {
-        return hashSizes[hash] || null
+    getHashInfo: (hash) => {
+        return hashInfo[hash]
     },
     settingsValidator: {
         uplThreads: (value) => {
@@ -272,8 +275,8 @@ let db = {
                 console.log('Error saving hash logs: ' + err)
         })
     },
-    writeHashSizesData: () => {
-        fs.writeFile(dbDir+'/hashsizes.json',JSON.stringify(hashSizes),(err) => {
+    writeHashInfoData: () => {
+        fs.writeFile(dbDir+'/hashInfo.json',JSON.stringify(hashInfo),(err) => {
             if (err)
                 console.log('Error saving hash sizes: ' + err)
         })

@@ -297,9 +297,11 @@ app.get('/pinsByType',(request,response) => {
     if (!hashes[typerequested])
         return response.status(404).send({error: 'Hash type not found for user'})
     for (let i = 0; i < hashes[typerequested].length; i++) {
+        let hashInfo = db.getHashInfo(hashes[typerequested][i])
         result.push({
             cid: hashes[typerequested][i],
-            size: db.getSizeByHash(hashes[typerequested][i])
+            size: hashInfo.size,
+            ts: hashInfo.ts
         })
     }
     response.send(result)
