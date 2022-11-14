@@ -22,6 +22,14 @@
         "maxSizeMb": 0
     },
 
+    "PinService": {
+        "SPKOrigins": []
+    },
+
+    "Discounts": {
+        "SPK": 0.25
+    },
+
     "ClientConfig": {
         "authIdentifier": "oneloveipfs_login",
         "authTimeoutBlocks": 20,

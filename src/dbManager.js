@@ -1,5 +1,6 @@
 // Flat file JSON database manager
 const fs = require('fs')
+const config = require('./config')
 const dir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 const dbDir = dir+'/db'
 
@@ -81,7 +82,7 @@ let db = {
                 result.push({username: db.toUsername(i), network: db.toNetwork(i)})
         return result
     },
-    recordHash: (username,network,type,hash,size) => {
+    recordHash: (username,network,type,hash,size,discount) => {
         if (!hash && !size) return false
         let fullusername = db.toFullUsername(username,network,true)
         if (!hashes[fullusername]) {
@@ -101,13 +102,18 @@ let db = {
 
         if (isNewHash)
             hashes[fullusername][type].push(hash)
+
+        let info = {
+            size: size,
+            ts: new Date().getTime()
+        }
+
+        if (discount)
+            info.discount = discount
         
         // Record size of file
-        if (size > 0)
-            hashInfo[hash] = {
-                size: size,
-                ts: new Date().getTime()
-            }
+        if (size > 0 && !hashInfo[hash])
+            hashInfo[hash] = info
 
         return isNewHash
     },
@@ -123,20 +129,22 @@ let db = {
             skylinks[fullusername][type].push(skylink)
     },
     // Retrieve usage and hashes data
-    getUsage: (username,network) => {
+    getUsage: (username,network,applyDiscounts = false) => {
         let result = {}
         let userHashes = db.getHashesByUser(possibleTypes,username,network)
         for (hashtype in userHashes) {
             result[hashtype] = 0
             for (h in userHashes[hashtype]) {
-                if (hashInfo[userHashes[hashtype][h]] && typeof hashInfo[userHashes[hashtype][h]].size === 'number')
-                    result[hashtype] += hashInfo[userHashes[hashtype][h]].size
+                if (hashInfo[userHashes[hashtype][h]] && typeof hashInfo[userHashes[hashtype][h]].size === 'number') {
+                    let discountFactor = applyDiscounts ? (typeof hashInfo[userHashes[hashtype][h]].discount === 'string' ? config.Discounts[hashInfo[userHashes[hashtype][h]].discount] || 1 : hashInfo[userHashes[hashtype][h]].discount) : 1
+                    result[hashtype] += Math.ceil(hashInfo[userHashes[hashtype][h]].size * discountFactor)
+                }
             }
         }
         return result
     },
-    getTotalUsage: (username,network) => {
-        let usageDet = db.getUsage(username,network)
+    getTotalUsage: (username,network,applyDiscounts = false) => {
+        let usageDet = db.getUsage(username,network,applyDiscounts)
         let qtotal = 0
         for (det in usageDet) {
             qtotal += usageDet[det]

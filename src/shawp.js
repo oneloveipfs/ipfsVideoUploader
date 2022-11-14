@@ -258,7 +258,7 @@ let Shawp = {
         let monthnow = datetoday.getMonth()
         let yearnow = datetoday.getFullYear()
         for (user in Customers) {
-            let usage = db.getTotalUsage(db.toUsername(user),db.toNetwork(user))
+            let usage = db.getTotalUsage(db.toUsername(user),db.toNetwork(user),true)
             let gbdays = Math.round(usage / 1073741824 * 100000000) / 100000000
             Customers[user].balance -= gbdays
 
@@ -278,7 +278,7 @@ let Shawp = {
     },
     getDaysRemaining: (username,network) => {
         let fullusername = db.toFullUsername(username,network,true)
-        let usage = db.getTotalUsage(username,network)
+        let usage = db.getTotalUsage(username,network,true)
         if (usage <= 0 || !Customers[fullusername])
             return { days: -1 }
         else if (Customers[fullusername].balance <= 0 && !Config.admins.includes(username))
