@@ -129,7 +129,7 @@ let db = {
         for (hashtype in userHashes) {
             result[hashtype] = 0
             for (h in userHashes[hashtype]) {
-                if (hashInfo[userHashes[hashtype][h]] && typeof hashInfo[userHashes[hashType][h]].size === 'number')
+                if (hashInfo[userHashes[hashtype][h]] && typeof hashInfo[userHashes[hashtype][h]].size === 'number')
                     result[hashtype] += hashInfo[userHashes[hashtype][h]].size
             }
         }
