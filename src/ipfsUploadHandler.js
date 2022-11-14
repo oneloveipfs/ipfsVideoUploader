@@ -140,7 +140,7 @@ const processSingleVideo = async (id,user,network,cb) => {
     // Video hash and usage should already been handled previously
     db.recordHash(user,network,'sprites',spriteGen.hash,spriteGen.size)
     db.writeHashesData()
-    db.writeHashSizesData()
+    db.writeHashInfoData()
 
     let result = {
         username: user,
@@ -194,7 +194,7 @@ let uploadOps = {
                 if (!request.query.onlyhash) {
                     db.recordHash(username,network,imgType,hash,request.file.size)
                     db.writeHashesData()
-                    db.writeHashSizesData()
+                    db.writeHashInfoData()
                 }
 
                 // Send image IPFS hash back to client and IPSync
@@ -227,7 +227,7 @@ let uploadOps = {
         
         db.recordHash(username,network,'subtitles',sub.cid.toString(),sub.size)
         db.writeHashesData()
-        db.writeHashSizesData()
+        db.writeHashInfoData()
 
         let result = {
             username: username,
@@ -272,7 +272,7 @@ let uploadOps = {
 
         db.recordHash(username,network,'chunks',ipfsAdd.cid.toString(),ipfsAdd.size)
         db.writeHashesData()
-        db.writeHashSizesData()
+        db.writeHashInfoData()
 
         let result = {
             username: username,
@@ -449,7 +449,7 @@ let uploadOps = {
                             // Record in db and return result
                             db.recordHash(user,network,'hls',folderhash.cid.toString(),folderhash.size)
                             db.writeHashesData()
-                            db.writeHashSizesData()
+                            db.writeHashInfoData()
 
                             let result = {
                                 username: user,
@@ -506,7 +506,7 @@ let uploadOps = {
                     db.recordHash(user,network,'videos',results.videohash.ipfshash,json.Upload.Size)
                     db.recordHash(user,network,'sprites',results.spritehash.hash,results.spritehash.size)
                     db.writeHashesData()
-                    db.writeHashSizesData()
+                    db.writeHashInfoData()
 
                     if (results.videohash.skylink) {
                         db.recordSkylink(user,network,'videos',results.videohash.skylink)
@@ -548,7 +548,7 @@ let uploadOps = {
                 addFile(filepath,true,Config.Skynet.enabled && json.Upload.MetaData.skynet == 'true',(size,hash,skylink) => {
                     db.recordHash(user,network,json.Upload.MetaData.type,hash,json.Upload.Size)
                     db.writeHashesData()
-                    db.writeHashSizesData()
+                    db.writeHashInfoData()
 
                     if (skylink) {
                         db.recordSkylink(user,network,json.Upload.MetaData.type,skylink)
@@ -846,7 +846,7 @@ let uploadOps = {
                             // Record in db and return result
                             db.recordHash(encoderRegister[r].queue[0].user,encoderRegister[r].queue[0].network,'hls',ipfsaddop.folderhash.cid.toString(),ipfsaddop.folderhash.size)
                             db.writeHashesData()
-                            db.writeHashSizesData()
+                            db.writeHashInfoData()
 
                             let result = {
                                 username: encoderRegister[r].queue[0].user,
