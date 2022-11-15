@@ -227,6 +227,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         postparams.scheduled = validateDatePicker()
         if (postparams.scheduled === -1) return
 
+        if (spkFinalizing && !isPlatformSelected['3Speak'])
+            return alert('3Speak platform must be selected to finalize a 3Speak video publish.')
+
         if (spkFinalizing) {
             delete postparams.scheduled
             postparams.permlink = spkUploadList[postparams.spkIdx].permlink
