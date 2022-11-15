@@ -218,6 +218,12 @@ app.get('/spk/pin/statuses',(req,res) => {
     res.send(FileUploader.spkPinRegister())
 })
 
+app.get('/spk/pin/status',(req,res) => {
+    Authenticate(req,res,false,(user,network) => {
+        res.send(FileUploader.spkPinsRegisterByUser(user,network))
+    })
+})
+
 app.get('/usage',(request,response) => {
     // API to get usage info
     if (!request.query.user || request.query.user === '') return response.send('Username is not defined!');

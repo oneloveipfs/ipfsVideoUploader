@@ -663,6 +663,13 @@ let uploadOps = {
         ipsync.emit('upload',result)
     },
     spkPinRegister: () => spkPinsRegister,
+    spkPinsRegisterByUser: (user,network) => {
+        let result = {}
+        for (let i in spkPinsRegister)
+            if (i.split(':')[0] === db.toFullUsername(user,network))
+                result[i.split(':')[1]] = spkPinsRegister[i]
+        return result
+    },
     writeUploadRegister: () => {
         fs.writeFile(defaultDir+'/db/register.json',JSON.stringify(uploadRegister),() => {})
     },
