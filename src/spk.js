@@ -4,6 +4,8 @@ const axios = require('axios')
 const tus = require('tus-js-client')
 const SPK_API_URL = 'https://studio.3speak.tv'
 const SPK_UPLOAD_URL = 'https://uploads.3speak.tv/files'
+const SPK_GATEWAY = 'https://ipfs-3speak.b-cdn.net'
+const SPK_GATEWAY_TIMEOUT = 10000
 
 const spk = {
     auth: async (username) => {
@@ -122,6 +124,19 @@ const spk = {
                 return e.originalResponse._xhr.responseText
         } catch {
             return 'Unknown Tus error'
+        }
+    },
+    retrieveIPFS: async (hash) => {
+        try {
+            let gwFileInfo = await axios.head(SPK_GATEWAY+'/ipfs/'+hash,{
+                timeout: SPK_GATEWAY_TIMEOUT,
+                decompress: false
+            })
+            return gwFileInfo.status
+        } catch (e) {
+            if (e.response && typeof e.response.status === 'number')
+                return e.response.status
+            return 404
         }
     }
 }

@@ -14,6 +14,7 @@ const db = require('./dbManager')
 const Auth = require('./authManager')
 const ProcessingQueue = require('./processingQueue')
 const helpers = require('./encoderHelpers')
+const spk = require('./spk')
 const globSource = IPFS.globSource
 const defaultDir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 
@@ -40,6 +41,11 @@ const MB = 1048576
 let uploadRegister = JSON.parse(fs.readFileSync(defaultDir+'/db/register.json','utf8'))
 let socketRegister = {}
 let encoderRegister = {}
+let spkPinsRegister = {}
+
+// spk pins timeouts
+const SPK_PIN_REGISTER_TIMEOUT_RESULTED_HRS = 6
+const SPK_PIN_REGISTER_TIMEOUT_RUNNING_HRS = 3
 
 const emitToUID = (id,evt,message,updateTs) => {
     if (socketRegister[id] && socketRegister[id].socket) {
@@ -600,6 +606,63 @@ let uploadOps = {
                 fs.unlinkSync(Config.tusdUploadDir+'/'+PartialUploads[i]+'.info')
         }
     },
+    pinFromSPKNodes: async (username,network,hash,type,cb) => {
+        let statusCode = await spk.retrieveIPFS(hash)
+        if (statusCode !== 200)
+            return cb('Failed to retrieve file from 3speak nodes, status code: '+statusCode)
+        let peerInterval = setInterval(async () => {
+            for (let i in Config.PinService.SPKOrigins)
+                try {
+                    await ipfsAPI.swarm.connect(Config.PinService[i])
+                } catch {}
+        },5000)
+        let pinOpId = db.toFullUsername(username,network)+':'+uploadOps.IPSync.randomID()
+        spkPinsRegister[pinOpId] = {
+            status: 0,
+            ts: new Date().getTime(),
+            hash: hash,
+            type: type
+        }
+        cb(null,pinOpId)
+        try {
+            console.log('SPK pinned hash',await ipfsAPI.pin.add(hash))
+            clearInterval(peerInterval)
+        } catch (e) {
+            spkPinsRegister[pinOpId].status = 2
+            spkPinsRegister[pinOpId].msg = e.toString()
+            spkPinsRegister[pinOpId].ts = new Date().getTime()
+            clearInterval(peerInterval)
+            return // handle ipfs pin add error
+        }
+
+        let size
+        try {
+            let stat = await ipfsAPI.files.stat('/ipfs/'+hash)
+            db.recordHash(username,network,type,hash,stat.cumulativeSize,'SPK')
+            db.writeHashesData()
+            db.writeHashInfoData()
+            size = stat.cumulativeSize
+        } catch (e) {
+            console.log(e)
+            spkPinsRegister[pinOpId].status = 3
+            spkPinsRegister[pinOpId].msg = e.toString()
+            spkPinsRegister[pinOpId].ts = new Date().getTime()
+            return // handle ipfs file stat error
+        }
+
+        let result = {
+            username: username,
+            network: network,
+            type: type,
+            hash: hash,
+            size: size
+        }
+        spkPinsRegister[pinOpId].status = 1
+        spkPinsRegister[pinOpId].ts = new Date().getTime()
+        console.log('SPK pin',result)
+        ipsync.emit('upload',result)
+    },
+    spkPinRegister: () => spkPinsRegister,
     writeUploadRegister: () => {
         fs.writeFile(defaultDir+'/db/register.json',JSON.stringify(uploadRegister),() => {})
     },
@@ -889,6 +952,14 @@ let uploadOps = {
                         delete encoderRegister[r].socket
                 })
             })
+
+            // regularly cleanup spk pins register
+            setInterval(() => {
+                for (let i in spkPinsRegister)
+                    if ((spkPinsRegister[i].status === 0 && spkPinsRegister[i].ts <= new Date().getTime() - (SPK_PIN_REGISTER_TIMEOUT_RUNNING_HRS*1000*3600)) ||
+                        (spkPinsRegister[i].ts <= new Date().getTime() - (SPK_PIN_REGISTER_TIMEOUT_RESULTED_HRS*1000*3600)))
+                        delete spkPinsRegister[i]
+            },60000)
         },
         activeCount: () => {
             return usercount

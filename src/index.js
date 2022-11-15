@@ -203,6 +203,21 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
     // console.log(request.headers['hook-name'],request.body.Upload)
 })
 
+app.post('/spk/pin',Parser.json({ verify: rawBodySaver }),(req,res) => {
+    Authenticate(req,res,true,(user,network) => {
+        FileUploader.pinFromSPKNodes(user,network,req.body.hash,req.body.type,(err,id) => {
+            if (err)
+                res.status(500).send({error: err})
+            else
+                res.send({id: id})
+        })
+    })
+})
+
+app.get('/spk/pin/statuses',(req,res) => {
+    res.send(FileUploader.spkPinRegister())
+})
+
 app.get('/usage',(request,response) => {
     // API to get usage info
     if (!request.query.user || request.query.user === '') return response.send('Username is not defined!');
