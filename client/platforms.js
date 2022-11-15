@@ -211,6 +211,8 @@ function updateDisplayPlatforms() {
         document.getElementById('customPermlink').disabled = true
         document.getElementById('customPermlinkField').classList.add('tooltip')
         document.getElementById('customPermlinkField').classList.add('tooltippm')
+        // for now scheduled publishes are unsupported
+        updateDisplayByIDs([],['schedulepost','scheduledStr'])
         updateDisplayByIDs(['customPermlink3Speak'],[])
     } else {
         document.getElementById('hlsencode').disabled = false
@@ -219,6 +221,7 @@ function updateDisplayPlatforms() {
         document.getElementById('customPermlinkField').classList.remove('tooltip')
         document.getElementById('customPermlinkField').classList.remove('tooltippm')
         updateDisplayByIDs([],['customPermlink3Speak'])
+        updateDisplayByIDs(['schedulepost','scheduledStr'],[])
     }
     if (selected.includes('DTube') && config && config.skynetEnabled)
         updateDisplayByIDs(['skynetswitch'],[])

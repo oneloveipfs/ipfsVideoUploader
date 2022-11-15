@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Beneficiaries description text
         document.getElementById('beneficiariesDesc').innerText = Beneficiaries.describe()
 
-        if (config.olisc)
+        if (config.olisc && !isPlatformSelected['3Speak'])
             updateDisplayByIDs(['schedulepost','scheduledStr'],[])
 
         if (isPlatformSelected.DTube && config.skynetEnabled)
@@ -228,6 +228,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (postparams.scheduled === -1) return
 
         if (spkFinalizing) {
+            delete postparams.scheduled
             postparams.permlink = spkUploadList[postparams.spkIdx].permlink
             postparams.imghash = spkUploadList[postparams.spkIdx].thumbnail.replace('ipfs://','')
             postparams.ipfshash = spkUploadList[postparams.spkIdx].filename.replace('ipfs://','')
