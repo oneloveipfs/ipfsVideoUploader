@@ -203,6 +203,7 @@ function spkLoadMetadataPostUpload(pm,idx) {
         document.getElementById('description').value = spkUploadList[idx].description
         updateDisplayByIDs(['editingDraft'],[])
     }
+    document.getElementById('videoduration').value = spkUploadList[idx].duration
     document.getElementById('editingDraftMsg').innerText = document.getElementById('editingDraftMsg').innerText.replace('Editing draft','Finalizing 3Speak upload metadata')
     document.getElementById('submitbutton').value = 'Submit'
     setDisplayByClass('fileUploadField')
