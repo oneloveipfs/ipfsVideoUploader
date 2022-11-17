@@ -198,6 +198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         let sourceVideo = document.getElementById('sourcevideo').files
         let snap = document.getElementById('snapfile').files
         let title = document.getElementById('title').value
+        let durationField = document.getElementById('videoduration').value
         if (title.length > 256)
             return alert('Title is too long!')
 
@@ -223,6 +224,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (tag.length == 0)
             return alert('Please enter some tags (up to 10) for your video!')
         postparams.tags = tags
+
+        if (durationField.length === 0)
+            return alert('Video duration is required')
+        else if (isNaN(parseFloat(durationField)) || parseFloat(durationField) < 0)
+            return alert('Video duration must be greater than 0 seconds')
+        
+        if (parseFloat(durationField) !== postparams.duration)
+            postparams.duration = parseFloat(durationField)
 
         postparams.scheduled = validateDatePicker()
         if (postparams.scheduled === -1) return
@@ -409,7 +418,10 @@ function sourceVideoSelect() {
     }
     let audioObj = document.createElement('audio')
     audioObj.autoplay = false
-    audioObj.addEventListener('canplaythrough',(evt) => postparams.duration = evt.currentTarget.duration)
+    audioObj.addEventListener('canplaythrough',(evt) => {
+        postparams.duration = evt.currentTarget.duration
+        document.getElementById('videoduration').value = evt.currentTarget.duration
+    })
     let videoObjUrl = URL.createObjectURL(selected[0])
     audioObj.src = videoObjUrl
 }
