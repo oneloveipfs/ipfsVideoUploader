@@ -636,12 +636,16 @@ let uploadOps = {
         }
 
         let size
+        let dir = []
         try {
             let stat = await ipfsAPI.files.stat('/ipfs/'+hash)
             db.recordHash(username,network,type,hash,stat.cumulativeSize,'SPK')
             db.writeHashesData()
             db.writeHashInfoData()
             size = stat.cumulativeSize
+            if (stat.type === 'directory')
+                for await (const f of ipfsAPI.ls('/ipfs/'+hash))
+                    dir.push(f)
         } catch (e) {
             console.log(e)
             spkPinsRegister[pinOpId].status = 3
@@ -650,15 +654,22 @@ let uploadOps = {
             return // handle ipfs file stat error
         }
 
+        for (let i in dir)
+            dir[i].cid = dir[i].cid.toString()
+
         let result = {
             username: username,
             network: network,
             type: type,
             hash: hash,
+            dir: dir,
             size: size
         }
         spkPinsRegister[pinOpId].status = 1
         spkPinsRegister[pinOpId].ts = new Date().getTime()
+        spkPinsRegister[pinOpId].hash = hash
+        spkPinsRegister[pinOpId].dir = dir
+        spkPinsRegister[pinOpId].size = size
         console.log('SPK pin',result)
         ipsync.emit('upload',result)
     },
@@ -669,6 +680,9 @@ let uploadOps = {
             if (i.split(':')[0] === db.toFullUsername(user,network))
                 result[i.split(':')[1]] = spkPinsRegister[i]
         return result
+    },
+    spkPinsRegisterByUserAndID: (user,network,id) => {
+        return spkPinsRegister[db.toFullUsername(user,network)+':'+id]
     },
     writeUploadRegister: () => {
         fs.writeFile(defaultDir+'/db/register.json',JSON.stringify(uploadRegister),() => {})

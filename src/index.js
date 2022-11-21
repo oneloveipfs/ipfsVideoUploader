@@ -224,6 +224,16 @@ app.get('/spk/pin/status',(req,res) => {
     })
 })
 
+app.get('/spk/pin/status/:id',(req,res) => {
+    Authenticate(req,res,false,(user,network) => {
+        let result = FileUploader.spkPinsRegisterByUserAndID(user,network,req.params.id)
+        if (!result)
+            return res.status(404).send({error: 'pin request not found'})
+        else
+            res.send(result)
+    })
+})
+
 app.get('/usage',(request,response) => {
     // API to get usage info
     if (!request.query.user || request.query.user === '') return response.send('Username is not defined!');
