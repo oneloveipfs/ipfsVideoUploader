@@ -234,6 +234,12 @@
                         </div>
                         <div id="spkauth" style="display: none;">
                             <p>We use necessary cookies to authenticate to your 3Speak video upload. By clicking "Authenticate", you consent to our use of third party cookies from 3speak.tv.</p>
+                            <p>Note for HiveAuth users: You will need to manually decrypt the memo with your private posting key and enter the resulting access token in the next step as the HiveAuth protocol does not support memo cryptography operations.</p>
+                        </div>
+                        <div id="spkauthhas" style="display: none;">
+                            <p>Decrypt the following message with your private posting key and enter it below:</p>
+                            <p id="spkAuthHasEnc" style="word-break: break-all;">#soemthignsomething</p>
+                            <input type="text" class="meta" id="spkauthhasresult" placeholder="Decrypted message (excluding #)">
                         </div>
                     </div>
                     <div class="popup-actions" id="spknotice-actions">
@@ -243,6 +249,10 @@
                     <div class="popup-actions" id="spkauth-actions" style="display: none;">
                         <input type="button" value="Reject" onclick="dismissPopupAction('spkPopup')">
                         <input type="button" value="Authenticate" id="spkAuthenticateBtn" onclick="spkGetAccessToken(spkUpload)">
+                    </div>
+                    <div class="popup-actions" id="spkauthhas-actions" style="display: none;">
+                        <input type="button" value="Back" onclick="updateDisplayByIDs(['spkauth'],['spkauthhas','spkauthhas-actions']); updateDisplayByIDs(['spkauth-actions'],[],'flex')">
+                        <input type="button" value="Proceed" id="spkHasProceedBtn" onclick="spkRequestCookie(document.getElementById('spkauthhasresult').value, spkUpload)">
                     </div>
                 </div>
             </div>
@@ -459,11 +469,23 @@
                         <h2>Notice</h2>
                     </div>
                     <div class="popup-body">
-                        <p>We use necessary cookies to authenticate to your 3Speak.tv account. By clicking "Authenticate", you consent to our use of third party cookies from 3speak.tv.</p>
+                        <div id="spkListAuthIntro">
+                            <p>We use necessary cookies to authenticate to your 3Speak.tv account. By clicking "Authenticate", you consent to our use of third party cookies from 3speak.tv.</p>
+                            <p>Note for HiveAuth users: You will need to manually decrypt the memo with your private posting key and enter the resulting access token in the next step as the HiveAuth protocol does not support memo cryptography operations.</p>
+                        </div>
+                        <div id="spkListAuthHas" style="display: none;">
+                            <p>Decrypt the following message with your private posting key and enter it below:</p>
+                            <p id="spkListAuthHasEnc" style="word-break: break-all;">#soemthignsomething</p>
+                            <input type="text" class="meta" id="spkListAuthHasResult2" placeholder="Decrypted message (excluding #)">
+                        </div>
                     </div>
-                    <div class="popup-actions">
+                    <div class="popup-actions" id="spkListAuthIntro-actions">
                         <input type="button" value="Reject" onclick="dismissPopupAction('spkListPopup')">
                         <input type="button" value="Authenticate" id="spkAuthenticateBtn" onclick="spkGetAccessToken(() => {})">
+                    </div>
+                    <div class="popup-actions" id="spkListAuthHas-actions" style="display: none;">
+                        <input type="button" value="Back" onclick="updateDisplayByIDs(['spkListAuthIntro'],['spkListAuthHas','spkListAuthHas-actions']); updateDisplayByIDs(['spkListAuthIntro-actions'],[],'flex')">
+                        <input type="button" value="Proceed" id="spkListAuthHasProceedBtn" onclick="spkRequestCookie(document.getElementById('spkListAuthHasResult2').value,() => {})">
                     </div>
                 </div>
             </div>

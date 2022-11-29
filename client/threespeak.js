@@ -43,7 +43,12 @@ function spkAuthResult(result,cb) {
     if (result.error)
         return spkError(result.error, 'spkauth-actions')
     if (hiveAuthLogin) {
-        return spkError('HiveAuth can\'t decrypt memos?!', 'spkauth-actions')
+        document.getElementById('spkListAuthHasEnc').innerText = result.memo
+        document.getElementById('spkAuthHasEnc').innerText = result.memo
+        updateDisplayByIDs(['spkListAuthHas','spkauthhas'],['spkListAuthIntro','spkListAuthIntro-actions','spkauth','spkauth-actions'])
+        updateDisplayByIDs(['spkListAuthHas-actions','spkauthhas-actions'],[],'flex')
+        return
+        // return spkError('HiveAuth can\'t decrypt memos?!', 'spkauth-actions')
     } else if (isElectron()) {
         let t
         try {
