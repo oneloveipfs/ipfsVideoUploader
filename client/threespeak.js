@@ -237,7 +237,7 @@ function spkUpdateDraft(cookie, idx, title, desc, tags, nsfw, cb) {
 function spkRefreshList(cookie, currentIdx, cb) {
     let oldId = spkUploadList[currentIdx]._id
     spkListUploads(cookie, () => {
-        if (currentIdx)
+        if (typeof currentIdx === 'number')
             for (let i in spkUploadList)
                 if (spkUploadList[i]._id === oldId)
                     return cb(i)
@@ -275,4 +275,100 @@ function spkError(error, group) {
     alert(error)
     if (group)
         togglePopupActions(group,false)
+}
+
+async function spkPinRequestStart() {
+    updateDisplayByIDs(['uploadProgressBack'],[])
+    let progressbarInner = document.getElementById('uploadProgressFront')
+    progressbarInner.style.width = '100%'
+    progressbarInner.innerText = 'Creating pin requests...'
+    let hlsHash = postparams.ipfshash.split('/')[0]
+    let hlsPinCompl = false, thumbnailPinCompl = false
+    let hlsPinReqCreate = await spkPinRequestCreate(hlsHash,'hls')
+    if (!hlsPinReqCreate)
+        return updateDisplayByIDs([],['uploadProgressBack'])
+    let thumbnailPinReqCreate = await spkPinRequestCreate(postparams.imghash,'thumbnails')
+    if (!thumbnailPinReqCreate)
+        return updateDisplayByIDs([],['uploadProgressBack'])
+    progressbarInner.innerText = 'Pinning files from 3Speak to IPFS node...'
+    let allPinIvl = setInterval(async () => {
+        if (hlsPinCompl && thumbnailPinCompl) {
+            clearInterval(allPinIvl)
+            console.log('all done')
+            // postVideo()
+        }
+    })
+    let hlsPinIvl = setInterval(async () => {
+        let q = await spkPinRequestQuery('hls')
+        if (q.error) {
+            clearInterval(hlsPinIvl)
+            clearInterval(allPinIvl)
+            spkError(q.error)
+        } else if (q.status === 1) {
+            clearInterval(hlsPinIvl)
+            for (let i in q.dir)
+                if (q.dir[i].type === 'dir') {
+                    if (q.dir[i].name === '1080p')
+                        postparams.ipfs1080hash = hlsHash+'/1080p/index.m3u8'
+                    else if (q.dir[i].name === '720p')
+                        postparams.ipfs720hash = hlsHash+'/720p/index.m3u8'
+                    else if (q.dir[i].name === '480p')
+                        postparams.ipfs480hash = hlsHash+'/480p/index.m3u8'
+                    else if (q.dir[i].name === '240p')
+                        postparams.ipfs240hash = hlsHash+'/240p/index.m3u8'
+                }
+            hlsPinCompl = true
+        }
+    },5000)
+    let thumbnailPinIvl = setInterval(async () => {
+        let q = await spkPinRequestQuery('thumbnails')
+        if (q.error) {
+            clearInterval(thumbnailPinIvl)
+            clearInterval(allPinIvl)
+            spkError(q.error)
+        } else if (q.status === 1) {
+            clearInterval(thumbnailPinIvl)
+            thumbnailPinCompl = true
+        }
+    },5000)
+}
+
+async function spkPinRequestCreate(hash, type) {
+    let call = '/spk/pin'+'?access_token='+Auth.token
+    if (Auth.iskeychain !== 'true')
+        call += '&scauth=true'
+    try {
+        let pinRequest = await axios.post(call,{
+            hash: hash,
+            type: type
+        },{ headers: { 'Content-Type': 'application/json' }})
+        if (pinRequest.status === 200) {
+            if (!postparams.spkPinRequests)
+                postparams.spkPinRequests = {}
+            postparams.spkPinRequests[type] = pinRequest.data.id
+            return true
+        } else {
+            spkError(pinRequest.data.error)
+            return false
+        }
+    } catch (e) {
+        console.log(e)
+        spkError('Failed to create '+type+' pin request')
+        return false
+    }
+}
+
+async function spkPinRequestQuery(type) {
+    let call = '/spk/pin/status/'+postparams.spkPinRequests[type].split(':')[1]+'?access_token='+Auth.token
+    if (Auth.iskeychain !== 'true')
+        call += '&scauth=true'
+    try {
+        let pinRequest = await axios.get(call)
+        console.log(pinRequest)
+        return pinRequest.data
+    } catch (e) {
+        if (e.response && e.response.status === 404)
+            return { error: 'not found' }
+        return { error: e }
+    }
 }

@@ -188,7 +188,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('submitbutton').onclick = () => {
         // Validate data entered
-        let spkFinalizing = parseInt(sessionStorage.getItem('editingMode')) === 3 && postparams.spkIdx && spkUploadList.length > 0
         postparams.postBody = document.getElementById('postBody').value
         postparams.description = document.getElementById('description').value
         postparams.powerup = document.getElementById('powerup').checked
@@ -211,10 +210,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             return alert('Please do not use more than 10 tags!')
 
         // Check for empty fields
-        if (!spkFinalizing && sourceVideo.length == 0)
+        if (!spkPosting() && sourceVideo.length == 0)
             return alert('Please upload a video!')
 
-        if (!spkFinalizing && snap.length == 0)
+        if (!spkPosting() && snap.length == 0)
             return alert('Please upload a thumbnail for your video!')
 
         if (title.length == 0)
@@ -236,19 +235,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         postparams.scheduled = validateDatePicker()
         if (postparams.scheduled === -1) return
 
-        if (spkFinalizing && !isPlatformSelected['3Speak'])
+        if (spkPosting() && !isPlatformSelected['3Speak'])
             return alert('3Speak platform must be selected to finalize a 3Speak video publish.')
 
-        if (spkFinalizing) {
+        if (spkPosting()) {
             delete postparams.scheduled
             postparams.permlink = spkUploadList[postparams.spkIdx].permlink
             postparams.imghash = spkUploadList[postparams.spkIdx].thumbnail.replace('ipfs://','')
-            postparams.ipfshash = spkUploadList[postparams.spkIdx].filename.replace('ipfs://','')
+            postparams.ipfshash = spkUploadList[postparams.spkIdx].video_v2.replace('ipfs://','')
             postparams.size = spkUploadList[postparams.spkIdx].size
             postparams.duration = spkUploadList[postparams.spkIdx].duration
-            spkUpdateDraft(spkGetSavedCookie(),postparams.spkIdx,postparams.title,postparams.description,postparams.tags,false,(newIdx) => {
+            postparams.spkPinRequests = {}
+            spkUpdateDraft(spkGetSavedCookie(),postparams.spkIdx,postparams.title,postparams.description,postparams.tags,false,async (newIdx) => {
                 postparams.spkIdx = newIdx
-                postVideo()
+                spkPinRequestStart()
             })
             return
         }
@@ -884,7 +884,7 @@ function buildJsonMetadata(network) {
             video_v2: spkUploadList[postparams.spkIdx].video_v2,
             ipfs: spkUploadList[postparams.spkIdx].filename.replace('ipfs://',''),
             sourceMap: [
-                { type: 'thumbnail', url: spkUploadList[postparams.spkIdx].thumbUrl },
+                { type: 'thumbnail', url: spkUploadList[postparams.spkIdx].thumbnail },
                 { type: 'video', url: spkUploadList[postparams.spkIdx].video_v2, format: 'm3u8' }
             ]
         }
