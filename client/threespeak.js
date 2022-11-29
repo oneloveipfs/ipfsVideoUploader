@@ -294,8 +294,7 @@ async function spkPinRequestStart() {
     let allPinIvl = setInterval(async () => {
         if (hlsPinCompl && thumbnailPinCompl) {
             clearInterval(allPinIvl)
-            console.log('all done')
-            // postVideo()
+            postVideo() // pinnings complete
         }
     })
     let hlsPinIvl = setInterval(async () => {
