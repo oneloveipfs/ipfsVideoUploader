@@ -388,7 +388,7 @@ let uploadOps = {
                         Config.Encoder.encoder,
                         Config.Encoder.quality,
                         outputResolutions,
-                        json.Upload.MetaData.createSprite,
+                        Config.spritesEnabled && json.Upload.MetaData.createSprite,
                         defaultDir+'/'+json.Upload.ID,
                         Config.Encoder.threads,
                         (id, resolution, p) => {
