@@ -172,12 +172,16 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
 
                 if (request.body.Upload.MetaData.type === 'hlsencode') {
                     let fullusername = db.toFullUsername(user,network)
-                    if (!Config.admins.includes(fullusername) && !Config.Encoder.accounts.includes(fullusername) && !Config.admins.includes(user) && !Config.Encoder.accounts.includes(user))
-                        return response.status(401).send({error: 'Uploads from encoding servers must be an admin or encoder account.'})
+                    if (request.body.Upload.MetaData.selfEncode) {
+                        if (!request.body.Upload.MetaData.encodeID || FileUploader.selfEncoderGet(fullusername) !== request.body.Upload.MetaData.encodeID)
+                            return response.status(401).send({error: 'Invalid self encode ID'})
+                    } else {
+                        if (!Config.admins.includes(fullusername) && !Config.Encoder.accounts.includes(fullusername) && !Config.admins.includes(user) && !Config.Encoder.accounts.includes(user))
+                            return response.status(401).send({error: 'Uploads from encoding servers must be an admin or encoder account.'})
 
-                    // encoder specific fields
-                    if (FileUploader.remoteEncoding(fullusername) !== request.body.Upload.MetaData.encodeID)
-                        return response.status(401).send({error: 'Encoding upload ID currently not first in queue'})
+                        if (FileUploader.remoteEncoding(fullusername) !== request.body.Upload.MetaData.encodeID)
+                            return response.status(401).send({error: 'Encoding upload ID currently not first in queue'})
+                    }
                     if (isNaN(parseInt(request.body.Upload.MetaData.idx)) || parseInt(request.body.Upload.MetaData.idx) < -1)
                         return response.status(401).send({error: 'Invalid encoder output file index'})
                     if (isNaN(parseInt(request.body.Upload.MetaData.output)) && request.body.Upload.MetaData.output !== 'sprite')
