@@ -282,6 +282,29 @@ app.get('/encoder/stats',(req,res) => {
     })
 })
 
+app.post('/encoder/self/register',(req,res) => {
+    Authenticate(req,res,true,(user,network) => {
+        return res.send({id: FileUploader.selfEncoderRegister(db.toFullUsername(user,network))})
+    })
+})
+
+app.delete('/encoder/self/deregister',(req,res) => {
+    Authenticate(req,res,false,(user,network) => {
+        FileUploader.selfEncoderDeregister(db.toFullUsername(user,network))
+        return res.send({success: true})
+    })
+})
+
+app.get('/encoder/self/get',(req,res) => {
+    Authenticate(req,res,false,(user,network) => {
+        return res.send({id: FileUploader.selfEncoderGet(db.toFullUsername(user,network))})
+    })
+})
+
+app.post('/encoder/self/complete',(req,res) => {
+
+})
+
 app.get('/hashes',(request,response) => {
     // API to get IPFS hashes of uploaded files
     let typerequested = request.query.hashtype

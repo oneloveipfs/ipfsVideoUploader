@@ -42,6 +42,7 @@ let uploadRegister = JSON.parse(fs.readFileSync(defaultDir+'/db/register.json','
 let socketRegister = {}
 let encoderRegister = {}
 let spkPinsRegister = {}
+let selfEncoderMap = {}
 
 // spk pins timeouts
 const SPK_PIN_REGISTER_TIMEOUT_RESULTED_HRS = 6
@@ -720,6 +721,25 @@ let uploadOps = {
     },
     remoteEncoderPushJob: (encoderName, id, username, network, duration, createSprite, thumbnailFname) => {
         encoderRegister[encoderName].queue.push({id,username,network,duration,createSprite,thumbnailFname})
+    },
+    selfEncoderGet: (fullUsername) => {
+        return selfEncoderMap[fullUsername] && selfEncoderMap[fullUsername].id ? selfEncoderMap[fullUsername].id : ''
+    },
+    selfEncoderRegister: (fullUsername) => {
+        if (selfEncoderMap[fullUsername] && selfEncoderMap[fullUsername].id && fs.existsSync(selfEncoderMap[fullUsername].id))
+            fs.unlinkSync(defaultDir+'/'+selfEncoderMap[fullUsername].id)
+        let randomID = uploadOps.IPSync.randomID()
+        selfEncoderMap[fullUsername] = {
+            id: randomID,
+            ts: new Date().getTime()
+        }
+        fs.mkdirSync(defaultDir+'/'+randomID)
+        return randomID
+    },
+    selfEncoderDeregister: (fullUsername) => {
+        if (selfEncoderMap[fullUsername] && selfEncoderMap[fullUsername].id && fs.existsSync(selfEncoderMap[fullUsername].id))
+            fs.unlinkSync(defaultDir+'/'+selfEncoderMap[fullUsername].id)
+        delete selfEncoderMap[fullUsername]
     },
     IPSync: {
         init: (server) => {
