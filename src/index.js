@@ -209,6 +209,8 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
 
 app.post('/spk/pin',Parser.json({ verify: rawBodySaver }),(req,res) => {
     Authenticate(req,res,true,(user,network) => {
+        if (req.body.type !== 'hls' && req.body.type !== 'thumbnails')
+            return res.status(401).send({error: 'type must be hls or thumbnails'})
         FileUploader.pinFromSPKNodes(user,network,req.body.hash,req.body.type,(err,id) => {
             if (err)
                 res.status(500).send({error: err})
