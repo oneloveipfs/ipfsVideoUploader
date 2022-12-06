@@ -1,5 +1,6 @@
 const Config = require('./config')
 const FileUploader = require('./ipfsUploadHandler')
+const encoderHelper = require('./encoderHelpers')
 const db = require('./dbManager')
 const Auth = require('./authManager')
 const Shawp = require('./shawp')
@@ -290,7 +291,13 @@ app.get('/encoder/stats',(req,res) => {
 
 app.post('/encoder/self/register',(req,res) => {
     Authenticate(req,res,true,(user,network) => {
-        return res.send({id: FileUploader.selfEncoderRegister(db.toFullUsername(user,network))})
+        if (!req.query.outputs)
+            return res.status(401).send({ error: 'comma-separated output resolutions are required' })
+        let outputs = req.query.outputs.split(',')
+        for (let i in outputs)
+            if (!encoderHelper.getHlsBw(outputs[i]))
+                return res.status(401).send({ error: 'invalid output '+outputs[i] })
+        return res.send({id: FileUploader.selfEncoderRegister(db.toFullUsername(user,network),outputs)})
     })
 })
 

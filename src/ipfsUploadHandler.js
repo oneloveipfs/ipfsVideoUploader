@@ -730,13 +730,14 @@ let uploadOps = {
     selfEncoderGet: (fullUsername) => {
         return selfEncoderMap[fullUsername] && selfEncoderMap[fullUsername].id ? selfEncoderMap[fullUsername].id : ''
     },
-    selfEncoderRegister: (fullUsername) => {
+    selfEncoderRegister: (fullUsername,outputs) => {
         if (selfEncoderMap[fullUsername] && selfEncoderMap[fullUsername].id && fs.existsSync(selfEncoderMap[fullUsername].id))
             fs.unlinkSync(defaultDir+'/'+selfEncoderMap[fullUsername].id)
         let randomID = uploadOps.IPSync.randomID()
         selfEncoderMap[fullUsername] = {
             id: randomID,
-            ts: new Date().getTime()
+            ts: new Date().getTime(),
+            outputs: outputs
         }
         fs.mkdirSync(defaultDir+'/'+randomID)
         return randomID
