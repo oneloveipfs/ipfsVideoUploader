@@ -728,7 +728,7 @@ let uploadOps = {
         encoderRegister[encoderName].queue.push({id,username,network,duration,createSprite,thumbnailFname})
     },
     selfEncoderGet: (fullUsername) => {
-        return selfEncoderMap[fullUsername] && selfEncoderMap[fullUsername].id ? selfEncoderMap[fullUsername].id : ''
+        return selfEncoderMap[fullUsername] || {}
     },
     selfEncoderRegister: (fullUsername,outputs) => {
         if (selfEncoderMap[fullUsername] && selfEncoderMap[fullUsername].id && fs.existsSync(selfEncoderMap[fullUsername].id))

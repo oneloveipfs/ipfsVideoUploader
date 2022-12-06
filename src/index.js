@@ -174,7 +174,7 @@ app.post('/uploadVideoResumable',Parser.json({ verify: rawBodySaver }),Parser.ur
                 if (request.body.Upload.MetaData.type === 'hlsencode') {
                     let fullusername = db.toFullUsername(user,network)
                     if (request.body.Upload.MetaData.selfEncode) {
-                        if (!request.body.Upload.MetaData.encodeID || FileUploader.selfEncoderGet(fullusername) !== request.body.Upload.MetaData.encodeID)
+                        if (!request.body.Upload.MetaData.encodeID || FileUploader.selfEncoderGet(fullusername).id !== request.body.Upload.MetaData.encodeID)
                             return response.status(401).send({error: 'Invalid self encode ID'})
                     } else {
                         if (!Config.admins.includes(fullusername) && !Config.Encoder.accounts.includes(fullusername) && !Config.admins.includes(user) && !Config.Encoder.accounts.includes(user))
@@ -310,7 +310,7 @@ app.delete('/encoder/self/deregister',(req,res) => {
 
 app.get('/encoder/self/get',(req,res) => {
     Authenticate(req,res,false,(user,network) => {
-        return res.send({id: FileUploader.selfEncoderGet(db.toFullUsername(user,network))})
+        return res.send(FileUploader.selfEncoderGet(db.toFullUsername(user,network)))
     })
 })
 
