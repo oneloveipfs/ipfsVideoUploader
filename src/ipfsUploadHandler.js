@@ -730,13 +730,14 @@ let uploadOps = {
     selfEncoderGet: (fullUsername) => {
         return selfEncoderMap[fullUsername] || {}
     },
-    selfEncoderRegister: (fullUsername,outputs) => {
+    selfEncoderRegister: (fullUsername,outputs,duration) => {
         if (selfEncoderMap[fullUsername] && selfEncoderMap[fullUsername].id && fs.existsSync(selfEncoderMap[fullUsername].id))
             fs.unlinkSync(defaultDir+'/'+selfEncoderMap[fullUsername].id)
         let randomID = uploadOps.IPSync.randomID()
         selfEncoderMap[fullUsername] = {
             id: randomID,
             ts: new Date().getTime(),
+            duration: duration,
             outputs: outputs
         }
         fs.mkdirSync(defaultDir+'/'+randomID)
@@ -746,6 +747,56 @@ let uploadOps = {
         if (selfEncoderMap[fullUsername] && selfEncoderMap[fullUsername].id && fs.existsSync(selfEncoderMap[fullUsername].id))
             fs.unlinkSync(defaultDir+'/'+selfEncoderMap[fullUsername].id)
         delete selfEncoderMap[fullUsername]
+    },
+    selfEncoderComplete: async (user,network) => {
+        let fullUsername = db.toFullUsername(user,network)
+        let details = selfEncoderMap[fullUsername]
+        delete selfEncoderMap[fullUsername]
+        emitToUID(details.id,'begin',{ step: 'container' }, true)
+
+        // Master playlist, thumbnail
+        let masterPlaylist = await helpers.createMasterPlaylist(defaultDir+'/'+details.id,details.outputs)
+        if (!masterPlaylist.success) {
+            emitToUID(details.id,'error',{ error: masterPlaylist.error },false)
+            return
+        }
+
+        // Add container to IPFS
+        emitToUID(details.id,'begin',{ step: 'ipfsadd' },true)
+        let ipfsaddop = await helpers.addHlsToIPFS(ipfsAPI,globSource,defaultDir,details.id,(addProgress) => {
+            emitToUID(details.id,'progress',{
+                job: 'ipfsadd',
+                progress: addProgress.progress,
+                total: addProgress.total
+            },true)
+        })
+        if (ipfsaddop.error) {
+            emitToUID(details.id,'error',{ error: ipfsaddop.error },false)
+            return
+        }
+
+        // Record in db and return result
+        db.recordHash(user,network,'hls',ipfsaddop.folderhash.cid.toString(),ipfsaddop.folderhash.size)
+        db.writeHashesData()
+        db.writeHashInfoData()
+
+        let result = {
+            username: user,
+            network: network,
+            type: 'hls',
+            ipfshash: ipfsaddop.folderhash.cid.toString(),
+            spritehash: ipfsaddop.spritehash,
+            size: ipfsaddop.folderhash.size,
+            duration: details.duration,
+            hasThumbnail: false,
+            resolutions: details.outputs,
+            encoder: 'SELF'
+        }
+        console.log(result)
+        emitToUID(details.id,'result',result,false)
+        delete socketRegister[details.id]
+        uploadRegister[details.id] = result
+        ipsync.emit('upload',result)
     },
     IPSync: {
         init: (server) => {

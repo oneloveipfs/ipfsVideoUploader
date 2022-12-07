@@ -297,7 +297,10 @@ app.post('/encoder/self/register',(req,res) => {
         for (let i in outputs)
             if (!encoderHelper.getHlsBw(outputs[i]))
                 return res.status(401).send({ error: 'invalid output '+outputs[i] })
-        return res.send({id: FileUploader.selfEncoderRegister(db.toFullUsername(user,network),outputs)})
+        let duration = parseFloat(req.query.duration)
+        if (isNaN(duration) || duration <= 0)
+            return res.status(401).send({ error: 'invalid duration' })
+        return res.send({id: FileUploader.selfEncoderRegister(db.toFullUsername(user,network),outputs,duration)})
     })
 })
 
@@ -315,7 +318,10 @@ app.get('/encoder/self/get',(req,res) => {
 })
 
 app.post('/encoder/self/complete',(req,res) => {
-
+    Authenticate(req,res,false,(user,network) => {
+        FileUploader.selfEncoderComplete(user,network)
+        return res.send({success: true})
+    })
 })
 
 app.get('/hashes',(request,response) => {
