@@ -2,7 +2,6 @@ const axios = require('axios')
 const { app, shell, ipcMain, dialog, BrowserWindow, Notification, Menu } = require('electron')
 const aboutWindow = require('about-window').default
 const fs = require('fs')
-const fileUploader = require('./ipfsUploadHandler')
 const spk = require('./spk')
 const config = require('./config')
 const package = require('../package.json')
@@ -215,6 +214,9 @@ ipcMain.on('spk_upload', (evt,arg) => {
 
 // Submit upload directly from filesystem
 ipcMain.on('fs_upload', async (evt,arg) => {
+    if (REMOTE_APP === 1)
+        return evt.sender.send('fs_upload_error',{error: 'Fs upload is not supported in remote app build'})
+    const fileUploader = require('./ipfsUploadHandler')
     if (!fs.existsSync(arg.filepath))
         return evt.sender.send('fs_upload_error',{error: 'File not found in filesystem'})
     if (config.enforceIPFSOnline && await fileUploader.isIPFSOnline() === false)
