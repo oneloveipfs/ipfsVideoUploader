@@ -11,14 +11,18 @@ module.exports = async (jobid,filepath,evt) => {
     let outputResolutions = encoder.determineOutputs(width,height,config.Encoder.outputs)
     const defaultDir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 
-    // Overwrite if exists
-    if (fs.existsSync(defaultDir+'/'+jobid))
-        fs.unlinkSync(defaultDir+'/'+jobid)
+    try {
+        // Overwrite if exists
+        if (fs.existsSync(defaultDir+'/'+jobid))
+            fs.unlinkSync(defaultDir+'/'+jobid)
 
-    // Create folders
-    fs.mkdirSync(defaultDir+'/'+jobid)
-    for (let r in outputResolutions)
-        fs.mkdirSync(defaultDir+'/'+jobid+'/'+outputResolutions[r]+'p')
+        // Create folders
+        fs.mkdirSync(defaultDir+'/'+jobid)
+        for (let r in outputResolutions)
+            fs.mkdirSync(defaultDir+'/'+jobid+'/'+outputResolutions[r]+'p')
+    } catch (e) {
+        return evt('self_encode_error',{ id: jobid, error: e.toString() })
+    }
 
     const ops = encoder.hlsEncode(
         jobid,filepath,
