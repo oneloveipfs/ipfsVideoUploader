@@ -55,6 +55,17 @@ let helpers = {
     createSpriteInContainer: (filepath, destDir) => {
         return new Promise((rs) => Shell.exec(__dirname+'/../scripts/dtube-sprite.sh ' + filepath + ' ' + destDir+'/sprite.jpg',() => rs()))
     },
+    determineOutputs: (width,height,possibleOutputs = []) => {
+        let outputResolutions = []
+        let sedge = Math.min(width,height)
+        for (let q in possibleOutputs)
+            if (helpers.getHlsBw(possibleOutputs[q]) && sedge >= possibleOutputs[q])
+                outputResolutions.push(possibleOutputs[q])
+        if (outputResolutions.length === 0 && possibleOutputs.length > 0)
+            outputResolutions.push(possibleOutputs[possibleOutputs.length-1])
+        outputResolutions = outputResolutions.sort((a,b) => a-b)
+        return outputResolutions
+    },
     hlsEncode: (id, filepath, orientation, encoder, quality, outputResolutions, createSprite, destDir, threads, onProgress, onError) => {
         const ffmpegbase = ffmpeg(filepath)
             .videoCodec(encoder)

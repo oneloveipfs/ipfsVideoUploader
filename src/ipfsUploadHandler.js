@@ -372,14 +372,7 @@ let uploadOps = {
                     else if (Config.Encoder.maxSizeMb && json.Upload.Size > Config.Encoder.maxSizeMb*MB)
                         return emitToUID(json.Upload.ID,'error',{ error: 'Uploaded file exceeds max size allowed by server encoder' })
 
-                    let outputResolutions = []
-                    let sedge = Math.min(width,height)
-                    for (let q in Config.Encoder.outputs)
-                        if (helpers.getHlsBw(Config.Encoder.outputs[q]) && sedge >= Config.Encoder.outputs[q])
-                            outputResolutions.push(Config.Encoder.outputs[q])
-                    if (outputResolutions.length === 0)
-                        outputResolutions.push(Config.Encoder.outputs[Config.Encoder.outputs.length-1])
-                    outputResolutions = outputResolutions.sort((a,b) => a-b)
+                    let outputResolutions = helpers.determineOutputs(width,height,Config.Encoder.outputs)
 
                     // Create folders
                     fs.mkdirSync(defaultDir+'/'+json.Upload.ID)
