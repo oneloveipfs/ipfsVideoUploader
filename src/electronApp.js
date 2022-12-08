@@ -59,7 +59,7 @@ const openAboutWindow = () => aboutWindow({
     license: package.license,
     use_version_info: true,
     icon_path: 'file://'+__dirname+'/../public/macos_icon.png',
-    copyright: 'Copyright (C) 2022 TechCoderX. Build: ' + BUILD_STR
+    copyright: 'Copyright (C) 2023 TechCoderX. Build: ' + BUILD_STR
 })
 
 const menuTemplate = [

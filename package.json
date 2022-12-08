@@ -25,7 +25,7 @@
   "build": {
     "appId": "com.oneloveipfs.uploader",
     "productName": "OneLoveIPFS",
-    "copyright": "Copyright (C) 2022 TechCoderX",
+    "copyright": "Copyright (C) 2023 TechCoderX",
     "files": [
       "!docs/",
       "!dist/",
