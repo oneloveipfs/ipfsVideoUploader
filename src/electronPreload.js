@@ -26,4 +26,7 @@ process.once('loaded',() => {
     passToRenderer('spk_finalize_publish_result')
     passToRenderer('fs_upload_error')
     passToRenderer('fs_upload_result')
+    passToRenderer('self_encode_error')
+    passToRenderer('self_encode_progress')
+    passToRenderer('self_encode_step')
 })

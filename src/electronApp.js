@@ -3,6 +3,7 @@ const { app, shell, ipcMain, dialog, BrowserWindow, Notification, Menu } = requi
 const aboutWindow = require('about-window').default
 const fs = require('fs')
 const spk = require('./spk')
+const selfEncoder = require('./selfEncoderJob')
 const config = require('./config')
 const package = require('../package.json')
 const isMac = process.platform === 'darwin'
@@ -211,11 +212,19 @@ ipcMain.on('spk_upload', (evt,arg) => {
         )
     )
 })
+ipcMain.on('self_encode', async (evt,arg) => {
+    // usually done in remote app build
+    // we expect this not to be called if disabled
+    if (config.Encoder.outputs.length === 0)
+        return
+    selfEncoder(arg.id,arg.path,(heading,resp) => evt.sender.send(heading,resp))
+})
 
 // Submit upload directly from filesystem
 ipcMain.on('fs_upload', async (evt,arg) => {
     if (REMOTE_APP === 1)
         return evt.sender.send('fs_upload_error',{error: 'Fs upload is not supported in remote app build'})
+    // requiring file uploader module here to avoid redundant dependencies in remote app build
     const fileUploader = require('./ipfsUploadHandler')
     if (!fs.existsSync(arg.filepath))
         return evt.sender.send('fs_upload_error',{error: 'File not found in filesystem'})
