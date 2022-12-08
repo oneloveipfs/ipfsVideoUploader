@@ -1,5 +1,6 @@
 const REMOTE_APP = 0
 const fs = require('fs')
+const shell = require('shelljs')
 const deepmerge = require('deepmerge')
 const userconfigdir = (process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs') + '/config.json'
 let defaultConfig = require('../config.json')
@@ -38,6 +39,18 @@ if (defaultConfig.Olisc.enabled) {
         console.log('Olisc is not installed but enabled in config, disabling it now')
         defaultConfig.Olisc.enabled = false
     }
+}
+
+const whichFfmpeg = shell.which('ffmpeg').toString()
+const whichFfprobe = shell.which('ffprobe').toString()
+if ((!whichFfmpeg || !whichFfprobe) && (!defaultConfig.Encoder.ffmpegPath || !defaultConfig.Encoder.ffprobePath)) {
+    console.log('cound not find ffmpeg/ffprobe, disabling internal video encoder')
+    defaultConfig.Encoder.outputs = []
+} else {
+    if (!defaultConfig.Encoder.ffmpegPath)
+        defaultConfig.Encoder.ffmpegPath = whichFfmpeg
+    if (!defaultConfig.Encoder.ffprobePath)
+        defaultConfig.Encoder.ffprobePath = whichFfprobe
 }
 
 module.exports = defaultConfig
