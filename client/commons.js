@@ -33,13 +33,11 @@ const AVALON_API = [
 ]
 
 const BLURT_API = [
-    'blurtdev.techcoderx.com',
     'rpc.blurt.world',
-    'rpc.blurt.live',
-    'rpc.blurtlatam.com',
     'blurt-rpc.saboin.com',
     'blurtrpc.actifit.io',
-    'kentzz.blurt.world'
+    'kentzz.blurt.world',
+    'blurt-rpc.sagarkothari88.one'
 ]
 
 function getBlockchainAPI(network,httpsPrefix = true) {

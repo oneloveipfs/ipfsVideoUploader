@@ -16,7 +16,7 @@ let RefillHistory = JSON.parse(fs.readFileSync(dbDir+'/shawpRefills.json'))
 let ConsumeHistory = JSON.parse(fs.readFileSync(dbDir+'/shawpConsumes.json'))
 
 let hiveStreamer = new GrapheneStreamer(Config.Shawp.HiveAPI || 'https://techcoderx.com',true,'hive')
-let blurtStreamer = new GrapheneStreamer(Config.Shawp.BlurtAPI || 'https://blurtdev.techcoderx.com',true,'blurt')
+let blurtStreamer = new GrapheneStreamer(Config.Shawp.BlurtAPI || 'https://rpc.blurt.world',true,'blurt')
 let avalonStreamer = new AvalonStreamer(Config.Shawp.AvalonAPI,true)
 
 let Shawp = {
