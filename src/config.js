@@ -41,16 +41,18 @@ if (defaultConfig.Olisc.enabled) {
     }
 }
 
-const whichFfmpeg = shell.which('ffmpeg').toString()
-const whichFfprobe = shell.which('ffprobe').toString()
-if ((!whichFfmpeg || !whichFfprobe) && (!defaultConfig.Encoder.ffmpegPath || !defaultConfig.Encoder.ffprobePath)) {
-    console.log('cound not find ffmpeg/ffprobe, disabling internal video encoder')
-    defaultConfig.Encoder.outputs = []
-} else {
-    if (!defaultConfig.Encoder.ffmpegPath)
-        defaultConfig.Encoder.ffmpegPath = whichFfmpeg
-    if (!defaultConfig.Encoder.ffprobePath)
-        defaultConfig.Encoder.ffprobePath = whichFfprobe
+if (defaultConfig.Encoder.outputs.length > 0) {
+    const whichFfmpeg = shell.which('ffmpeg').toString()
+    const whichFfprobe = shell.which('ffprobe').toString()
+    if ((!whichFfmpeg || !whichFfprobe) && (!defaultConfig.Encoder.ffmpegPath || !defaultConfig.Encoder.ffprobePath)) {
+        console.log('cound not find ffmpeg/ffprobe, disabling internal video encoder')
+        defaultConfig.Encoder.outputs = []
+    } else {
+        if (!defaultConfig.Encoder.ffmpegPath)
+            defaultConfig.Encoder.ffmpegPath = whichFfmpeg
+        if (!defaultConfig.Encoder.ffprobePath)
+            defaultConfig.Encoder.ffprobePath = whichFfprobe
+    }
 }
 
 module.exports = defaultConfig
