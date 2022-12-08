@@ -219,12 +219,7 @@ async function proceedPersistentLogin() {
                 keychainSigCb(challenge.challenge+':'+res.data.challenge.challenge,'hive',true,'Posting')
             }).catch(e => {
                 updateDisplayByIDs([],['persistenthiveauth'])
-                if (e.toString() === 'Error: expired')
-                    handleLoginError('HiveAuth authentication request expired')
-                else if (e.cmd === 'auth_nack')
-                    handleLoginError('HiveAuth authentication request rejected')
-                else if (e.cmd === 'auth_err')
-                    handleLoginError(e.error)
+                handleLoginError(HASError(e))
             })
             return
         } else
@@ -409,12 +404,7 @@ async function hiveAuthLogin() {
         localStorage.setItem('hiveAuth',JSON.stringify(window.logins.hiveAuth))
         keychainSigCb(challenge.challenge+':'+res.data.challenge.challenge,'hive',false,'Posting')
     }).catch((e) => {
-        if (e.toString() === 'Error: expired')
-            alert('HiveAuth authentication request expired')
-        else if (e.cmd === 'auth_nack')
-            alert('HiveAuth authentication request rejected')
-        else if (e.cmd === 'auth_err')
-            alert(e.error)
+        alert(HASError(e))
         updateDisplayByIDs(['loginformhive'],['loginformhiveauth'])
         updateDisplayByIDs(['loginformhive-actions'],[],'flex')
     })

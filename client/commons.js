@@ -183,6 +183,17 @@ function togglePopupActions(popupActionGroupId, disable = false) {
     Array.from(document.getElementById(popupActionGroupId).children).forEach((val) => val.disabled = disable)
 }
 
+function HASError(e) {
+    if (e.toString() === 'Error: expired')
+        return 'HiveAuth authentication request expired'
+    else if (e.cmd === 'auth_nack')
+        return 'HiveAuth authentication request rejected'
+    else if (e.cmd === 'sign_nack')
+        return 'HiveAuth broadcast request rejected'
+    else if (e.cmd === 'auth_err' || e.cmd === 'sign_err')
+        return e.error
+}
+
 function axiosErrorHandler(e) {
     alert(axiosErrorMessage(e))
 }

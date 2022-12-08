@@ -634,16 +634,7 @@ function hiveBroadcast(hiveTx = null, serial = true) {
         if (hiveAuthLogin)
             hiveauth.broadcast(hiveAuthLogin,'posting',hiveTx,() => document.getElementById('uploadProgressFront').innerText = 'Approve Hive transaction in HiveAuth PKSA')
                 .then(() => hiveCb({},serial))
-                .catch((e) => {
-                    let em = ''
-                    if (e.toString() === 'Error: expired')
-                        em = 'HiveAuth broadcast request expired'
-                    else if (e.cmd === 'sign_nack')
-                        em = 'HiveAuth broadcast request rejected'
-                    else if (e.cmd === 'sign_err')
-                        em = e.error
-                    hiveCb({error: em},serial)
-                })
+                .catch((e) => hiveCb({error: HASError(e)},serial))
         else if (isElectron())
             grapheneSignAndBroadcast('hive',sessionStorage.getItem('hiveKey'),hiveTx)
                 .then((r) => hiveCb(r,serial))
