@@ -253,8 +253,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             return
         }
 
-        if (isPlatformSelected['3Speak'] && usernameByNetwork('hive'))
+        if (isPlatformSelected['3Speak'] && usernameByNetwork('hive')) {
+            if (sourceVideo[0].size > 5*1024*1024*1024)
+                return alert('Max upload size for 3speak video is 5GB')
             return displayPopup('spkPopup')
+        }
 
         // Upload thumbnail
         let formdata = new FormData()
