@@ -60,7 +60,7 @@ module.exports = async (jobid,filepath,evt) => {
             total += fs.readdirSync(defaultDir+'/'+jobid+'/'+outputResolutions[o]+'p').length
         evt('self_encode_step',{
             id: jobid,
-            step: 'upload',
+            step: 'encodecomplete',
             outputs: outputResolutions,
             totalFiles: total
         })

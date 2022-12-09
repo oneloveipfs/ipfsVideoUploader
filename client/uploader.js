@@ -30,55 +30,8 @@ let scheduleDatePicker
 let uplStat
 axios.get('/proxy_server').then((r) => {
     uplStat = io.connect(r.data.server+'/uploadStat')
-    uplStat.on('begin',(s) => {
-        console.log('begin',s)
-        switch (s.step) {
-            case 'encode':
-                let encodeProgressBars = []
-                document.getElementById('uploadProgressFront').innerText = 'Encoding HLS video...'
-                for (let r in s.outputs) {
-                    // create encoding progress bar elements
-                    let back = document.createElement('div')
-                    back.setAttribute('class','progressBack')
-                    back.setAttribute('id','encodeProgressBack'+s.outputs[r])
-                    let front = document.createElement('div')
-                    front.setAttribute('class','progressFront')
-                    front.setAttribute('id','encodeProgressFront'+s.outputs[r])
-                    back.appendChild(front)
-                    document.getElementById('encodeProgress').appendChild(document.createElement('br'))
-                    document.getElementById('encodeProgress').appendChild(back)
-
-                    // setup progress
-                    encodeProgressBars.push('encodeProgressBack'+s.outputs[r])
-                    document.getElementById('encodeProgressFront'+s.outputs[r]).innerText = 'Encoding to '+s.outputs[r]+'... (0%)'
-                }
-                updateDisplayByIDs(encodeProgressBars,[])
-                break
-            case 'container':
-                document.getElementById('encodeProgress').innerHTML = ''
-                document.getElementById('uploadProgressFront').innerText = 'Processing output container...'
-                break
-            case 'ipfsadd':
-                document.getElementById('uploadProgressFront').innerText = 'Adding to IPFS...'
-                break
-            default:
-                break
-        }
-    })
-    uplStat.on('progress',(p) => {
-        console.log('progress',p)
-        switch (p.job) {
-            case 'encode':
-                document.getElementById('encodeProgressFront'+p.resolution).style.width = p.progress+'%'
-                document.getElementById('encodeProgressFront'+p.resolution).innerText = 'Encoding to '+p.resolution+'... ('+Math.round(p.progress)+'%)'
-                break
-            case 'ipfsadd':
-                document.getElementById('uploadProgressFront').innerText = 'Adding to IPFS... ('+p.progress+' of '+p.total+' files)'
-                break
-            default:
-                break
-        }
-    })
+    uplStat.on('begin',(s) => uplStatBegin(s))
+    uplStat.on('progress',(p) => uplStatProgress(p))
     uplStat.on('error',(e) => {
         console.log('upload processing error',e)
         alert(e.error)
@@ -520,6 +473,9 @@ function uploadVideo(resolution,next) {
                 next()
         }
         return
+    } else if (isElectron() && resolutionFType === 'hls') {
+        // call self-encoder from remote app build
+        return selfEncode(generatePermlink(),videoToUpload[0].path)
     }
     progressbarInner.innerHTML = 'Uploading... (0%)'
 
@@ -575,6 +531,82 @@ function uploadVideo(resolution,next) {
             videoUpload.resumeFromPreviousUpload(p[0])
         videoUpload.start()
     })
+}
+
+function uplStatBegin(s) {
+    console.log('step',s)
+    switch (s.step) {
+        case 'encode':
+            let encodeProgressBars = []
+            document.getElementById('uploadProgressFront').innerText = 'Encoding HLS video...'
+            for (let r in s.outputs) {
+                // create encoding progress bar elements
+                let back = document.createElement('div')
+                back.setAttribute('class','progressBack')
+                back.setAttribute('id','encodeProgressBack'+s.outputs[r])
+                let front = document.createElement('div')
+                front.setAttribute('class','progressFront')
+                front.setAttribute('id','encodeProgressFront'+s.outputs[r])
+                back.appendChild(front)
+                document.getElementById('encodeProgress').appendChild(document.createElement('br'))
+                document.getElementById('encodeProgress').appendChild(back)
+
+                // setup progress
+                encodeProgressBars.push('encodeProgressBack'+s.outputs[r])
+                document.getElementById('encodeProgressFront'+s.outputs[r]).innerText = 'Encoding to '+s.outputs[r]+'... (0%)'
+            }
+            updateDisplayByIDs(encodeProgressBars,[])
+            break
+        case 'container':
+            document.getElementById('encodeProgress').innerHTML = ''
+            document.getElementById('uploadProgressFront').innerText = 'Processing output container...'
+            break
+        case 'ipfsadd':
+            document.getElementById('uploadProgressFront').innerText = 'Adding to IPFS...'
+            break
+        default:
+            break
+    }
+}
+
+function uplStatProgress(p) {
+    console.log('progress',p)
+    switch (p.job) {
+        case 'encode':
+            document.getElementById('encodeProgressFront'+p.resolution).style.width = p.progress+'%'
+            document.getElementById('encodeProgressFront'+p.resolution).innerText = 'Encoding to '+p.resolution+'... ('+Math.round(p.progress)+'%)'
+            break
+        case 'ipfsadd':
+            document.getElementById('uploadProgressFront').innerText = 'Adding to IPFS... ('+p.progress+' of '+p.total+' files)'
+            break
+        default:
+            break
+    }
+}
+
+function selfEncode(id,path) {
+    window.postMessage({ action: 'self_encode', data: { id,path }})
+    let errorChannel = new BroadcastChannel('self_encode_error')
+    let progressChannel = new BroadcastChannel('self_encode_progress')
+    let stepChannel = new BroadcastChannel('self_encode_step')
+    const closeChannels = () => {
+        errorChannel.close()
+        progressChannel.close()
+        stepChannel.close()
+    }
+    errorChannel.onmessage = evt => {
+        alert(evt.data.error)
+        closeChannels()
+        updateDisplayByIDs([],['uploadProgressBack'])
+        reenableFields()
+    }
+    progressChannel.onmessage = evt => uplStatProgress(evt.data)
+    stepChannel.onmessage = evt => {
+        uplStatBegin(evt.data)
+        if (evt.data.step === 'encodecomplete') {
+            closeChannels()
+        }
+    }
 }
 
 function toggleImg(disable = false) {
