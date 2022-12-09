@@ -390,6 +390,13 @@ app.get('/config',(req,res) => {
             runInterval: Config.Olisc.runInterval
         }
     configRes.skynetEnabled = Config.Skynet.enabled
+    configRes.encoder = {
+        accounts: Config.Encoder.accounts,
+        encoder: Config.Encoder.encoder,
+        quality: Config.Encoder.quality,
+        outputs: Config.Encoder.outputs,
+        maxSizeMb: Config.Encoder.maxSizeMb
+    }
     res.send(configRes)
 })
 

@@ -25,6 +25,7 @@ let avalonKey = sessionStorage.getItem('avalonKey')
 // Post parameters (videohash, video240, video480 etc)
 let postparams = {}
 let scheduleDatePicker
+let encoderAvailable = false
 
 // Socket.io connection to server
 let uplStat
@@ -124,6 +125,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }).catch(() => {})
             else
                 updateDisplayByIDs([],['beneficiaryHeading'+capitalizeFirstLetter(grapheneNetworks[g]),'beneficiaryTableList'+capitalizeFirstLetter(grapheneNetworks[g]),'totalBeneficiariesLabel'+capitalizeFirstLetter(grapheneNetworks[g]),grapheneNetworks[g]+'Community'])
+
+        if (config.encoder.accounts.length > 0 || config.encoder.outputs.length > 0) {
+            updateDisplayByIDs(['encoderSwitch'],[])
+            encoderAvailable = true
+        }
     })
 
     if (!tus.isSupported)
@@ -232,8 +238,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             postparams = Object.assign(postparams,uploaderResponse)
 
             // Upload all videos
-            if (document.getElementById('hlsencode').checked)
-                uploadVideo(-1,() => console.log('begin encode'),uploaderResponse.fsname)
+            if (encoderAvailable && document.getElementById('hlsencode').checked)
+                uploadVideo(-1,() => console.log('begin encode'))
             else
                 uploadVideo(0,() => console.log('all videos uploaded successfully'))
         },() => {
