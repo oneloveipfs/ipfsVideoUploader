@@ -339,6 +339,7 @@ let uploadOps = {
                 }
                 let ack = {
                     method: 'hlsencode',
+                    type: 'hlsencode',
                     id: json.Upload.MetaData.encodeID,
                     idx: json.Upload.MetaData.idx,
                     output: json.Upload.MetaData.output,

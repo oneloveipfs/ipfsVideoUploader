@@ -60,6 +60,8 @@ axios.get('/proxy_server').then((r) => {
             case 'hls':
                 postparams = Object.assign(postparams,r)
                 break
+            case 'hlsencode':
+                break
             default:
                 return console.log('uplStat Error: missing type in repsonse')
         }
