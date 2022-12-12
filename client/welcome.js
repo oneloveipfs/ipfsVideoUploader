@@ -102,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
             updateLogs()
         }).catch(() => {})
     }
-    loadAPISelections()
     if (isElectron())
         updateDisplayByIDs([],['appIntro'])
 })

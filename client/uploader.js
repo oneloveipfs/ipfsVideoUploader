@@ -84,6 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         config = result.data
 
         loadPins('videos')
+        loadAPISelections()
 
         if (config.disabled) {
             document.getElementById('disabledText').innerText = config.disabledMessage
@@ -275,7 +276,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         uploadThumbnail('images',imgFormData,(response) => {
             updateDisplayByIDs([],['uploadProgressBack'])
-            document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + ']('+config.gateway+'/ipfs/' + response.data.imghash + ')');
+            document.getElementById('postBody').value += ('\n![' + document.getElementById('postImg').value.replace(/.*[\/\\]/, '') + ']('+getPreferredIPFSGw(true)+'/ipfs/' + response.data.imghash + ')');
             toggleImg(false)
         },() => {
             updateDisplayByIDs([],['uploadProgressBack'])
@@ -652,7 +653,7 @@ function selfEncodeUpload(encodeId,uploadId,outputs) {
         try {
             let compl = await axios.post('/encoder/self/complete?access_token='+Auth.token+(Auth.iskeychain !== 'true'?'&scauth=true':''))
             if (!compl.data || !compl.data.success)
-                throw
+                throw ''
         } catch {
             alert('Something went wrong when finalizing self-encode upload')
             updateDisplayByIDs([],['uploadProgressBack'])
@@ -911,9 +912,9 @@ function postThumbnailByPlatform(network) {
     let pf = pfPostEmbed(network)
     switch (pf) {
         case '3Speak':
-            return '<center>[![]('+config.gateway+'/ipfs/'+postparams.imghash+')](https://3speak.tv/watch?v='+usernameByNetwork(network)+'/'+postparams.permlink+')</center><hr>'
+            return '<center>[![]('+getPreferredIPFSGw(true)+'/ipfs/'+postparams.imghash+')](https://3speak.tv/watch?v='+usernameByNetwork(network)+'/'+postparams.permlink+')</center><hr>'
         case 'DTube':
-            return '<center><a href=\'https://d.tube/#!/v/'+usernameByNetwork(network)+'/'+postparams.permlink+'\'><img src=\''+config.gateway+'/ipfs/'+postparams.imghash+'\'></a></center><hr>'
+            return '<center><a href=\'https://d.tube/#!/v/'+usernameByNetwork(network)+'/'+postparams.permlink+'\'><img src=\''+getPreferredIPFSGw(true)+'/ipfs/'+postparams.imghash+'\'></a></center><hr>'
     }
 }
 
@@ -925,7 +926,7 @@ function buildPostBody(network) {
         result += '\n[▶️ 3Speak](https://3speak.tv/watch?v='+usernameByNetwork(network)+'/'+postparams.permlink+')'
     if (isPlatformSelected['DTube'])
         result += '\n[▶️ DTube](https://d.tube/#!/v/'+usernameByNetwork(network)+'/'+postparams.permlink+')'
-    result += '\n[▶️ IPFS]('+config.gateway+'/ipfs/'+postparams.ipfshash+')'
+    result += '\n[▶️ IPFS]('+getPreferredIPFSGw(true)+'/ipfs/'+postparams.ipfshash+')'
     if (postparams.skylink)
         result += '\n[▶️ Skynet](https://siasky.net/'+postparams.skylink+')'
     return result
@@ -988,7 +989,7 @@ function buildJsonMetadataAvalon() {
                 }
             }
         },
-        thumbnailUrl: config.gateway+'/ipfs/'+postparams.imghash,
+        thumbnailUrl: getPreferredIPFSGw(true)+'/ipfs/'+postparams.imghash,
         dur: postparams.duration,
         title: postparams.title,
         desc: postparams.description,
@@ -1020,7 +1021,7 @@ function buildJsonMetadataAvalon() {
             if (postparams['skylink'+defaultRes[r]])
                 jsonMeta.files.sia.vid[defaultRes[r]] = postparams['skylink'+defaultRes[r]]
     }
-    if (config.gateway) jsonMeta.files.ipfs.gw = config.gateway 
+    if (getPreferredIPFSGw(true)) jsonMeta.files.ipfs.gw = getPreferredIPFSGw(true) 
 
     if (subtitleList.length > 0) {
         jsonMeta.files.ipfs.sub = {}
@@ -1149,7 +1150,7 @@ function updateSubtitle() {
     
     for (let i = 0; i < allSubtitlePrevBtnElems.length; i++) {
         document.getElementById(allSubtitlePrevBtnElems[i].id).onclick = () => {
-            window.open(config.gateway+'/ipfs/' + subtitleList[i].hash,'name','width=600,height=400')
+            window.open(getPreferredIPFSGw(true)+'/ipfs/' + subtitleList[i].hash,'name','width=600,height=400')
         }
     }
 

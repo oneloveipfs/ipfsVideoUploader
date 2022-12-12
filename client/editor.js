@@ -209,7 +209,7 @@ function editorFinalizeDTube(network,newTitle,newDesc,newTags,newThumbnailHash) 
             if (newThumbnailHash) {
                 json.video.files.ipfs.img[118] = newThumbnailHash
                 json.video.files.ipfs.img[360] = newThumbnailHash
-                json.video.thumbnailUrl = config.gateway+'/ipfs/'+newThumbnailHash
+                json.video.thumbnailUrl = getPreferredIPFSGw(true)+'/ipfs/'+newThumbnailHash
             }
             json.video.title = newTitle
             json.video.desc = newDesc
@@ -222,7 +222,7 @@ function editorFinalizeDTube(network,newTitle,newDesc,newTags,newThumbnailHash) 
             if (newThumbnailHash) {
                 json.files.ipfs.img[118] = newThumbnailHash
                 json.files.ipfs.img[360] = newThumbnailHash
-                json.thumbnailUrl = config.gateway+'/ipfs/'+newThumbnailHash
+                json.thumbnailUrl = getPreferredIPFSGw(true)+'/ipfs/'+newThumbnailHash
             }
             json.title = newTitle
             json.desc = newDesc

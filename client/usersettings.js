@@ -37,7 +37,8 @@ function fillSettings() {
         else
             document.getElementsByTagName('body')[0].classList.remove('darkmode')
     }
-    loadAPISelections()
+    if (config)
+        loadAPISelections()
 }
 
 function fillDescription() {

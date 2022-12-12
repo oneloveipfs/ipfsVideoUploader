@@ -34,6 +34,7 @@
         "authIdentifier": "oneloveipfs_login",
         "authTimeoutBlocks": 20,
         "gateway": "https://video.oneloveipfs.com",
+        "useUserPreferredGateway": true,
         "hivesignerEnabled": true,
         "hivesignerApp": "ipfsuploader.app",
         "blurtApp": "ipfsuploader.app",

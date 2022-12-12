@@ -334,7 +334,7 @@ function postpublishshare(dest) {
             popupUrl = 'http://www.tumblr.com/share/link?url='+tgurl
             break
         case 'pinterest':
-            popupUrl = 'http://www.pinterest.com/pin/create/button/?url='+tgurl+'&media='+encodeURIComponent(config.gateway+'/ipfs/'+postparams.imghash)
+            popupUrl = 'http://www.pinterest.com/pin/create/button/?url='+tgurl+'&media='+encodeURIComponent(getPreferredIPFSGw(true)+'/ipfs/'+postparams.imghash)
             break
         case 'linkedin':
             popupUrl = 'http://linkedin.com/shareArticle?mini=true&amp;url='+tgurl

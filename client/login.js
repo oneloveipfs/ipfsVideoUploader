@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!config.hivesignerEnabled || isElectron())
             setDisplayByClass('sclogin')
+        loadAPISelections()
     })
 
     axios.get('/shawp_config').then((result) => {

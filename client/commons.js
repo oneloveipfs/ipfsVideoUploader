@@ -40,6 +40,13 @@ const BLURT_API = [
     'blurt-rpc.sagarkothari88.one'
 ]
 
+const IPFS_GATEWAYS = [
+    'ipfs.io',
+    'gateway.pinata.cloud',
+    'ipfs.fleek.co',
+    'ipfs.litnet.work'
+]
+
 function getBlockchainAPI(network,httpsPrefix = true) {
     let persist = localStorage.getItem(network+'API')
     let result = ''
@@ -64,25 +71,51 @@ function getBlockchainAPI(network,httpsPrefix = true) {
     return result
 }
 
+function getPreferredIPFSGw(httpsPrefix = true) {
+    if (!config.useUserPreferredGateway) {
+        if (httpsPrefix && !config.gateway.startsWith('https://') && !config.gateway.startsWith('http://'))
+            return 'https://'+config.gateway
+        else if (!httpsPrefix)
+            return config.gateway.replace('http://','').replace('https://','')
+    }
+    let result = localStorage.getItem('preferredIPFSGw') || config.gateway
+    if (httpsPrefix && !result.startsWith('https://') && !result.startsWith('http://'))
+        result = 'https://'+result
+    return result
+}
+
 function loadAPISelections() {
     let hiveSelect = document.getElementById('hiveAPISelection')
     let avalonSelect = document.getElementById('avalonAPISelection')
     let blurtSelect = document.getElementById('blurtAPISelection')
+    let ipfsGwSelect = document.getElementById('ipfsGwSelection')
     for (let i in HIVE_API)
         hiveSelect.appendChild(createOption(HIVE_API[i],HIVE_API[i]))
     for (let i in AVALON_API)
         avalonSelect.appendChild(createOption(AVALON_API[i],AVALON_API[i]))
     for (let i in BLURT_API)
         blurtSelect.appendChild(createOption(BLURT_API[i],BLURT_API[i]))
+    let primaryIpfsGw = config.gateway.replace('http://','').replace('https://','')
+    if (config.gateway)
+        ipfsGwSelect.appendChild(createOption(primaryIpfsGw,primaryIpfsGw))
+    if (config.useUserPreferredGateway) {
+        for (let i in IPFS_GATEWAYS)
+            if (IPFS_GATEWAYS[i] !== primaryIpfsGw)
+                ipfsGwSelect.appendChild(createOption(IPFS_GATEWAYS[i],IPFS_GATEWAYS[i]))
+    } else
+        ipfsGwSelect.disabled = true
     hiveSelect.value = getBlockchainAPI('hive',false)
     avalonSelect.value = getBlockchainAPI('avalon',false)
     blurtSelect.value = getBlockchainAPI('blurt',false)
+    ipfsGwSelect = getPreferredIPFSGw(false)
 }
 
 function saveAPISelections() {
     localStorage.setItem('hiveAPI',document.getElementById('hiveAPISelection').value)
     localStorage.setItem('avalonAPI',document.getElementById('avalonAPISelection').value)
     localStorage.setItem('blurtAPI',document.getElementById('blurtAPISelection').value)
+    if (config.useUserPreferredGateway)
+        localStorage.setItem('preferredIPFSGw',document.getElementById('ipfsGwSelection').value)
 }
 
 function getCookie(name) {
