@@ -191,7 +191,7 @@ ipcMain.on('open_browser_window',(evt,arg) => shell.openExternal(arg))
 ipcMain.on('spk_auth', async (evt,arg) => evt.sender.send('spk_auth_result', await spk.auth(arg)))
 ipcMain.on('spk_cookie', async (evt,arg) => evt.sender.send('spk_cookie_result', await spk.cookie(arg.user, arg.token)))
 ipcMain.on('spk_list_uploads', async (evt,arg) => evt.sender.send('spk_list_uploads_result', await spk.listUploads(arg)))
-ipcMain.on('spk_update_info', async (evt,arg) => evt.sender.send('spk_update_info_result', await spk.updateInfo(arg.cookie,arg.id,arg.title,arg.desc,arg.tags,arg.nsfw)))
+ipcMain.on('spk_update_info', async (evt,arg) => evt.sender.send('spk_update_info_result', await spk.updateInfo(arg.cookie,arg.id,arg.title,arg.desc,arg.tags,arg.nsfw,arg.thumbnail)))
 ipcMain.on('spk_finalize_publish', async (evt,arg) => evt.sender.send('spk_finalize_publish_result', await spk.finalizePublish(arg.cookie,arg.id)))
 ipcMain.on('spk_upload', (evt,arg) => {
     spk.upload(
@@ -211,6 +211,15 @@ ipcMain.on('spk_upload', (evt,arg) => {
                     evt.sender.send('spk_upload_result',r.data)
             })
         )
+    )
+})
+ipcMain.on('spk_thumbnail_upload', (evt,arg) => {
+    spk.upload(
+        arg.cookie,
+        arg.thumbnailPath,
+        (e) => evt.sender.send('spk_thumbnail_upload_error', spk.tusError(e)),
+        (bu,bt) => evt.sender.send('spk_thumbnail_upload_progress', Math.round((bu / bt) * 100)),
+        (tid) => evt.sender.send('spk_thumbnail_upload_result',tid)
     )
 })
 ipcMain.on('self_encode', (evt,arg) => selfEncoder(arg.id,arg.path,(heading,resp) => evt.sender.send(heading,resp)))

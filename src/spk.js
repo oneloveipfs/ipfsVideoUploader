@@ -76,18 +76,21 @@ const spk = {
         .then(r => cb(null,r))
         .catch(e => cb(e.toString()))
     },
-    updateInfo: async (cookie, id, title, desc, tags, nsfw = false) => {
+    updateInfo: async (cookie, id, title, desc, tags, nsfw = false, thumbnail = '') => {
         if (Array.isArray(tags))
             tags = tags.join(',')
         let r 
         try {
-            r = (await axios.post(SPK_API_URL+'/mobile/api/update_info',{
+            let newDetails = {
                 videoId: id,
                 title: title,
                 description: desc,
                 tags: tags,
                 isNsfwContent: nsfw
-            }, { headers: {
+            }
+            if (thumbnail)
+                newDetails.thumbnail = thumbnail
+            r = (await axios.post(SPK_API_URL+'/mobile/api/update_info',newDetails, { headers: {
                 'Cookie': cookie,
                 'Content-Type': 'application/json'
             }})).data

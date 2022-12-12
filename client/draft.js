@@ -165,7 +165,7 @@ function saveDraft() {
     updateDisplayByIDs(['editingDraft'],[])
     listDrafts()
     if (parseInt(sessionStorage.getItem('editingMode')) === 3 && typeof postparams.spkIdx === 'number' && spkUploadList.length > 0)
-        spkUpdateDraft(spkGetSavedCookie(),postparams.spkIdx,newDraftObj.title,newDraftObj.desc,newDraftObj.tags.split(' '),false,(newIdx) => postparams.spkIdx = newIdx)
+        spkUpdateDraft(spkGetSavedCookie(),postparams.spkIdx,newDraftObj.title,newDraftObj.desc,newDraftObj.tags.split(' '),false,'',(newIdx) => postparams.spkIdx = newIdx)
 }
 
 function leaveDraft() {

@@ -216,7 +216,7 @@ function spkLoadMetadataPostUpload(pm,idx) {
     sessionStorage.setItem('editingMode',3)
 }
 
-function spkUpdateDraft(cookie, idx, title, desc, tags, nsfw, cb) {
+function spkUpdateDraft(cookie, idx, title, desc, tags, nsfw, thumbnail, cb) {
     window.postMessage({
         action: 'spk_update_info',
         data: {

@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             postparams.size = spkUploadList[postparams.spkIdx].size
             postparams.duration = spkUploadList[postparams.spkIdx].duration
             postparams.spkPinRequests = {}
-            spkUpdateDraft(spkGetSavedCookie(),postparams.spkIdx,postparams.title,postparams.description,postparams.tags,false,async (newIdx) => {
+            spkUpdateDraft(spkGetSavedCookie(),postparams.spkIdx,postparams.title,postparams.description,postparams.tags,false,'',async (newIdx) => {
                 postparams.spkIdx = newIdx
                 spkPinRequestStart()
             })
