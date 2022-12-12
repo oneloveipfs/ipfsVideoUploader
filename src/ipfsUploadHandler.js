@@ -723,6 +723,7 @@ let uploadOps = {
     selfEncoderGet: (fullUsername) => {
         return selfEncoderMap[fullUsername] || {}
     },
+    selfEncoderGetAll: () => selfEncoderMap,
     selfEncoderRegister: (fullUsername,outputs,duration) => {
         if (selfEncoderMap[fullUsername] && selfEncoderMap[fullUsername].id && fs.existsSync(selfEncoderMap[fullUsername].id))
             fs.unlinkSync(defaultDir+'/'+selfEncoderMap[fullUsername].id)

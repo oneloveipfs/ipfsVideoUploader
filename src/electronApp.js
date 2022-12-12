@@ -4,6 +4,7 @@ const aboutWindow = require('about-window').default
 const fs = require('fs')
 const spk = require('./spk')
 const selfEncoder = require('./selfEncoderJob')
+const selfEncoderUpload = require('./selfEncoderUpload')
 const config = require('./config')
 const package = require('../package.json')
 const isMac = process.platform === 'darwin'
@@ -212,13 +213,8 @@ ipcMain.on('spk_upload', (evt,arg) => {
         )
     )
 })
-ipcMain.on('self_encode', async (evt,arg) => {
-    // usually done in remote app build
-    // we expect this not to be called if disabled
-    if (config.Encoder.outputs.length === 0)
-        return
-    selfEncoder(arg.id,arg.path,(heading,resp) => evt.sender.send(heading,resp))
-})
+ipcMain.on('self_encode', (evt,arg) => selfEncoder(arg.id,arg.path,(heading,resp) => evt.sender.send(heading,resp)))
+ipcMain.on('self_encode_upload', (evt,arg) => selfEncoderUpload(arg.encodeId,arg.uploadId,arg.token,arg.outputs,arg.threads,(heading,resp) => evt.sender.send(heading,resp)))
 
 // Submit upload directly from filesystem
 ipcMain.on('fs_upload', async (evt,arg) => {

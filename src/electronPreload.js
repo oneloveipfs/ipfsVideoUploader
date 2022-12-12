@@ -29,4 +29,5 @@ process.once('loaded',() => {
     passToRenderer('self_encode_error')
     passToRenderer('self_encode_progress')
     passToRenderer('self_encode_step')
+    passToRenderer('self_encode_upload_result')
 })

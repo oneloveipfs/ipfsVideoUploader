@@ -2,14 +2,18 @@ const async = require('async')
 const encoder = require('./encoderHelpers')
 const fs = require('fs')
 const config = require('./config')
+const defaultDir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 
 module.exports = async (jobid,filepath,evt) => {
+    // usually done in remote app build
+    // we expect this not to be called if disabled
+    if (config.Encoder.outputs.length === 0)
+        return
     let { width, height, duration, orientation } = await encoder.getFFprobeVideo(filepath)
     if (!width || !height || !duration || !orientation)
         return evt('self_encode_error',{ id: jobid, error: 'failed to ffprobe video info' })
 
     let outputResolutions = encoder.determineOutputs(width,height,config.Encoder.outputs)
-    const defaultDir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 
     try {
         // Overwrite if exists
@@ -62,7 +66,8 @@ module.exports = async (jobid,filepath,evt) => {
             id: jobid,
             step: 'encodecomplete',
             outputs: outputResolutions,
-            totalFiles: total
+            totalFiles: total,
+            duration: duration
         })
         // register self encode upload in renderer
     })

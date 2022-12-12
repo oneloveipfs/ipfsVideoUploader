@@ -607,10 +607,54 @@ function selfEncode(id,path) {
         reenableFields()
     }
     progressChannel.onmessage = evt => uplStatProgress(evt.data)
-    stepChannel.onmessage = evt => {
+    stepChannel.onmessage = async evt => {
         uplStatBegin(evt.data)
         if (evt.data.step === 'encodecomplete') {
             closeChannels()
+            document.getElementById('uploadProgressFront').innerText = 'Starting self-encode upload...'
+            try {
+                let reg = await axios.post('/encoder/self/register?duration='+evt.data.duration+'&outputs='+evt.data.outputs.join(',')+'&access_token='+Auth.token+(Auth.iskeychain !== 'true'?'&scauth=true':''))
+                selfEncodeUpload(id,reg.data.id,evt.data.outputs)
+            } catch {
+                alert('Something went wrong when starting self-encode upload')
+                updateDisplayByIDs([],['uploadProgressBack'])
+                reenableFields()
+            }
+        }
+    }
+}
+
+function selfEncodeUpload(encodeId,uploadId,outputs) {
+    uplStat.emit('registerid',{
+        id: uploadId,
+        type: 'hls',
+        access_token: Auth.token,
+        keychain: Auth.iskeychain
+    })
+    window.postMessage({ action: 'self_encode_upload', data: {
+        encodeId,
+        uploadId,
+        token: window.btoa(JSON.stringify({keychain: Auth.iskeychain === 'true'})).replace(/={1,2}$/, '')+'.'+Auth.token,
+        threads: parseInt(usersettings.uplThreads) || 10,
+        outputs: outputs
+    }})
+    let uploadResultChannel = new BroadcastChannel('self_encode_upload_result')
+    uploadResultChannel.onmessage = async evt => {
+        uploadResultChannel.close()
+        if (!evt.data.success) {
+            alert('Something went wrong during self-encode upload')
+            updateDisplayByIDs([],['uploadProgressBack'])
+            reenableFields()
+        }
+        document.getElementById('uploadProgressFront').innerText = 'Finalizing self-encode upload...'
+        try {
+            let compl = await axios.post('/encoder/self/complete?access_token='+Auth.token+(Auth.iskeychain !== 'true'?'&scauth=true':''))
+            if (!compl.data || !compl.data.success)
+                throw
+        } catch {
+            alert('Something went wrong when finalizing self-encode upload')
+            updateDisplayByIDs([],['uploadProgressBack'])
+            reenableFields()
         }
     }
 }

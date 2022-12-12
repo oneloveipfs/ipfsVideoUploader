@@ -317,6 +317,10 @@ app.get('/encoder/self/get',(req,res) => {
     })
 })
 
+app.get('/encoder/self/all',(req,res) => {
+    return res.send(FileUploader.selfEncoderGetAll())
+})
+
 app.post('/encoder/self/complete',(req,res) => {
     Authenticate(req,res,false,(user,network) => {
         FileUploader.selfEncoderComplete(user,network)
