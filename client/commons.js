@@ -44,7 +44,8 @@ const IPFS_GATEWAYS = [
     'ipfs.io',
     'gateway.pinata.cloud',
     'ipfs.fleek.co',
-    'ipfs.litnet.work'
+    'ipfs.litnet.work',
+    'ipfs-3speak.b-cdn.net'
 ]
 
 function getBlockchainAPI(network,httpsPrefix = true) {
