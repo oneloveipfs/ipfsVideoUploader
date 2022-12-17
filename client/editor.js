@@ -101,7 +101,6 @@ function onEditLinkSubmit() {
 
 function onEditSubmit() {
     let newTitle = document.getElementById('editTitle').value
-    let newDesc = document.getElementById('editDescription').value
     let newTags = document.getElementById('editTags').value
     let newThumbnail = document.getElementById('metaEditImg').files
 
@@ -115,8 +114,12 @@ function onEditSubmit() {
     if ((Object.keys(editor.editingPosts).length > 1 || !editor.editingPosts.avalon) && tags.length > 10)
         return alert('Please do not use more than 10 tags!')
 
-    if (editor.editingPlatforms.includes('3Speak') && spkGetIdxByPermlink(editor.editingPosts.hive.permlink) === -1)
-        return alert('Could not find video from 3Speak db?!?!')
+    if (editor.editingPlatforms.includes('3Speak')) {
+        if (!spkGetSavedCookie())
+            return alert('Please authenticate with 3Speak API in 3Speak Uploads page first.')
+        else if (spkGetIdxByPermlink(editor.editingPosts.hive.permlink) === -1)
+            return alert('Could not find video from 3Speak db?!?!')
+    }
 
     if (newThumbnail.length > 0 && !editor.editingPlatforms.includes('3Speak')) {
         let formdata = new FormData()
