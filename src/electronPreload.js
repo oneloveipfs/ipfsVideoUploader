@@ -19,6 +19,7 @@ process.once('loaded',() => {
     passToRenderer('spk_video_upload_error')
     passToRenderer('spk_thumbnail_upload_progress')
     passToRenderer('spk_thumbnail_upload_error')
+    passToRenderer('spk_thumbnail_upload_result')
     passToRenderer('spk_upload_result')
     passToRenderer('spk_upload_error')
     passToRenderer('spk_list_uploads_result')

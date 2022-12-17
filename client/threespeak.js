@@ -123,7 +123,7 @@ function spkUpload(cookie) {
         let videoProgress = new BroadcastChannel('spk_video_upload_progress')
         let thumbnailProgress = new BroadcastChannel('spk_thumbnail_upload_progress')
         let videoError = new BroadcastChannel('spk_video_upload_error')
-        let thumbnailError = new BroadcastChannel('spk_video_thumbnail_error')
+        let thumbnailError = new BroadcastChannel('spk_thumbnail_upload_error')
         let uploadError = new BroadcastChannel('spk_upload_error')
         let uploadResult = new BroadcastChannel('spk_upload_result')
         let closeChannels = () => {
@@ -225,6 +225,7 @@ function spkUpdateDraft(cookie, idx, title, desc, tags, nsfw, thumbnail, cb) {
             title: title,
             desc: desc,
             tags: tags,
+            thumbnail: thumbnail,
             nsfw: nsfw
         }
     })
@@ -242,11 +243,18 @@ function spkUpdateDraft(cookie, idx, title, desc, tags, nsfw, thumbnail, cb) {
 function spkRefreshList(cookie, currentIdx, cb) {
     let oldId = spkUploadList[currentIdx]._id
     spkListUploads(cookie, () => {
-        if (typeof currentIdx === 'number')
+        if (typeof currentIdx === 'number' || !isNaN(parseInt(currentIdx)))
             for (let i in spkUploadList)
                 if (spkUploadList[i]._id === oldId)
                     return cb(i)
     })
+}
+
+function spkGetIdxByPermlink(pm) {
+    for (let i in spkUploadList)
+        if (spkUploadList[i].permlink === pm)
+            return i
+    return -1
 }
 
 function spkPosting() {

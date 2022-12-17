@@ -19,6 +19,7 @@ const dtubeLinks = [
 ]
 
 const threespeakUri = '/watch/hive:'
+const threespeakUrl = 'https://3speak.tv/watch?v='
 
 let editor = {
     editingPosts: {},
@@ -44,7 +45,7 @@ function onEditLinkSubmit() {
             if (link.startsWith(dtubeLinks[f]))
                 linkType = 'dtube'
     if (!linkType)
-        if (link.startsWith(threespeakUri))
+        if (link.startsWith(threespeakUri) || link.startsWith(threespeakUrl))
             linkType = '3speak'
     if (!linkType)
         return alert('Invalid link')
@@ -62,10 +63,10 @@ function onEditLinkSubmit() {
             authorLink = link.split('/v/')[1]
             break
         case '3speak':
-            let lk = link.replace(threespeakUri,'').split(':')
+            let lk = link.startsWith(threespeakUrl) ? link.replace(threespeakUrl,'').split('/') : link.replace(threespeakUri,'').split(':')
             if (lk.length !== 2)
                 return alert('Invalid 3speak link')
-            authorLink = lk.replace(':','/')
+            authorLink = lk.join('/')
             break
         default:
             return alert('Unknown link ?!')
@@ -114,7 +115,10 @@ function onEditSubmit() {
     if ((Object.keys(editor.editingPosts).length > 1 || !editor.editingPosts.avalon) && tags.length > 10)
         return alert('Please do not use more than 10 tags!')
 
-    if (newThumbnail.length > 0) {
+    if (editor.editingPlatforms.includes('3Speak') && spkGetIdxByPermlink(editor.editingPosts.hive.permlink) === -1)
+        return alert('Could not find video from 3Speak db?!?!')
+
+    if (newThumbnail.length > 0 && !editor.editingPlatforms.includes('3Speak')) {
         let formdata = new FormData()
         formdata.append('image',newThumbnail[0])
         updateDisplayByIDs(['uploadProgressBack'],[])
@@ -141,7 +145,7 @@ async function finalizeEdit(newThumbnailHash) {
             if (n === 'hive' || n === 'blurt')
                 editor.editingPosts[n].title = newTitle
             if (n === 'hive')
-                editorFinalize3Speak(newTitle,newDesc,newTags,newThumbnailHash)
+                newThumbnailHash = await editorFinalize3Speak(newTitle,newDesc,newTags)
             editorFinalizeDTube(n,newTitle,newDesc,newTags,newThumbnailHash)
         } catch (e) {
             alert('Failed to update json metadata with new values. See logs for details.')
@@ -231,20 +235,49 @@ function editorFinalizeDTube(network,newTitle,newDesc,newTags,newThumbnailHash) 
     }
 }
 
-function editorFinalize3Speak(newTitle,newDesc,newTags,newThumbnailHash) {
+async function editorFinalize3Speak(newTitle,newDesc,newTags) {
+    let json = JSON.parse(editor.editingPosts.hive.json_metadata)
+    let tags = newTags.split(' ')
+    let thumbnailId = await editorUploadSPKThumbnail()
+    let idx = spkGetIdxByPermlink(editor.editingPosts.hive.permlink)
+    idx = await editorUpdateSPKDetailPromise(idx,newTitle,newDesc,newTags,spkUploadList[idx].nsfw,thumbnailId)
+    console.log(thumbnailId,idx)
     if (!editor.editingPlatforms.includes('3Speak')) return
     if (!editor.editingPosts.hive) return
-    let tags = newTags.split(' ')
-    let json = JSON.parse(editor.editingPosts.hive.json_metadata)
-    if (newThumbnailHash)
-        for (let s in json.video.info.sourceMap)
-            if (json.video.info.sourceMap[s].type === 'thumbnail')
-                json.video.info.sourceMap[s].url = 'ipfs://'+newThumbnailHash
+    for (let s in json.video.info.sourceMap)
+        if (json.video.info.sourceMap[s].type === 'thumbnail')
+            json.video.info.sourceMap[s].url = spkUploadList[idx].thumbnail
     json.video.info.title = newTitle
     json.video.content.description = newDesc
     json.video.content.tags = tags
     json.tags = tags
     editor.editingPosts.hive.json_metadata = JSON.stringify(json)
+}
+
+function editorUploadSPKThumbnail() {
+    return new Promise((rs,rj) => {
+        let t = document.getElementById('metaEditImg').files
+        if (t.length > 0) {
+            window.postMessage({ action: 'spk_thumbnail_upload', data: { cookie: spkGetSavedCookie(), thumbnailPath: t[0].path }})
+            let thumbnailError = new BroadcastChannel('spk_thumbnail_upload_error')
+            let thumbnailResult = new BroadcastChannel('spk_thumbnail_upload_result')
+            thumbnailError.onmessage = evt => {
+                thumbnailError.close()
+                thumbnailResult.close()
+                rj(evt.data)
+            }
+            thumbnailResult.onmessage = evt => {
+                thumbnailError.close()
+                thumbnailResult.close()
+                rs(evt.data)
+            }
+        } else
+            rs(null)
+    })
+}
+
+function editorUpdateSPKDetailPromise(idx,title,desc,tags,nsfw,thumbnailId) {
+    return new Promise((rs) => spkUpdateDraft(spkGetSavedCookie(),idx,title,desc,tags,nsfw,thumbnailId,(newIdx) => rs(newIdx)))
 }
 
 function editorFetchContent(linkType, author, link, ref) {
@@ -301,9 +334,9 @@ function editorJsonCheck(network, isRef = false) {
             editor.params.title = json.video.info.title
             editor.params.description = json.video.content.description
             editor.params.tags = json.tags
-            for (let s in json.sourceMap) {
-                if (json.sourceMap[s].type === 'thumbnail') {
-                    editor.params.imghash = json.sourceMap[s].url.replace('ipfs://','').replace('https://ipfs-3speak.b-cdn.net/ipfs/','')
+            for (let s in json.video.info.sourceMap) {
+                if (json.video.info.sourceMap[s].type === 'thumbnail') {
+                    editor.params.imghash = json.video.info.sourceMap[s].url.replace('ipfs://','').replace('https://ipfs-3speak.b-cdn.net/ipfs/','')
                     break
                 }
             }
