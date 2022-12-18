@@ -108,7 +108,7 @@ let db = {
             ts: new Date().getTime()
         }
 
-        if (discount)
+        if (isNewHash && discount)
             info.discount = discount
         
         // Record size of file
