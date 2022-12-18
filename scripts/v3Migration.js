@@ -1,5 +1,6 @@
+const dir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 const fs = require('fs')
-const hashSizes = require('/Users/techcoderx/.oneloveipfs/db/hashsizes.json')
+const hashSizes = require(dir+'/db/hashsizes.json')
 let hashInfo = {}
 
 // try to trace back when those uploads were made from blockchain data
@@ -11,4 +12,4 @@ for (let h in hashSizes)
         ts: NEW_TIMESTAMP
     }
 
-fs.writeFileSync('/Users/techcoderx/.oneloveipfs/db/hashInfo.json',JSON.stringify(hashInfo))
+fs.writeFileSync(dir+'/db/hashInfo.json',JSON.stringify(hashInfo))
