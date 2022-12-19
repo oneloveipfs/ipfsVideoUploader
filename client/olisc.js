@@ -50,6 +50,7 @@ function handleOliscFilterSelection(selected) {
 async function loadOliscList(status) {
     loadEditor()
     let list = await olisc.list({status})
+    if (!Array.isArray(list)) return
     let renderer = new TbodyRenderer()
     oliscLoaded = {}
     for (let i in list) {
