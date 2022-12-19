@@ -96,7 +96,7 @@
     "node-schedule": "^2.1.0",
     "node-webvtt": "^1.9.4",
     "shelljs": "^0.8.5",
-    "socket.io": "^4.5.3",
+    "socket.io": "^4.5.4",
     "tus-js-client": "^3.0.1"
   },
   "devDependencies": {
