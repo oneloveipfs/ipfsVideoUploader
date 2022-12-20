@@ -43,7 +43,7 @@
             <a class="headBtn" id="apiSelector" onclick="displayPopup('apiSettingsPopup')"><i class="fas fa-server"></i></a>
             <div class="textcontainer">
                 <h1>OneLoveIPFS Uploader</h1>
-                <h3>An alternative way of uploading videos to DTube, a decentralized video platform built on Steem, Hive and Avalon blockchain.</h3>
+                <h3>Cross-platform uploader and hosting service for 3Speak and DTube videos.</h3>
                 <h3 id="homepagePriceLbl">$/GB/month</h3>
                 <table id="buttons"><tr>
                     <td><a id="signupButton" class="styledButton" onclick="displayPopup('signupPopup')">Sign Up</a></td>
@@ -70,47 +70,39 @@
                 <h1 id="userCount">0</h1><p>total users</p>
             </div>
         </div>
-        <h2 class="feature-heading">Top Features</h2>
+        <h2 class="feature-heading">Community Run</h2>
+        <div class="featureContainer featureContainerHighlight">
+            <div class="feature-item">
+                <img class="feature-preview-img" src="public/about/swap.png" alt="thumbnail swap tool">
+            </div>
+            <div class="feature-item">
+                <p>Videos on decentralized platforms should be hosted by its users, not just the creators behind the DApps. Upload and self-host your content with ease with our desktop app, paired with easy-to-use interfaces such as IPFS desktop. Or use an alternative hosting service maintained by community members like us if you can't self-host for any reason.</p>
+            </div>
+        </div>
         <div class="featureContainer">
             <div class="feature-item">
                 <h3>Resumable Uploads</h3>
                 <p>Uploading on a slow or unreliable internet connection? Large video files? We support Tus resumable uploads for the best uploading experience. No upload progress is lost if it gets interrupted for any reason.</p>
             </div>
             <div class="feature-item">
-                <h3>Dual Protocol Support</h3>
-                <p>OneLoveIPFS uploader pins videos to IPFS and Skynet, which are the best decentralized file sharing protocols available. Your videos are available on multiple decentralized networks for the best file availability possible.</p>
+                <h3>Cross-platform Publishing</h3>
+                <p>Maximise your exposure and reach as many viewers as possible across multiple video platforms. All within one post per network. We support publishing to 3Speak and DTube, and more platforms to come.</p>
             </div>
             <div class="feature-item">
-                <h3>0% Beneficiaries</h3>
-                <p>Neither OneLoveIPFS nor DTube collects any additional post beneficiaries when uploading through OneLoveIPFS uploader as your usage is billed by disk utilization. You can set your own beneficiaries if you like.</p>
+                <h3>No Additional Beneficiary Fee</h3>
+                <p>Other than the 11.5% mandated fee on HIVE posting rewards for 3Speak videos, OneLoveIPFS does not collect any additional beneficiary fees as your usage is billed by disk utilization on our service.</p>
             </div>
             <div class="feature-item">
-                <h3>Full Quality Videos</h3>
-                <p>All files uploaded to our servers get added directly to IPFS and Skynet without any additional processing. Your viewers enjoy the best quality video, which is what you originally uploaded. 4K video? Sure, we can take that.</p>
-            </div>
-            <div class="feature-item">
-                <h3>Article Body Image Uploads</h3>
-                <p>Need some images for your Steem/Hive article body of your corresponding video? You can upload them right in our interface. Unlike other frontends, uploaded images goes straight to IPFS, not centralized image servers.</p>
-            </div>
-            <div class="feature-item">
-                <h3>7 Tags Support</h3>
-                <p>Need to use more than one tag that is allowed on DTube upload page? You can use up to 7 tags in our interface, where the first tag will be the first curated tag for your Avalon post.</p>
+                <h3>Dedicated IPFS Gateway</h3>
+                <p>Retrieve your uploaded files from our gateway served directly from our IPFS nodes containing the pinned file in the repo. Skip the waiting time for public gateway caching over the IPFS network, if you wish.</p>
             </div>
         </div>
-        <h2 class="feature-heading">Wrong thumbnail?</h2>
-        <div class="featureContainer thumbnailSwapFeatureContainer">
-            <div class="feature-item">
-                <img class="feature-preview-img" src="public/about/swap.png" alt="thumbnail swap tool">
-            </div>
-            <div class="feature-item">
-                <p>With our thumbnail swap tool, you can replace the thumbnail of your existing DTube video, regardless of where the video was uploaded from, as long as it is an IPFS, BTFS or Skynet upload. The new thumbnail will be at full quality, so people that come across your videos see the finest detail of it, just like any new uploads made on our uploader.<br><br>This tool will not work for 3rd party upload sources.</p>
-            </div>
-        </div>
+        <!-- NEED NEW UP TO DATE REVIEWS
         <div class="testimonial">
             <h3>It's now possible that you can upload your video...and they're playable every time you click on the video. - <a href="https://d.tube/#!/v/mvd/st0typeu" target="_blank">@mvd</a></h3>
-        </div>
+        </div>-->
         <h2 class="feature-heading">Releases</h2>
-        <p class="updatesText">OneLoveIPFS uploader is open source under GPLv3 license. All releases are announced on Steem and Hive blockchains, the same places where your videos are posted on.</p>
+        <p class="updatesText">OneLoveIPFS uploader is open source under GPLv3 license. All major releases are announced on our Hive blog.</p>
         <div id="updatesContainer"></div>
         <div id="appIntro">
             <h2 class="feature-heading">Desktop App</h2>
@@ -125,8 +117,7 @@
             <div class="footerContainer">
                 <div class="footer-item">
                     <h2>Contact</h2>
-                    <a href="https://d.tube/#!/c/oneloveipfs" target="_blank"><img src="public/dtube.png"></a>
-                    <a href="https://peakd.com/@oneloveipfs/posts" target="_blank"><img src="public/hive.png"></a>
+                    <a href="https://peakd.com/@oneloveipfs" target="_blank"><img src="public/hive.png"></a>
                     <a href="https://github.com/oneloveipfs" target="_blank"><i class="fab fa-github"></i></a>
                     <a href="https://twitter.com/oneloveipfs" target="_blank"><i class="fab fa-twitter"></i></a>
                     <a href="https://discord.gg/ZWj5NqaBeF" target="_blank"><i class="fab fa-discord"></i></a>
@@ -134,7 +125,7 @@
                 <div class="footer-item">
                     <h4><a href="https://order.oneloveipfs.com/privacy-policy" target="_blank">Privacy Policy</a></h4>
                     <h4><a href="https://order.oneloveipfs.com/terms-of-service/" target="_blank">Terms of Service</a></h4>
-                    <h4><br><a href="https://d.tube/#!/c/techcoderx" target="_blank">Made by @techcoderx</a></h4>
+                    <h4><br><a href="https://peakd.com/@techcoderx" target="_blank">Made by @techcoderx</a></h4>
                 </div>
             </div>
         </div>

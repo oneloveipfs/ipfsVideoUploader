@@ -1185,7 +1185,7 @@ textarea {
     margin: 0;
 }
 
-.thumbnailSwapFeatureContainer {
+.featureContainerHighlight {
     grid-template-columns: 40% 60%;
 }
 
