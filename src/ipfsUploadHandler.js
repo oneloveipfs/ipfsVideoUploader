@@ -73,7 +73,7 @@ const getEncoderBySocket = (socket) => {
     return null
 }
 
-const ipfsAPI = IPFS.create({ host: 'localhost', port: Config.IPFS_API_PORT, protocol: 'http' })
+const ipfsAPI = IPFS.create({ host: Config.IPFS_HOST, port: Config.IPFS_API_PORT, protocol: Config.IPFS_PROTOCOL })
 const streamUpload = Multer({ dest: defaultDir, limits: { fileSize: 52428800 } }) // 50MB segments
 const imgUpload = Multer({ dest: defaultDir, limits: { fileSize: 7340032 } })
 

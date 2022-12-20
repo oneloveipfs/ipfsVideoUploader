@@ -1,5 +1,7 @@
 {
+    "IPFS_HOST": "127.0.0.1",
     "IPFS_API_PORT": 5001,
+    "IPFS_PROTOCOL": "http",
     "HTTP_PORT": 3000,
     "HTTP_BIND_IP": "127.0.0.1",
     "whitelistEnabled": false,
