@@ -53,14 +53,14 @@
 ```
 /user_info?access_token=AUTH_TOKEN
 ```
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
 * `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 
 #### To get user aliases:
 ```
 /get_alias?access_token=AUTH_TOKEN
 ```
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
 * `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 
 #### To initiate a login:
@@ -75,15 +75,29 @@
 
 The client decrypts the returned string of `encrypted_memo` using the posting key of `USERNAME`, then sends the decrypted string back to the server with `/logincb` POST API call to obtain the access token.
 
+#### To verify generated access token:
+```
+/auth?access_token=AUTH_TOKEN
+```
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig`.
+
 # POST API
 
-#### To obtain access token of a login:
+#### To obtain access token of a login (decrypted message):
 ```
 /logincb
 ```
 
 * Content type: text/plain
 * Input data: The string obtained from `/login` GET API after decrypting with posting key
+
+#### To obtain access token of a login (signed message):
+```
+/loginsig
+```
+
+* Content type: text/plain
+* Input data: The recently signed message
 
 #### To upload a video:
 Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/ResumableUploads.md) for details regarding Tus resumable video upload API.
@@ -96,9 +110,8 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 * `UPLOAD_TYPE` *(required)*: Kind of image to upload. Valid values:
     - `images` -> Treats the image file as a photo that is part of Steem article body.
     - `thumbnails` -> Treats the image file as the thumbnail of a video.
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
 * `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
-* `onlyhash` *(optional)*: Set this to `true` to upload image without adding to IPFS.
 * Content type: multipart/form-data
 * File input: `image`
 * Output data example:
@@ -116,7 +129,7 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 /uploadSubtitle?access_token=AUTH_TOKEN
 ```
 
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
 * `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 * Content type: text/plain
 * Text input must be a valid WebVTT subtitles or else it will return an error.
@@ -133,7 +146,7 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 ```
 /uploadStream?access_token=AUTH_TOKEN
 ```
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
 * `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 * Content type: multipart/form-data
 * File input: `segment`
@@ -155,7 +168,7 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 ```
 /update_settings?access_token=AUTH_TOKEN
 ```
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
 * `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 * Content type: application/json
 * Example content JSON:
@@ -171,7 +184,7 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 ```
 /update_alias?access_token=AUTH_TOKEN
 ```
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or HiveSigner login access token.
+* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
 * `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 * Content type: application/json
 * Example content JSON to set alias:
