@@ -1,3 +1,18 @@
+# Authenticated methods
+
+Authenticated methods in this API documentation will contain the following:
+
+```
+access_token=AUTH_TOKEN
+```
+
+For every REST API method that is authenticated, the following request query must be present in every call:
+
+* `access_token` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
+* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
+
+Other authenticated APIs such as tus uploads and socket.io endpoints will be authenticated differently.
+
 # GET API
 
 #### To check if user is in the whitelist:
@@ -53,15 +68,11 @@
 ```
 /user_info?access_token=AUTH_TOKEN
 ```
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
-* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 
 #### To get user aliases:
 ```
 /get_alias?access_token=AUTH_TOKEN
 ```
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
-* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 
 #### To initiate a login:
 ```
@@ -80,6 +91,8 @@ The client decrypts the returned string of `encrypted_memo` using the posting ke
 /auth?access_token=AUTH_TOKEN
 ```
 * `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig`.
+
+This method does not verify HiveSigner authentications.
 
 # POST API
 
@@ -128,9 +141,6 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 ```
 /uploadSubtitle?access_token=AUTH_TOKEN
 ```
-
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
-* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 * Content type: text/plain
 * Text input must be a valid WebVTT subtitles or else it will return an error.
 * Output data example:
@@ -146,8 +156,6 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 ```
 /uploadStream?access_token=AUTH_TOKEN
 ```
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
-* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 * Content type: multipart/form-data
 * File input: `segment`
 * Additional field:
@@ -168,8 +176,6 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 ```
 /update_settings?access_token=AUTH_TOKEN
 ```
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
-* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 * Content type: application/json
 * Example content JSON:
 ```
@@ -184,8 +190,6 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 ```
 /update_alias?access_token=AUTH_TOKEN
 ```
-* `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
-* `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.
 * Content type: application/json
 * Example content JSON to set alias:
 ```
