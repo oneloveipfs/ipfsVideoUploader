@@ -38,16 +38,17 @@ OneLoveIPFS data dir, which is the working directory for uploader databases and 
 |-|:-:|:-:|:-:|:-:|
 |Interface|Desktop App|Desktop App|Browser|Browser|
 |Upload Server|Localhost|Remote|Localhost|Remote|
-|Auth|Private Keys|Private Keys|Keychain & Custom Keys|Keychain & Custom Keys|
+|Avalon Login Methods|Plaintext|Plaintext|Keychain/Plaintext|Keychain/Plaintext|
+|Hive Login Methods|HiveAuth/Plaintext|HiveAuth/Plaintext|HiveAuth/Keychain/HiveSigner|HiveAuth/Keychain/HiveSigner|
 |Login Persistence|Yes|Yes|Keychain only|Keychain only|
 |Upload Protocol|Filesystem|Tus|Tus|Tus|
-|Steem/Hive Default Beneficiaries|0%|0%|0%|0%|
 |Config Flexibility|Medium|Low|High|Low|
 |Sprites Support|No|Remote Server|Yes (macOS & Linux)|Remote Server|
+|3Speak Publishing|Yes|Yes|No|No|
 
 # Supported file formats
 
-IPFS works the best for videos with .mp4, therefore only mp4 files will be supported at this moment. Both .jpg and .png file formats are supported for thumbnail uploads.
+IPFS works the best for videos with .mp4, however `video/mp4` and `video/quicktime` mime types will be supported. JPG, PNG and GIF file formats are supported for thumbnail uploads.
 
 # RESTful HTTP API & IPSync
 
