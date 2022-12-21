@@ -38,8 +38,8 @@ OneLoveIPFS data dir, which is the working directory for uploader databases and 
 |-|:-:|:-:|:-:|:-:|
 |Interface|Desktop App|Desktop App|Browser|Browser|
 |Upload Server|Localhost|Remote|Localhost|Remote|
-|Avalon Login Methods|Plaintext|Plaintext|Keychain/Plaintext|Keychain/Plaintext|
-|Hive Login Methods|HiveAuth/Plaintext|HiveAuth/Plaintext|HiveAuth/Keychain/HiveSigner|HiveAuth/Keychain/HiveSigner|
+|Avalon Login Methods|Plaintext|Plaintext|Keychain / Plaintext|Keychain / Plaintext|
+|Hive Login Methods|HiveAuth / Plaintext|HiveAuth / Plaintext|HiveAuth / Keychain / HiveSigner|HiveAuth / Keychain / HiveSigner|
 |Login Persistence|Yes|Yes|Keychain only|Keychain only|
 |Upload Protocol|Filesystem|Tus|Tus|Tus|
 |Config Flexibility|Medium|Low|High|Low|
