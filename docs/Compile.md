@@ -2,7 +2,7 @@
 
 After performing the manual installation [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/Installation.md), the uploader can be compiled from source code into Electron desktop apps that can be installed on Windows, macOS and Linux.
 
-Two types of desktop apps may be compiled, which are full apps that are run fully on your system along with IPFS daemon (optionally `siad`), and remote apps which acts as a desktop interface for remote standalone upload servers.
+Two types of desktop apps may be compiled, which are full apps that are run fully on your system along with IPFS daemon (optionally `skyd`), and remote apps which acts as a desktop interface for remote standalone upload servers.
 
 ## Preparation
 

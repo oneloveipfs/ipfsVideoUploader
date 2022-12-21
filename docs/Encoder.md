@@ -2,7 +2,7 @@
 
 ## `accounts`
 
-List of Hive usernames who may run encoding servers remotely to encode incoming uploads by uploader users. The remote encoding servers are designed to reduce hosting costs as these can be run anywhere in the world given decent encoding hardware and internet bandwidth to download the input file and upload the result of the encode job.
+List of usernames (in full username format) who may run encoding servers remotely to encode incoming uploads by uploader users. The remote encoding servers are designed to reduce hosting costs as these can be run anywhere in the world given decent encoding hardware and internet bandwidth to download the input file and upload the result of the encode job.
 
 ## `encoder`
 
@@ -17,7 +17,7 @@ Recommended values (varies on hardware):
 * `h264_vaapi`: VAAPI abstraction API encoder. Linux only.
 * `h264_omx`: Raspberry Pi encoder.
 
-Leave this value blank to disable built-in encoder.
+Leave this value blank to disable built-in encoder. Replace `264` with `265` to use H.265 encoder instead.
 
 ## `quality`
 
@@ -40,4 +40,12 @@ Path to `ffprobe` executable, varies by OS. Installed together with `ffmpeg`. De
 
 ## `outputs`
 
-List of video resolution outputs that will be produced by the encoder. No video will be upscaled. Valid values: `4320`, `2160`, `1440`, `1080`, `720`, `480` and `240`.
+List of video resolution outputs that will be produced by the encoder. No video will be upscaled. Valid values: `4320`, `2160`, `1440`, `1080`, `720`, `480` and `240`. Empty array to disable built-in encoder.
+
+## `threads`
+
+Number of CPU threads to use for x264 or x265 encoding.
+
+## `maxSizeMb`
+
+Maximum input filesize (in MB) to accept for encoding.

@@ -15,7 +15,7 @@ Cross-platform IPFS uploader for 3Speak and DTube. Can be run as a standalone up
 ### Additional requirements
 
 * A HiveSigner application (if HiveSigner authentication is used)
-* A running `siad` node for Skynet upload support.
+* A running `skyd` node for Skynet upload support.
 * `tusd` running daemon when running as standalone upload server, which can be installed and configured [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/ResumableUploads.md#server-installation).
 
 # Installation

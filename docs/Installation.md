@@ -59,4 +59,16 @@ npm i
 cp config_example.json config.json
 ```
 
+## Olisc module
+
+#### Install
+```
+npm run install-olisc
+```
+
+#### Uninstall
+```
+npm run remove-olisc
+```
+
 If running as a standalone upload server, install and configure `tusd` [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/ResumableUploads.md).

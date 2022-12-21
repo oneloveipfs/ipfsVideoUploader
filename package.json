@@ -20,6 +20,7 @@
     "build-installer": "electron-builder",
     "build-hivecryptpro": "browserify -e src/hivecryptPro.js -p tinyify -o lib/hivecryptpro.min.js",
     "install-olisc": "npm i https://github.com/oneloveipfs/olisc --save-optional",
+    "remove-olisc": "npm un olisc",
     "dep-prune": "npm un @snyk/protect body-parser bs58 crypto-js form-data hivecrypt hivesigner ipfs-http-client jsonwebtoken mime-types multer node-schedule node-webvtt secp256k1 socket.io"
   },
   "build": {
