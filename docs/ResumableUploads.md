@@ -80,13 +80,13 @@ Upload ID registration may be done by emitting `registerid` to the `/uploadStat`
 ## Javascript example
 
 HTML:
-```
+```html
 <script src="https://cdn.jsdelivr.net/npm/tus-js-client@latest/dist/tus.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.js"></script>
 ```
 
 Javascript:
-```
+```js
 // Socket IO connection for upload results
 let uplStat = io.connect('/uploadStat')
 
@@ -145,38 +145,38 @@ videoUpload.findPreviousUploads().then((p) => {
 #### Result example:
 
 For `videos` upload type:
-```
+```json
 {
-    username: "techcoderx",
-    network: "all",
-    type: "videos",
-    ipfshash: "QmXEVRMFWJtGodYdcQQ5EEVJE7VTsq4rPcoBet4KLonF1r",
-    spritehash: "QmTfsUT6aS2QXUoA9CSgTF9Lp4sFruRix29RjxznkQVCv1",
-    duration: 666.967,
-    filesize: 553986721
+    "username": "techcoderx",
+    "network": "all",
+    "type": "videos",
+    "ipfshash": "QmXEVRMFWJtGodYdcQQ5EEVJE7VTsq4rPcoBet4KLonF1r",
+    "spritehash": "QmTfsUT6aS2QXUoA9CSgTF9Lp4sFruRix29RjxznkQVCv1",
+    "duration": 666.967,
+    "filesize": 553986721
 }
 ```
 
 For `hls` upload type:
-```
+```json
 {
-    username: "randomvlogs",
-    network: "hive",
-    type: "hls",
-    ipfshash: "Qmc1jNJLWCTguN6v6qeaeVR8upRKwSurnUStyRWTk2GV6Y",
-    size: 2314353,
-    duration: 6.515,
-    hasThumbnail: true,
-    resolutions: [720,1080]
+    "username": "randomvlogs",
+    "network": "hive",
+    "type": "hls",
+    "ipfshash": "Qmc1jNJLWCTguN6v6qeaeVR8upRKwSurnUStyRWTk2GV6Y",
+    "size": 2314353,
+    "duration": 6.515,
+    "hasThumbnail": true,
+    "resolutions": [720,1080]
 }
 ```
 
 Other than the above upload types:
-```
+```json
 {
-    username: "techcoderx",
-    network: "all",
-    type: "video720",
-    hash: "QmSGEj3j7i1YJtYmuAEKzNaKhifDiB41fdiDHjAeGSpMGe"
+    "username": "techcoderx",
+    "network": "all",
+    "type": "video720",
+    "hash": "QmSGEj3j7i1YJtYmuAEKzNaKhifDiB41fdiDHjAeGSpMGe"
 }
 ```

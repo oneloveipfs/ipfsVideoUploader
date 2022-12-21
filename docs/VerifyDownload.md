@@ -7,12 +7,12 @@ Due to the exorbitant costs of code-signing our desktop apps, you may experience
 You can verify your download by running the following commands:
 
 ###### Linux/macOS terminal
-```
+```bash
 shasum -a 256 /path/to/donwloaded/file
 ```
 
 ###### Windows Powershell
-```
+```powershell
 Get-FileHash C:\path\to\downloaded\file
 ```
 

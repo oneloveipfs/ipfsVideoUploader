@@ -25,7 +25,7 @@ If successful, the call will return the encode ID (`id`, string) which will be n
 
 For all feedback regarding upload progress and result, register with upload stat socket.io endpoint with type `hls`.
 
-```
+```js
 let uplStat = io.connect('/uploadStat')
 uplStat.emit('registerid',{
     id: 'upload id from step 1 above',
