@@ -54,6 +54,10 @@ IPFS works the best for videos with .mp4, however `video/mp4` and `video/quickti
 
 API calls for authentication, file uploads, hashes and usage data are documented [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/APIDocs.md). Resumable video upload API documentation may be found [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/ResumableUploads.md).
 
+# Important notice on 3Speak uploads
+
+All 3Sepak videos **MUST** go through 3Speak's centralized API and encoding system as of v3.0 release. There is no other way to get them to play on 3speak.tv website.
+
 # How to contribute?
 
 If you found any ways to improve on the code, or found any bugs, feel free to create a pull request on the GitHub repository. You can also contact me on Discord `techcoderx#7481` if you have any enquiries.

@@ -1,5 +1,7 @@
 # Resumable Uploads API
 
+**NOTE: All 3Sepak videos MUST go through 3Speak's centralized API and encoding system as of v3.0 release. There is no other way to get them to play on 3speak.tv website.**
+
 OneLoveIPFS uploader uses [tus](https://tus.io) protocol for resumable video uploads, which handles chunked file uploads over HTTPS. The results of the file upload is stored in an upload register, which may be retrieved over `/uploadStat` Socket IO endpoint.
 
 ## Server installation

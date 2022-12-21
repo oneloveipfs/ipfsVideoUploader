@@ -1,5 +1,7 @@
 # Encoder Config Guide
 
+**NOTE: All 3Sepak videos MUST go through 3Speak's centralized API and encoding system as of v3.0 release. There is no other way to get them to play on 3speak.tv website.**
+
 ## `accounts`
 
 List of usernames (in full username format) who may run encoding servers remotely to encode incoming uploads by uploader users. The remote encoding servers are designed to reduce hosting costs as these can be run anywhere in the world given decent encoding hardware and internet bandwidth to download the input file and upload the result of the encode job.
