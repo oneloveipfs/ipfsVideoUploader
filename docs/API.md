@@ -207,6 +207,13 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 }
 ```
 
+# Other methods
+
+More feature specific methods may be found in their own respective pages:
+
+* [SPK API](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/SpkAPI.md)
+* [Encoder API](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/EncoderAPI.md)
+
 # IPSync
 
 A [Socket.io](https://socket.io) endpoint that notifies other nodes of new uploads in real time.
