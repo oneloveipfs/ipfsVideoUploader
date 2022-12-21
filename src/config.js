@@ -53,6 +53,11 @@ if (defaultConfig.Encoder.outputs.length > 0) {
         if (!defaultConfig.Encoder.ffprobePath)
             defaultConfig.Encoder.ffprobePath = whichFfprobe
     }
+
+    if (defaultConfig.Encoder.encoder !== 'libx264' && defaultConfig.Encoder.encoder !== 'libx265' && defaultConfig.Encoder.threads) {
+        console.log('Ignoring thread count for non-CPU encoders')
+        defaultConfig.Encoder.threads = 0
+    }
 }
 
 module.exports = defaultConfig

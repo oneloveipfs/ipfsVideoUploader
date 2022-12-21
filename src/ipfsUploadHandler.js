@@ -28,13 +28,23 @@ ffmpeg.setFfprobePath(Config.Encoder.ffprobePath ? Config.Encoder.ffprobePath : 
 
 const encoderQueue = new ProcessingQueue()
 const supportedEncoders = [
+    // H.264
     'libx264',
     'h264_videotoolbox',
     'h264_nvenc',
     'h264_qsv',
     'h264_amf',
     'h264_vaapi',
-    'h264_omx'
+    'h264_omx',
+
+    // H.265
+    'libx265',
+    'h265_videotoolbox',
+    'h265_nvenc',
+    'h265_qsv',
+    'h265_amf',
+    'h265_vaapi',
+    'h265_omx'
 ]
 const MB = 1048576
 
