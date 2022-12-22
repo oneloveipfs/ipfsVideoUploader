@@ -53,7 +53,7 @@ let helpers = {
         return l
     },
     createSpriteInContainer: (filepath, destDir) => {
-        return new Promise((rs) => Shell.exec(__dirname+'/../scripts/dtube-sprite.sh ' + filepath + ' ' + destDir+'/sprite.jpg',() => rs()))
+        return new Promise((rs) => Shell.exec(__dirname+'/../scripts/dtube-sprite.sh ' + filepath + ' ' + destDir+'/sprite.jpg',(exitCode) => rs(exitCode === 0)))
     },
     determineOutputs: (width,height,possibleOutputs = []) => {
         let outputResolutions = []
@@ -93,7 +93,7 @@ let helpers = {
                     .run()
         }
         if (createSprite)
-            ops.sprite = (cb) => helpers.createSpriteInContainer(filepath,destDir).then(() => cb(null))
+            ops.sprite = (cb) => helpers.createSpriteInContainer(filepath,destDir).then((success) => cb(null,{success}))
         return ops
     },
     hlsThumbnail: (fname, srcDir, destDir) => {

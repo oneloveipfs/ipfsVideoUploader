@@ -140,8 +140,11 @@ const skynetAdd = (path,opts) => {
 const addSprite = async (filepath,id) => {
     return new Promise((rs,rj) => {
         if (!Config.spritesEnabled) return rs({})
-        Shell.exec(__dirname+'/../scripts/dtube-sprite.sh ' + filepath + ' ' + defaultDir + '/' + id + '.jpg',() => {
-            addFile(defaultDir+'/'+id + '.jpg',true,false,(size,hash) => rs({size: size, hash: hash}))
+        Shell.exec(__dirname+'/../scripts/dtube-sprite.sh ' + filepath + ' ' + defaultDir + '/' + id + '.jpg',(exitCode) => {
+            if (exitCode === 0)
+                addFile(defaultDir+'/'+id + '.jpg',true,false,(size,hash) => rs({success: true, size: size, hash: hash}))
+            else
+                rs({success: false})
         })
     })
 }
@@ -155,7 +158,8 @@ const processSingleVideo = async (id,user,network,cb) => {
     if (!fs.existsSync(vpath)) return cb({ error: 'Could not find upload' })
     let spriteGen = await addSprite(vpath,id)
     // Video hash and usage should already been handled previously
-    db.recordHash(user,network,'sprites',spriteGen.hash,spriteGen.size)
+    if (spriteGen.success)
+        db.recordHash(user,network,'sprites',spriteGen.hash,spriteGen.size)
     db.writeHashesData()
     db.writeHashInfoData()
 
@@ -164,7 +168,7 @@ const processSingleVideo = async (id,user,network,cb) => {
         network: network,
         type: 'videos',
         ipfshash: uploadRegister[id].hash,
-        spritehash: spriteGen.hash
+        spritehash: spriteGen.hash || null
     }
 
     if (Config.durationAPIEnabled)
@@ -517,7 +521,8 @@ let uploadOps = {
                     if (errors) console.log(errors)
                     console.log(results)
                     db.recordHash(user,network,'videos',results.videohash.ipfshash,json.Upload.Size)
-                    db.recordHash(user,network,'sprites',results.spritehash.hash,results.spritehash.size)
+                    if (results.spritehash.success)
+                        db.recordHash(user,network,'sprites',results.spritehash.hash,results.spritehash.size)
                     db.writeHashesData()
                     db.writeHashInfoData()
 
@@ -531,7 +536,7 @@ let uploadOps = {
                         network: network,
                         type: 'videos',
                         ipfshash: results.videohash.ipfshash,
-                        spritehash: results.spritehash.hash,
+                        spritehash: results.spritehash.hash || null,
                         skylink: results.videohash.skylink,
                         filesize: json.Upload.Size
                     }

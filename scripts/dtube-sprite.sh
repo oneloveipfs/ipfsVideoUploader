@@ -45,13 +45,18 @@ for i in `seq 0 $((MAX - 1))` ; do
 
 	ffmpeg -hide_banner -loglevel error -accurate_seek -ss $(bc <<< $i*$STEPS) -i $1 -s 128x72 -frames:v 1 $TEMPDIR/sprite_$lz$i.bmp
 
+	# exit if failed to extract
+	if [ $? -ne 0 ]; then exit 1; fi
+
 	if [ "$((i%(MAX/4)))" = 0 ]; then printf "$((i/(MAX/4)*25))%% "; fi
 done
 printf "100%%\nCreating sprite image\n"
 
 montage $TEMPDIR/sprite_*.bmp -mode Concatenate -tile 1x$MAX $2
+if [ $? -ne 0 ]; then exit 1; fi
 
 echo Done.
 echo Video duration: $RUNTIME seconds
 
 rm -rf $TEMPDIR
+exit 0
