@@ -16,7 +16,7 @@ As far as our code repositories go, we acknowledge that they are hosted by centr
 
 #### 3. Who is behind the project?
 
-The main developer is currently @techcoderx, while other members of the OneLoveIPFS team (they are [sag333ar](https://github.com/sag333ar), [vaultec81](https://github.com/vaultec81) and [graylan0](https://github.com/graylan0)) may assist with the development of the project.
+The main developer is currently [techcoderx](https://github.com/techcoderx), while other members of the OneLoveIPFS team (they are [sag333ar](https://github.com/sag333ar), [vaultec81](https://github.com/vaultec81) and [graylan0](https://github.com/graylan0)) may assist with the development of the project.
 
 Anyone is welcome to create issues and pull requests on our maintained repositories.
 
