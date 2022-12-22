@@ -147,6 +147,9 @@ function spkUpload(cookie) {
             document.getElementById('customPermlink').value = evt.data.permlink
             postparams.spkUpload = evt.data._id
             saveDraft()
+
+            document.getElementById('uploadProgressFront').style.width = '100%'
+            document.getElementById('uploadProgressFront').innerHTML = 'All done, please wait for processing on 3Speak\'s end.'
         }
     }
 }
