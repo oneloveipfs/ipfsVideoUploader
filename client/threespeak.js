@@ -149,7 +149,7 @@ function spkUpload(cookie) {
             saveDraft()
 
             document.getElementById('uploadProgressFront').style.width = '100%'
-            document.getElementById('uploadProgressFront').innerHTML = 'All done, please wait for processing on 3Speak\'s end.'
+            document.getElementById('uploadProgressFront').innerHTML = 'All done, please wait for processing from 3Speak. Feel free to close and come back later.'
         }
     }
 }
