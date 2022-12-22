@@ -1,63 +1,116 @@
-# FAQ
+# General FAQ
+
+#### 1. Why does this even exist? Do we really need an alternative video uploader?
+
+As of now, running nodes to self-host videos on protocols such as IPFS (especially involving CLI) is something that most users don't have the technical capability for. Hence, a lot of videos on many decentralized video platforms are usually hosted by one entity, that is the core teams behind these platforms. That also means one single upload service is being relied on by its users.
+
+OneLoveIPFS offers an alternative interface (and optionally hosting service) for video content creators, no matter their technical abilities. Users who opt to self-host can use the full desktop app build complemented by protocol specific daemon with GUI, such as [IPFS Desktop](https://github.com/ipfs/ipfs-desktop). Those who can't self-host for any reason may choose to use our hosting service as the alternative host.
+
+#### 2. Is OneLoveIPFS uploader actually decentralized?
+
+Users may choose to use our interface as a helper tool to upload videos to their own IPFS nodes (or Skynet portals) and have them published on decentralized video platforms. They do not rely on OneLoveIPFS developers to provide any hosting, therefore the interface continues to work as long as protocols such as IPFS and Skynet, and underlying blockchains such as Hive are functional.
+
+At the same time, OneLoveIPFS developers do run a centralized IPFS hosting service for those who do not wish to self-host. Anyone who wishes to host a copy of files uploaded to our service may fetch the IPFS hashes from the uploader API and have them pinned themselves.
+
+As far as our code repositories go, we acknowledge that they are hosted by centralized organizations such as Github. We will be working on getting these hosted by decentralized Git protocols so that this does not become a single point of failure of the project.
+
+#### 3. Who is behind the project?
+
+The main developer is currently @techcoderx, while other members of the OneLoveIPFS team (they are [sag333ar](https://github.com/sag333ar), [vaultec81](https://github.com/vaultec81) and [graylan0](https://github.com/graylan0)) may assist with the development of the project.
+
+Anyone is welcome to create issues and pull requests on our maintained repositories.
+
+#### 4. Does OneLoveIPFS have a token? If not, will it ever have one?
+
+OneLoveIPFS will **never** issue tokens of any kind. Beware of scammers that claim otherwise.
+
+GBDays on our hosting service are just hosting credits on a centralized database that will consume daily based on your disk utilization of the day.
+
+#### 5. My question is not listed in this document. What can I do?
+
+Contact us in [OneLoveIPFS Discord server](https://discord.gg/ZWj5NqaBeF). Include screenshot of the console output from your browser whenever applicable.
+
+# Uploader FAQ
 
 #### 1. I'm getting an alert that I do not have access to the uploader after logging in.
 
-If you're the server admin, please add your Steem username to `whitelist.txt`, reload the uploader page and try again. Otherwise contact a server admin on how to get into the whitelist for uploader access.
+For full desktop app build, ensure that `whitelistEnabled` is set to false. More details about app config [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/ConfigDocs.md).
 
-#### 2. Why is .mp4 the only accepted file format for video uploads?
+As for our hosting service (accessing through webapp or remote app build), please contact us in our [Discord server](https://discord.gg/ZWj5NqaBeF) with the transaction ID of your payment if the issue persists after the required confirmation times.
 
-We have done some testing with several video file formats for IPFS, and we found that .mp4 file format performed the best for video on IPFS.
+#### 2. I'm getting a network error while uploading. Is there a server issue?
 
-#### 3. I'm getting a sc2-sdk error while submitting video onto the blockchain. What is happenning?
+For remotely hosted service (i.e. uploader.oneloveipfs.com), check your internet connection and try again later. If webpage fails to load right after you get this error, there is an issue with the upload servers. You may also want to check the #service-notices channel on our [Discord server](https://discord.gg/ZWj5NqaBeF) for any service outages.
 
-Looks like SteemConnect, the auth solution that we're currently using right now, has some issues with the API. This is not an issue with upload servers or IPFS. Clear your browser cache, refresh the webpage and try again later.
+For standalone server accessed through localhost, ensure that the tusd server is actually running with the correct webhooks and `ClientConfig.tusdEndpoint` is pointed at the correct tusd endpoint.
 
-Alternatively you may authenticate with Steem Keychain to avoid this SteemConnect related issue.
+#### 3. The text underneath the submit button reads "Detecting login" even after waiting for a few minutes. What went wrong here?
 
-#### 4. I'm getting a network error while uploading. Is there a server issue?
+This is either a HiveSigner issue if using HiveSigner auth, or blockchain API node issue. You may try changing blockchain API nodes of the networks you are logging into from the homepage next to the login button.
 
-Check your internet connection and try again later. If webpage fails to load right after you get this error, there is an issue with the upload servers.
+If the issue still persists, please contact us on our [Discord server](https://discord.gg/ZWj5NqaBeF).
 
-#### 5. The text underneath the submit button reads "Detecting login" even after waiting for a few minutes. What went wrong here?
+#### 4. What is the best specifications for thumbnails?
 
-Refresh the webpage and see if your Steem username shows up. If not, there might be an issue with SteemConnect's API server. If so, try again later. (Also see below if using Brave Browser)
+We recommend 1280x720px at `.jpg`, `.png` or `.gif` file formats.
 
-If using Steem Keychain for authentication, this is an auth API issue. Please take a screenshot of your console output from your browser and send a DM to `techcoderx#7481` on Discord.
+#### 5. Can I upload in 4K or 8K?
 
-#### 6. I'm getting CORS related errors logged into the console on Brave Browser. What do?
+For self-hosters, there is no upload limit for the uploader itself. For optimal performance, you may want to have your videos pinned to multiple IPFS nodes, either manually or setting up an [IPFS cluster](https://github.com/ipfs/ipfs-cluster).
 
-Change the Brave Shields settings to allow all cookies instead of blocking 3rd party cookies. Refresh the webpage.
+Our hosting service has been tested on 4K H.264 videos without major playback issues, although 8K has not been tested yet. IPFS has come a long way since the very first version of the uploader, so anyone with an IPFS node should be able to fetch those videos through p2p and stream them through their local gateway smoothly.
 
-#### 7. I'm not getting any encoded versions of the source video. What did I do wrong?
-
-We have made a decision that videos should be user encoded to reduce overhead costs of running the upload servers. This also increases decentralization further because encoding is done with user's computing power, not on the server side.
-
-You may encode your video into another video file that is lower resolution than your source video, using [Handbrake](https://handbrake.fr) with the prepared config files [here](https://steemit.com/video/@techcoderx/config-files-for-encoding-dtube-videos-with-handbrake). Then upload those files in the respective upload fields in the advanced tab of the uploader page.
-
-#### 8. What is the best specifications for thumbnails?
-
-We recommend either 1280x720px, or 1920x1080px at `.jpg` or `.png` file formats.
-
-#### 9. Can I upload in 4K?
-
-We have tested 4K video uploads (with 4K videos pinned to a single node) and it ended up playing for most users who have the average internet bandwidth required for streaming 4K videos. For optimal performance, you may want to have your videos pinned to multiple IPFS nodes, either manually or setting up an [IPFS cluster](https://github.com/ipfs/ipfs-cluster).
-
-In 0.8.2 update, you may now call an API to obtain the list of IPFS hashes of files uploaded by certain user (or all users), categorized by videos, thumbnails and sprites. You may then sync up your node with the data returned.
-
-You may also want to encode your video into another video file that is lower resolution than the source video file, and upload them seperately by selecting the encoded files in the respective upload fields in the advanced tab. This will allow users with poor internet connection to play the video at lower quality settings.
-
-#### 10. I have saved my metadata as draft, but they disappeared the next time I log in.
+#### 6. I have saved my metadata as draft, but they disappeared the next time I log in.
 
 The drafts are stored in your web browser locally, so when you login with the same account on another web browser (or another device), it will not find your saved drafts. Also please ensure that you're not in private browsing mode while saving them as draft. Clearing your browser cache will delete your drafts as well.
 
-#### 11. How are the beneficiaries set?
+#### 7. How are the beneficiaries set?
 
-For OneLoveDTube's uploader services, beneficiary to @dtube account is set to 2% to support their development and curation efforts (instead of 10%). If authenticated with SteemConnect, [additional fees](https://steemit.com/steemconnect/@fabien/major-incoming-changes-on-steemconnect) may be imposed by the SteemConnect team (up to 2.5%). Other than the $10 USD/month flat rate to use OneLoveDTube's uploader services, we do not take any other additional beneficiaries from your post payouts.
+0% fee whenever possible across all networks.
 
-#### 12. Am I eligible for DTube curation when I upload my videos using this uploader?
+However, an 11.5% fee will be levied on HIVE post rewards for all 3Speak video uploads. This fee is imposed by 3Speak team, OneLoveIPFS does not have control over it.
 
-Yes! We have tested this with actual high quality DTube videos, and they get picked up by the curation team, just like any other DTube videos.
+#### 8. Why must all 3Speak videos be uploaded to their centralized servers and processed through their encoding system?
 
-#### 13. My question is not listed in this document. What can I do?
+As of v3.0 release, this is the only way to get any video to play on 3speak.tv website (hence the 11.5% mandated fee). Unfortunately, 3Speak is still centralized no matter what they claim to be.
 
-Contact us in [OneLoveIPFS Discord server](https://discord.gg/ZWj5NqaBeF), with a screenshot of the console output from your browser (if applicable).
+With that said, the files get added to IPFS as part of their processing and its IPFS hash are published on Hive. Anyone can still host IPFS-supported 3Speak videos (in HLS container format) on their own IPFS nodes. Maybe a 3rd party frontend could exist that fetches the uploads from Hive and play the videos. Let's hope that the items on their roadmap will be delivered on-time to allow us to upload videos to 3Speak without any of their centralized infrastructure.
+
+This is also the reason why 3Speak uploads may take some time for the IPFS node (with the uploader) to fetch from 3Speak's nodes over p2p.
+
+# Hosting Service FAQ
+
+#### 1. Where are your servers located?
+
+Currently the main uploader node lives in Singapore datacenters. Additional to online IPFS nodes, an offline copy of each uploaded file is kept in local drives in case anything goes wrong with the servers.
+
+If usage grows, additional IPFS nodes will be deployed to meet network demands. Ideally the centralized hosting service should be kept as small as possible to ensure that it does not host any majority amount of videos which undermines decentralization of the video platforms.
+
+#### 2. What sets you apart from other centralized IPFS hosting services?
+
+OneLoveIPFS caters to platform specific needs with highly specific requirements (such as video DApps).
+
+Ask any centralized IPFS hosting service about your 3Speak or DTube videos hosted on their services and they probably can't help. But it is something that OneLoveIPFS team is likely able to answer.
+
+#### 3. What happened to Skynet upload support?
+
+Due to low usage, we have stopped running Sia nodes and maintaining the file contracts. Storing a few GB is much more expensive per GB than storing a few TB of data. However, Skynet support remains in the uploader which can be enabled in the config provided if you have access to a `skyd` node or willing to use a public Skynet webportal.
+
+#### 4. How long are the block confirmation times for payments?
+
+* HIVE/HBD - 1 block
+* BLURT - 21 blocks
+* DTUBE - 15 blocks
+
+All coins above are running on blockchains with 3 second block times.
+#### 5. How do I delete uploaded content from the service?
+
+Currently, the uploader does not this functionality yet. Please reach out to `techcoderx#7481` on our [Discord server](https://discord.gg/ZWj5NqaBeF) for now.
+
+#### 6. What are the maximum upload sizes?
+
+10GB for non-3Speak videos, 4MB for images of all types. There is a 5GB limit on 3Speak videos enforced on 3Speak's upload endpoints.
+
+#### 7. What happens in an event of non-payment?
+
+Uploads are only allowed when there are sufficient hosting credits for at least 24 hours. The grace period runs for approximately 7 days, after which the files may be deleted at any time when is required for us to reclaim server space.
