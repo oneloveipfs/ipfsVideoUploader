@@ -181,33 +181,21 @@ OneLoveIPFS will terminate the Service of repeat copyright infringers.
 
 2. If you believe your copyright is being infringed by a person using the Service, please submit a properly formatted DMCA request (see 17 U.S.C. § 512) to graylan00@protonmail.com. Your notice must include the following:
 
-```
- - A physical or electronic signature of a person authorized to act on behalf of the owner of an exclusive right that is allegedly infringed.
-
- - Identification of the copyrighted work claimed to have been infringed, or if multiple copyrighted works are covered by a single notification, a representative list of such works.
-
- - Identification of the material that is claimed to be infringing or to be the subject of infringing activity and that is to be removed or access to which is to be disabled, and information reasonably sufficient to permit OneLoveIPFS to locate the material.
-
- - Information reasonably sufficient to permit OneLoveIPFS to contact you, such as an address, telephone number, and, if available, an e‐mail address.
-
- - A statement that you have a good faith belief that use of the material in the manner complained of is not authorized by the copyright owner, the copyright owner’s agent, or the law.
-
- - A statement that the information in the notification is accurate, and under penalty of perjury that you are authorized to act on behalf of the owner of an exclusive right that is allegedly infringed.
-```
+    - A physical or electronic signature of a person authorized to act on behalf of the owner of an exclusive right that is allegedly infringed.
+    - Identification of the copyrighted work claimed to have been infringed, or if multiple copyrighted works are covered by a single notification, a representative list of such works.
+    - Identification of the material that is claimed to be infringing or to be the subject of infringing activity and that is to be removed or access to which is to be disabled, and information reasonably sufficient to permit OneLoveIPFS to locate the material.
+    - Information reasonably sufficient to permit OneLoveIPFS to contact you, such as an address, telephone number, and, if available, an e‐mail address.
+    - A statement that you have a good faith belief that use of the material in the manner complained of is not authorized by the copyright owner, the copyright owner’s agent, or the law.
+    - A statement that the information in the notification is accurate, and under penalty of perjury that you are authorized to act on behalf of the owner of an exclusive right that is allegedly infringed.
 
 3. Misrepresentations of infringement can result in liability for monetary damages. You may want to consult an attorney before taking any action pursuant to the DMCA.
 
 4. Your right to file a counter-notice. If you believe your user content was wrongly removed due to a mistake or misidentification of the material, you can end a counter-notice to our Copyright Agent (contact information provided above) that includes the following:
 
-```
- - Your physical or electronic signature;
-
- - Identification of the material that has been removed or to which access has been disabled and where the material was located online before it was removed or access to it was disabled;
-
- - A statement by you, under penalty of perjury, that you have a good faith belief that the material was removed or disabled because of mistake or misidentification of the material to be removed or disabled; and
-
- - Your name, address, and telephone number, and a statement that you.
-```
+    - Your physical or electronic signature;
+    - Identification of the material that has been removed or to which access has been disabled and where the material was located online before it was removed or access to it was disabled;
+    - A statement by you, under penalty of perjury, that you have a good faith belief that the material was removed or disabled because of mistake or misidentification of the material to be removed or disabled; and
+    - Your name, address, and telephone number, and a statement that you.
 
 5. Consent to the jurisdiction of federal district court for the judicial district in which the address is located, or if your address is outside of the United States, for any judicial district in which the service provider may be found, and that you will accept service of process from the person who provided notification under DMCA 512 subsection (c)(1)(c) or an agent of such person.
 
