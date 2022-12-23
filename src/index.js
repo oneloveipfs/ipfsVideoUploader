@@ -40,6 +40,11 @@ app.get('/upload', (request,response) => loadWebpage(__dirname+'/../client/uploa
 app.get('/404', (request,response) => loadWebpage(__dirname+'/../client/404.html',response)) // 404 page
 app.get('/hivesigner', (request,response) => loadWebpage(__dirname+'/../client/hivesigner.html',response)) // HiveSigner callback
 
+// documentations
+app.get('/privacy', (request,response) => loadWebpage(__dirname+'/../client/generated/privacy.html',response))
+app.get('/terms', (request,response) => loadWebpage(__dirname+'/../client/generated/terms.html',response))
+app.get('/faq', (request,response) => loadWebpage(__dirname+'/../client/generated/faq.html',response))
+
 app.get('/checkuser',(request,response) => {
     // Check if user is in whitelist
     if (!Config.whitelistEnabled)
