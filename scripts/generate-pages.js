@@ -1,5 +1,4 @@
 // HTML page generator for markdown documentations
-
 const fs = require('fs')
 const { marked } = require('marked')
 const template = fs.readFileSync(__dirname+'/../client/docs.html','utf-8')
