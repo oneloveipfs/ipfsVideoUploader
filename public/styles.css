@@ -605,6 +605,10 @@ br {
     word-wrap: break-word;
 }
 
+.docs a {
+    text-decoration: underline;
+}
+
 .meta {
     width: 100%;
     height: 29px;
