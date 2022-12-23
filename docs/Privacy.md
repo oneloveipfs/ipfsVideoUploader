@@ -31,7 +31,7 @@ Examples of Cookies we use:
 * Local Storage. We use Local Storage to remember persistent information such as drafts.
 
 ### Usage Data
-We may also collect information how the Service is accessed and used ("Usage Data"). This Usage Data may include information such as your computer’s IP address, browser type, browser version, the pages of our Service that you visit, the time and date of your visit and other diagnostic data.
+We may also collect information how the Service is accessed and used ("Usage Data"). This Usage Data may include information such as your computer's IP address, browser type, browser version, the pages of our Service that you visit, the time and date of your visit and other diagnostic data.
 
 These Usage Data will only be kept for a maximum of 60 days.
 
@@ -47,7 +47,7 @@ OneLoveIPFS uses the collected data for various purposes:
 * To detect, prevent and address technical issues
 
 ## Transfer of Data
-Your information, including Personal Data, may be transferred to — and maintained on — computers located outside of your state, province, country or other governmental jurisdiction where the data protection laws may differ than those from your jurisdiction.
+Your information, including Personal Data, may be transferred to, and maintained on, computers located outside of your state, province, country or other governmental jurisdiction where the data protection laws may differ than those from your jurisdiction.
 
 Your consent to this Privacy Policy followed by your submission of such information represents your agreement to that transfer.
 
@@ -91,7 +91,7 @@ By confirming a blockchain transaction, the contents of the transaction payload 
 The blockchains that the Service uses are public networks where anyone may view, store and process any data that has been broadcasted there. We have no control over anything that has been published on the blockchains.
 
 ## Links To Other Sites
-Our service may contain links to other sites that are not operated by us. If you click on a third party link, you will be directed to that third party’s site. We strongly advise you to review the Privacy Policy of every site you visit.
+Our service may contain links to other sites that are not operated by us. If you click on a third party link, you will be directed to that third party's site. We strongly advise you to review the Privacy Policy of every site you visit.
 
 We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.
 
