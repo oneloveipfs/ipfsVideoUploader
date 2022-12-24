@@ -1,6 +1,7 @@
 const ffmpeg = require('fluent-ffmpeg')
 const Shell = require('shelljs')
 const fs = require('fs')
+const config = require('./config')
 
 const encoderOptions = [
     '-hls_time 5',
@@ -19,6 +20,9 @@ const hlsBandwidth = {
     480: 680000,
     240: 340000
 }
+
+ffmpeg.setFfmpegPath(config.Encoder.ffmpegPath)
+ffmpeg.setFfprobePath(config.Encoder.ffprobePath)
 
 let helpers = {
     getHlsBw: (q) => hlsBandwidth[q],

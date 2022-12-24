@@ -398,7 +398,7 @@ function uploadThumbnail(type,imgFormData,successCb,errorCb) {
         },
         onUploadProgress: function (progressEvent) {
             let progressPercent = Math.round((progressEvent.loaded / progressEvent.total) * 100)
-            updateProgressBar(progressPercent);
+            updateProgressBar(progressPercent,'Uploading thumbnail...');
         }
     }
 

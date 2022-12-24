@@ -8,8 +8,18 @@ module.exports = async (jobid,filepath,evt) => {
     // usually done in remote app build
     // we expect this not to be called if disabled
     if (config.Encoder.outputs.length === 0)
-        return
-    let { width, height, duration, orientation } = await encoder.getFFprobeVideo(filepath)
+        return evt('self_encode_error',{ id: jobid, error: 'no outputs to encode to' })
+
+    let width, height, duration, orientation
+    try {
+        let ffprobeDetails = await encoder.getFFprobeVideo(filepath)
+        width = ffprobeDetails.width
+        height = ffprobeDetails.height
+        duration = ffprobeDetails.duration
+        orientation = ffprobeDetails.orientation
+    } catch (e) {
+        return evt('self_encode_error',{ id: jobid, error: 'failed to ffprobe video info' })
+    }
     if (!width || !height || !duration || !orientation)
         return evt('self_encode_error',{ id: jobid, error: 'failed to ffprobe video info' })
 

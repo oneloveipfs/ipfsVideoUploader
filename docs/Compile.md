@@ -20,13 +20,6 @@ REMOTE_APP=1 npm run prepapp # macOS/Linux
 $env:REMOTE_APP=1; npm run prepapp # Windows
 ```
 
-To cleanup unused dependencies in remote app to save space, run
-```
-npm run dep-prune
-```
-
-To restore dependencies after cleanup, repeat the uploader installation procedure [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/Installation.md#uploader-installation).
-
 ## Development app
 ```
 npm run devapp
@@ -45,4 +38,9 @@ It is recommended to build the installer for a target OS on the OS itself (e.g. 
 #### Build installer for host OS and architecture:
 ```
 npm run build-installer
+```
+
+#### Skip macOS Code Signing
+```
+export CSC_IDENTITY_AUTO_DISCOVERY=false
 ```
