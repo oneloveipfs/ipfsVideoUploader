@@ -946,7 +946,7 @@ function buildJsonMetadata(network) {
         jsonMeta.video.refs = generateRefs(network)
     }
 
-    if (spkPosting()) {
+    if (network === 'hive' && spkPosting()) {
         // 3speak.tv format
         jsonMeta.type = '3speak/video'
         jsonMeta.image = ['https://ipfs-3speak.b-cdn.net/ipfs/'+postparams.imghash]
@@ -1108,7 +1108,7 @@ function generatePost(network) {
         }
     }
 
-    if (spkPosting())
+    if (network === 'hive' && spkPosting())
         operations.push(['custom_json', {
             required_auths: [],
             required_posting_auths: [user],
