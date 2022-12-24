@@ -85,6 +85,11 @@ We highly recommend that you review the Privacy Policies of the respective block
 ## Private Keys
 The Website may collect the plaintext Private Key of your account for authentication. These Private Keys are stored in your browser for the duration of the browsing session of the Website and will only be used to sign transactions. They will never be sent anywhere.
 
+## Scheduled Publishing
+By scheduling your post to be published automatically by the Service, we collect and store the transaction payloads, the date and time where the transactions are scheduled to be broadcasted and the blockchain network where the transaction needs to be broadcasted to.
+
+In order to successfully facilitate the transactions automatically by the scheduled date and time, we require your consent to transact with your blockchain accounts on your behalf by delegating the posting authority to us. You may revoke the permissions at any time by removing the posting authority on the wallet interfaces for the said blockchain.
+
 ## Contents Broadcasted To Blockchains
 By confirming a blockchain transaction, the contents of the transaction payload (including but not limited to data entered on the Website, such as video metadata) will be broadcasted to the blockchains.
 
