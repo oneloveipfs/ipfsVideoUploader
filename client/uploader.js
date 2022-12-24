@@ -774,7 +774,7 @@ async function avalonBroadcast(tx = null, serial = true) {
             tx = {
                 type: 4,
                 data: {
-                    link: postparams.ipfshash,
+                    link: generateAvalonLinkFromIpfsHash(postparams.ipfshash),
                     json: buildJsonMetadataAvalon(),
                     vt: Math.floor(getAvalonVP(avalonAcc)*(document.getElementById('avalonvw').value)/100),
                     tag: tag
@@ -1036,7 +1036,7 @@ function buildJsonMetadataAvalon() {
 function generateRefs(network) {
     let ref = []
     if (network !== 'avalon' && avalonUser)
-        ref.push('dtc/' + avalonUser + '/' + postparams.ipfshash)
+        ref.push('dtc/' + avalonUser + '/' + generateAvalonLinkFromIpfsHash(postparams.ipfshash))
     if (network !== 'hive' && hiveDisplayUser)
         ref.push('hive/' + hiveDisplayUser + '/' + postparams.permlink)
     if (network !== 'steem' && steemUser)

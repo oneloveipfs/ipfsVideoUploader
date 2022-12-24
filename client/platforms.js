@@ -270,7 +270,7 @@ function pfPlayerEmbed(pf) {
         case '3Speak':
             return '<iframe src="https://3speak.tv/embed?v='+usernameByNetwork('hive')+'/'+postparams.permlink+'&autoplay=false" frameborder="0" allowfullscreen></iframe>'
         case 'DTube':
-            return '<iframe src="https://emb.d.tube/#!/'+(av?av:username)+'/'+(av?postparams.ipfshash:postparams.permlink)+'" frameborder="0" allowfullscreen></iframe>'
+            return '<iframe src="https://emb.d.tube/#!/'+(av?av:username)+'/'+(av?generateAvalonLinkFromIpfsHash(postparams.ipfshash):postparams.permlink)+'" frameborder="0" allowfullscreen></iframe>'
     }
 }
 
@@ -288,7 +288,7 @@ function postpublish() {
     }
     if (isPlatformSelected['DTube']) {
         let du = usernameByNetwork('avalon')
-        let dp = postparams.ipfshash
+        let dp = generateAvalonLinkFromIpfsHash(postparams.ipfshash)
         if (!du) {
             du = username
             dp = postparams.permlink
@@ -309,7 +309,7 @@ function postpublishshare(dest) {
         case 'None':
             return alert('Please select a target video platform to share links')
         case 'DTube':
-            tgurl = 'https://d.tube/#!/v/'+(av ? av : username)+'/'+(av ? postparams.ipfshash : postparams.permlink)
+            tgurl = 'https://d.tube/#!/v/'+(av ? av : username)+'/'+(av ? generateAvalonLinkFromIpfsHash(postparams.ipfshash) : postparams.permlink)
             break
         case '3Speak':
             tgurl = 'https://3speak.tv/watch?v='+usernameByNetwork('hive')+'/'+postparams.permlink
@@ -346,4 +346,8 @@ function postpublishshare(dest) {
             break
     }
     window.open(popupUrl,'name')
+}
+
+function generateAvalonLinkFromIpfsHash(ipfshash = '') {
+    return ipfshash.split('/')[0].substring(0,50)
 }
