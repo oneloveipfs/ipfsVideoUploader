@@ -977,7 +977,7 @@ function buildJsonMetadata(network) {
 }
 
 function buildJsonMetadataAvalon() {
-    let defaultRes = [240,480,720,1080]
+    let defaultRes = [240,480,720,1080,2160,4320]
     let jsonMeta = {
         files: {
             ipfs: {
@@ -1005,10 +1005,16 @@ function buildJsonMetadataAvalon() {
             jsonMeta.files.ipfs.vid[postparams.resolutions[r]] = postparams.ipfshash+'/'+postparams.resolutions[r]+'p/index.m3u8'
         jsonMeta.files.ipfs.vid.src = postparams.ipfshash+'/'+postparams.resolutions[postparams.resolutions.length-1]+'p/index.m3u8'
     } else {
+        let highestQuality = defaultRes[0]
         jsonMeta.files.ipfs.vid.src = postparams.ipfshash
         for (let r in defaultRes)
-            if (postparams['ipfs'+defaultRes[r]+'hash'])
+            if (postparams['ipfs'+defaultRes[r]+'hash']) {
                 jsonMeta.files.ipfs.vid[defaultRes[r]] = postparams['ipfs'+defaultRes[r]+'hash']
+                if (defaultRes[r] > highestQuality)
+                    highestQuality = defaultRes[r]
+            }
+        if (spkPosting())
+            jsonMeta.files.ipfs.vid.src = postparams['ipfs'+highestQuality+'hash']
     }
 
     // Add Skylinks if applicable
