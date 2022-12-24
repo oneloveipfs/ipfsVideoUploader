@@ -46,11 +46,11 @@ Configures application-specific pinning service.
 #### Discounts
 Configures usage multipliers for files with certain discount labels. JSON object with key (discount label): value (multiplier).
 
-For example, files with `SPK` discount label to be billed at 25% of the hosting cost of the file (75% discount).
+For example, files with `SPK` discount label to be billed at 50% of the hosting cost of the file (50% discount).
 
 ```
 "Discounts": {
-    "SPK": 0.25
+    "SPK": 0.5
 },
 ```
 
