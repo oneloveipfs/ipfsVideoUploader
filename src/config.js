@@ -5,8 +5,6 @@ const defaultFfmpegPath = require('ffmpeg-static').replace('app.asar','app.asar.
 const defaultFfprobePath = require('ffprobe-static').path.replace('app.asar','app.asar.unpacked')
 const userconfigdir = (process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs') + '/config.json'
 let defaultConfig = require('../config.json')
-if (REMOTE_APP === 1)
-    defaultConfig = require('../remoteAppConfig.json')
 let userConfig = {}
 
 if (fs.existsSync(userconfigdir)) {

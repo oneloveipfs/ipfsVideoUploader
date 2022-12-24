@@ -19,7 +19,7 @@ app.get('/404', (request,response) => loadWebpage(__dirname+'/../client/404.html
 app.get('/proxy_server',(req,res) => res.send({server: Config.REAL_ENDPOINT}))
 app.get('/config', (req,res) => {
     axios.get(Config.REAL_ENDPOINT+'/config').then(upstreamRes => {
-        upstreamRes.data.Encoder = Config.Encoder
+        upstreamRes.data.encoder = Config.Encoder
         res.send(upstreamRes.data)
     }).catch(() => res.status(503).send({error: 'failed to fetch config from upstream server'}))
 })
