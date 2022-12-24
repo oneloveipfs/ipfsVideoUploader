@@ -331,7 +331,7 @@ let uploadOps = {
                             })
                             return callback()
                         } else if (json.Upload.MetaData.selfEncode)
-                            emitToUID(json.upload.MetaData.encodeID,'error',{ error: 'duplicate output upload '+json.Upload.MetaData.output+'p idx '+json.Upload.MetaData.idx })
+                            emitToUID(json.Upload.MetaData.encodeID,'error',{ error: 'duplicate output upload '+json.Upload.MetaData.output+'p idx '+json.Upload.MetaData.idx })
                 } else {
                     if (!fs.existsSync(workingDir+'/sprite.jpg'))
                         fs.renameSync(filepath,workingDir+'/sprite.jpg')
@@ -346,7 +346,7 @@ let uploadOps = {
                             })
                             return callback()
                         } else if (json.Upload.MetaData.selfEncode)
-                            emitToUID(json.upload.MetaData.encodeID,'error',{ error: 'duplicate sprite upload' })
+                            emitToUID(json.Upload.MetaData.encodeID,'error',{ error: 'duplicate sprite upload' })
                 }
                 let ack = {
                     method: 'hlsencode',
@@ -359,7 +359,7 @@ let uploadOps = {
                 if (!json.Upload.MetaData.selfEncode && encoderRegister[db.toFullUsername(user,network)] && encoderRegister[db.toFullUsername(user,network)].socket)
                     encoderRegister[db.toFullUsername(user,network)].socket.emit('result',ack)
                 else if (json.Upload.MetaData.selfEncode)
-                    emitToUID(json.upload.MetaData.encodeID,'result',ack,true)
+                    emitToUID(json.Upload.MetaData.encodeID,'result',ack,true)
                 callback()
                 break
             case 'hls':

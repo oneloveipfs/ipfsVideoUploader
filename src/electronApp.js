@@ -223,7 +223,7 @@ ipcMain.on('spk_thumbnail_upload', (evt,arg) => {
     )
 })
 ipcMain.on('self_encode', (evt,arg) => selfEncoder(arg.id,arg.path,(heading,resp) => evt.sender.send(heading,resp)))
-ipcMain.on('self_encode_upload', (evt,arg) => selfEncoderUpload(arg.encodeId,arg.uploadId,arg.token,arg.outputs,arg.threads,(heading,resp) => evt.sender.send(heading,resp)))
+ipcMain.on('self_encode_upload', (evt,arg) => selfEncoderUpload(arg.encodeId,arg.uploadId,arg.token,arg.outputs,arg.threads,arg.endpoint,(heading,resp) => evt.sender.send(heading,resp)))
 
 // Submit upload directly from filesystem
 ipcMain.on('fs_upload', async (evt,arg) => {

@@ -21,7 +21,7 @@ module.exports = async (jobid,filepath,evt) => {
             fs.unlinkSync(defaultDir+'/'+jobid)
 
         // Create folders
-        fs.mkdirSync(defaultDir+'/'+jobid)
+        fs.mkdirSync(defaultDir+'/'+jobid,{ recursive: true })
         for (let r in outputResolutions)
             fs.mkdirSync(defaultDir+'/'+jobid+'/'+outputResolutions[r]+'p')
     } catch (e) {

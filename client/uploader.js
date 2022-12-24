@@ -639,7 +639,8 @@ function selfEncodeUpload(encodeId,uploadId,outputs) {
         uploadId,
         token: window.btoa(JSON.stringify({keychain: Auth.iskeychain === 'true'})).replace(/={1,2}$/, '')+'.'+Auth.token,
         threads: parseInt(usersettings.uplThreads) || 10,
-        outputs: outputs
+        outputs: outputs,
+        endpoint: config.tusdEndpoint
     }})
     let uploadResultChannel = new BroadcastChannel('self_encode_upload_result')
     uploadResultChannel.onmessage = async evt => {

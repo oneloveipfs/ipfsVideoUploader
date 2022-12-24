@@ -4,35 +4,38 @@ const config = require('./config')
 const { tusError } = require('./spk')
 const defaultDir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 
-module.exports = (encodeId,uploadId,token,outputs,threads,evt) => {
-    uploadOutputs(token,encodeId,uploadId,outputs,threads,(success) => evt('self_encode_upload_result',{ success }))
+module.exports = (encodeId,uploadId,token,outputs,threads,endpoint,evt) => {
+    uploadOutputs(token,encodeId,uploadId,endpoint,outputs,threads,(success) => evt('self_encode_upload_result',{ success }))
 }
 
-async function uploadOutputs(token, encodeId, uploadId, outputs = [], threads = 10, cb = () => {}) {
+async function uploadOutputs(token, encodeId, uploadId, endpoint, outputs = [], threads = 10, cb = () => {}) {
+    console.log('uploadOutputs',arguments)
     if (outputs.length === 0)
         return cb(true)
-    let r = await uploadOutput(token, encodeId, uploadId, outputs[0], threads)
+    let r = await uploadOutput(token, encodeId, uploadId, endpoint, outputs[0], threads)
     outputs.shift()
     if (!r)
         return cb(false)
     uploadOutputs(token,encodeId,uploadId,outputs,cb)
 }
 
-async function uploadOutput(token, encodeId, uploadId, output, threads) {
+async function uploadOutput(token, encodeId, uploadId, endpoint, output, threads) {
+    console.log('uploadOutput',arguments)
     let files = fs.readdirSync(defaultDir+'/'+encodeId+'/'+output+'p')
     for (let f in files)
         try {
-            await uploadOne(token,uploadId,output,defaultDir+'/'+encodeId+'/'+output+'p/'+files[f],files[f],threads)
+            await uploadOne(token,uploadId,endpoint,output,defaultDir+'/'+encodeId+'/'+output+'p/'+files[f],files[f],threads)
         } catch {
             return false
         }
     return true
 }
 
-function uploadOne(token, id, output, dir = '', file = '', threads = 10) {
+function uploadOne(token, id, endpoint, output, dir = '', file = '', threads = 10) {
+    console.log('uploadOne',arguments)
     return new Promise((rs,rj) => {
         let upload = new tus.Upload(fs.createReadStream(dir),{
-            endpoint: config.REAL_ENDPOINT || 'http://'+config.HTTP_BIND_IP+':'+config.HTTP_PORT,
+            endpoint: endpoint,
             retryDelays: [0,3000,5000,10000,20000],
             parallelUploads: threads,
             headers: {
