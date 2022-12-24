@@ -40,12 +40,12 @@ if (REMOTE_APP === 0 && defaultConfig.Olisc.enabled) {
     }
 }
 
-if (defaultConfig.Encoder.outputs.length > 0) {
-    if (!defaultConfig.Encoder.ffmpegPath)
-        defaultConfig.Encoder.ffmpegPath = defaultFfmpegPath
-    if (!defaultConfig.Encoder.ffprobePath)
-        defaultConfig.Encoder.ffprobePath = defaultFfprobePath
+if (!defaultConfig.Encoder.ffmpegPath)
+    defaultConfig.Encoder.ffmpegPath = defaultFfmpegPath
+if (!defaultConfig.Encoder.ffprobePath)
+    defaultConfig.Encoder.ffprobePath = defaultFfprobePath
 
+if (defaultConfig.Encoder.outputs.length > 0) {
     if (defaultConfig.Encoder.encoder !== 'libx264' && defaultConfig.Encoder.encoder !== 'libx265' && defaultConfig.Encoder.threads) {
         console.log('Ignoring thread count for non-CPU encoders')
         defaultConfig.Encoder.threads = 0
