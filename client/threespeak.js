@@ -205,6 +205,7 @@ function spkLoadMetadataPostUpload(pm,idx) {
     let draft = retrieveDraft(pm)
     if (!draft) {
         sessionStorage.setItem('editingDraft',pm)
+        document.getElementById('customPermlink').value = pm
         document.getElementById('newUploadModeBtn').onclick()
         document.getElementById('editingDraftMsg').innerText = 'Finalizing 3Speak upload metadata: '+pm+', last saved: never'
         document.getElementById('title').value = spkUploadList[idx].title

@@ -745,7 +745,7 @@ async function hiveCb(r,serial) {
         return
     }
 
-    if (spkPosting()) {
+    if (!config.noBroadcast && spkPosting()) {
         document.getElementById('uploadProgressFront').innerHTML = 'Finalizing 3Speak upload...'
         await spkFinalizePublishPromise(spkGetSavedCookie(),postparams.spkIdx)
     }
