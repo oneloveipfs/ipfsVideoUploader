@@ -57,6 +57,7 @@ git clone https://github.com/oneloveipfs/ipfsVideoUploader
 cd ipfsVideoUploader
 npm i
 cp config_example.json config.json
+node scripts/generate-pages.js
 ```
 
 ## Olisc module
