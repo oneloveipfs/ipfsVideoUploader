@@ -23,8 +23,8 @@ let usercount = 0
 
 db.setupDb('register')
 
-ffmpeg.setFfmpegPath(Config.Encoder.ffmpegPath ? Config.Encoder.ffmpegPath : Shell.which('ffmpeg').toString())
-ffmpeg.setFfprobePath(Config.Encoder.ffprobePath ? Config.Encoder.ffprobePath : Shell.which('ffprobe').toString())
+ffmpeg.setFfmpegPath(Config.Encoder.ffmpegPath)
+ffmpeg.setFfprobePath(Config.Encoder.ffprobePath)
 
 const encoderQueue = new ProcessingQueue()
 const supportedEncoders = [

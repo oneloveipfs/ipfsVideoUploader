@@ -1,7 +1,8 @@
 const REMOTE_APP = 0
 const fs = require('fs')
-const shell = require('shelljs')
 const deepmerge = require('deepmerge')
+const defaultFfmpegPath = require('ffmpeg-static').replace('app.asar','app.asar.unpacked')
+const defaultFfprobePath = require('ffprobe-static').path.replace('app.asar','app.asar.unpacked')
 const userconfigdir = (process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs') + '/config.json'
 let defaultConfig = require('../config.json')
 if (REMOTE_APP === 1)
@@ -42,17 +43,10 @@ if (defaultConfig.Olisc.enabled) {
 }
 
 if (defaultConfig.Encoder.outputs.length > 0) {
-    const whichFfmpeg = shell.which('ffmpeg').toString()
-    const whichFfprobe = shell.which('ffprobe').toString()
-    if ((!whichFfmpeg || !whichFfprobe) && (!defaultConfig.Encoder.ffmpegPath || !defaultConfig.Encoder.ffprobePath)) {
-        console.log('cound not find ffmpeg/ffprobe, disabling internal video encoder')
-        defaultConfig.Encoder.outputs = []
-    } else {
-        if (!defaultConfig.Encoder.ffmpegPath)
-            defaultConfig.Encoder.ffmpegPath = whichFfmpeg
-        if (!defaultConfig.Encoder.ffprobePath)
-            defaultConfig.Encoder.ffprobePath = whichFfprobe
-    }
+    if (!defaultConfig.Encoder.ffmpegPath)
+        defaultConfig.Encoder.ffmpegPath = defaultFfmpegPath
+    if (!defaultConfig.Encoder.ffprobePath)
+        defaultConfig.Encoder.ffprobePath = defaultFfprobePath
 
     if (defaultConfig.Encoder.encoder !== 'libx264' && defaultConfig.Encoder.encoder !== 'libx265' && defaultConfig.Encoder.threads) {
         console.log('Ignoring thread count for non-CPU encoders')

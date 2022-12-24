@@ -32,9 +32,9 @@ let auth = {
     },
     keygen: () => {
         return {
-            wifMessage: HivecryptPro.hivecryptrandomWif(),
-            AESKey: HivecryptPro.hivecryptrandomWif().substr(3,32),
-            JWTKey: HivecryptPro.hivecryptrandomWif().substr(3,32)
+            wifMessage: HivecryptPro.hivecrypt.randomWif(),
+            AESKey: HivecryptPro.hivecrypt.randomWif().slice(3,35),
+            JWTKey: HivecryptPro.hivecrypt.randomWif().slice(3,35)
         }
     },
     watch: () => {
