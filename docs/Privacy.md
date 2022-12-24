@@ -56,6 +56,9 @@ OneLoveIPFS will take all steps reasonably necessary to ensure that your data is
 ## Security of Data
 The security of your data is important to us, but remember that no method of transmission over the Internet, or method of electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your Personal Data, we cannot guarantee its absolute security.
 
+## Retention of Data
+Unless otherwise specified in this Privacy Policy, the data collected will be stored on the Service for as long as you have an Account with us.
+
 ## Service Providers
 We may employ third party companies and individuals to facilitate our service ("Service Providers"), to provide the service on our behalf, to perform service-related services or to assist us in analyzing how our service is used.
 
