@@ -115,6 +115,8 @@ function onEditSubmit() {
         return alert('Please do not use more than 10 tags!')
 
     if (editor.editingPlatforms.includes('3Speak')) {
+        if (!isElectron())
+            return alert('Editing of 3Speak videos can only be done on desktop app as the 3Speak API is not available in webapp.')
         if (!spkGetSavedCookie())
             return alert('Please authenticate with 3Speak API in 3Speak Uploads page first.')
         else if (spkGetIdxByPermlink(editor.editingPosts.hive.permlink) === -1)
