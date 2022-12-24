@@ -27,13 +27,13 @@ if (process.platform == 'win32' && REMOTE_APP === 0 || require('electron').app) 
 }
 
 // authIdentifier must not contain colons
-if (defaultConfig.ClientConfig.authIdentifier.includes(':')) {
+if (REMOTE_APP === 0 && defaultConfig.ClientConfig.authIdentifier.includes(':')) {
     console.log('removing all colons from authIdentifier')
     defaultConfig.ClientConfig.authIdentifier = defaultConfig.ClientConfig.authIdentifier.replace(/:/g,'')
 }
 
 // check olisc installation if enabled
-if (defaultConfig.Olisc.enabled) {
+if (REMOTE_APP === 0 && defaultConfig.Olisc.enabled) {
     try {
         require.resolve('olisc')
     } catch {
