@@ -328,6 +328,8 @@ app.get('/encoder/self/all',(req,res) => {
 
 app.post('/encoder/self/complete',(req,res) => {
     Authenticate(req,res,false,(user,network) => {
+        if (!FileUploader.selfEncoderGet(db.toFullUsername(username,network)).id)
+            return res.send({success: false})
         FileUploader.selfEncoderComplete(user,network)
         return res.send({success: true})
     })

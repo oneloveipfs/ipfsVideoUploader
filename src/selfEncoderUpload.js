@@ -1,6 +1,5 @@
 const tus = require('tus-js-client')
 const fs = require('fs')
-const config = require('./config')
 const { tusError } = require('./spk')
 const defaultDir = process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs'
 
@@ -16,7 +15,7 @@ async function uploadOutputs(token, encodeId, uploadId, endpoint, outputs = [], 
     outputs.shift()
     if (!r)
         return cb(false)
-    uploadOutputs(token,encodeId,uploadId,outputs,cb)
+    uploadOutputs(token,encodeId,uploadId,endpoint,outputs,threads,cb)
 }
 
 async function uploadOutput(token, encodeId, uploadId, endpoint, output, threads) {

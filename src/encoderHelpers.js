@@ -109,7 +109,7 @@ let helpers = {
         for (let r in outputResolutions) {
             let rd
             try {
-                rd = await helpers.getFFprobeVideo(dir+'/'+outputResolutions[r]+'p/0.ts')
+                rd = await helpers.getFFprobeVideo(dir+'/'+outputResolutions[r]+'p/index.m3u8')
             } catch {
                 return { success: false, error: 'could not retrieve ffprobe info on '+outputResolutions[r]+'p encoded video' }
             }
