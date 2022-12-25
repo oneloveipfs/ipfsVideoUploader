@@ -256,6 +256,7 @@ function getPaymentInfo() {
     let creditsToBuy = parseFloat(document.getElementById('gbdaysInput').value)
     let nativePymtProcessors = ['DTUBE','HIVE','HBD','BLURT']
     if (selectedNetwork === 'none') return alert('Please select a network for your account.')
+    if (paymentMethod.startsWith('Select')) return alert('Please select a payment method.')
 
     // Validate usernames
     let hiveValid = validateHiveUsername(receipient)

@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let paymentMethod = document.getElementById('pymtMtd').value
         let creditsToBuy = parseFloat(document.getElementById('gbdaysInput').value)
         if (creditsToBuy <= 0) return alert('Purchase quantity must not be less than or equals to zero.')
+        if (paymentMethod.startsWith('Select')) return alert('Please select a payment method.')
         document.getElementById('refillSubmitBtn').value = 'Loading...'
         document.getElementById('refillSubmitBtn').disabled = true
         let nativePymtProcessors = ['DTUBE','HIVE','HBD','BLURT']
