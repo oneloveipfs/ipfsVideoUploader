@@ -69,7 +69,7 @@
 
     "Shawp": {
         "Enabled": false,
-        "DefaultUSDRate": 0.0029,
+        "DefaultUSDRate": 0.0026,
         "AvalonAPI": "https://api.avalonblocks.com",
         "HiveAPI": "https://techcoderx.com",
         "BlurtAPI": "https://rpc.blurt.world",
