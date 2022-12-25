@@ -34,7 +34,7 @@ describe('Shawp',() => {
 
     it('Shawp.ValidatePayment should parse memos attached to payments correctly',(done) => {
         assert.equal(Shawp.ValidatePayment(Config.test.user,'a').length,0)
-        assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'')),'["techcoderx","all"]')
+        assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'')),'["'+Config.test.user+'","all"]')
         assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'')),'["' + Config.test.user + '","all"]')
         assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'to: @'+Config.test.user)),'["' + Config.test.user + '","all"]')
         assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'to: hive@'+Config.test.user)),'["' + Config.test.user + '","hive"]')
