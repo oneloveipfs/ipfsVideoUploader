@@ -529,12 +529,12 @@ function hivePaymentClickListener(u,to,amt,currency,memo,p = 'signup') {
                 return alert(repeatPymtValidation)
             hive_keychain.requestRecurrentTransfer(u,to,amt,currency,memo,recurrence,frequency,(e) => {
                 if (e.error) return alert(e.message)
-                updateDisplayByIDs([p+'cb'],[p+'pay'])
+                updateDisplayByIDs([p+'cb'],[p+'pay','HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'])
             })
         } else
             hive_keychain.requestTransfer(u,to,amt.toString(),memo,currency,(e) => {
                 if (e.error) return alert(e.message)
-                updateDisplayByIDs([p+'cb'],[p+'pay'])
+                updateDisplayByIDs([p+'cb'],[p+'pay','HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'])
             })
     }
     document.getElementById('HiveSignerBtn').onclick = () => {
@@ -556,7 +556,7 @@ function blurtPaymentClickListener(u,to,amt,currency,memo,p = 'signup') {
         blurt_keychain.requestTransfer(u,to,amt.toString(),memo,currency,(e) => {
             console.log(e)
             if (e.error) return alert(e.message)
-            updateDisplayByIDs([p+'cb'],[p+'pay'])
+            updateDisplayByIDs([p+'cb'],[p+'pay','BlurtKeychainBtn'])
         })
     }
 }
