@@ -221,7 +221,8 @@ function updateDisplayPlatforms() {
         document.getElementById('customPermlinkField').classList.remove('tooltip')
         document.getElementById('customPermlinkField').classList.remove('tooltippm')
         updateDisplayByIDs([],['customPermlink3Speak'])
-        updateDisplayByIDs(['schedulepost','scheduledStr'],[])
+        if (config && config.olisc)
+            updateDisplayByIDs(['schedulepost','scheduledStr'],[])
     }
     if (selected.includes('DTube') && config && config.skynetEnabled)
         updateDisplayByIDs(['skynetswitch'],[])
