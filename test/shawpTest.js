@@ -106,6 +106,7 @@ describe('Shawp',() => {
             assert.typeOf(history[i],'array')
             assert.typeOf(history[i][0],'string')
             assert.typeOf(history[i][1],'number')
+            assert.isAbove(history[i][1],0)
         }
         done()
     })

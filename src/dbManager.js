@@ -136,7 +136,7 @@ let db = {
             result[hashtype] = 0
             for (h in userHashes[hashtype]) {
                 if (hashInfo[userHashes[hashtype][h]] && typeof hashInfo[userHashes[hashtype][h]].size === 'number') {
-                    let discountFactor = applyDiscounts ? (typeof hashInfo[userHashes[hashtype][h]].discount === 'string' ? config.Discounts[hashInfo[userHashes[hashtype][h]].discount] || 1 : hashInfo[userHashes[hashtype][h]].discount) : 1
+                    let discountFactor = applyDiscounts ? (typeof hashInfo[userHashes[hashtype][h]].discount === 'string' ? config.Discounts[hashInfo[userHashes[hashtype][h]].discount] || 1 : 1) : 1
                     result[hashtype] += Math.ceil(hashInfo[userHashes[hashtype][h]].size * discountFactor)
                 }
             }
