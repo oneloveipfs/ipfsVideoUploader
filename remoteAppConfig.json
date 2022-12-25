@@ -3,7 +3,7 @@
     "HTTP_PORT": 3000,
     "HTTP_BIND_IP": "127.0.0.1",
     "Build": {
-        "number": 8,
+        "number": 9,
         "version": "v3.0",
         "link": "https://github.com/oneloveipfs/ipfsVideoUploader/releases"
     },
