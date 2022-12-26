@@ -27,15 +27,15 @@ The network to be authenticated. Allowed values are `hive` and `avalon`.
 
 In the example above, it is `hive`.
 
-#### Section 4: Recent Block Number
+### Section 4: Recent Block Number
 
 The most recent block number of the blockchain network. Only blocks as recent as `config.authTimeoutBlocks` old are accepted. In the example above, it is [70852842](https://hiveblocks.com/b/70852842).
 
-#### Section 5: Block ID/Hash of the Recent Block Number
+### Section 5: Block ID/Hash of the Recent Block Number
 
 The block ID or hash of the block number in the previous section. In the example above, the block ID of the said block was `043920ea4796055a699e0b15f057211b63dd27be`.
 
-#### Section 6: Signature
+### Section 6: Signature
 
 The graphene formatted signature of all of the above sections, as a string.
 
