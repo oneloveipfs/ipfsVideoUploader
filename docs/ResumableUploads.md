@@ -110,10 +110,11 @@ let videoToUpload = document.getElementById('fileInput').files[0]
 let videoUpload = new tus.Upload(videoToUpload[0], {
     endpoint: 'https://tusd.oneloveipfs.com/files',
     retryDelays: [0,3000,5000,10000,20000],
-    parallelUploads: 10, // number of upload threads
+    parallelUploads: 10, // number of upload threads, parallelUploads not supported on iOS
+    headers: {
+        'Authorization': 'Bearer '+window.btoa(JSON.stringify({keychain: Auth.iskeychain === true})).replace(/={1,2}$/, '')+'.'+'your access token here',
+    },
     metadata: {
-        access_token: 'your access token here',
-        keychain: 'true',
         type: 'videos'
     },
     onError: (e) => {
