@@ -937,7 +937,7 @@ function buildJsonMetadata(network) {
     let jsonMeta = {
         video: {},
         tags: postparams.tags,
-        app: 'oneloveipfs/3',
+        app: 'oneloveipfs/3.0.1',
     }
 
     if (isPlatformSelected.DTube && allowedPlatformNetworks.DTube.includes(network)) {
