@@ -977,7 +977,7 @@ function buildJsonMetadata(network) {
 }
 
 function buildJsonMetadataAvalon() {
-    let defaultRes = [240,480,720,1080,2160,4320]
+    let defaultRes = [240,480,720,1080,1440,2160,4320]
     let jsonMeta = {
         files: {
             ipfs: {

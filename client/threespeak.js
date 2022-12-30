@@ -326,7 +326,11 @@ async function spkPinRequestStart() {
             clearInterval(hlsPinIvl)
             for (let i in q.dir)
                 if (q.dir[i].type === 'dir') {
-                    if (q.dir[i].name === '1080p')
+                    if (q.dir[i].name === '2160p')
+                        postparams.ipfs2160hash = hlsHash+'/2160p/index.m3u8'
+                    else if (q.dir[i].name === '1440p')
+                        postparams.ipfs1440hash = hlsHash+'/1440p/index.m3u8'
+                    else if (q.dir[i].name === '1080p')
                         postparams.ipfs1080hash = hlsHash+'/1080p/index.m3u8'
                     else if (q.dir[i].name === '720p')
                         postparams.ipfs720hash = hlsHash+'/720p/index.m3u8'
