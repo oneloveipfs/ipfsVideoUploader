@@ -460,7 +460,8 @@
         </div>
         <div class="uploadpage" id="spkUploads">
             <h2>3Speak uploads</h2>
-            <a class="styledButton styledButtonSmall" id="spkUploadListAuth" onclick="displayPopup('spkListPopup')">Authenticate with 3speak.tv</a>
+            <input type="button" class="styledButton styledButtonSmall" id="spkUploadListAuth" value="Authenticate with 3speak.tv" onclick="displayPopup('spkListPopup')">
+            <input type="button" class="styledButton styledButtonSmall" id="spkUploadListRefresh" value="Refresh" onclick="spkRefreshListTable()" style="display: none;">
             <table style="width: 100%;" id="spkUploadListTable">
                 <thead><tr><td>Permlink</td><td>Created</td><td>Status</td><td>Action</td></tr></thead>
                 <tbody id="spkUploadListTbody"></tbody>

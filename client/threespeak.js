@@ -83,6 +83,7 @@ function spkRequestCookie(token,cb) {
             dismissPopupAction('spkPopup')
             dismissPopupAction('spkListPopup')
             updateDisplayByIDs([],['spkUploadListAuth'])
+            updateDisplayByIDs(['spkUploadListRefresh'],[],'inline-block')
             channel.close()
             spkListUploads(cookie.cookie)
             cb(cookie.cookie)
@@ -252,6 +253,17 @@ function spkRefreshList(cookie, currentIdx, cb) {
                 if (spkUploadList[i]._id === oldId)
                     return cb(i)
     })
+}
+
+function spkRefreshListTable() {
+    document.getElementById('spkUploadListRefresh').disabled = true
+    if (postparams.spkIdx)
+        spkRefreshList(spkGetSavedCookie(),postparams.spkIdx,(newIdx) => {
+            postparams.spkIdx = newIdx
+            document.getElementById('spkUploadListRefresh').disabled = false
+        })
+    else
+        spkListUploads(spkGetSavedCookie(),() => document.getElementById('spkUploadListRefresh').disabled = false)
 }
 
 function spkGetIdxByPermlink(pm) {

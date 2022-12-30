@@ -144,6 +144,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateDisplayByIDs(['spkModeBtn'],[])
         if (spkGetSavedCookie()) {
             updateDisplayByIDs([],['spkUploadListAuth'])
+            updateDisplayByIDs(['spkUploadListRefresh'],[],'inline-block')
             spkListUploads(spkGetSavedCookie())
         }
     }
