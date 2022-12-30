@@ -119,7 +119,11 @@ app.post('/loginsig',(request,response) => {
         if (Config.whitelistEnabled && !Auth.isInWhitelist(split[0],split[2]))
             return response.status(403).send({error: 'Uploader access denied'})
         
-        Auth.generateJWT(split[0],split[2],(err,token) => {
+        let authNetwork = split[2]
+        let isInAllWhitelists = Auth.isInWhitelist(split[0],'all')
+        if (isInAllWhitelists)
+            authNetwork = 'all'
+        Auth.generateJWT(split[0],authNetwork,(err,token) => {
             if (err) return response.send({error: err})
             response.send({access_token: token, error: null})
         })
