@@ -763,14 +763,13 @@ async function avalonBroadcast(tx = null, serial = true) {
 
     if (!postparams.scheduled)
         document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Avalon...'
-    let tag = ''
-    if (postparams.tags.length !== 0)
-        tag = postparams.tags[0]
-
-    let burnAmt = document.getElementById('dtcBurnInput').value ? Math.floor(parseFloat(document.getElementById('dtcBurnInput').value) * 100) : 0
 
     try {
         if (!tx) {
+            let burnAmt = document.getElementById('dtcBurnInput').value ? Math.floor(parseFloat(document.getElementById('dtcBurnInput').value) * 100) : 0
+            let tag = ''
+            if (postparams.tags.length !== 0)
+                tag = postparams.tags[0]
             let avalonAcc = await getAvalonAccount(avalonUser)
             tx = {
                 type: 4,
