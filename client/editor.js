@@ -245,7 +245,7 @@ async function editorFinalize3Speak(newTitle,newDesc,newTags) {
     let tags = newTags.split(' ')
     let thumbnailId = await editorUploadSPKThumbnail()
     let idx = spkGetIdxByPermlink(editor.editingPosts.hive.permlink)
-    idx = await editorUpdateSPKDetailPromise(idx,newTitle,newDesc,newTags,spkUploadList[idx].nsfw,thumbnailId)
+    idx = await editorUpdateSPKDetailPromise(idx,newTitle,newDesc,tags,spkUploadList[idx].nsfw,thumbnailId)
     console.log(thumbnailId,idx)
     if (!editor.editingPlatforms.includes('3Speak')) return
     if (!editor.editingPosts.hive) return
