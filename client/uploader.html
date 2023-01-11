@@ -192,17 +192,17 @@
                         <h5>Pick a Nexus powered community on Blurt to post your video to. The default is OneLoveIPFS (blurt-134220).</h5>
                         <select class="meta communitySelect" id="blurtCommunitySelect"><option value="blurt-134220">OneLoveIPFS (blurt-134220)</option></select>
                     </div>
-                    <div id="schedulepost">
-                        <label class="switch">
-                            <input type="checkbox" name="schedulepostswitch" id="schedulepostswitch" onchange="document.getElementById('schedulepostswitch').checked ? updateDisplayByIDs(['schedulepostdetails'],[]) : updateDisplayByIDs([],['schedulepostdetails'])">
-                            <span class="slider round"></span>
-                        </label><h3 class="poweruptext" id="scheduleposttext"> Schedule Publish</h3>
-                        <div id="schedulepostdetails">
-                            <label for="scheduleposttime">Select date and time: </label><input type="text" class="meta" placeholder="Pick a date and time" id="scheduleposttime" name="scheduleposttime" style="margin-block-start: 1em;">
-                            <p style="font-size: smaller;">To ensure that your video gets published successfully on-time, please authorize your posting authority to us using the buttons in Menu > Get Help.</p>
-                        </div>
-                    </div><br>
                 </div>
+                <div id="schedulepost">
+                    <label class="switch">
+                        <input type="checkbox" name="schedulepostswitch" id="schedulepostswitch" onchange="document.getElementById('schedulepostswitch').checked ? updateDisplayByIDs(['schedulepostdetails'],[]) : updateDisplayByIDs([],['schedulepostdetails'])">
+                        <span class="slider round"></span>
+                    </label><h3 class="poweruptext" id="scheduleposttext"> Schedule Publish</h3>
+                    <div id="schedulepostdetails">
+                        <label for="scheduleposttime">Select date and time: </label><input type="text" class="meta" placeholder="Pick a date and time" id="scheduleposttime" name="scheduleposttime" style="margin-block-start: 1em;">
+                        <p style="font-size: smaller;">To ensure that your video gets published successfully on-time, please authorize your posting authority to us using the buttons in Menu > Get Help.</p>
+                    </div>
+                </div><br>
             </div>
             <div id="uploadActions">
                 <input class="styledButton" type="submit" value="Upload!" id="submitbutton">
