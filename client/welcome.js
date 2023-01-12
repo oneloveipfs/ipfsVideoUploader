@@ -82,7 +82,7 @@ let updates = [
         version: "3.0",
         description: "Onboarding new platforms and highly requested features",
         link: "https://hive.blog/hive-134220/@techcoderx/oneloveipfs-uploader-v3-onboarding-new-platforms-and-highly-requested-features",
-        payout: "Pending"
+        payout: "$11.25"
     }
 ]
 
