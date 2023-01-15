@@ -78,6 +78,18 @@ With that said, the files get added to IPFS as part of their processing and its 
 
 This is also the reason why 3Speak uploads may take some time for the IPFS node (with the uploader) to fetch from 3Speak's nodes over p2p.
 
+## 9. What is the difference between the webapp and the desktop apps?
+
+The webapp refers to the website in which the hosting service (it can be run by us or anyone else) is accessible through a web browser. The desktop app is an installable binary that is meant to run on your computer as an app.
+
+Certain features may or may not be available on the webapp or the desktop app. See [here](https://github.com/oneloveipfs/ipfsVideoUploader#full-vs-remote-vs-standalone-vs-web) for more details.
+
+## 10. What is the difference between the full and remote build?
+
+The full build is designed to communicate directly with a locally running IPFS daemon for ease of use, it does not communicate to a remote service (with exception of update checks). The remote build communicates with a remote service (such as uploader.oneloveipfs.com) and works like the webapp, but with some features that are exclusive to the desktop app.
+
+See [here](https://github.com/oneloveipfs/ipfsVideoUploader#full-vs-remote-vs-standalone-vs-web) for more details between the builds.
+
 # Hosting Service FAQ
 
 ## 1. Where are your servers located?
