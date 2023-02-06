@@ -36,7 +36,7 @@ module.exports = class {
                 }
                 this.headBlock = num
             } else
-                console.log(this.network,'get_dynamic_global_properties error',props.data.error)
+                console.error(this.network,'get_dynamic_global_properties error',props.data.error)
         }).catch((e) => console.log(this.network,'get_dynamic_global_properties error',e.toString()))
     }
 
@@ -68,7 +68,7 @@ module.exports = class {
                     setTimeout(() => this.fetchBlocks(cb),9000)
                 }
             }).catch((e) => {
-                console.log(this.network,'get_block_range error',e.toString())
+                console.error(this.network,'get_block_range error',e.toString())
                 setTimeout(() => this.fetchBlocks(cb),3000)
             })
         } else {
@@ -85,7 +85,7 @@ module.exports = class {
                     setTimeout(() => this.fetchBlocks(cb),this.headBlock === this.parsedBlock ? 3000 : 250)
                 }
             }).catch((e) => {
-                console.log(this.network,'get_block error',e.toString())
+                console.error(this.network,'get_block error',e.toString())
                 setTimeout(() => this.fetchBlocks(cb),3000)
             })
         }
@@ -122,7 +122,7 @@ module.exports = class {
             }
             setTimeout(() => this.fetchVops(filter,cb),9000)
         }).catch((e) => {
-            console.log(this.network,'enum_virtual_ops error',e.toString())
+            console.error(this.network,'enum_virtual_ops error',e.toString())
             setTimeout(() => this.fetchVops(filter,cb),3000)
         })
     }
