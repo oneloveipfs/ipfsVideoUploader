@@ -518,6 +518,18 @@ function generateMessageToSignPromise (username,network) {
     return new Promise((rs,rj) => generateMessageToSign(username,network,(e,r) => e ? rj(e) : rs(r)))
 }
 
+function disablePaymentMethods() {
+    let paymentOptions = document.getElementById('pymtMtd').getElementsByTagName('option')
+    for (let i = 0; i < paymentOptions.length; i++) {
+        if ((paymentOptions[i].value == "HIVE" || paymentOptions[i].value == "HBD") && !shawpconfig.HiveReceiver)
+            paymentOptions[i].disabled = true
+        else if (paymentOptions[i].value === 'BLURT' && !shawpconfig.BlurtReceiver)
+            paymentOptions[i].disabled = true
+        else if (paymentOptions[i].value === 'DTUBE' && !shawpconfig.DtcReceiver)
+            paymentOptions[i].disabled = true
+    }
+}
+
 function hivePaymentClickListener(u,to,amt,currency,memo,p = 'signup') {
     updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'],['DTubeChannelBtn','dtcInstruction','BlurtKeychainBtn'])
     document.getElementById('HiveKeychainBtn').onclick = () => {
