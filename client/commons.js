@@ -21,13 +21,14 @@ const HIVE_API = [
     'anyx.io',
     'hived.emre.sh',
     'hive-api.arcange.eu',
-    'rpc.ausbit.dev'
+    'rpc.ausbit.dev',
+    'rpc.mahdiyari.info'
 ]
 
 const AVALON_API = [
     'api.avalonblocks.com',
     'avalon.d.tube',
-    'avalon.tibfox.com',
+    'avalon.sagarkothari88.one',
     'dtube.fso.ovh',
     'dtube.tekraze.com'
 ]
