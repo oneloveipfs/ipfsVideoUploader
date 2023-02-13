@@ -6,7 +6,7 @@ const Proxy = require('http-proxy')
 const CORS = require('cors')
 const app = Express()
 const http = require('http').createServer(app)
-const ProxyConfig = { changeOrigin: true, target: Config.REAL_ENDPOINT }
+const ProxyConfig = { changeOrigin: true, target: Config.upstream }
 const ProxyAPI = Proxy.createProxyServer(ProxyConfig)
 
 app.use(Express.static(__dirname+'/..', { dotfiles: 'deny' }));
@@ -16,9 +16,9 @@ app.use(CORS())
 app.get('/', (request,response) => loadWebpage(__dirname+'/../client/welcome.html',response)) // Home page
 app.get('/upload', (request,response) => loadWebpage(__dirname+'/../client/uploader.html',response)) // Upload page
 app.get('/404', (request,response) => loadWebpage(__dirname+'/../client/404.html',response)) // 404 page
-app.get('/proxy_server',(req,res) => res.send({server: Config.REAL_ENDPOINT}))
+app.get('/proxy_server',(req,res) => res.send({server: Config.upstream}))
 app.get('/config', (req,res) => {
-    axios.get(Config.REAL_ENDPOINT+'/config').then(upstreamRes => {
+    axios.get(Config.upstream+'/config').then(upstreamRes => {
         upstreamRes.data.encoder = Config.Encoder
         res.send(upstreamRes.data)
     }).catch(() => res.status(503).send({error: 'failed to fetch config from upstream server'}))

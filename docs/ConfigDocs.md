@@ -23,6 +23,7 @@ For full desktop apps, the sections that matter the most to end users are Genera
 * `enforceIPFSOnline`: Accept upload requests only if IPFS daemon is online.
 * `tokenExpiry`: Speficy time in ms of access token expiry from time of issuance.
 * `tokenApp`: Name of application used for generating unique access tokens.
+* `upstream`: Upstream server URL for remote app environment.
 
 #### Beta
 These values will only apply to APIs that are currently not used by the interface or other external repositories.

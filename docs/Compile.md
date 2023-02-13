@@ -4,22 +4,6 @@ After performing the manual installation [here](https://github.com/oneloveipfs/i
 
 Two types of desktop apps may be compiled, which are full apps that are run fully on your system along with IPFS daemon (optionally `skyd`), and remote apps which acts as a desktop interface for remote standalone upload servers.
 
-## Preparation
-
-Run the suitable command depending on OS.
-
-#### Full app
-```
-REMOTE_APP=0 npm run prepapp # macOS/Linux
-$env:REMOTE_APP=0; npm run prepapp # Windows
-```
-
-#### Remote app
-```
-REMOTE_APP=1 npm run prepapp # macOS/Linux
-$env:REMOTE_APP=1; npm run prepapp # Windows
-```
-
 ## Development app
 ```
 npm run devapp

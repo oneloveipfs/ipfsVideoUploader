@@ -8,8 +8,7 @@ const selfEncoderUpload = require('./selfEncoderUpload')
 const config = require('./config')
 const package = require('../package.json')
 const isMac = process.platform === 'darwin'
-const REMOTE_APP = 0
-const BUILD_STR = config.Build.number.toString() + (REMOTE_APP === 1 ? 'R' : '')
+const BUILD_STR = config.Build.number.toString()
 
 if (require('electron-squirrel-startup')) {
     app.quit()
@@ -37,10 +36,11 @@ process.on('uncaughtException',(error) => {
         errorHandler()
 })
 
-require('./index')
-
-if (REMOTE_APP === 0)
+if (!config.isRemoteApp) {
+    require('./index')
     AuthManager = require('./authManager')
+} else
+    require('./remoteAppUser')
 
 let mainWindow
 
@@ -81,7 +81,7 @@ const menuTemplate = [
         submenu: [...(!isMac ? [{
             label: 'About',
             click: openAboutWindow
-        }] : []),...(REMOTE_APP === 0 ? [{ 
+        }] : []),...(!config.isRemoteApp ? [{ 
             label: 'Reset Auth Keys',
             click: async () => {
                 let resetAuthAlert = await dialog.showMessageBox(null,{
@@ -90,13 +90,29 @@ const menuTemplate = [
                     title: 'Reset Auth Keys',
                     message: 'This will reset the keys used for authentication. The app will be relaunched.'
                 })
-                if (resetAuthAlert.response === 0 && REMOTE_APP === 0) {
+                if (resetAuthAlert.response === 0 && !config.isRemoteApp) {
                     AuthManager.refreshKeys()
                     app.relaunch()
                     app.exit()
                 }
             }
         }] : []), {
+            label: 'Switch to '+(config.isRemoteApp?'local':'remote')+' environment',
+            click: async () => {
+                let content = config.isRemoteApp ? 0 : 1
+                let switchEnvAlert = await dialog.showMessageBox(null,{
+                    type: 'info',
+                    buttons: ['Proceed','Cancel'],
+                    title: 'Switch to '+(config.isRemoteApp?'local':'remote')+' environment',
+                    message: 'The app will be relaunched.'
+                })
+                if (switchEnvAlert.response === 0) {
+                    fs.writeFileSync(config.dataDir+'/db/app_type',content.toString())
+                    app.relaunch()
+                    app.exit()
+                }
+            }
+        }, {
             label: 'Configuration Guide',
             click: () => shell.openExternal('https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/ConfigDocs.md')
         }]
@@ -227,7 +243,7 @@ ipcMain.on('self_encode_upload', (evt,arg) => selfEncoderUpload(arg.encodeId,arg
 
 // Submit upload directly from filesystem
 ipcMain.on('fs_upload', async (evt,arg) => {
-    if (REMOTE_APP === 1)
+    if (config.isRemoteApp)
         return evt.sender.send('fs_upload_error',{error: 'Fs upload is not supported in remote app build'})
     // requiring file uploader module here to avoid redundant dependencies in remote app build
     const fileUploader = require('./ipfsUploadHandler')
