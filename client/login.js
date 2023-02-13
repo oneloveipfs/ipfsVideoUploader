@@ -29,6 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!config.hivesignerEnabled || isElectron())
             setDisplayByClass('sclogin')
+        if (isElectron()) {
+            document.getElementById('appTypeRectTxt').innerText = config.isRemote ? 'Remote' : 'Local'
+            updateDisplayByIDs(['appTypeRect'],[])
+        }
         loadAPISelections()
     })
 

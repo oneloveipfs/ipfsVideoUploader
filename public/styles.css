@@ -1045,9 +1045,16 @@ textarea {
 }
 
 #head #authButton2 p,
-#head #apiSelector p {
+#head #apiSelector p,
+#head #appTypeRect p {
     margin-block-start: 5px;
     margin-block-end: 5px;
+}
+
+#head #appTypeRect {
+    right: 260px;
+    width: 70px;
+    display: none;
 }
 
 #head .scrollarrow {

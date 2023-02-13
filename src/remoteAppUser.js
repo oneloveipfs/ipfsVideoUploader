@@ -20,6 +20,7 @@ app.get('/proxy_server',(req,res) => res.send({server: Config.upstream}))
 app.get('/config', (req,res) => {
     axios.get(Config.upstream+'/config').then(upstreamRes => {
         upstreamRes.data.encoder = Config.Encoder
+        upstreamRes.data.isRemote = true
         res.send(upstreamRes.data)
     }).catch(() => res.status(503).send({error: 'failed to fetch config from upstream server'}))
 })
