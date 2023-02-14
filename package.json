@@ -1,7 +1,7 @@
 {
   "name": "ipfsvideouploader",
   "productName": "OneLoveIPFS",
-  "version": "3.0.1",
+  "version": "3.1.0",
   "description": "Cross-platform IPFS uploader for 3Speak and DTube videos.",
   "homepage": "https://uploader.oneloveipfs.com",
   "repository": {
@@ -20,8 +20,7 @@
     "build-installer": "electron-builder",
     "build-hivecryptpro": "browserify -e src/hivecryptPro.js -p tinyify -o lib/hivecryptpro.min.js",
     "install-olisc": "npm i https://github.com/oneloveipfs/olisc --save-optional",
-    "remove-olisc": "npm un olisc",
-    "dep-prune": "npm un @snyk/protect body-parser bs58 crypto-js form-data hivecrypt hivesigner ipfs-http-client jsonwebtoken mime-types multer node-schedule node-webvtt secp256k1 socket.io"
+    "remove-olisc": "npm un olisc"
   },
   "build": {
     "appId": "com.oneloveipfs.uploader",
@@ -85,7 +84,7 @@
     "@snyk/protect": "^1.1088.0",
     "about-window": "^1.15.2",
     "async": "^3.2.4",
-    "axios": "1.1.3",
+    "axios": "1.3.3",
     "body-parser": "^1.20.1",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",

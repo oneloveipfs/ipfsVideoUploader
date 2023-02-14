@@ -52,8 +52,8 @@
     },
 
     "Build": {
-        "number": 10,
-        "version": "v3.0.1",
+        "number": 11,
+        "version": "v3.1.0",
         "link": "https://github.com/oneloveipfs/ipfsVideoUploader/releases"
     },
 
