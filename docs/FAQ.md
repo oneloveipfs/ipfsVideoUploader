@@ -90,6 +90,12 @@ The local environment is designed to communicate directly with a locally running
 
 See [here](https://github.com/oneloveipfs/ipfsVideoUploader#local-vs-remote-vs-standalone-vs-web) for more details between the builds.
 
+## 11. How do I switch between local and remote runtime environments?
+
+On the topbar: Uploader > Switch to `<target>` environment.
+
+Click Proceed on the confirmation box to restart the app to apply changes.
+
 # Hosting Service FAQ
 
 ## 1. Where are your servers located?
