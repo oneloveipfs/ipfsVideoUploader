@@ -26,7 +26,7 @@ This formatting applies when referring to usernames in databases as well as `whi
 
 ## Shawp refill memos
 
-For technical reasons, the username formatting for Shawp refill memos on Avalon, Hive and Steem networks will differ slightly. A complete memo for Shawp refills looks something like this:
+For technical reasons, the username formatting for Shawp refill memos on Avalon and Hive networks will differ slightly. A complete memo for Shawp refills looks something like this:
 ```
 to: network@username
 ```

@@ -6,13 +6,12 @@ const defaultPlatforms = {
 const supportedPlatforms = {
     hive: ['3Speak','DTube'],
     avalon: ['DTube'],
-    steem: ['DTube'],
     blurt: ['DTube']
 }
 
 const allowedPlatformNetworks = {
     '3Speak': ['hive'],
-    'DTube': ['avalon','hive','steem','blurt']
+    'DTube': ['avalon','hive','blurt']
 }
 
 const isPlatformSelected = {
@@ -20,7 +19,7 @@ const isPlatformSelected = {
     'DTube': false
 }
 
-const grapheneNetworks = ['hive','steem','blurt']
+const grapheneNetworks = ['hive','blurt']
 
 document.addEventListener('DOMContentLoaded', () => {
     let pages = ['uploadForm','thumbnailSwapper','yourFiles','wcinfo','refiller','getHelp','dropdownbox','settings','scheduledPublishes','postpublish','draftList','spkUploads']
@@ -257,7 +256,6 @@ function pfPostEmbed(network) {
                 return '3Speak'
             else
                 return 'DTube'
-        case 'steem':
         case 'blurt':
             return 'DTube'
         default:

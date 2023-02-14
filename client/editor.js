@@ -24,7 +24,6 @@ const threespeakUrl = 'https://3speak.tv/watch?v='
 let editor = {
     editingPosts: {},
     editingPlatforms: [],
-    steemIgnored: false,
     refs: [],
     params: {}
 }
@@ -193,7 +192,6 @@ async function finalizeEdit(newThumbnailHash) {
     editor = {
         editingPosts: {},
         editingPlatforms: [],
-        steemIgnored: false,
         refs: [],
         params: {}
     }
@@ -305,8 +303,6 @@ function editorFetchContent(linkType, author, link, ref) {
             console.log(e)
             alert('Failed to fetch avalon content, see browser console for details')
         })
-    else if (linkType === 'steem')
-        editor.steemIgnored = true
 }
 
 // json metadata check up to 1 refs deep

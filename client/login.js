@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updateDisplayByIDs(['signupcb','signupPopup'],['signupstart'])
 
     if (!isElectron()) {
-        updateDisplayByIDs([],['hiveLoginKey','blurtLoginKey','steemLoginKey'])
+        updateDisplayByIDs([],['hiveLoginKey','blurtLoginKey'])
         setDisplayByClass('rememberme')
     } else {
         let tochange = document.getElementsByClassName('kcAuth')
@@ -73,13 +73,11 @@ function loginBtnClicked() {
                 }
 
                 // All other key based logins
-                if ((!storedLogin.avalonUser && !storedLogin.hiveUser && !storedLogin.steemUser) || 
+                if ((!storedLogin.avalonUser && !storedLogin.hiveUser) || 
                     (storedLogin.avalonUser && !storedLogin.avalonKey) || 
                     (storedLogin.hiveUser && !storedLogin.hiveKey && !persistentHiveAuth) || 
-                    (storedLogin.steemUser && !storedLogin.steemKey) ||
                     (storedLogin.blurtUser && !storedLogin.blurtKey)) throw 'invalid keys'
                 if (storedLogin.hiveUser) persistentLoginText += '<h4>Hive: ' + storedLogin.hiveUser + (persistentHiveAuth ? ' (HiveAuth)' : '')+'</h4>'
-                if (storedLogin.steemUser) persistentLoginText += '<h4>Steem: ' + storedLogin.steemUser+'</h4>'
                 if (storedLogin.blurtUser) persistentLoginText += '<h4>Blurt: ' + storedLogin.blurtUser+'</h4>'
                 if (storedLogin.avalonUser) persistentLoginText += '<h4>Avalon: ' + storedLogin.avalonUser+'</h4>'
             } catch {
@@ -110,14 +108,13 @@ async function proceedLogin() {
     if (isElectron())
         storeLogins()
     if (window.logins.keychain) cbUrl += '&keychain=true'
-    if (window.logins.steemUser) cbUrl += '&steemuser=' + window.logins.steemUser
     if (window.logins.blurtUser) cbUrl += '&blurtuser=' + window.logins.blurtUser
     if (window.logins.avalonHiveKeychain) cbUrl += '&avalonkc=' + window.logins.avalonHiveKeychain + '&avalonkcuser=' + window.logins.avalonHiveKeychainUser
     window.location.href = cbUrl
 }
 
 function loginBackBtn() {
-    updateDisplayByIDs(['loginformmain'],['loginformhive','loginformhive-actions','loginformavalon','loginformavalon-actions','loginformsteem','loginformsteem-actions','loginformblurt','loginformblurt-actions'])
+    updateDisplayByIDs(['loginformmain'],['loginformhive','loginformhive-actions','loginformavalon','loginformavalon-actions','loginformblurt','loginformblurt-actions'])
     updateDisplayByIDs(['loginformmain-actions'],[],'flex')
 }
 
@@ -530,7 +527,7 @@ async function blurtLogin() {
 
     if (isElectron()) {
         try {
-            let login = await steemKeyLogin('blurt',blurtUsername,blurtKey,'BLT')
+            let login = await blurtKeyLogin('blurt',blurtUsername,blurtKey,'BLT')
             if (typeof login === 'string')
                 throw login
         } catch (e) {
@@ -554,53 +551,14 @@ async function blurtLogin() {
     }
 }
 
-// NOTE: I really want to remove Steem from OneLoveIPFS entirely, however
-// there are people who still post there so limited support will have to stay unfortunately :\
-// TODO: Remove in v3.1
-async function steemLogin() {
-    let steemUsername = document.getElementById('steemLoginUsername').value.toLowerCase().replace('@','')
-    let steemKey = document.getElementById('steemLoginKey').value
-
-    if (!steemUsername) return alert('Username is required')
-    if (!window.steem_keychain && !isElectron()) return alert('Blurt Keychain is not installed')
-    if (!steemKey && isElectron()) return alert('Posting key is required')
-
-    togglePopupActions('loginformsteem-actions',true)
-
-    if (isElectron()) {
-        try {
-            let login = await steemKeyLogin('steem',steemUsername,steemKey)
-            if (typeof login === 'string')
-                throw login
-        } catch (e) {
-            alert(e.toString())
-            togglePopupActions('loginformsteem-actions',false)
-            return
-        }
-        sessionStorage.setItem('steemUser',steemUsername)
-        sessionStorage.setItem('steemKey',steemKey)
-        loginCb('steem')
-    } else {
-        steem_keychain.requestSignBuffer(steemUsername,'login','Posting',(steemLoginRes) => {
-            if (steemLoginRes.success)
-                loginCb('steem')
-            else {
-                alert('Steem Keychain login error: ' + steemLoginRes.message)
-                togglePopupActions('loginformsteem-actions',false)
-                return
-            }
-        })
-    }
-}
-
-async function steemKeyLogin(network,username,wif,prefix='STM') {
+async function blurtKeyLogin(network,username,wif,prefix='BLT') {
     try {
         let acc = await getGrapheneAccounts(network,[username])
         if (acc.length == 0) return 'Account does not exist'
         try {
             let pubkey = hivecryptpro.PrivateKey.fromString(wif).createPublic().toString()
-            if (prefix !== 'STM')
-                pubkey = pubkey.replace('STM',prefix)
+            if (prefix !== 'BLT')
+                pubkey = pubkey.replace('BLT',prefix)
             for (let i = 0; i < acc[0].posting.key_auths.length; i++)
                 if (acc[0].posting.key_auths[i][0].toString() === pubkey.toString())
                     return true

@@ -5,7 +5,6 @@ function convertDraft() {
     let savedTags = localStorage.getItem('OneLoveTags')
     let savedPostBody = localStorage.getItem('OneLovePostBody')
     let savedGraphenePermlink = localStorage.getItem('DraftGraphenePermlink')
-    let savedSteemBenefs = localStorage.getItem('DraftSteemBeneficiaries')
     let savedHiveBenefs = localStorage.getItem('DraftHiveBeneficiaries')
     let savedPowerUp = localStorage.getItem('DraftPowerUp')
     let savedSkynetUpload = localStorage.getItem('DraftSkynetUpload')
@@ -22,11 +21,6 @@ function convertDraft() {
             createdTs: new Date().getTime(),
             lastTs: new Date().getTime()
         }
-        if (savedSteemBenefs) {
-            try {
-                newDraftObj.steemBeneficiaries =  JSON.parse(savedSteemBenefs)
-            } catch {}
-        }
         if (savedHiveBenefs) {
             try {
                 newDraftObj.hiveBeneficiaries = JSON.parse(savedHiveBenefs)
@@ -41,10 +35,8 @@ function convertDraft() {
         localStorage.removeItem('OneLovePostBody')
         localStorage.removeItem('OneLoveSubtitles')
         localStorage.removeItem('DraftGraphenePermlink')
-        localStorage.removeItem('DraftSteemBeneficiaries')
         localStorage.removeItem('DraftHiveBeneficiaries')
         localStorage.removeItem('DraftBlurtBeneficiaries')
-        localStorage.removeItem('DraftSteemCommunity')
         localStorage.removeItem('DraftHiveCommunity')
         localStorage.removeItem('DraftPowerUp')
         localStorage.removeItem('DraftSkynetUpload')
@@ -102,17 +94,12 @@ function retrieveDraft(pm) {
         updateSubtitle()
     }
     document.getElementById('customPermlink').value = pm
-    if (Array.isArray(draftObj.steemBeneficiaries))
-        for (let b in draftObj.steemBeneficiaries)
-            steemBeneficiaries.addAccount(draftObj.steemBeneficiaries[b].account,draftObj.steemBeneficiaries[b].weight)
     if (Array.isArray(draftObj.hiveBeneficiaries))
         for (let b in draftObj.hiveBeneficiaries)
             hiveBeneficiaries.addAccount(draftObj.hiveBeneficiaries[b].account,draftObj.hiveBeneficiaries[b].weight)
     if (Array.isArray(draftObj.blurtBeneficiaries))
         for (let b in draftObj.blurtBeneficiaries)
             blurtBeneficiaries.addAccount(draftObj.blurtBeneficiaries[b].account,draftObj.blurtBeneficiaries[b].weight)
-    if (draftObj.steemCommunity)
-        document.getElementById('steemCommunitySelect').value = draftObj.steemCommunity
     if (draftObj.hiveCommunity)
         document.getElementById('hiveCommunitySelect').value = draftObj.hiveCommunity
     if (draftObj.blurtCommunity)
@@ -138,8 +125,6 @@ function saveDraft() {
         subtitles: subtitleList,
         powerup: document.getElementById('powerup').checked,
         skynet: document.getElementById('skynetupload').checked,
-        steemBeneficiaries: steemBeneficiaries.accounts,
-        steemCommunity: document.getElementById('steemCommunitySelect').value,
         hiveBeneficiaries: hiveBeneficiaries.accounts,
         hiveCommunity: document.getElementById('hiveCommunitySelect').value,
         blurtBeneficiaries: blurtBeneficiaries.accounts,

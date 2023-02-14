@@ -121,7 +121,7 @@ Please refer to [ResumableUploads.md](https://github.com/oneloveipfs/ipfsVideoUp
 ```
 
 * `UPLOAD_TYPE` *(required)*: Kind of image to upload. Valid values:
-    - `images` -> Treats the image file as a photo that is part of Steem article body.
+    - `images` -> Treats the image file as a photo that is part of post article body.
     - `thumbnails` -> Treats the image file as the thumbnail of a video.
 * `AUTH_TOKEN` *(required)*: Access token obtained from `/logincb` or `/loginsig` or HiveSigner login access token.
 * `scauth` *(optional)*: Set this to `true` if `AUTH_TOKEN` provided is a HiveSigner access token.

@@ -1,4 +1,4 @@
-// Hive, Steem and Blurt beneficiaries
+// Hive and Blurt beneficiaries
 class Beneficiaries {
     constructor(network) {
         this.accounts = []
@@ -121,7 +121,6 @@ class Beneficiaries {
     static describe() {
         let beneficiariesGrapheneList = []
         if (hiveDisplayUser) beneficiariesGrapheneList.push('HIVE')
-        if (steemUser) beneficiariesGrapheneList.push('STEEM')
         if (blurtUser) beneficiariesGrapheneList.push('BLURT')
         let beneficiariesDescText = 'Add some accounts here to automatically receive a portion of your '+listWords(beneficiariesGrapheneList)+' post rewards.'
         if (avalonUser)

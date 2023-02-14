@@ -213,7 +213,7 @@ br {
     margin: 5px 0px;
     font-size: 20px;
 }
-#persistentform, #persistenthiveauth, #loginformhive, #loginformhiveauth, #loginformavalon, #loginformblurt, #loginformsteem { display: none; }
+#persistentform, #persistenthiveauth, #loginformhive, #loginformhiveauth, #loginformavalon, #loginformblurt { display: none; }
 #hiveauthqr img, #persistenthiveauthqr img {
     margin-left: auto;
     margin-right: auto;
@@ -723,7 +723,7 @@ textarea {
 }
 
 /* Beneficiaries */
-#beneficiaryHeadingHive, #beneficiaryHeadingSteem, #beneficiaryHeadingBlurt {
+#beneficiaryHeadingHive, #beneficiaryHeadingBlurt {
     margin-block-start: 0.25em;
     margin-block-end: 0.25em;
 }

@@ -1,8 +1,6 @@
-// Load Steem Connect access token to client
 let url = new URL(window.location.href)
 let token = url.searchParams.get('access_token') // Access token for logged in user
 let iskeychain = url.searchParams.get('keychain')
-let steemUser = url.searchParams.get('steemuser')
 let blurtUser = url.searchParams.get('blurtuser')
 let avalonKc = url.searchParams.get('avalonkc')
 let avalonKcUser = url.searchParams.get('avalonkcuser')
@@ -29,7 +27,7 @@ async function Hive() {
                 } else {
                     window.currentnetwork = authResponse.data.network // network used for access token
                     hiveDisplayUser = sessionStorage.getItem('hiveUser')
-                    if (!hiveDisplayUser && !steemUser && !blurtUser) {
+                    if (!hiveDisplayUser && !blurtUser) {
                         setDisplayByClass('grapheneSettings')
                     } else {
                         // HiveAuth login
@@ -147,8 +145,6 @@ function displayLoginMessage(errored) {
         let displayAccs = []
         if (hiveDisplayUser)
             displayAccs.push(hiveDisplayUser + ' on Hive' + (hiveAuthLogin ? ' (HiveAuth)' : ''))
-        if (steemUser)
-            displayAccs.push(steemUser + ' on Steem')
         if (blurtUser)
             displayAccs.push(blurtUser + ' on Blurt')
         if (dtcDisplayUser)
@@ -169,8 +165,6 @@ function usernameByNetwork(network) {
             return hiveDisplayUser
         case 'avalon':
             return dtcDisplayUser
-        case 'steem':
-            return steemUser
         case 'blurt':
             return blurtUser
     }

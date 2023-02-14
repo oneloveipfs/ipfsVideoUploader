@@ -6,7 +6,6 @@ const APP_META = {
 
 const CHAIN_IDS = {
     hive: 'beeab0de00000000000000000000000000000000000000000000000000000000',
-    steem: '0000000000000000000000000000000000000000000000000000000000000000',
     blurt: 'cd8d90f29ae273abec3eaa7731e25934c63eb654d55080caff2ebb7f5df6381f'
 }
 
@@ -61,9 +60,6 @@ function getBlockchainAPI(network,httpsPrefix = true) {
             break
         case 'blurt':
             result = (persist && BLURT_API.includes(persist)) ? persist : BLURT_API[0]
-            break
-        case 'steem':
-            result = 'api.steemit.com'
             break
         default:
             return ''

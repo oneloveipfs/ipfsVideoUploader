@@ -15,7 +15,6 @@ let subtitleList = []
 
 // Beneficiaries
 let hiveBeneficiaries = new Beneficiaries('Hive')
-let steemBeneficiaries = new Beneficiaries('Steem')
 let blurtBeneficiaries = new Beneficiaries('Blurt')
 
 // Load Avalon login
@@ -350,7 +349,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         let network = document.getElementById('newBeneficiaryNetwork').value
         let nobj = {
             Hive: hiveBeneficiaries,
-            Steem: steemBeneficiaries,
             Blurt: blurtBeneficiaries
         }
 
@@ -819,34 +817,6 @@ function avalonCb(e,serial) {
     }
 
     if (typeof serial === 'boolean' && serial === true)
-        steemBroadcaster()
-    else if (typeof serial === 'function')
-        serial(true)
-}
-
-function steemBroadcaster(serial = true) {
-    if (steemUser && supportedPlatforms.steem.filter((p) => isPlatformSelected[p]).length > 0 && !config.noBroadcast) {
-        let steemTx = generatePost('steem')
-        console.log('Steem tx',steemTx)
-        document.getElementById('uploadProgressFront').innerHTML = 'Submitting video to Steem...'
-        if (isElectron())
-            grapheneSignAndBroadcast('steem',sessionStorage.getItem('steemKey'),steemTx)
-                .then((r) => steemCb(r,serial))
-                .catch((e) => steemCb({error: e.toString()},serial))
-        else
-            steem_keychain.requestBroadcast(steemUser,steemTx,'Posting',(r) => steemCb(r,serial))
-    } else steemCb({},serial)
-}
-
-function steemCb(r,serial) {
-    if (r.error) {
-        bcError('Steem broadcast',r.error.toString())
-        if (typeof serial === 'function')
-            serial(false)
-        return
-    }
-
-    if (typeof serial === 'boolean' && serial === true)
         blurtBroadcaster()
     else if (typeof serial === 'function')
         serial(true)
@@ -1046,8 +1016,6 @@ function generateRefs(network) {
         ref.push('dtc/' + avalonUser + '/' + generateAvalonLinkFromIpfsHash(postparams.ipfshash))
     if (network !== 'hive' && hiveDisplayUser)
         ref.push('hive/' + hiveDisplayUser + '/' + postparams.permlink)
-    if (network !== 'steem' && steemUser)
-        ref.push('steem/' + steemUser + '/' + postparams.permlink)
     if (network !== 'blurt' && blurtUser)
         ref.push('blurt/' + blurtUser + '/' + postparams.permlink)
     return ref
@@ -1064,9 +1032,7 @@ function generatePost(network) {
             sortedBeneficiary = hiveBeneficiaries.spkGetSortedAccounts(spkUploadList[postparams.spkIdx].beneficiaries)
         else
             sortedBeneficiary = hiveBeneficiaries.sort()
-    } else if (network === 'steem')
-        sortedBeneficiary = steemBeneficiaries.sort()
-    else if (network === 'blurt')
+    } else if (network === 'blurt')
         sortedBeneficiary = blurtBeneficiaries.sort()
     let user = usernameByNetwork(network)
 
@@ -1104,11 +1070,7 @@ function generatePost(network) {
 
     if (sortedBeneficiary.length > 0 || rewardPercent < 10000) {
         operations.push(commentOptions)
-        if (network === 'steem') {
-            operations[1][1].max_accepted_payout = '1000000.000 SBD'
-            operations[1][1].percent_steem_dollars = rewardPercent
-            delete operations[1][1].percent_hbd
-        } else if (network === 'blurt') {
+        if (network === 'blurt') {
             operations[1][1].max_accepted_payout = '1000000.000 BLURT'
             delete operations[1][1].percent_hbd
             delete operations[0][1].category

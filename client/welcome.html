@@ -171,13 +171,6 @@
                                     </td>
                                     <td id="loginnetworkblurt">></td>
                                 </tr>
-                                <tr onclick="loginNetworkBtn('steem')">
-                                    <td>
-                                        <h4>Steem (deprecated)</h4>
-                                        <h5>Posts to DTube</h5>
-                                    </td>
-                                    <td id="loginnetworksteem">></td>
-                                </tr>
                             </table><br>
                             <div class="rememberme"><label class="switch">
                                 <input type="checkbox" name="rememberme" id="rememberme" onchange="updateRememberMeState()" checked>
@@ -213,14 +206,6 @@
                             <input type="text" placeholder="BLURT Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="blurtLoginUsername" class="loginFields">
                             <input type="password" placeholder="BLURT Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="blurtLoginKey" class="loginFields">
                         </div>
-                        <div id="loginformsteem">
-                            <a onclick="loginBackBtn()"><< Back</a><br><br>
-                            <div class="warningbox">Please note that Steem has been deprecated in OneLoveIPFS and will be removed in v3.1. We will not resolve any posting issues associated with Steem, therefore please be cautious if you choose to proceed.</div>
-                            <div id="actualSteemLoginForm" style="display: none;">
-                                <input type="text" placeholder="STEEM Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="steemLoginUsername" class="loginFields">
-                                <input type="password" placeholder="STEEM Posting Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="steemLoginKey" class="loginFields">
-                            </div>
-                        </div>
                     </div>
                     <div id="persistentform">
                         <div id="persistentLoginText"></div>
@@ -245,9 +230,6 @@
                 </div>
                 <div class="popup-actions" id="loginformblurt-actions" style="display: none;">
                     <input type="button" class="kcAuth" id="blurtAuthBtn" value="Keychain" onclick="blurtLogin()">
-                </div>
-                <div class="popup-actions" id="loginformsteem-actions" style="display: none;">
-                    <input type="button" id="steemAuthBtn" value="Proceed Anyway" onclick="if (document.getElementById('steemAuthBtn').value !== 'Proceed Anyway') steemLogin(); else {updateDisplayByIDs(['actualSteemLoginForm'],[]); updateDisplayByIDs(['loginformsteem-actions'],[],'flex'); document.getElementById('steemAuthBtn').value = 'Login'}">
                 </div>
                 <div class="popup-actions" id="persistentform-actions" style="display: none;">
                     <input type="button" id="clearPersistAuthBtn" value="Clear Login" onclick="clearPersistentLogin()">
