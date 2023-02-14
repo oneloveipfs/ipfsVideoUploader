@@ -233,7 +233,6 @@ function updateDisplayPlatforms() {
         updateDisplayByIDs([],['postpublishsharetgpf'])
     else
         updateDisplayByIDs(['postpublishsharetgpf'],[],'inline-block')
-    updateEncoderDisplay()
 }
 
 function pfSelect(p) {
@@ -271,13 +270,6 @@ function pfPlayerEmbed(pf) {
         case 'DTube':
             return '<iframe src="https://emb.d.tube/#!/'+(av?av:username)+'/'+(av?generateAvalonLinkFromIpfsHash(postparams.ipfshash):postparams.permlink)+'" frameborder="0" allowfullscreen></iframe>'
     }
-}
-
-function updateEncoderDisplay() {
-    if (document.getElementById('hlsencode').checked)
-        updateDisplayByIDs([],['mp4encodedupload'])
-    else
-        updateDisplayByIDs(['mp4encodedupload'],[])
 }
 
 function postpublish() {

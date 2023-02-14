@@ -21,7 +21,7 @@ let blurtBeneficiaries = new Beneficiaries('Blurt')
 let avalonUser = sessionStorage.getItem('avalonUser')
 let avalonKey = sessionStorage.getItem('avalonKey')
 
-// Post parameters (videohash, video240, video480 etc)
+// Post parameters
 let postparams = {}
 let scheduleDatePicker
 let encoderAvailable = false
@@ -47,14 +47,6 @@ axios.get('/proxy_server').then((r) => {
                 // use duration from fake player if possible
                 if (existingDuration && typeof existingDuration === 'number')
                     postparams.duration = existingDuration
-                break
-            case 'video240':
-            case 'video480':
-            case 'video720':
-            case 'video1080':
-                let resolution = r.type.replace('video','')
-                postparams['ipfs'+resolution+'hash'] = r.hash
-                if (r.skylink) postparams['skylink'+resolution] = r.skylink
                 break
             case 'hls':
                 postparams = Object.assign(postparams,r)
@@ -418,7 +410,6 @@ function uploadThumbnail(type,imgFormData,successCb,errorCb) {
 
 function uploadVideo(resolution,next) {
     let fInputElemName, resolutionFType, progressTxt
-    let lbl = ['source','240','480','720','1080']
     switch (resolution) {
         case -1:
             fInputElemName = 'sourcevideo'
@@ -429,14 +420,6 @@ function uploadVideo(resolution,next) {
             fInputElemName = 'sourcevideo'
             resolutionFType = 'videos'
             progressTxt = 'Uploading source video...'
-            break
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-            fInputElemName = `video${lbl[resolution]}p`
-            resolutionFType = `video${lbl[resolution]}`
-            progressTxt = `Uploading ${lbl[resolution]}p video...`
             break
         default:
             return next()
@@ -672,12 +655,6 @@ function reenableFields() {
 
 function postVideo() {
     let requiredFields = ['ipfshash','imghash','duration']
-    let encodedVidInputs = ['video240p','video480p','video720p','video1080p']
-    let respectiveField = ['ipfs240hash','ipfs480hash','ipfs720hash','ipfs1080hash']
-
-    for (let i = 0; i < encodedVidInputs.length; i++)
-        if (document.getElementById(encodedVidInputs[i]).files.length > 0) requiredFields.push(respectiveField[i])
-
     for (let j = 0; j < requiredFields.length; j++)
         if (!postparams[requiredFields[j]]) return console.log('missing hash, not proceeding with broadcast')
 
