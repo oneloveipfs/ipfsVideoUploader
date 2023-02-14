@@ -409,15 +409,13 @@ function uploadThumbnail(type,imgFormData,successCb,errorCb) {
 }
 
 function uploadVideo(resolution,next) {
-    let fInputElemName, resolutionFType, progressTxt
+    let resolutionFType, progressTxt
     switch (resolution) {
         case -1:
-            fInputElemName = 'sourcevideo'
             resolutionFType = 'hls'
             progressTxt = 'Uploading video...'
             break
         case 0:
-            fInputElemName = 'sourcevideo'
             resolutionFType = 'videos'
             progressTxt = 'Uploading source video...'
             break
@@ -425,7 +423,7 @@ function uploadVideo(resolution,next) {
             return next()
     }
 
-    let videoToUpload = document.getElementById(fInputElemName).files
+    let videoToUpload = document.getElementById('sourcevideo').files
     if (videoToUpload.length < 1) return uploadVideo(resolution+1,next)
 
     updateDisplayByIDs(['uploadProgressBack'],[])
