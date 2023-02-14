@@ -7,13 +7,13 @@
 ```
 # Main dependencies
 sudo apt-get update
-sudo apt-get install curl git wget nodejs npm ffmpeg imagemagick bc
+sudo apt-get install curl git wget ffmpeg imagemagick bc
 
-# NVM to use Node v16
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+# NVM to use Node v18
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
 source ~/.bashrc
-nvm install 16
-nvm use 16
+nvm install 18
+nvm use 18
 
 # go-ipfs (skip this if using IPFS desktop)
 # Get the latest version at https://dist.ipfs.io
@@ -30,11 +30,13 @@ xcode-select --install
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
 # Main dependencies
-brew install git wget nodejs npm nvm ffmpeg imagemagick bc
+brew install git wget ffmpeg imagemagick bc
 
-# Use Node v16 with NVM
-nvm install 16
-nvm use 16
+# Use Node v18 with NVM
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.3/install.sh | bash
+source ~/.bashrc
+nvm install 18
+nvm use 18
 
 # go-ipfs (skip this if using IPFS desktop)
 # Get the latest version at https://dist.ipfs.io

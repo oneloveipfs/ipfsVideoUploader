@@ -8,7 +8,7 @@ fi
 
 VERSION=$1
 if [ "$VERSION" = "" ]; then
-    VERSION="0.16.0"
+    VERSION="0.18.1"
 fi
 
 echo "Downloading ipfs v${VERSION} for Ubuntu..."

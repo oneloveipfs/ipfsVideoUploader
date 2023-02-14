@@ -36,7 +36,7 @@ Contact us in [OneLoveIPFS Discord server](https://discord.gg/ZWj5NqaBeF). Inclu
 
 For full desktop app build, ensure that `whitelistEnabled` is set to false. More details about app config [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/ConfigDocs.md).
 
-As for our hosting service (accessing through webapp or remote app build), please contact us in our [Discord server](https://discord.gg/ZWj5NqaBeF) with the transaction ID of your payment if the issue persists after the required confirmation times.
+As for our hosting service (accessing through webapp or desktop app), please contact us in our [Discord server](https://discord.gg/ZWj5NqaBeF) with the transaction ID of your payment if the issue persists after the required confirmation times.
 
 ## 2. I'm getting a network error while uploading. Is there a server issue?
 
@@ -82,13 +82,13 @@ This is also the reason why 3Speak uploads may take some time for the IPFS node 
 
 The webapp refers to the website in which the hosting service (it can be run by us or anyone else) is accessible through a web browser. The desktop app is an installable binary that is meant to run on your computer as an app.
 
-Certain features may or may not be available on the webapp or the desktop app. See [here](https://github.com/oneloveipfs/ipfsVideoUploader#full-vs-remote-vs-standalone-vs-web) for more details.
+Certain features may or may not be available on the webapp or the desktop app. See [here](https://github.com/oneloveipfs/ipfsVideoUploader#local-vs-remote-vs-standalone-vs-web) for more details.
 
-## 10. What is the difference between the full and remote build?
+## 10. What is the difference between the local and remote runtime environment?
 
-The full build is designed to communicate directly with a locally running IPFS daemon for ease of use, it does not communicate to a remote service (with exception of update checks). The remote build communicates with a remote service (such as uploader.oneloveipfs.com) and works like the webapp, but with some features that are exclusive to the desktop app.
+The local environment is designed to communicate directly with a locally running IPFS daemon for ease of use, it does not communicate to a remote service (with exception of update checks). The remote environment communicates with a remote service (such as uploader.oneloveipfs.com) and works like the webapp, but with some features that are exclusive to the desktop app.
 
-See [here](https://github.com/oneloveipfs/ipfsVideoUploader#full-vs-remote-vs-standalone-vs-web) for more details between the builds.
+See [here](https://github.com/oneloveipfs/ipfsVideoUploader#local-vs-remote-vs-standalone-vs-web) for more details between the builds.
 
 # Hosting Service FAQ
 

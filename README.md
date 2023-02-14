@@ -32,9 +32,9 @@ The ways in which configuration is done depends on how OneLoveIPFS uploader is r
 
 OneLoveIPFS data dir, which is the working directory for uploader databases and files can be set with `ONELOVEIPFS_DATA_DIR` environment variable.
 
-# Full vs Remote vs Standalone vs Web
+# Local vs Remote vs Standalone vs Web
 
-|Feature|Full Desktop|Remote Desktop|Standalone Server|Remote Web|
+|Feature|Local (Desktop)|Remote (Desktop)|Standalone Server|Remote Web|
 |-|:-:|:-:|:-:|:-:|
 |Interface|Desktop App|Desktop App|Browser|Browser|
 |Upload Server|Localhost|Remote|Localhost|Remote|
