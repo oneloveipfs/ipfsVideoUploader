@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     infoToDisplay += '<h4>Days remaining (based on balance and usage): ' + result.data.daysremaining + '</h4>'
 
                 infoToDisplay += '<h4>Rate: $' + result.data.rate + '/day (~$' + monthlyRate + '/month)</h4>'
-                infoToDisplay += '<h4>Joined Since: ' + moment(result.data.joinedSince).utc(result.data.joinedSince).local().format('MMMM DD YYYY h:mm:ss a') + '</h4>'
+                infoToDisplay += '<h4>Joined Since: '+joinedSinceStr(result.data.joinedSince)+'</h4>'
 
                 if (result.data.usagedetails && result.data.usage > 0) {
                     infoToDisplay += '<br><h2>Usage breakdown</h2>'
@@ -226,4 +226,10 @@ async function hiveAliasAuth(hiveUsername,hiveKey,cb) {
             return cb(message)
         })
     })
+}
+
+function joinedSinceStr(joinedDate = new Date().getTime()) {
+    let dateObj = new Date(joinedDate)
+    const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    return monthNames[dateObj.getMonth()]+' '+dateObj.getDate()+' '+dateObj.getFullYear()+' '+dateObj.toLocaleTimeString()
 }
