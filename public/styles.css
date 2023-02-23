@@ -44,6 +44,7 @@ html {
     margin: 10px 5px;
 }
 
+.footerContainer .footer-item svg,
 .footerContainer .footer-item img {
     width: 30px;
     height: 30px;
