@@ -20,6 +20,7 @@ const HIVE_API = [
     'anyx.io',
     'hived.emre.sh',
     'hive-api.arcange.eu',
+    'hive-api.3speak.tv',
     'rpc.ausbit.dev',
     'rpc.mahdiyari.info'
 ]
