@@ -28,7 +28,7 @@ FFmpeg option to specify output video quality. Varies on the encoder selected ab
 These values are tested (*or calculated) by myself for the best output quality at reasonable filesizes and may not contain the option that is specific to your hardware. If you want to add yours, please make a PR.
 
 * `libx264`: `-crf 18`
-* `h264_videotoolbox`: `-q:v 54`
+* `h264_videotoolbox`: `-q:v 62`
 * `h264_qsv`: `-global_quality 20`*
 * `h264_nvenc`: `-cq:v 19`*
 
