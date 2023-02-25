@@ -5,7 +5,13 @@ const defaultFfprobePath = require('ffprobe-static').path.replace('app.asar','ap
 const dataDir = (process.env.ONELOVEIPFS_DATA_DIR || require('os').homedir() + '/.oneloveipfs')
 const userconfigdir = dataDir+'/config.json'
 let isRemoteApp = fs.existsSync(dataDir+'/db/app_type') ? fs.readFileSync(dataDir+'/db/app_type','utf-8').trim() === '1' : false
-let defaultConfig = require('../config.json')
+let defaultConfig
+
+try {
+    defaultConfig = require('../config.json')
+} catch {
+    defaultConfig = require('../config_example.json')
+}
 let userConfig = {}
 
 if (fs.existsSync(userconfigdir)) {
