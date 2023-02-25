@@ -26,7 +26,13 @@ if (fs.existsSync(userconfigdir)) {
 
 // Sprite generation script and video duration is not supported on Windows
 // Also disabled on Electron apps for security reasons :\
-if (process.platform == 'win32' && !isRemoteApp || require('electron').app) {
+let hasElectron = false
+try {
+    require('electron')
+} catch {
+    // electron not installed, skip
+}
+if ((process.platform == 'win32' && !isRemoteApp) || (hasElectron && require('electron').app)) {
     defaultConfig.spritesEnabled = false
     defaultConfig.durationAPIEnabled = false
 }
