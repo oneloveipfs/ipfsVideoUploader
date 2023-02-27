@@ -36,8 +36,8 @@ module.exports = class {
                 }
                 this.headBlock = num
             } else
-                console.error(this.network,'get_dynamic_global_properties error',props.data.error)
-        }).catch((e) => console.log(this.network,'get_dynamic_global_properties error',e.toString()))
+                console.error(this.network,'get_dynamic_global_properties error',props.data.error.message)
+        }).catch((e) => console.error(this.network,'get_dynamic_global_properties error',e.toString()))
     }
 
     fetchBlocks(cb) {
