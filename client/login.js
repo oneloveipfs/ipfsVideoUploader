@@ -246,24 +246,21 @@ function getPaymentInfo() {
     let receipient = document.getElementById('receiverUsername').value
     let paymentMethod = document.getElementById('pymtMtd').value
     let creditsToBuy = parseFloat(document.getElementById('gbdaysInput').value)
-    let nativePymtProcessors = ['DTUBE','HIVE','HBD','BLURT']
+    let nativePymtProcessors = ['HIVE','HBD','BLURT']
     if (selectedNetwork === 'none') return alert('Please select a network for your account.')
     if (paymentMethod.startsWith('Select')) return alert('Please select a payment method.')
 
     // Validate usernames
     let hiveValid = validateHiveUsername(receipient)
-    let dtcValid = validateAvalonUsername(receipient)
-    if (selectedNetwork === 'all' && receipient && (hiveValid !== null || dtcValid !== null))
-        return alert(hiveValid || dtcValid)
+    if (selectedNetwork === 'all' && receipient && hiveValid !== null)
+        return alert(hiveValid)
     if (selectedNetwork === 'hive' && hiveValid !== null)
         return alert(hiveValid)
-    if (selectedNetwork === 'dtc' && dtcValid !== null)
-        return alert(dtcValid)
     
     if (creditsToBuy <= 0) return alert('Purchase quantity must not be less than or equals to zero.')
     if (nativePymtProcessors.includes(paymentMethod)) exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
         if (e) return alert(e)
-        amt = paymentMethod === 'DTUBE' ? amt.toFixed(2) : amt.toFixed(3)
+        amt = amt.toFixed(3)
         if (receipient) document.getElementById('receiverAccConfirm').innerText = 'Username: ' + receipient
         document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + creditsToBuy + ' GBdays'
         document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
@@ -276,11 +273,6 @@ function getPaymentInfo() {
         document.getElementById('xferMemo').innerHTML = memo !== '' ? 'Memo: <u>' + memo + '</u> <a onclick="copyToClipboard(\''+ memo + '\',\'copymemo\')"><i class="fas fa-clipboard tooltip" id="copybtn"><span class="tooltiptext" id="copymemo">Click to copy</span></i></a>' : 'No memo required'
 
         switch (paymentMethod) {
-            case 'DTUBE':
-                updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment','BlurtKeychainBtn'])
-                document.getElementById('DTubeChannelBtn').onclick = () => window.open('https://d.tube/#!/c/' + shawpconfig.DtcReceiver)
-                document.getElementById('DTubeChannelBtn').href = 'https://d.tube/#!/c/' + shawpconfig.DtcReceiver
-                break
             case 'HIVE':
             case 'HBD':
                 hivePaymentClickListener(receipient,shawpconfig.HiveReceiver,amt,paymentMethod,memo,'signup')
@@ -311,9 +303,6 @@ function signupNetworkSelect() {
             break
         case 'hive':
             document.getElementById('receiverUsername').placeholder = 'HIVE Username'
-            break
-        case 'dtc':
-            document.getElementById('receiverUsername').placeholder = 'AVALON Username'
             break
     }
 }

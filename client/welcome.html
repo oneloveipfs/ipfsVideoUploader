@@ -250,14 +250,12 @@
                             <option value="none">Select a network for your account...</option>
                             <option value="all">All</option>
                             <option value="hive">Hive</option>
-                            <option value="dtc">Avalon</option>
                         </select>
                         <input type="text" placeholder="Username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="receiverUsername" class="loginFields">
                         <input type="number" placeholder="GBdays to purchase" id="gbdaysInput" class="loginFields">
                         <h4 style="margin-block-start: 0.25em; margin-block-end: 0.6em;">Payment method: 
                         <select class="meta" id="pymtMtd">
                             <option>Select One...</option>
-                            <option>DTUBE</option>
                             <option>HIVE</option>
                             <option>HBD</option>
                             <option>BLURT</option>
@@ -266,7 +264,6 @@
                     </div>
                     <div id="signuppay" style="display: none;">
                         <a onclick="updateDisplayByIDs(['signupstart'],['signuppay','pymtpay-actions']); updateDisplayByIDs(['pymtstart-actions'],[],'flex');"><< Back</a><br><br>
-                        <h4 id="dtcInstruction">To continue, make a DTUBE transfer with the details below. Memo required is <u>clearly underlined</u>, if any. DTUBE payments take approximately 42 seconds (14 blocks) to process. Once complete, you may login and begin uploading videos to our service.<br><br>If you have any issues, please contact the OneLoveIPFS team on <u><a href="https://discord.gg/ZWj5NqaBeF" target="_blank">Discord</a></u>.<br><br></h4>
                         <h4 id="receiverAccConfirm"></h4>
                         <h4 id="gbdaysconfirm">Credits: 0 GBdays</h4>
                         <h4 id="quoteAmt">Amount: </h4>
@@ -305,7 +302,6 @@
                     <input type="button" id="HiveSignerBtn" target="_blank" rel="noreferrer" value="HiveSigner">
                     <input type="button" id="HiveKeychainBtn" value="Hive Keychain">
                     <input type="button" id="BlurtKeychainBtn" value="Blurt Keychain">
-                    <input type="button" id="DTubeChannelBtn" target="_blank" rel="noreferrer" value="Pay on d.tube">
                 </div>
             </div>
         </div>

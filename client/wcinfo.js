@@ -94,12 +94,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (paymentMethod.startsWith('Select')) return alert('Please select a payment method.')
         document.getElementById('refillSubmitBtn').value = 'Loading...'
         document.getElementById('refillSubmitBtn').disabled = true
-        let nativePymtProcessors = ['DTUBE','HIVE','HBD','BLURT']
+        let nativePymtProcessors = ['HIVE','HBD','BLURT']
         if (nativePymtProcessors.includes(paymentMethod)) exchageRate(paymentMethod,creditsToBuy,(e,amt) => {
             document.getElementById('refillSubmitBtn').value = 'Refill'
             document.getElementById('refillSubmitBtn').disabled = false
             if (e) return alert(e)
-            amt = paymentMethod === 'DTUBE' ? amt.toFixed(2) : amt.toFixed(3)
+            amt = amt.toFixed(3)
             document.getElementById('gbdaysconfirm').innerText = 'Credits: ' + creditsToBuy + ' GBdays'
             document.getElementById('quoteAmt').innerText = 'Amount: ' + amt + ' ' + paymentMethod
             updateDisplayByIDs(['nativeDisclaimer'],[])
@@ -108,11 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('xferMemo').innerHTML = 'Memo: <u>' + memo + '</u> <a onclick="copyToClipboard(\''+ memo + '\',\'copymemo\')"><i class="fas fa-clipboard tooltip" id="copybtn"><span class="tooltiptext" id="copymemo">Click to copy</span></i></a>'
 
             switch (paymentMethod) {
-                case 'DTUBE':
-                    updateDisplayByIDs(['DTubeChannelBtn','dtcInstruction'],['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment','BlurtKeychainBtn'])
-                    document.getElementById('DTubeChannelBtn').onclick = () => window.open('https://d.tube/#!/c/' + shawpconfig.DtcReceiver)
-                    document.getElementById('DTubeChannelBtn').href = 'https://d.tube/#!/c/' + shawpconfig.DtcReceiver
-                    break
                 case 'HIVE':
                 case 'HBD':
                     hivePaymentClickListener(username,shawpconfig.HiveReceiver,amt,paymentMethod,memo,'refill')

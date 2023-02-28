@@ -1,6 +1,5 @@
 const Config = require('./config')
 const db = require('./dbManager')
-const AvalonStreamer = require('./avalonStreamer')
 const GrapheneStreamer = require('./grapheneStreamer')
 const fs = require('fs')
 const axios = require('axios')
@@ -17,7 +16,6 @@ let ConsumeHistory = JSON.parse(fs.readFileSync(dbDir+'/shawpConsumes.json'))
 
 let hiveStreamer = new GrapheneStreamer(Config.Shawp.HiveAPI || 'https://techcoderx.com',true,'hive')
 let blurtStreamer = new GrapheneStreamer(Config.Shawp.BlurtAPI || 'https://rpc.blurt.world',true,'blurt')
-let avalonStreamer = new AvalonStreamer(Config.Shawp.AvalonAPI,true)
 
 let Shawp = {
     init: () => {
@@ -42,16 +40,6 @@ let Shawp = {
                     Shawp.ProcessBlurtTx(transaction.operations[op][1],transaction.transaction_id)
         })
 
-        if (Config.Shawp.DtcReceiver) {
-            avalonStreamer.streamBlocks((newBlock) => {
-                for (let txn in newBlock.txs)
-                    if (newBlock.txs[txn].type === 3 && newBlock.txs[txn].data.receiver === Config.Shawp.DtcReceiver) {
-                        let tx = newBlock.txs[txn]
-                        Shawp.ProcessAvalonTx(tx)
-                    }
-            })
-        }
-
         Scheduler.scheduleJob('0 0 * * *',() => {
             Shawp.Consume()
             Shawp.WriteConsumeHistory()
@@ -61,9 +49,6 @@ let Shawp = {
     },
     FetchTx: (id,network,cb) => {
         switch (network) {
-            case Shawp.methods.DTUBE:
-                axios.get(Config.Shawp.AvalonAPI+'/tx/'+id).then(d => cb(null,d.data)).catch(e => cb(e))
-                break
             case Shawp.methods.Hive:
                 axios.post(Config.Shawp.HiveAPI,{
                     id: 1,
@@ -80,26 +65,29 @@ let Shawp = {
                         cb(null,d.data.result)
                 })
                 break
+            case Shawp.methods.Blurt:
+                axios.post(Config.Shawp.BlurtAPI,{
+                    id: 1,
+                    jsonrpc: '2.0',
+                    method: 'account_history_api.get_transaction',
+                    params: {
+                        id: id,
+                        include_reversible: false
+                    }
+                }).then(d => {
+                    if (d.data.error)
+                        cb(d.data.error.message)
+                    else
+                        cb(null,d.data.result)
+                })
+                break
+                break
             case Shawp.methods.Steem:
                 cb('Deprecated')
             default:
                 cb('Invalid network')
                 break
         }
-    },
-    ProcessAvalonTx: (tx) => {
-        console.log(tx)
-        let amt = tx.data.amount / 100
-        Shawp.ExchangeRate(Shawp.coins.DTUBE,amt,(e,usd) => {
-            let receiver = tx.sender
-            let memo = tx.data.memo.toLowerCase().trim()
-            let parsedDetails = Shawp.ValidatePayment(receiver,memo)
-            if (parsedDetails.length !== 2) return
-            Shawp.Refill(tx.sender,parsedDetails[0],parsedDetails[1],Shawp.methods.DTUBE,tx.hash,tx.ts,amt+' DTUBE',usd)
-            Shawp.WriteRefillHistory()
-            Shawp.WriteUserDB()
-            console.log('Refilled $' + usd + ' to ' + (parsedDetails[1] != 'all' ? parsedDetails[1] : '') + '@' + parsedDetails[0] + ' successfully')
-        })
     },
     ProcessHiveTx: (tx,txid) => {
         console.log(tx,txid)
@@ -210,9 +198,6 @@ let Shawp = {
     ExchangeRate: (coin,amount,cb) => {
         let coingeckoUrl
         switch (coin) {
-            case 0:
-                coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/dtube-coin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
-                break
             case 1:
                 coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/hive?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
                 break
@@ -343,8 +328,7 @@ let Shawp = {
         Blurt: 7 // added in v3
     },
     hiveStreamer,
-    blurtStreamer,
-    avalonStreamer
+    blurtStreamer
 }
 
 module.exports = Shawp

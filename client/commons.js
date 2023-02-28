@@ -278,10 +278,6 @@ function exchageRate (coin,amount,cb) {
     let coingeckoUrl
     let precision = 3
     switch (coin) {
-        case 'DTUBE':
-            coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/dtube-coin?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
-            precision = 2
-            break
         case 'HIVE':
             coingeckoUrl = 'https://api.coingecko.com/api/v3/coins/hive?localization=false&tickers=false&market_data=true&community_data=false&developer_data=false&sparkline=false'
             break
@@ -522,13 +518,11 @@ function disablePaymentMethods() {
             paymentOptions[i].disabled = true
         else if (paymentOptions[i].value === 'BLURT' && !shawpconfig.BlurtReceiver)
             paymentOptions[i].disabled = true
-        else if (paymentOptions[i].value === 'DTUBE' && !shawpconfig.DtcReceiver)
-            paymentOptions[i].disabled = true
     }
 }
 
 function hivePaymentClickListener(u,to,amt,currency,memo,p = 'signup') {
-    updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'],['DTubeChannelBtn','dtcInstruction','BlurtKeychainBtn'])
+    updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'],['BlurtKeychainBtn'])
     document.getElementById('HiveKeychainBtn').onclick = () => {
         if (document.getElementById('hiveRecPaymentCheckbox').checked) {
             let recurrence = parseInt(document.getElementById('hiveRecPaymentRecurrence').value)
@@ -560,7 +554,7 @@ function hivePaymentClickListener(u,to,amt,currency,memo,p = 'signup') {
 }
 
 function blurtPaymentClickListener(u,to,amt,currency,memo,p = 'signup') {
-    updateDisplayByIDs(['BlurtKeychainBtn'],['DTubeChannelBtn','dtcInstruction','HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'])
+    updateDisplayByIDs(['BlurtKeychainBtn'],['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'])
     document.getElementById('BlurtKeychainBtn').onclick = () => {
         blurt_keychain.requestTransfer(u,to,amt.toString(),memo,currency,(e) => {
             console.log(e)
