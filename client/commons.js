@@ -28,7 +28,6 @@ const HIVE_API = [
 const AVALON_API = [
     'api.avalonblocks.com',
     'avalon.d.tube',
-    'avalon.sagarkothari88.one',
     'dtube.fso.ovh',
     'dtube.tekraze.com'
 ]
