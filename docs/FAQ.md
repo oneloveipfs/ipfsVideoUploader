@@ -116,11 +116,8 @@ Due to low usage, we have stopped running Sia nodes and maintaining the file con
 
 ## 4. How long are the block confirmation times for payments?
 
-* HIVE/HBD - 1 block
-* BLURT - 21 blocks
-* DTUBE - 15 blocks
-
-All coins above are running on blockchains with 3 second block times.
+* HIVE/HBD - 1 block (3 seconds)
+* BLURT - 21 blocks (63 seconds)
 
 ## 5. How do I delete uploaded content from the service?
 
