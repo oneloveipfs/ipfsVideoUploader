@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     infoToDisplay += '<br><hr><h2>Aliased Users</h2>'
                     infoToDisplay += '<h4>You may add another account on the same or different network as an alias so that you can upload using those accounts while having your upload usage billed to this account. You may need to enter the private key of the alias account if not using Keychain extensions. The private key entered will only be used for verification purposes and will not leave your browser, nor stored anywhere.</h4><br>'
                     infoToDisplay += '<table id="newAlias">'
-                    infoToDisplay += '<td><select id="newAliasNet" class="meta" style="height:34px; line-height:34px; width:100px;" onchange="aliasNetworkSelect()"><option value="hive">Hive</option><option value="dtc">Avalon</option></select></td>'
+                    infoToDisplay += '<td><select id="newAliasNet" class="meta" style="height:34px; line-height:34px; width:100px;" onchange="aliasNetworkSelect()"><option value="hive">Hive</option><option value="dtc" disabled>Avalon</option></select></td>'
                     infoToDisplay += '<td><input type="text" placeholder="New alias username" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="newAliasUser" class="meta"></td>'
                     infoToDisplay += '<td><input type="password" placeholder="Key" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" id="newAliasKey" class="meta"></td>'
                     infoToDisplay += '<td><a class="styledButton styledButtonSmall" id="newAliasAdd" onclick="addAliasBtn()">+</a></td>'
@@ -147,9 +147,7 @@ function aliasNetworkSelect() {
                 updateDisplayByIDs(['newAliasKey'],[],'inline')
             }
             break
-        case 'dtc':
-            document.getElementById('newAliasKey').placeholder = 'Avalon Key'
-            updateDisplayByIDs(['newAliasKey'],[],'inline')
+        default:
             break
     }
 }
@@ -168,9 +166,7 @@ function getAUTHtml(data) {
 
 function addAlias(user,key,network) {
     let loginMtd
-    if (network == 'dtc')
-        loginMtd = avalonAliasAuth
-    else if (network == 'hive')
+    if (network == 'hive')
         loginMtd = hiveAliasAuth
     loginMtd(user,key,(token) => {
         axios.put('/update_alias'+geturl,{ operation: 'set', aliasKey: token })
@@ -194,16 +190,6 @@ function refreshAliasAccs() {
             document.getElementById('newAliasKey').value = ''
         })
         .catch(() => alert('Deletion success but something went wrong while updating alias list'))
-}
-
-function avalonAliasAuth(avalonUsername,avalonKey,cb) {
-    generateMessageToSign(avalonUsername,'dtc',(e,message) => {
-        if (e)
-            return alert(e)
-        let signature = hivecryptpro.Signature.avalonCreate(hivecryptpro.sha256(message),avalonKey).customToString()
-        message += ':'+signature
-        cb(message)
-    })
 }
 
 async function hiveAliasAuth(hiveUsername,hiveKey,cb) {

@@ -26,6 +26,8 @@ async function Hive() {
                     resolve(null)
                 } else {
                     window.currentnetwork = authResponse.data.network // network used for access token
+                    if (window.currentnetwork === 'dtc')
+                        updateDisplayByIDs(['avalondeprecation'],[])
                     hiveDisplayUser = sessionStorage.getItem('hiveUser')
                     if (!hiveDisplayUser && !blurtUser) {
                         setDisplayByClass('grapheneSettings')
