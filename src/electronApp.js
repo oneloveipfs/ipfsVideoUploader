@@ -164,6 +164,7 @@ const menuTemplate = [
             { label: 'Documentation', click: () => shell.openExternal('https://docs.oneloveipfs.com') },
             { label: 'Report An Issue', click: () => shell.openExternal('https://github.com/oneloveipfs/ipfsVideoUploader/issues') },
             { label: 'OneLoveIPFS Discord Server', click: () => shell.openExternal('https://discord.gg/ZWj5NqaBeF') },
+            { label: 'OneLoveIPFS Matrix Space', click: () => shell.openExternal('https://matrix.to/#/#oneloveipfs:privex.io') },
             { type: 'separator' },
             { label: 'Source Code', click: () => shell.openExternal('https://github.com/oneloveipfs/ipfsVideoUploader') },
             { label: 'View License', click: () => shell.openExternal('https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/LICENSE') }

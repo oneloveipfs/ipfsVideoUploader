@@ -28,7 +28,7 @@ GBDays on our hosting service are just hosting credits on a centralized database
 
 ## 5. My question is not listed in this document. What can I do?
 
-Contact us in [OneLoveIPFS Discord server](https://discord.gg/ZWj5NqaBeF). Include screenshot of the console output from your browser whenever applicable.
+Contact us in OneLoveIPFS [Discord server](https://discord.gg/ZWj5NqaBeF) or [Matrix Room](https://matrix.to/#/#oneloveipfs:privex.io). Include screenshot of the console output from your browser whenever applicable.
 
 # Uploader FAQ
 
@@ -36,11 +36,11 @@ Contact us in [OneLoveIPFS Discord server](https://discord.gg/ZWj5NqaBeF). Inclu
 
 For full desktop app build, ensure that `whitelistEnabled` is set to false. More details about app config [here](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/docs/ConfigDocs.md).
 
-As for our hosting service (accessing through webapp or desktop app), please contact us in our [Discord server](https://discord.gg/ZWj5NqaBeF) with the transaction ID of your payment if the issue persists after the required confirmation times.
+As for our hosting service (accessing through webapp or desktop app), please contact us in our [Discord server](https://discord.gg/ZWj5NqaBeF) or [Matrix Room](https://matrix.to/#/#oneloveipfs:privex.io) with the transaction ID of your payment if the issue persists after the required confirmation times.
 
 ## 2. I'm getting a network error while uploading. Is there a server issue?
 
-For remotely hosted service (i.e. uploader.oneloveipfs.com), check your internet connection and try again later. If webpage fails to load right after you get this error, there is an issue with the upload servers. You may also want to check the #service-notices channel on our [Discord server](https://discord.gg/ZWj5NqaBeF) for any service outages.
+For remotely hosted service (i.e. uploader.oneloveipfs.com), check your internet connection and try again later. If webpage fails to load right after you get this error, there is an issue with the upload servers. You may also want to check the #service-notices channel on our [Discord server](https://discord.gg/ZWj5NqaBeF) and/or [Matrix Room](https://matrix.to/#/#oneloveipfs-service-notices:privex.io) for any service outages.
 
 For standalone server accessed through localhost, ensure that the tusd server is actually running with the correct webhooks and `ClientConfig.tusdEndpoint` is pointed at the correct tusd endpoint.
 
@@ -48,7 +48,7 @@ For standalone server accessed through localhost, ensure that the tusd server is
 
 This is either a HiveSigner issue if using HiveSigner auth, or blockchain API node issue. You may try changing blockchain API nodes of the networks you are logging into from the homepage next to the login button.
 
-If the issue still persists, please contact us on our [Discord server](https://discord.gg/ZWj5NqaBeF).
+If the issue still persists, please contact us on our [Discord server](https://discord.gg/ZWj5NqaBeF) or [Matrix Room](https://matrix.to/#/#oneloveipfs:privex.io).
 
 ## 4. What is the best specifications for thumbnails?
 
@@ -121,7 +121,7 @@ Due to low usage, we have stopped running Sia nodes and maintaining the file con
 
 ## 5. How do I delete uploaded content from the service?
 
-Currently, the uploader does not this functionality yet. Please reach out to `techcoderx#7481` on our [Discord server](https://discord.gg/ZWj5NqaBeF) for now.
+Currently, the uploader does not this functionality yet. Please reach out to `techcoderx#7481` on our [Discord server](https://discord.gg/ZWj5NqaBeF) or [Matrix Room](https://matrix.to/#/#oneloveipfs:privex.io) for now.
 
 ## 6. What are the maximum upload sizes?
 

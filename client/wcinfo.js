@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (error.response.data && error.response.data.error)
                 document.getElementById('wcinfo').innerHTML = '<h3>' + JSON.stringify(error.response.data.error) + '</h3>'
             else
-                document.getElementById('wcinfo').innerHTML = '<h3>There is an error retrieving your OneLoveIPFS account details. Please login again. If error still persists, please contact techcoderx#7481 on Discord.</h3>'
+                document.getElementById('wcinfo').innerHTML = '<h3>There is an error retrieving your OneLoveIPFS account details. Please login again. If error still persists, please contact techcoderx#7481 on Discord or #techcoderx:privex.io on Matrix.</h3>'
         })
 
         axios.get('/shawp_refill_history'+geturl).then(rfh => {
