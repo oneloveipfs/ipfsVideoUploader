@@ -386,10 +386,6 @@ function getAvalonVP(account) {
     return new GrowInt(account.vt, {growth:account.balance/360000000, max: account.maxVt}).grow(new Date().getTime()).v
 }
 
-function getAvalonBw(account) {
-    return new GrowInt(account.bw, {growth:Math.max(account.baseBwGrowth || 0,account.balance)/36000000, max:64000}).grow(new Date().getTime()).v
-}
-
 async function broadcastAvalonTx(tx) {
     await axios.post(getBlockchainAPI('avalon')+'/transact',tx,{
         'Accept': 'application/json, text/plain, */*',
@@ -456,24 +452,6 @@ function validateHiveUsername(value) {
             return suffix + "end with a letter or digit."
         if (!(label.length >= 3))
             return suffix + "be longer"
-    }
-    return null
-}
-
-function validateAvalonUsername(u) {
-    if (typeof u !== 'string') return 'username must be a string'
-    if (u.length < 1 || u.length > 50) return 'username nust be between 1 and 50 characters long'
-    let allowedUsernameChars = 'abcdefghijklmnopqrstuvwxyz0123456789'
-    let allowedUsernameCharsOnlyMiddle = '-.'
-    u = u.toLowerCase()
-    for (let i = 0; i < u.length; i++) {
-        const c = u[i]
-        // allowed username chars
-        if (allowedUsernameChars.indexOf(c) === -1) 
-            if (allowedUsernameCharsOnlyMiddle.indexOf(c) === -1)
-                return 'invalid character ' + c
-            else if (i === 0 || i === u.length-1)
-                return 'character ' + c + ' can only be in the middle'
     }
     return null
 }
