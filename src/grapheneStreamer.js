@@ -66,7 +66,8 @@ module.exports = class {
                         cb(newBlocks.data.result.blocks[b])
                     }
                     setTimeout(() => this.fetchBlocks(cb),9000)
-                }
+                } else
+                    setTimeout(() => this.fetchBlocks(cb),3000)
             }).catch((e) => {
                 console.error(this.network,'get_block_range error',e.toString())
                 setTimeout(() => this.fetchBlocks(cb),3000)
@@ -83,7 +84,8 @@ module.exports = class {
                     // console.log('headBlock',this.headBlock,'parsedBlock',this.parsedBlock)
                     cb(newBlock.data.result)
                     setTimeout(() => this.fetchBlocks(cb),this.headBlock === this.parsedBlock ? 3000 : 250)
-                }
+                } else
+                    setTimeout(() => this.fetchBlocks(cb),3000)
             }).catch((e) => {
                 console.error(this.network,'get_block error',e.toString())
                 setTimeout(() => this.fetchBlocks(cb),3000)
