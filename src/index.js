@@ -84,10 +84,7 @@ app.get('/login',(request,response) => {
     }
 
     if (request.query.network === 'dtc') {
-        Auth.generateEncryptedMemoAvalon(request.query.user,request.query.dtckeyid,(e,memo) => {
-            if (e) return response.send(e)
-            response.send({encrypted_memo: memo, error: null})
-        })
+        response.status(410).send({error: '/login route has been deprecated for Avalon logins'})
     } else Auth.generateEncryptedMemo(request.query.user,(err,memo) => {
         if (err) return response.send({error: err})
         response.send({encrypted_memo: memo, error: null})

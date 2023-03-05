@@ -53,8 +53,6 @@ let auth = {
         let message = username + ':'+Config.ClientConfig.authIdentifier+':hive'
         if (auth.isInWhitelist(username,null))
             message = username + ':'+Config.ClientConfig.authIdentifier+':all'
-        else if (auth.isInWhitelist(username,'dtc'))
-            message = username + ':'+Config.ClientConfig.authIdentifier+':dtc'
         let encrypted_message = Crypto.AES.encrypt(message,Keys.AESKey).toString()
         axios.post(Config.Shawp.HiveAPI || 'https://techcoderx.com',{
             id: 1,
@@ -73,30 +71,6 @@ let auth = {
             }
             cb(null,encrypted_memo)
         }).catch(e => cb(e))
-    },
-    generateEncryptedMemoAvalon: async (username,keyid,cb) => {
-        if (keyid && keyid.length > 25) return cb({error: 'Invalid custom key identifier'})
-        let message = username + ':'+Config.ClientConfig.authIdentifier+':dtc'
-        if (auth.isInWhitelist(username,null)) message = username + ':'+Config.ClientConfig.authIdentifier+':all'
-        let encrypted_message = Crypto.AES.encrypt(message,Keys.AESKey).toString()
-        try {
-            let avalonAcc = (await axios.get(Config.Shawp.AvalonAPI+'/account/'+username)).data
-            let pubKey
-            if (keyid || keyid === '') {
-                // Custom key
-                for (let i = 0; i < avalonAcc.keys.length; i++) 
-                    if (avalonAcc.keys[i].id === keyid && avalonAcc.keys[i].types.includes(4))
-                        pubKey = avalonAcc.keys[i].pub
-                if (!pubKey)
-                    return cb({error: 'Custom key identifier not found'})
-            } else
-                pubKey = avalonAcc.pub // Master key
-
-            let encrypted = HivecryptPro.hivecrypt.encode(Keys.wifMessage,HivecryptPro.PublicKey.fromAvalonString(pubKey).toString(),'#' + encrypted_message)
-            cb(null,encrypted)
-        } catch (e) {
-            cb(e)
-        }
     },
     generateJWT: (user,network,cb) => {
         // Generate access token to be sent as response

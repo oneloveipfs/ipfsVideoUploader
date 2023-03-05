@@ -16,15 +16,6 @@ describe('Auth',() => {
         })
     })
 
-    it('generateEncryptedMemoAvalon should return a string that also starts with a #',function(done) {
-        this.timeout(0)
-        Auth.generateEncryptedMemoAvalon(user,null,(err,result) => {
-            assert.typeOf(result,'string')
-            assert.equal(result.charAt(0),'#')
-            done()
-        })
-    })
-
     it('whitelist should be an array',function (done) {
         assert.typeOf(Auth.whitelist(),'array')
         done()
