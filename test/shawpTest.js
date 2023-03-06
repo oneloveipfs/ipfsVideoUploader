@@ -29,7 +29,6 @@ describe('Shawp',() => {
         assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'')),'["' + Config.test.user + '","all"]')
         assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'to: @'+Config.test.user)),'["' + Config.test.user + '","all"]')
         assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'to: hive@'+Config.test.user)),'["' + Config.test.user + '","hive"]')
-        assert.equal(JSON.stringify(Shawp.ValidatePayment(Config.test.user,'to: dtc@'+Config.test.user)),'["' + Config.test.user + '","dtc"]')
         done()
     })
 
@@ -45,14 +44,14 @@ describe('Shawp',() => {
     })
 
     it('Shawp.AddUser with network should only add user to network specific whitelist',(done) => {
-        Shawp.AddUser(Config.test.avalonUser+'2','dtc',true)
-        assert.isTrue(Shawp.UserExists(Config.test.avalonUser+'2','dtc'))
-        assert.isFalse(Shawp.UserExists(Config.test.avalonUser+'2','hive'))
-        assert.isFalse(Shawp.UserExists(Config.test.avalonUser+'2'))
+        Shawp.AddUser(Config.test.otherUser+'2','abc',true)
+        assert.isTrue(Shawp.UserExists(Config.test.otherUser+'2','abc'))
+        assert.isFalse(Shawp.UserExists(Config.test.otherUser+'2','hive'))
+        assert.isFalse(Shawp.UserExists(Config.test.otherUser+'2'))
 
         Shawp.AddUser(Config.test.hiveUser+'2','hive',true)
         assert.isTrue(Shawp.UserExists(Config.test.hiveUser+'2','hive'))
-        assert.isFalse(Shawp.UserExists(Config.test.hiveUser+'2','dtc'))
+        assert.isFalse(Shawp.UserExists(Config.test.hiveUser+'2','abc'))
         assert.isFalse(Shawp.UserExists(Config.test.hiveUser+'2'))
 
         done()

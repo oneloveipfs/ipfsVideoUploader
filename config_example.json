@@ -92,7 +92,7 @@
     "test": {
         "hashType": ["videos","thumbnails","sprites","images","video240","video480","video720","video1080","subtitles"],
         "user": "techcoderx",
-        "avalonUser": "alice",
+        "otherUser": "alice",
         "hiveUser": "bob",
         "aliasedUser": "john"
     }

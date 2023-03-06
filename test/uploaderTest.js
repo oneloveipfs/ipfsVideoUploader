@@ -47,7 +47,7 @@ describe('Uploader',() => {
 
     it('remoteEncoding should return ID of first item in encoding queue',(done) => {
         uploader.remoteEncoderPushJob(hiveEncoder,uploader.IPSync.randomID(),Config.test.aliasedUser,'all',200,true,null)
-        uploader.remoteEncoderPushJob(hiveEncoder,uploader.IPSync.randomID(),Config.test.avalonUser,'dtc',200,true,null)
+        uploader.remoteEncoderPushJob(hiveEncoder,uploader.IPSync.randomID(),Config.test.otherUser,'abc',200,true,null)
         let encodingID = uploader.remoteEncoding(hiveEncoder)
         assert.strictEqual(encodingID,random)
         done()

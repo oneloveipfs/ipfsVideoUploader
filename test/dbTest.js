@@ -63,27 +63,27 @@ describe('Database',() => {
     })
 
     it('setUserAlias should add a user as alias to another main account',(done) => {
-        db.setUserAlias(Config.test.hiveUser,'hive',Config.test.aliasedUser,'dtc')
-        assert.isNotNull(db.getAliasOf(Config.test.aliasedUser,'dtc'))
-        assert.equal(db.toFullUsername(Config.test.aliasedUser,'dtc',true),Config.test.hiveUser+'@hive')
+        db.setUserAlias(Config.test.hiveUser,'hive',Config.test.aliasedUser,'abc')
+        assert.isNotNull(db.getAliasOf(Config.test.aliasedUser,'abc'))
+        assert.equal(db.toFullUsername(Config.test.aliasedUser,'abc',true),Config.test.hiveUser+'@hive')
         done()
     })
 
     it('setUserAlias should throw when adding another aliased user as an alias',(done) => {
-        assert.throws(()=>{db.setUserAlias(Config.test.aliasedUser,'dtc','smith','all')})
+        assert.throws(()=>{db.setUserAlias(Config.test.aliasedUser,'abc','smith','all')})
         done()
     })
 
     it('getAliasedUsers should list all users aliased to a particular username',(done) => {
-        assert.strictEqual(JSON.stringify(db.getAliasedUsers(Config.test.hiveUser,'hive')),JSON.stringify([{username:Config.test.aliasedUser,network:'dtc'}]))
+        assert.strictEqual(JSON.stringify(db.getAliasedUsers(Config.test.hiveUser,'hive')),JSON.stringify([{username:Config.test.aliasedUser,network:'abc'}]))
         done()
     })
 
     it('unsetUserAlias should remove associations with main account',(done) => {
-        assert.doesNotThrow(()=>db.unsetUserAlias(Config.test.hiveUser,'hive',Config.test.aliasedUser,'dtc'))
-        assert.throws(()=>db.unsetUserAlias(Config.test.hiveUser,'hive',Config.test.aliasedUser,'dtc'))
-        assert.isNull(db.getAliasOf(Config.test.aliasedUser,'dtc'))
-        assert.equal(db.toFullUsername(Config.test.aliasedUser,'dtc',true),Config.test.aliasedUser+'@dtc')
+        assert.doesNotThrow(()=>db.unsetUserAlias(Config.test.hiveUser,'hive',Config.test.aliasedUser,'abc'))
+        assert.throws(()=>db.unsetUserAlias(Config.test.hiveUser,'hive',Config.test.aliasedUser,'abc'))
+        assert.isNull(db.getAliasOf(Config.test.aliasedUser,'abc'))
+        assert.equal(db.toFullUsername(Config.test.aliasedUser,'abc',true),Config.test.aliasedUser+'@abc')
         done()
     })
 
