@@ -181,7 +181,7 @@ let auth = {
         let split = message.split(':')
         if (split.length !== 6 ||
             split[1] !== Config.ClientConfig.authIdentifier ||
-            (split[2] !== 'hive' && split[2] !== 'dtc' && split[2] !== 'avalon') ||
+            split[2] !== 'hive' || // networks
             isNaN(parseInt(split[3])))
             return cb(false,'Invalid auth message format')
         let original = split.slice(0,5).join(':')
@@ -207,18 +207,7 @@ let auth = {
                         cb(false,'Invalid signature')
                 }).catch(() => cb(false,'Failed to verify signature'))
                 break
-            case 'dtc':
-            case 'avalon':
-                axios.get(Config.Shawp.AvalonAPI+'/account/'+split[0]).then((r) => {
-                    let pub = HivecryptPro.PublicKey.fromString(HivecryptPro.Signature.fromString(split[5]).recover(hash)).toAvalonString()
-                    if (r.data.pub === pub)
-                        return auth.verifyBlockInfo('dtc',split[3],split[4],cb)
-                    if (r.data.keys)
-                        for (let i in r.data.keys)
-                            if (r.data.keys[i].pub === pub && r.data.keys[i].types.includes(4))
-                                return auth.verifyBlockInfo('dtc',split[3],split[4],cb)
-                    return cb(false,'Invalid signature')
-                }).catch(() => cb(false,'Failed to verify signature'))
+            default:
                 break
         }
     },
@@ -237,8 +226,7 @@ let auth = {
                         return cb(false,'Invalid block ID for block')
                 }).catch(() => cb(false,'Could not verify block ID'))
                 break
-            case 'dtc':
-                axios.get(Config.Shawp.AvalonAPI+'/block/'+number).then(r => r.data.hash === id ? auth.verifyBlockExpiry(network,number,cb) : cb(false,'Invalid block ID for block')).catch(() => cb(false,'Could not verify block ID'))
+            default:
                 break
         }
     },
@@ -257,13 +245,7 @@ let auth = {
                         return cb(false,'Block info specified timed out')
                 }).catch(() => cb(false,'Could not verify block expiry'))
                 break
-            case 'dtc':
-                axios.get(Config.Shawp.AvalonAPI+'/count').then(r => {
-                    if (r.data && r.data.count <= parseInt(number) + Config.ClientConfig.authTimeoutBlocks)
-                        cb(true)
-                    else
-                        cb(false,'Block info specified timed out')
-                }).catch(() => cb(false,'Could not verify block expiry'))
+            default:
                 break
         }
     },

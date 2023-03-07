@@ -75,7 +75,7 @@ app.get('/login',(request,response) => {
     if (isInAllWhitelists)
         queryNetwork = 'all'
     if (Config.Shawp.Enabled && request.query.needscredits === 'true') {
-        let daysRemaining = Shawp.getDaysRemaining(request.query.user,isInAllWhitelists ? 'all' : (request.query.network || 'dtc'))
+        let daysRemaining = Shawp.getDaysRemaining(request.query.user,isInAllWhitelists ? 'all' : (request.query.network || 'hive'))
         if (daysRemaining.days === 0 && daysRemaining.needs)
             return response.status(402).send({
                 error: 'Insufficient hosting credits, needs additional ' + Math.ceil(daysRemaining.needs) + ' GBdays.',
