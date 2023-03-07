@@ -147,18 +147,14 @@ let Shawp = {
     },
     ValidatePayment: (receiver,memo) => {
         let network = 'all'
-        if (memo !== '' && !memo.startsWith('to: @') && !memo.startsWith('to: hive@') && !memo.startsWith('to: dtc@')) return [] // Memo must be empty or begin with "to: @" or "to: network@"
+        if (memo !== '' && !memo.startsWith('to: @') && !memo.startsWith('to: hive@')) return [] // Memo must be empty or begin with "to: @" or "to: network@"
         if (memo && memo.startsWith('to: @')) {
             let otheruser = memo.replace('to: @','')
-            if (require('./authManager').invalidHiveUsername(otheruser) == null && db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
+            if (require('./authManager').invalidHiveUsername(otheruser) === null) receiver = otheruser
         } else if (memo && memo.startsWith('to: hive@')) {
             let otheruser = memo.replace('to: hive@','')
             if (require('./authManager').invalidHiveUsername(otheruser) == null) receiver = otheruser
             network = 'hive'
-        } else if (memo && memo.startsWith('to: dtc@')) {
-            let otheruser = memo.replace('to: dtc@','')
-            if (db.isValidAvalonUsername(otheruser) == null) receiver = otheruser
-            network = 'dtc'
         }
         return [receiver,network]
     },
