@@ -84,7 +84,7 @@ app.get('/login',(request,response) => {
     }
 
     if (request.query.network === 'dtc') {
-        response.status(410).send({error: '/login route has been deprecated for Avalon logins'})
+        response.status(410).send({error: 'Avalon logins are deprecated'})
     } else Auth.generateEncryptedMemo(request.query.user,(err,memo) => {
         if (err) return response.send({error: err})
         response.send({encrypted_memo: memo, error: null})
@@ -625,8 +625,6 @@ if (Config.Olisc.enabled) {
                 // Handle access token from /logincb
                 Auth.verifyAuth(req.query.access_token,false,(e,result) => {
                     if (e) return rs({ error: e })
-                    if (result.network === 'dtc')
-                        result.network = 'avalon'
                     rs(result)
                 })
         })

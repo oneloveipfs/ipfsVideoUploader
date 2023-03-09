@@ -224,8 +224,6 @@ async function proceedPersistentLogin() {
         let sig
         if (network === 'hive')
             sig = hivecryptpro.Signature.create(hivecryptpro.sha256(msg),storedDetails.hiveKey).customToString()
-        else if (network === 'avalon')
-            sig = hivecryptpro.Signature.avalonCreate(hivecryptpro.sha256(msg),storedDetails.avalonKey).customToString()
         msg += ':'+sig
         keychainSigCb(msg,network,true)
     } catch (e) {

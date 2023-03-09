@@ -23,7 +23,7 @@ In the example above, it is `oneloveipfs_login`.
 
 ### Section 3: Network
 
-The network to be authenticated. Allowed values are `hive` and `avalon`.
+The network to be authenticated.
 
 In the example above, it is `hive`.
 
