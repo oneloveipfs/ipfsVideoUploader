@@ -192,7 +192,7 @@ async function proceedPersistentLogin() {
                 challenge: ''
             }
             try {
-                challenge.challenge = await generateMessageToSignPromise(window.logins.hiveUser,'hive')
+                challenge.challenge = await generateMessageToSign(window.logins.hiveUser,'hive')
             } catch {
                 return handleLoginError('Challenge generation failed for HiveAuth login')
             }
@@ -209,7 +209,7 @@ async function proceedPersistentLogin() {
             }).then(res => {
                 updateDisplayByIDs([],['persistenthiveauth'])
                 localStorage.setItem('hiveAuth',JSON.stringify(window.logins.hiveAuth))
-                keychainSigCb(challenge.challenge+':'+res.data.challenge.challenge,'hive',true,'Posting')
+                keychainSigCb(challenge.challenge+':'+res.data.challenge.challenge,'hive',true)
             }).catch(e => {
                 updateDisplayByIDs([],['persistenthiveauth'])
                 handleLoginError(HASError(e))
@@ -220,7 +220,7 @@ async function proceedPersistentLogin() {
     }
     let network = storedDetails.tokenNetwork
     try {
-        let msg = await generateMessageToSignPromise(storedDetails[network+'User'],network)
+        let msg = await generateMessageToSign(storedDetails[network+'User'],network)
         let sig
         if (network === 'hive')
             sig = hivecryptpro.Signature.create(hivecryptpro.sha256(msg),storedDetails.hiveKey).customToString()
@@ -362,7 +362,7 @@ async function hiveAuthLogin() {
         username: hiveUsername
     }
     try {
-        challenge.challenge = await generateMessageToSignPromise(hiveUsername,'hive')
+        challenge.challenge = await generateMessageToSign(hiveUsername,'hive')
     } catch (e) {
         return alert('Challenge generation failed')
     }
@@ -385,7 +385,7 @@ async function hiveAuthLogin() {
     }).then((res) => {
         sessionStorage.setItem('hiveUser',hiveUsername)
         localStorage.setItem('hiveAuth',JSON.stringify(window.logins.hiveAuth))
-        keychainSigCb(challenge.challenge+':'+res.data.challenge.challenge,'hive',false,'Posting')
+        keychainSigCb(challenge.challenge+':'+res.data.challenge.challenge,'hive',false)
     }).catch((e) => {
         alert(HASError(e))
         updateDisplayByIDs(['loginformhive'],['loginformhiveauth'])
@@ -409,13 +409,13 @@ function keychainCb(encrypted_message,network,persistence) {
     }).finally(() => togglePopupActions('loginform'+network+'-actions',false))
 }
 
-function keychainSigCb(message,network,persistence,role = 'Posting') {
+function keychainSigCb(message,network,persistence) {
     axios.post('/loginsig',message,{ headers: { 'Content-Type': 'text/plain' }}).then((cbResponse) => {
         if (cbResponse.data.error != null) {
             alert(cbResponse.data.error)
         } else {
             console.log(cbResponse.data)
-            keychainPostCall(cbResponse.data.access_token,network,persistence,role)
+            keychainPostCall(cbResponse.data.access_token,network,persistence)
         }
     }).catch((err) => {
         if (err.response.data.error)
@@ -425,17 +425,17 @@ function keychainSigCb(message,network,persistence,role = 'Posting') {
     }).finally(() => togglePopupActions('loginform'+network+'-actions',false))
 }
 
-function keychainPostCall(token,network,persistence,role) {
+function keychainPostCall(token,network,persistence) {
     if (isElectron() && persistence) {
         window.logins.token = token
         window.logins.tokenNetwork = network
         window.logins.keychain = true
         proceedLogin()
     } else
-        loginCb(network,token,false,role)
+        loginCb(network,token,false)
 }
 
-function loginCb(network,token,oauth2,role) {
+function loginCb(network,token,oauth2) {
     if (!window.logins.token && token) {
         window.logins.token = token
         window.logins.tokenNetwork = network
@@ -445,10 +445,9 @@ function loginCb(network,token,oauth2,role) {
         window.logins[network+'User'] = document.getElementById(network+'LoginUsername').value.toLowerCase().replace('@','')
         window.logins[network+'Key'] = document.getElementById(network+'LoginKey').value
     }
-    if (avalonKcToggled && network === 'avalon') {
-        window.logins.avalonHiveKeychain = role
-        window.logins.avalonHiveKeychainUser = document.getElementById('avalonSignerUsername').value
+    if (network === 'avalon') {
         sessionStorage.setItem('avalonUser',window.logins.avalonUser)
+        sessionStorage.setItem('avalonKey',window.logins.avalonKey)
     }
     togglePopupActions('loginform'+network+'-actions',false)
     updateDisplayByIDs(['loginformmain'],['loginform'+network,'loginform'+network+'-actions','loginformhiveauth'])
@@ -460,48 +459,41 @@ function loginCb(network,token,oauth2,role) {
 async function avalonLogin() {
     let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
     let avalonKey = document.getElementById('avalonLoginKey').value
-    let msg
 
     togglePopupActions('loginformavalon-actions',true)
-
-    try {
-        msg = await generateMessageToSignPromise(avalonUsername,'dtc')
-    } catch (e) {
-        return handleLoginError(e,'avalon')
-    }
 
     if (avalonKcToggled) {
         let signerUsername = document.getElementById('avalonSignerUsername').value
         let signerRole = document.getElementById('avalonSignerRole').value
-        hive_keychain.requestSignBuffer(signerUsername,msg,signerRole,(signResult) => {
+        hive_keychain.requestSignBuffer(signerUsername,'oneloveipfs_avalon_login',signerRole,async (signResult) => {
             if (signResult.error)
                 return handleLoginError(signResult.error,'avalon')
-            msg += ':'+signResult.result
-            keychainSigCb(msg,'avalon',false,signerRole)
+            let validate = await avalonLoginValidate(avalonUsername,hivecryptpro.PublicKey.fromString(signResult.publicKey).toAvalonString())
+            if (validate) {
+                window.logins.avalonHiveKeychain = signerRole
+                window.logins.avalonHiveKeychainUser = signerUsername
+                loginCb('avalon')
+            }
         })
         return
     }
+    let validate = await avalonLoginValidate(avalonUsername,null,avalonKey)
+    if (validate)
+        loginCb('avalon')
+}
+
+async function avalonLoginValidate(avalonUsername, avalonPubKey, avalonKey) {
     let avalonKeyId = false
     try {
-        avalonKeyId = await getAvalonKeyId(avalonUsername,avalonKey)
+        if (avalonKey)
+            avalonPubKey = hivecryptpro.PrivateKey.fromAvalonString(avalonKey).createPublic().toAvalonString()
+        avalonKeyId = await getAvalonKeyId(avalonUsername,avalonPubKey)
         if (avalonKeyId === false)
             return handleLoginError('Invalid Avalon key','avalon')
     } catch (e) {
         return handleLoginError('Avalon login error: ' + e.toString(),'avalon')
     }
-
-    sessionStorage.setItem('avalonUser',avalonUsername)
-    sessionStorage.setItem('avalonKey',avalonKey)
-
-    if (window.logins.token) {
-        // an access token already generated, login is complete
-        loginCb('avalon')
-    } else {
-        let sig = hivecryptpro.Signature.avalonCreate(hivecryptpro.sha256(msg),avalonKey).customToString()
-        msg += ':'+sig
-        console.log(msg)
-        keychainSigCb(msg,'avalon',false)
-    }
+    return avalonKeyId
 }
 
 async function blurtLogin() {

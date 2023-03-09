@@ -1,16 +1,16 @@
 let geturl = '?access_token=' + token
 if (iskeychain !== 'true') geturl += '&scauth=true'
 
-axios.get('/shawp_config').then((result) => {
-    window.shawpconfig = result.data
-    if (!window.shawpconfig.Enabled) updateDisplayByIDs([],['refillCrModeBtn','subDetModeBtn'])
-    disablePaymentMethods()
-})
-
 document.addEventListener('DOMContentLoaded', () => {
     if (token == null || token == '') {
         document.getElementById('wcinfo').innerHTML = '<h3>Please login to view your account details.</h3>'
     } else {
+        axios.get('/shawp_config').then((result) => {
+            window.shawpconfig = result.data
+            if (!window.shawpconfig.Enabled) updateDisplayByIDs([],['refillCrModeBtn','subDetModeBtn'])
+            disablePaymentMethods()
+        })
+
         axios.get('/shawp_user_info'+geturl).then((result) => {
             window.accdetail = result.data
             if (isEmpty(result.data)) {
@@ -193,19 +193,16 @@ function refreshAliasAccs() {
 }
 
 async function hiveAliasAuth(hiveUsername,hiveKey,cb) {
-    generateMessageToSign(hiveUsername,'hive',(e,message) => {
-        if (e)
-            return alert(e)
-        if (isElectron()) {
-            let signature = hivecryptpro.Signature.create(hivecryptpro.sha256(message),hiveKey).customToString()
-            message += ':'+signature
-            return cb(message)
-        } else hive_keychain.requestSignBuffer(hiveUsername,message,'Posting',(kr) => {
-            if (kr.error)
-                return alert(kr.message)
-            message += ':'+kr.result
-            return cb(message)
-        })
+    let message = await generateMessageToSign(hiveUsername,'hive')
+    if (isElectron()) {
+        let signature = hivecryptpro.Signature.create(hivecryptpro.sha256(message),hiveKey).customToString()
+        message += ':'+signature
+        return cb(message)
+    } else hive_keychain.requestSignBuffer(hiveUsername,message,'Posting',(kr) => {
+        if (kr.error)
+            return alert(kr.message)
+        message += ':'+kr.result
+        return cb(message)
     })
 }
 

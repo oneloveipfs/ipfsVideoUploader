@@ -324,9 +324,8 @@ async function getAvalonAccount(username) {
     return (await axios.get(getBlockchainAPI('avalon')+'/account/'+username)).data
 }
 
-async function getAvalonKeyId(avalonUsername,avalonKey) {
+async function getAvalonKeyId(avalonUsername,avalonPubKey) {
     let result = await getAvalonAccount(avalonUsername)
-    let avalonPubKey = hivecryptpro.PrivateKey.fromAvalonString(avalonKey).createPublic().toAvalonString()
     if (result.pub === avalonPubKey) return true
 
     // Custom key login (recommended)
@@ -456,37 +455,16 @@ function validateHiveUsername(value) {
     return null
 }
 
-function generateMessageToSign (username,network,cb) {
+async function generateMessageToSign (username,network) {
     // Generate text for user to sign
     // using latest block id
     let message = username+':'+config.authIdentifier+':'+network+':'
     switch (network) {
         case 'hive':
-            appbaseCall(network,'condenser_api.get_dynamic_global_properties',[]).then(dgp => {
-                message += dgp.head_block_number+':'+dgp.head_block_id
-                cb(null,message)
-            }).catch(e => cb(e.toString()))
-            break
-        case 'dtc':
-        case 'avalon':
-            axios.get(getBlockchainAPI('avalon')+'/count').then((r) => {
-                if (r.data && r.data.count) {
-                    message += r.data.count-1
-                    message += ':'
-                    axios.get(getBlockchainAPI('avalon')+'/block/'+(r.data.count-1)).then((b) => {
-                        if (b.data && b.data.hash) {
-                            message += b.data.hash
-                            cb(null,message)
-                        }
-                    }).catch(e => cb(e.toString()))
-                }
-            }).catch(e => cb(e.toString()))
-            break
+            let dgp = await appbaseCall(network,'condenser_api.get_dynamic_global_properties',[])
+            message += dgp.head_block_number+':'+dgp.head_block_id
+            return message
     }
-}
-
-function generateMessageToSignPromise (username,network) {
-    return new Promise((rs,rj) => generateMessageToSign(username,network,(e,r) => e ? rj(e) : rs(r)))
 }
 
 function disablePaymentMethods() {
