@@ -480,6 +480,8 @@ function disablePaymentMethods() {
 function hivePaymentClickListener(u,to,amt,currency,memo,p = 'signup') {
     updateDisplayByIDs(['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'],['BlurtKeychainBtn'])
     document.getElementById('HiveKeychainBtn').onclick = () => {
+        if (!window.hive_keychain)
+            return alert('Hive Keychain is not installed')
         if (document.getElementById('hiveRecPaymentCheckbox').checked) {
             let recurrence = parseInt(document.getElementById('hiveRecPaymentRecurrence').value)
             let frequency = parseInt(document.getElementById('hiveRecPaymentFrequency').value)
@@ -512,6 +514,8 @@ function hivePaymentClickListener(u,to,amt,currency,memo,p = 'signup') {
 function blurtPaymentClickListener(u,to,amt,currency,memo,p = 'signup') {
     updateDisplayByIDs(['BlurtKeychainBtn'],['HiveKeychainBtn','HiveSignerBtn','hiveRecPayment'])
     document.getElementById('BlurtKeychainBtn').onclick = () => {
+        if (!window.blurt_keychain)
+            return alert('Blurt Keychain is not installed')
         blurt_keychain.requestTransfer(u,to,amt.toString(),memo,currency,(e) => {
             console.log(e)
             if (e.error) return alert(e.message)
