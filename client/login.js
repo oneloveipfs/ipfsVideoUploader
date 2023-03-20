@@ -306,8 +306,8 @@ function signupNetworkSelect() {
 }
 
 function hiveLogin() {
-    let hiveUsername = document.getElementById('hiveLoginUsername').value.toLowerCase().replace('@','')
-    let hiveKey = document.getElementById('hiveLoginKey').value
+    let hiveUsername = document.getElementById('hiveLoginUsername').value.toLowerCase().trim().replace('@','')
+    let hiveKey = document.getElementById('hiveLoginKey').value.trim()
 
     if (!hiveUsername) return alert('Username is required')
     if (!window.hive_keychain && !isElectron()) return alert('Hive Keychain is not installed')
@@ -344,7 +344,7 @@ function hiveLogin() {
 }
 
 async function hiveAuthLogin() {
-    let hiveUsername = document.getElementById('hiveLoginUsername').value.toLowerCase().replace('@','')
+    let hiveUsername = document.getElementById('hiveLoginUsername').value.toLowerCase().trim().replace('@','')
     if (!hiveUsername) return alert('Username is required')
     try {
         if (!(await axios.get('/checkuser?network=hive&user='+hiveUsername)).data.isInWhitelist)
@@ -455,8 +455,8 @@ function loginCb(network,token,oauth2) {
 }
 
 async function avalonLogin() {
-    let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().replace('@','')
-    let avalonKey = document.getElementById('avalonLoginKey').value
+    let avalonUsername = document.getElementById('avalonLoginUsername').value.toLowerCase().trim().replace('@','')
+    let avalonKey = document.getElementById('avalonLoginKey').value.trim()
 
     togglePopupActions('loginformavalon-actions',true)
 
@@ -495,8 +495,8 @@ async function avalonLoginValidate(avalonUsername, avalonPubKey, avalonKey) {
 }
 
 async function blurtLogin() {
-    let blurtUsername = document.getElementById('blurtLoginUsername').value.toLowerCase().replace('@','')
-    let blurtKey = document.getElementById('blurtLoginKey').value
+    let blurtUsername = document.getElementById('blurtLoginUsername').value.toLowerCase().trim().replace('@','')
+    let blurtKey = document.getElementById('blurtLoginKey').value.trim()
 
     if (!blurtUsername) return alert('Username is required')
     if (!window.blurt_keychain && !isElectron()) return alert('Blurt Keychain is not installed')
