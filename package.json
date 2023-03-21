@@ -1,7 +1,7 @@
 {
   "name": "ipfsvideouploader",
   "productName": "OneLoveIPFS",
-  "version": "3.1.0",
+  "version": "3.2.0",
   "description": "Cross-platform IPFS uploader for 3Speak and DTube videos.",
   "homepage": "https://uploader.oneloveipfs.com",
   "repository": {
@@ -84,7 +84,7 @@
     "@snyk/protect": "^1.1109.0",
     "about-window": "^1.15.2",
     "async": "^3.2.4",
-    "axios": "1.3.4",
+    "axios": "^1.3.4",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
