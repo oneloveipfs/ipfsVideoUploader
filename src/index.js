@@ -612,7 +612,7 @@ function Authenticate(request,response,needscredits,next) {
 
 const route404 = () => app.use((req,res) => { return res.status(404).redirect('/404') })
 
-if (Config.Olisc.enabled) {
+if (!Config.isRemoteApp && Config.Olisc.enabled) {
     const olisc = require('olisc')
     const oliscAuthFunc = (req) => {
         return new Promise((rs) => {
