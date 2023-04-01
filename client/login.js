@@ -560,7 +560,8 @@ function retrieveEncrypted(key,password) {
     if (!enc.startsWith('#')) return enc
     try {
         let result = hivecryptpro.hivecrypt.decode(wif,enc).substr(1)
-        return result
+        let resulta = result.split('\x02')
+        return resulta[resulta.length-1]
     } catch {
         return null
     }
