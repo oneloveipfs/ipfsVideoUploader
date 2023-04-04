@@ -41,7 +41,7 @@
         <div id="head">
             <a class="headBtn" id="authButton2"><p>Log In</p></a>
             <a class="headBtn" id="apiSelector" onclick="displayPopup('apiSettingsPopup')"><i class="fas fa-server"></i></a>
-            <div class="headBtn" id="appTypeRect"><p id="appTypeRectTxt">Local</p></div>
+            <a class="headBtn" id="appTypeRect" onclick="displayPopup('appTypePopup')"><p id="appTypeRectTxt">Local</p></a>
             <div class="textcontainer">
                 <h1>OneLoveIPFS Uploader</h1>
                 <h3>Cross-platform uploader and hosting service for 3Speak and DTube videos.</h3>
@@ -129,6 +129,24 @@
                     <h4><a href="/terms">Terms of Service</a></h4>
                     <h4><a href="/faq">FAQ</a></h4>
                     <h4><br><a href="https://peakd.com/@techcoderx" target="_blank">Made by @techcoderx</a></h4>
+                </div>
+            </div>
+        </div>
+        <div id="appTypePopup" class="popup">
+            <div class="popup-content" id="appTypePopupContent">
+                <div class="popup-header">
+                    <h2>Runtime Environment</h2>
+                </div>
+                <div class="popup-body">
+                    <div id="appTypeLocalInfo" style="display: none;">
+                        Currently in local runtime environment. Communicates to a locally running IPFS node at <span id="appLocalBackend"></span>.
+                    </div>
+                    <div id="appTypeRemoteInfo" style="display: none;">
+                        Currently in remote runtime environment. Communicates to a remote upload server at <span id="appRemoteBackend"></span>.
+                    </div>
+                </div>
+                <div class="popup-actions">
+                    <input type="button" id="appTypeSwitch" onclick="window.postMessage({ action: 'switch_app_type', data: {} })">
                 </div>
             </div>
         </div>

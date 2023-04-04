@@ -21,6 +21,7 @@ app.get('/config', (req,res) => {
     axios.get(Config.upstream+'/config').then(upstreamRes => {
         upstreamRes.data.encoder = Config.Encoder
         upstreamRes.data.isRemote = true
+        upstreamRes.data.backend = Config.upstream
         res.send(upstreamRes.data)
     }).catch(() => res.status(503).send({error: 'failed to fetch config from upstream server'}))
 })

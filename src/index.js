@@ -409,6 +409,7 @@ app.get('/config',(req,res) => {
         outputs: Config.Encoder.outputs,
         maxSizeMb: Config.Encoder.maxSizeMb
     }
+    configRes.backend = Config.IPFS_HOST+':'+Config.IPFS_API_PORT
     res.send(configRes)
 })
 

@@ -1043,7 +1043,8 @@ textarea {
 }
 
 #head #authButton2:hover,
-#head #apiSelector:hover {
+#head #apiSelector:hover,
+#head #appTypeRect:hover {
     background-color: #ffffff;
     color: rgb(54,57,63);
 }

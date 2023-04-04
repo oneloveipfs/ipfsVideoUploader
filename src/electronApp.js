@@ -64,6 +64,12 @@ const openAboutWindow = () => aboutWindow({
     copyright: 'Copyright (C) 2023 TechCoderX. Build: ' + BUILD_STR
 })
 
+const switchAppType = (type = 0) => {
+    fs.writeFileSync(config.dataDir+'/db/app_type',type.toString())
+    app.relaunch()
+    app.exit()
+}
+
 const menuTemplate = [
     ...(isMac ? [{
         label: app.name,
@@ -106,11 +112,8 @@ const menuTemplate = [
                     title: 'Switch to '+(config.isRemoteApp?'local':'remote')+' environment',
                     message: 'The app will be relaunched.'
                 })
-                if (switchEnvAlert.response === 0) {
-                    fs.writeFileSync(config.dataDir+'/db/app_type',content.toString())
-                    app.relaunch()
-                    app.exit()
-                }
+                if (switchEnvAlert.response === 0)
+                    switchAppType(content)
             }
         }, {
             label: 'Configuration Guide',
@@ -204,6 +207,7 @@ app.on('activate', () => {
         createWindow()
 })
 
+ipcMain.on('switch_app_type',() => switchAppType(config.isRemoteApp ? 0 : 1))
 ipcMain.on('open_browser_window',(evt,arg) => shell.openExternal(arg))
 ipcMain.on('spk_auth', async (evt,arg) => evt.sender.send('spk_auth_result', await spk.auth(arg)))
 ipcMain.on('spk_cookie', async (evt,arg) => evt.sender.send('spk_cookie_result', await spk.cookie(arg.user, arg.token)))

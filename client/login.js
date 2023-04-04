@@ -31,6 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
             setDisplayByClass('sclogin')
         if (isElectron()) {
             document.getElementById('appTypeRectTxt').innerText = config.isRemote ? 'Remote' : 'Local'
+            document.getElementById('app'+document.getElementById('appTypeRectTxt').innerText+'Backend').innerText = config.backend
+            document.getElementById('appTypeSwitch').value = 'Switch to '+(config.isRemote ? 'Local' : 'Remote')
+            updateDisplayByIDs(['appType'+document.getElementById('appTypeRectTxt').innerText+'Info'],[])
             updateDisplayByIDs(['appTypeRect'],[])
         }
         loadAPISelections()
@@ -56,6 +59,7 @@ function windowClick(event) {
     dismissPopup(event,'loginPopup')
     dismissPopup(event,'signupPopup')
     dismissPopup(event,'apiSettingsPopup')
+    dismissPopup(event,'appTypePopup')
 }
 
 function loginBtnClicked() {
