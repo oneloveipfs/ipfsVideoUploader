@@ -1,6 +1,0 @@
-language: node_js
-node_js:
-  - "14"
-install:
-  - npm i
-  - cp config_example.json config.json
