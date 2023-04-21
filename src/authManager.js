@@ -266,8 +266,6 @@ let auth = {
                 return suffix + "start with a letter."
             if (!/^[a-z0-9-]*$/.test(label))
                 return suffix + "have only letters, digits, or dashes."
-            if (/--/.test(label))
-                return suffix + "have only one dash in a row."
             if (!/[a-z0-9]$/.test(label))
                 return suffix + "end with a letter or digit."
             if (!(label.length >= 3))
