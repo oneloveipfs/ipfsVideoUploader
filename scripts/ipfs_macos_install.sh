@@ -8,7 +8,7 @@ fi
 
 VERSION=$1
 if [ "$VERSION" = "" ]; then
-    VERSION="0.18.1"
+    VERSION="0.21.0"
 fi
 
 ARCH="$(uname -m)"
