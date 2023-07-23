@@ -81,7 +81,7 @@
   "bugs": "https://github.com/oneloveipfs/ipfsVideoUploader/issues",
   "license": "GPLv3",
   "dependencies": {
-    "@snyk/protect": "^1.1182.0",
+    "@snyk/protect": "^1.1187.0",
     "about-window": "^1.15.2",
     "async": "^3.2.4",
     "axios": "^1.4.0",
