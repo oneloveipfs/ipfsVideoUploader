@@ -98,7 +98,7 @@
     "hivesigner": "^3.3.4",
     "http-proxy": "^1.18.1",
     "ipfs-http-client": "^56.0.3",
-    "jsonwebtoken": "^9.0.0",
+    "jsonwebtoken": "^9.0.1",
     "multer": "^1.4.5-lts.1",
     "node-schedule": "^2.1.1",
     "node-webvtt": "^1.9.4",
