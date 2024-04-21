@@ -84,7 +84,7 @@
     "@snyk/protect": "^1.1281.0",
     "about-window": "^1.15.2",
     "async": "^3.2.5",
-    "axios": "^1.6.7",
+    "axios": "^1.6.8",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
