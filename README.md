@@ -2,6 +2,8 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![License](https://img.shields.io/github/license/oneloveipfs/ipfsVideoUploader)](https://github.com/oneloveipfs/ipfsVideoUploader/blob/master/LICENSE)
 
+**Status: Deprecated.**
+
 # OneLoveIPFS Uploader
 
 Cross-platform IPFS uploader for 3Speak and DTube. Can be run as a standalone upload server or a locally-running Electron app. Also supports Skynet protocol.
